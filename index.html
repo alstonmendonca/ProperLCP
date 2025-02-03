@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lassi Corner Billing System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Top Horizontal Panel -->
+  <div id="top-panel">
+    <button class="top" id="Home" onclick="updateMainContent('Home')">Home</button>
+    <button class="top" id="Menu" onclick="updateMainContent('Menu')">Menu</button>
+    <button class="top" id="Analytics" onclick="updateMainContent('Analytics')">Analytics</button>
+    <button class="top" id="Categories" onclick="updateMainContent('Categories')">Categories</button>
+    <button class="top" id="History" onclick="updateMainContent('History')">History</button>
+    <button class="top" id="Settings" onclick="updateMainContent('Settings')">Settings</button>
+  </div>
+
+  <!-- Main Content -->
+  <div id="content">
+    <!-- Left Vertical Panel -->
+    <div id="category-panel">
+
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-content">
+      <h2>Welcome to LASSI CORNER!</h2>
+      <p>Time to make some sales!</p>
+    </div>
+
+    <!-- Bill Panel (Right Side) -->
+<!-- Bill Panel (Right Side) -->
+<div id="bill-panel">
+  <h3>Bill</h3>
+  <div id="bill-items-list">
+      <!-- Items will be dynamically added here -->
+  </div>
+  <hr>
+  <div id="total-amount">Total: Rs. 0.00</div>
+
+  <!-- Buttons Section - HOLD AND SAVE AND PRINT AND APPLY DISCOUNT -->
+  <div id="bill-buttons" style="margin-top: 15px;">
+    <button id='saveandprintbutton' onclick="saveAndPrintBill()">Save and Print</button>
+    <button id="applydiscountbutton" onclick="toggleDiscountInputs()">Apply Discount</button>
+    <button id='holdbutton' onclick="holdBill()">Hold</button>
+  </div>
+
+  <!-- Discount Section - Hidden by default -->
+  <div id="discount-section" style="margin-top: 15px; display: none;">
+    <label for="discount-percentage">Discount Percentage:</label>
+    <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" />
+    <br>
+    <label for="discount-amount">Fixed Discount (Rs.):</label>
+    <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" />
+  
+    <button id="apply-discount-btn" onclick="applyDiscount()">Apply</button>
+  </div>
+</div>
+
+
+  <script src="renderer.js"></script>
+  <script src="table.js"></script>
+  <script src="bill.js"></script>
+  <script src="ui.js"></script>
+  <script src="menu.js"></script>
+</body>
+</html>

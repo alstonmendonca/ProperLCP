@@ -1,0 +1,423 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Top Horizontal Panel */
+#top-panel {
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: space-evenly; /* Space buttons evenly */
+    align-items: stretch;
+    height: 50px; /* Adjust the height of the panel */
+}
+
+.top {
+    flex: 1;
+    padding: 10px 20px;
+    background-color: #444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.top:hover {
+    background-color: #555;
+}
+
+/* Container for left and main panels */
+#content {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Left Vertical Panel */
+#category-panel {
+    background-color: #f4f4f4;
+    width: 200px;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto
+}
+
+.category {
+    width: 100%;
+    padding: 10px;
+    background-color: #444;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+}
+
+.category:hover {
+    background-color: #ccc;
+    color: #333;
+}
+
+/* Main Content Area */
+#main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #fff;
+    justify-content: space-evenly;
+}
+
+/* Bill Panel (Right Side) */
+#bill-panel {
+    position: relative;
+    width: 600px; /* Adjust width as needed */
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Set a fixed height for scrolling */
+    overflow: hidden; /* Prevents the entire panel from scrolling */
+}
+
+#bill-panel h3 {
+    margin-top: 0;
+}
+
+/* Scrollable Bill Items List */
+#bill-items-list {
+    margin-top: 10px;
+    border:1px solid #555;
+    flex-grow: 1;
+    overflow-y: auto; /* Enables scrolling */
+    max-height: calc(100% - 250px); /* Ensures enough space for buttons */
+    padding-right: 10px; /* Prevents horizontal scrollbar */
+}
+
+/* Separation line between content and bill panel */
+#content > #main-content {
+    border-right: 2px solid #ddd;
+}
+
+/* Bill Items */
+.bill-item {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.bill-item-name {
+    font-weight: bold;
+}
+
+.bill-quantity, .bill-price, .bill-total {
+    margin: 0 5px;
+}
+
+.bill-item button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.bill-item button:hover {
+    background-color: #d32f2f;
+}
+
+/* Total Amount */
+#total-amount {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+    text-align: right;
+}
+
+/* Bill Buttons - Fixed at Bottom */
+#bill-buttons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #ddd;
+}
+
+/* Discount Section - Initially Hidden */
+#discount-section {
+    margin-top: 15px;
+    display: none;
+    padding-bottom: 10px;
+    border-top: 1px solid #ddd; /* Keeps UI neat */
+}
+
+/* Button Styling */
+button {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#saveandprintbutton,
+#holdbutton,
+#applydiscountbutton {
+    position: relative;
+    flex-grow: 1; /* Makes sure buttons are evenly distributed */
+    margin: 0 5px;
+}
+
+/* Apply Discount Inputs */
+#discount-section input {
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#apply-discount-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#apply-discount-btn:hover {
+    background-color: #45a049;
+}
+
+/* CSS to improve the display of discount section */
+#discount-section {
+    margin-top: 15px;
+    display: none;  /* Hidden by default */
+    padding: 10px;
+    bottom: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;  /* Stack the children (labels + inputs) vertically */
+}
+
+#discount-section div {
+    display: flex;
+    align-items: center;  /* Align the label and input horizontally */
+    margin-bottom: 10px;  /* Space between label-input pairs */
+}
+
+#discount-section label {
+    margin-right: 10px; /* Space between the label and the input */
+    white-space: nowrap;  /* Prevent label text from wrapping */
+}
+
+#discount-section input {
+    padding: 5px;
+    width: 150px; /* Adjust the width of the input */
+    font-size: 16px;
+}
+
+#apply-discount-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;  /* Make the button take full width of the container */
+    max-width: 250px;
+}
+
+#apply-discount-btn:hover {
+    background-color: #45a049;
+}
+
+
+/* Basic styling for buttons */
+button:focus {
+    outline: none;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+
+/* Basic styling for the quantity buttons and input */
+.quantity-btn {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background-color: #ddd;
+}
+
+input[type="number"] {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    margin: 0 10px;
+}
+/* General fade effect */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/*FOR THE SCROLL OPTION IN THE TABLE DISPLAYED WHEN THE CATEGORIES ARE CLICKED */
+.table-container {
+    max-height: 400px; /* Adjust this height based on your UI */
+    overflow-y: auto; /* Enables vertical scrolling */
+    border: 1px solid #ccc; /* Optional: for better visibility */
+    margin-top: 10px; /* Optional: spacing above the table */
+}
+
+/* Optional: Add a scrollbar style for better visuals */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+/* Order History Section */
+#orderHistory {
+    margin-top: 20px;
+}
+
+/* Date Filters Container */
+.date-filters {
+    display: flex;
+    flex-wrap: wrap; /* Wrap elements to the next line on smaller screens */
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Labels for Date Inputs */
+.date-filters label {
+    font-weight: bold;
+    margin-right: 5px; /* Space between label and input */
+}
+
+/* Date Input Fields */
+.date-filters input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 40px; /* Space between inputs and button */
+}
+
+/* Show History Button */
+.date-filters button {
+    padding: 8px 16px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.date-filters button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Order History Table */
+.order-history-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove space between cells */
+    margin-top: 20px; /* Space above the table */
+    font-family: Arial, sans-serif; /* Use a clean font */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+/* Table Header */
+.order-history-table thead th {
+    background-color: #4CAF50; /* Green header */
+    color: white; /* White text */
+    padding: 12px; /* Padding for header cells */
+    text-align: left; /* Align text to the left */
+    font-weight: bold; /* Bold text */
+}
+
+/* Table Rows */
+.order-history-table tbody tr {
+    border-bottom: 1px solid #ddd; /* Add a border between rows */
+}
+
+/* Alternate Row Colors */
+.order-history-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Light gray for even rows */
+}
+
+.order-history-table tbody tr:hover {
+    background-color: #f1f1f1; /* Light gray on hover */
+}
+
+/* Table Cells */
+.order-history-table td {
+    padding: 12px; /* Padding for cells */
+    text-align: left; /* Align text to the left */
+}
+
+/* No Orders Message */
+#orderHistory p {
+    text-align: center;
+    color: #888; /* Gray text */
+    font-style: italic; /* Italicize the message */
+    margin-top: 20px; /* Space above the message */
+}
