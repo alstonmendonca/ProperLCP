@@ -1,22 +1,29 @@
 const { ipcRenderer } = require("electron");
 
-function fetchOrderHistory() {
+function fetchCategoryWise() {
     const startDate = document.getElementById("startDate").value;
     const endDate = document.getElementById("endDate").value;
+    const category = document.getElementById("categoryDropdown").value; // Get selected category
 
     if (!startDate || !endDate) {
         alert("Please select both start and end dates.");
         return;
     }
 
-    ipcRenderer.send("get-order-history", { startDate, endDate });
+    if (!category) {
+        alert("Please select a category.");
+        return;
+    }
+
+    ipcRenderer.send("get-category-wise", { startDate, endDate, category });
 }
 
+
 // Receive the order history from the main process and update the UI
-ipcRenderer.on("order-history-response", (event, data) => {
-    console.log("Received order history:", data);
+ipcRenderer.on("category-wise-response", (event, data) => {
+    console.log("Received category wise:", data);
     const orders = data.orders;
-    const orderHistoryDiv = document.getElementById("orderHistoryDiv");
+    const orderHistoryDiv = document.getElementById("categoryWiseDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
 
     if (orders.length === 0) {
@@ -64,4 +71,4 @@ ipcRenderer.on("order-history-response", (event, data) => {
 });
 
 // Export function so it can be used in renderer.js
-module.exports = { fetchOrderHistory };
+module.exports = { fetchCategoryWise };

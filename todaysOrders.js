@@ -1,30 +1,22 @@
 const { ipcRenderer } = require("electron");
 
-function fetchOrderHistory() {
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-
-    if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
-        return;
-    }
-
-    ipcRenderer.send("get-order-history", { startDate, endDate });
+function fetchTodaysOrders() {
+    ipcRenderer.send("get-todays-orders");
 }
 
-// Receive the order history from the main process and update the UI
-ipcRenderer.on("order-history-response", (event, data) => {
-    console.log("Received order history:", data);
+// Receive today's orders from the main process and update the UI
+ipcRenderer.on("todays-orders-response", (event, data) => {
+    console.log("Received today's orders:", data);
     const orders = data.orders;
-    const orderHistoryDiv = document.getElementById("orderHistoryDiv");
-    orderHistoryDiv.innerHTML = ""; // Clear previous content
+    const todaysOrdersDiv = document.getElementById("todaysOrdersDiv");
+    todaysOrdersDiv.innerHTML = ""; // Clear previous content
 
     if (orders.length === 0) {
-        orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
+        todaysOrdersDiv.innerHTML = "<p>No orders found for today.</p>";
         return;
     }
 
-    // Create a table
+    // Create a table (same layout as order history)
     let tableHTML = `
         <table class="order-history-table">
             <thead>
@@ -60,8 +52,8 @@ ipcRenderer.on("order-history-response", (event, data) => {
     });
 
     tableHTML += `</tbody></table>`;
-    orderHistoryDiv.innerHTML = tableHTML;
+    todaysOrdersDiv.innerHTML = tableHTML;
 });
 
-// Export function so it can be used in renderer.js
-module.exports = { fetchOrderHistory };
+// Export function so it can be used in `renderer.js`
+module.exports = { fetchTodaysOrders };

@@ -144,7 +144,8 @@ async function updateMainContent(contentType) {
             billPanel.style.display = 'none'; // Hide bill panel for Settings
         } 
         // Add First Category
-        else if (contentType === "AddFirstCategory") {
+        else if (contentType === "Categories") {
+            console.log("I'm inside categories of left panel");
             mainContent.innerHTML = `
                 <div style="display: flex; justify-content: center; align-items: center; height: 20vh;">
                     <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer; width: 300px; height: 80px;">
@@ -155,20 +156,20 @@ async function updateMainContent(contentType) {
             billPanel.style.display = 'none'; // Hide bill panel for Add First Category
         } 
         // HISTORY TAB
-        else if (contentType === 'History') {
+        else if (contentType === 'History' || contentType === "todaysOrders") {
             mainContent.innerHTML = `
-                <style>
-                    .date-filters {
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        justify-content: center;
-                        gap: 10px;
-                        text-align: center;
-                        margin: 20px auto;
-                    }
-                </style>
+                <h1>Todays Orders</h1>
+                <div id="todaysOrdersDiv"></div>
+            `;
+            fetchTodaysOrders();
+            billPanel.style.display = 'none'; // Hide bill panel for History
+        } 
 
+        // HISTORY TAB
+        else if (contentType === 'orderHistory') {
+            
+            mainContent.innerHTML = `
+                <h1>Order History</h1>
                 <div class="date-filters">
                     <label for="startDate">Start Date:</label>
                     <input type="date" id="startDate">
@@ -176,12 +177,51 @@ async function updateMainContent(contentType) {
                     <label for="endDate">End Date:</label>
                     <input type="date" id="endDate">
                     
-                    <button onclick="fetchOrderHistory()">Show History</button>
+                    <button class="showHistoryButton" onclick="fetchOrderHistory()" >Show History</button>
+                    <button onclick="exportToExcel()">Export to Excel</button>
                 </div>
-                <div id="orderHistory"></div>
+                <div id="orderHistoryDiv"></div>
             `;
-            billPanel.style.display = 'none'; // Hide bill panel for History
-        } 
+            
+        } else if (contentType === 'categoryHistory') {
+            mainContent.innerHTML = `
+                <h1>Category-wise Sales</h1>
+                <div class="date-filters">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate">
+                    
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate">
+                    
+                    <select id="categoryDropdown"></select>
+                    <button class="showHistoryButton" onclick="fetchCategoryWise()">Show History</button>
+                    <button onclick="exportToExcel('.category-wise-table', 'Category_Sales.xlsx')">Export to Excel</button>
+                </div>
+                <div id="categoryWiseDiv"></div>
+            `;
+        
+            fetchCategories(); // Fetch categories and populate the dropdown
+        }
+         else if (contentType === "deletedOrders") {
+            mainContent.innerHTML = `
+                <h1>Deleted Orders</h1>
+                <div class="date-filters">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate">
+                    
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate">
+                    
+                    <button class="showHistoryButton" id="fetchDeletedOrdersBtn">Show Deleted Orders</button>
+                    <button onclick="exportToExcel('.category-wise-table', 'Category_Sales.xlsx')">Export to Excel</button>
+                </div>
+                <div id="deletedOrdersDiv"></div>
+            `;
+
+            // Attach event listener to the button
+            document.getElementById("fetchDeletedOrdersBtn").addEventListener("click", fetchDeletedOrders);
+        }
+
         //MENU TAB
         else if (contentType === "Menu") {
             displayMenu(); // Call the function from menu.js to display menu
@@ -239,9 +279,14 @@ async function updateLeftPanel(contentType) {
             break;
 
         case "History":
-            // Render History-related buttons (currently empty)
-            categoryPanel.innerHTML = ``;
-            break;
+            // Render History-related buttons
+            categoryPanel.innerHTML = `
+            <button class="category" id="TodaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
+            <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
+            <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
+            <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
+        `;
+        break;
 
         case "Categories":
             // Render category-related content when no categories exist

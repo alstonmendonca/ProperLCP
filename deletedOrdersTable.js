@@ -1,6 +1,6 @@
 const { ipcRenderer } = require("electron");
 
-function fetchOrderHistory() {
+function fetchDeletedOrders() {
     const startDate = document.getElementById("startDate").value;
     const endDate = document.getElementById("endDate").value;
 
@@ -9,18 +9,18 @@ function fetchOrderHistory() {
         return;
     }
 
-    ipcRenderer.send("get-order-history", { startDate, endDate });
+    ipcRenderer.send("get-deleted-orders", { startDate, endDate });
 }
 
-// Receive the order history from the main process and update the UI
-ipcRenderer.on("order-history-response", (event, data) => {
-    console.log("Received order history:", data);
+// Receive the deleted orders response from the main process and update the UI
+ipcRenderer.on("deleted-orders-response", (event, data) => {
+    console.log("Received deleted orders:", data);
     const orders = data.orders;
-    const orderHistoryDiv = document.getElementById("orderHistoryDiv");
+    const orderHistoryDiv = document.getElementById("deletedOrdersDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
 
     if (orders.length === 0) {
-        orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
+        orderHistoryDiv.innerHTML = "<p>No deleted orders found for the selected date range.</p>";
         return;
     }
 
@@ -37,6 +37,7 @@ ipcRenderer.on("order-history-response", (event, data) => {
                     <th>SGST (₹)</th>
                     <th>CGST (₹)</th>
                     <th>Tax (₹)</th>
+                    <th>Reason</th>
                     <th>Food Items</th>
                 </tr>
             </thead>
@@ -54,6 +55,7 @@ ipcRenderer.on("order-history-response", (event, data) => {
                 <td>${order.sgst.toFixed(2)}</td>
                 <td>${order.cgst.toFixed(2)}</td>
                 <td>${order.tax.toFixed(2)}</td>
+                <td>${order.reason}</td>
                 <td>${order.food_items || "No items"}</td>
             </tr>
         `;
@@ -64,4 +66,4 @@ ipcRenderer.on("order-history-response", (event, data) => {
 });
 
 // Export function so it can be used in renderer.js
-module.exports = { fetchOrderHistory };
+module.exports = { fetchDeletedOrders };

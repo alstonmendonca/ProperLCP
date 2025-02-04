@@ -340,9 +340,12 @@ input[type="number"] {
 /* Date Filters Container */
 .date-filters {
     display: flex;
-    flex-wrap: wrap; /* Wrap elements to the next line on smaller screens */
+    flex-direction: row;
     align-items: center;
-    margin-bottom: 20px;
+    justify-content: left;
+    gap: 10px;
+    text-align: center;
+    margin: 20px auto;
 }
 
 /* Labels for Date Inputs */
