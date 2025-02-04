@@ -289,12 +289,50 @@ async function updateLeftPanel(contentType) {
         break;
 
         case "Categories":
-            // Render category-related content when no categories exist
+            // Fetch categories from the main process
+            const cats = await ipcRenderer.invoke("get-categories");
+
+            if (cats.length > 0) {
+            // Render categories as buttons and include the "Add Category" button
             categoryPanel.innerHTML = `
-                <p style="text-align: center;" id="AddFirstCategory">No categories added</p>
+                <div>
+                ${cats
+                    .map(
+                    (category) => `
+                        <button class="category" onclick="updateMainContent('${category.catname}')">
+                        ${category.catname}
+                        </button>`
+                    )
+                    .join("")}
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer;">
+                    Add Category
+                </button>
+                </div>
             `;
-            updateMainContent('AddFirstCategory');
+            } else {
+            // If no categories, show a message and the "Add Category" button
+            categoryPanel.innerHTML = `
+                <p style="text-align: center;">No categories added</p>
+                <div style="text-align: center; margin-top: 20px;">
+                <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer;">
+                    Add Category
+                </button>
+                </div>
+            `;
+            }
+
+            // Remove existing event listeners for the "Add Category" button to prevent duplication
+            const addCategoryBtn = document.getElementById('addCategoryBtn');
+            addCategoryBtn?.removeEventListener('click', openAddCategoryWindow); // Remove any existing listener
+
+            // Add event listener for "Add Category" button
+            addCategoryBtn?.addEventListener('click', openAddCategoryWindow);
+
             break;
+
+
 
         case "Settings":
             // Render Settings-related buttons
