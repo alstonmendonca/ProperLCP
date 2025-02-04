@@ -244,6 +244,59 @@ ipcMain.handle("get-food-items", async (event, categoryName) => {
         });
     });
 });
+// ADD FOOD ITEM IN MENU APP
+// Fetch categories for dropdown
+let addItemWindow;
+ipcMain.on("open-add-item-window", () => {
+    if (!addItemWindow) {
+        addItemWindow = new BrowserWindow({
+            width: 500,
+            height: 600,
+            modal: true, // Keeps it on top
+            parent: mainWindow, // Assuming mainWindow is your main app window
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false // Ensure IPC works properly
+            }
+        });
+
+        addItemWindow.loadFile(path.join(__dirname, "AddItem.html"));
+
+        addItemWindow.on("closed", () => {
+            addItemWindow = null;
+        });
+    }
+});
+
+ipcMain.handle("get-categories-for-additem", async () => {
+    return new Promise((resolve, reject) => {
+        db.all("SELECT catid, catname FROM Category", [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+});
+
+// Add new food item
+ipcMain.handle("add-food-item", async (event, item) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `INSERT INTO FoodItem (fname, category, cost, sgst, cgst, tax, active, is_on, veg)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [item.fname, item.category, item.cost, item.sgst, item.cgst, item.tax, item.active, item.is_on, item.veg],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ success: true, fid: this.lastID });
+                }
+            }
+        );
+    });
+});
 //EXIT THE APP
 // Event listener to handle exit request
 ipcMain.on("exit-app", (event) => {

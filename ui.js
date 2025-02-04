@@ -97,11 +97,16 @@ async function updateMainContent(contentType) {
                 "UpdateItem": "Edit an existing item",
                 "DeleteItem": "Remove an item from the menu"
             };
-
-            mainContent.innerHTML = `
+            if (contentType === "AddItem") {
+                ipcRenderer.send("open-add-item-window"); // Send event to main process
+                return; // Stop further execution
+            }
+            else {
+                mainContent.innerHTML = `
                 <h2>${contentType.replace(/([A-Z])/g, " $1")}</h2>
                 <p>${actionText[contentType]}</p>
             `;
+            }
             billPanel.style.display = 'none'; // Hide bill panel for Menu Management
         } 
         // Analytics
