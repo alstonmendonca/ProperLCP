@@ -1,28 +1,37 @@
 const { ipcRenderer } = require("electron");
-const XLSX = require("xlsx");
 
-function fetchOrderHistory() {
+function fetchCategoryWise() {
     const startDate = document.getElementById("startDate").value;
     const endDate = document.getElementById("endDate").value;
+    const category = document.getElementById("categoryDropdown").value; // Get selected category
 
     if (!startDate || !endDate) {
         alert("Please select both start and end dates.");
         return;
     }
 
-    ipcRenderer.send("get-order-history", { startDate, endDate });
+    if (!category) {
+        alert("Please select a category.");
+        return;
+    }
+
+    ipcRenderer.send("get-category-wise", { startDate, endDate, category });
 }
 
-// Listen for order history response and update UI
-ipcRenderer.on("order-history-response", (event, data) => {
-    const orderHistoryDiv = document.getElementById("orderHistoryDiv");
+
+// Receive the order history from the main process and update the UI
+ipcRenderer.on("category-wise-response", (event, data) => {
+    console.log("Received category wise:", data);
+    const orders = data.orders;
+    const orderHistoryDiv = document.getElementById("categoryWiseDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
 
-    if (!data.success || data.orders.length === 0) {
+    if (orders.length === 0) {
         orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
         return;
     }
 
+    // Create a table
     let tableHTML = `
         <table class="order-history-table">
             <thead>
@@ -41,7 +50,7 @@ ipcRenderer.on("order-history-response", (event, data) => {
             <tbody>
     `;
 
-    data.orders.forEach(order => {
+    orders.forEach(order => {
         tableHTML += `
             <tr>
                 <td>${order.billno}</td>
@@ -61,30 +70,5 @@ ipcRenderer.on("order-history-response", (event, data) => {
     orderHistoryDiv.innerHTML = tableHTML;
 });
 
-function exportToExcel() {
-    const table = document.querySelector(".order-history-table");
-    if (!table) {
-        ipcRenderer.send("show-excel-export-message", {
-            type: "warning",
-            title: "Export Failed",
-            message: "No data available to export.",
-        });
-        return;
-    }
-
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.table_to_sheet(table);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "OrderHistory");
-
-    const filename = "Order_History.xlsx";
-    XLSX.writeFile(workbook, filename);
-
-    ipcRenderer.send("show-excel-export-message", {
-        type: "info",
-        title: "Export Successful",
-        message: `✅ Export successful! File saved as: ${filename}\nCheck the project folder.`,
-    });
-}
-
-// Export functions so they can be used in renderer.js
-module.exports = { fetchOrderHistory, exportToExcel };
+// Export function so it can be used in renderer.js
+module.exports = { fetchCategoryWise };

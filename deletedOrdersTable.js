@@ -1,7 +1,6 @@
 const { ipcRenderer } = require("electron");
-const XLSX = require("xlsx");
 
-function fetchOrderHistory() {
+function fetchDeletedOrders() {
     const startDate = document.getElementById("startDate").value;
     const endDate = document.getElementById("endDate").value;
 
@@ -10,19 +9,22 @@ function fetchOrderHistory() {
         return;
     }
 
-    ipcRenderer.send("get-order-history", { startDate, endDate });
+    ipcRenderer.send("get-deleted-orders", { startDate, endDate });
 }
 
-// Listen for order history response and update UI
-ipcRenderer.on("order-history-response", (event, data) => {
-    const orderHistoryDiv = document.getElementById("orderHistoryDiv");
+// Receive the deleted orders response from the main process and update the UI
+ipcRenderer.on("deleted-orders-response", (event, data) => {
+    console.log("Received deleted orders:", data);
+    const orders = data.orders;
+    const orderHistoryDiv = document.getElementById("deletedOrdersDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
 
-    if (!data.success || data.orders.length === 0) {
-        orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
+    if (orders.length === 0) {
+        orderHistoryDiv.innerHTML = "<p>No deleted orders found for the selected date range.</p>";
         return;
     }
 
+    // Create a table
     let tableHTML = `
         <table class="order-history-table">
             <thead>
@@ -35,13 +37,14 @@ ipcRenderer.on("order-history-response", (event, data) => {
                     <th>SGST (₹)</th>
                     <th>CGST (₹)</th>
                     <th>Tax (₹)</th>
+                    <th>Reason</th>
                     <th>Food Items</th>
                 </tr>
             </thead>
             <tbody>
     `;
 
-    data.orders.forEach(order => {
+    orders.forEach(order => {
         tableHTML += `
             <tr>
                 <td>${order.billno}</td>
@@ -52,6 +55,7 @@ ipcRenderer.on("order-history-response", (event, data) => {
                 <td>${order.sgst.toFixed(2)}</td>
                 <td>${order.cgst.toFixed(2)}</td>
                 <td>${order.tax.toFixed(2)}</td>
+                <td>${order.reason}</td>
                 <td>${order.food_items || "No items"}</td>
             </tr>
         `;
@@ -61,30 +65,5 @@ ipcRenderer.on("order-history-response", (event, data) => {
     orderHistoryDiv.innerHTML = tableHTML;
 });
 
-function exportToExcel() {
-    const table = document.querySelector(".order-history-table");
-    if (!table) {
-        ipcRenderer.send("show-excel-export-message", {
-            type: "warning",
-            title: "Export Failed",
-            message: "No data available to export.",
-        });
-        return;
-    }
-
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.table_to_sheet(table);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "OrderHistory");
-
-    const filename = "Order_History.xlsx";
-    XLSX.writeFile(workbook, filename);
-
-    ipcRenderer.send("show-excel-export-message", {
-        type: "info",
-        title: "Export Successful",
-        message: `✅ Export successful! File saved as: ${filename}\nCheck the project folder.`,
-    });
-}
-
-// Export functions so they can be used in renderer.js
-module.exports = { fetchOrderHistory, exportToExcel };
+// Export function so it can be used in renderer.js
+module.exports = { fetchDeletedOrders };

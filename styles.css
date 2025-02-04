@@ -175,14 +175,6 @@ body {
     border-top: 1px solid #ddd; /* Keeps UI neat */
 }
 
-/* Button Styling */
-button {
-    padding: 8px 12px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
 
 #saveandprintbutton,
 #holdbutton,
@@ -420,4 +412,122 @@ input[type="number"] {
     color: #888; /* Gray text */
     font-style: italic; /* Italicize the message */
     margin-top: 20px; /* Space above the message */
+}
+
+/* Center the welcome content */
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80vh; /* Adjust height to push content towards the center */
+    text-align: center;
+}
+
+/* Style the welcome title */
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Style the entry button */
+.entry-button {
+    background-color: #ff9800; /* Warm, inviting color */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover effect */
+.entry-button:hover {
+    background-color: #e68900;
+    transform: scale(1.05);
+}
+
+/* Button click effect */
+.entry-button:active {
+    transform: scale(0.95);
+}
+
+/* Style the left panel only on the welcome screen */
+.welcome-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    background: linear-gradient(to bottom, #fff3e0, #ffcc80); /* Warm gradient */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Style the tagline */
+.welcome-tagline {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #6d4c41; /* Warm brown */
+    margin-bottom: 10px;
+}
+
+/* Style the illustration */
+.welcome-image {
+    width: 80%; /* Adjust size */
+    max-width: 200px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the category dropdown */
+#categoryDropdown {
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 220px; /* Adjust width for better readability */
+    margin-right: 40px; /* Adds spacing between dropdown and 'show history' button */
+}
+
+/* Hover effect */
+#categoryDropdown:hover {
+    border-color: #888;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .date-filters {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    #categoryDropdown, .date-filters button {
+        width: 100%; /* Full width on smaller screens */
+    }
+}
+
+/* Add space below the header */
+h1 {
+    margin-bottom: 20px; /* Adjust the spacing as needed */
+}
+
+.showHistoryButton {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    margin-right: 40px;
 }

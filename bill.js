@@ -140,3 +140,4 @@ function toggleDiscountInputs() {
         discountSection.style.display = 'block';
     }
 }
+

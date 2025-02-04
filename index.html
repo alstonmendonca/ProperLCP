@@ -21,13 +21,18 @@
   <div id="content">
     <!-- Left Vertical Panel -->
     <div id="category-panel">
-
+      <div id="welcome-panel" class="welcome-panel">
+          <h2 class="welcome-tagline">When life gives you lemons, make Lassi!</h2>
+          <img src="welcomeScreenPhoto.png" alt="Lassi Illustration" class="welcome-image">
+      </div>
     </div>
 
     <!-- Main Content Area -->
     <div id="main-content">
-      <h2>Welcome to LASSI CORNER!</h2>
-      <p>Time to make some sales!</p>
+      <div class="welcome-container">
+          <h1 class="welcome-title">Welcome to Lassi Corner!</h1>
+          <button id="EntryButton" class="entry-button" onclick="updateMainContent('Home')">Click here to Enter</button>
+      </div>
     </div>
 
     <!-- Bill Panel (Right Side) -->
@@ -61,9 +66,12 @@
 
 
   <script src="renderer.js"></script>
-  <script src="table.js"></script>
-  <script src="bill.js"></script>
   <script src="ui.js"></script>
   <script src="menu.js"></script>
+  <script src="table.js"></script>
+  <script src="bill.js"></script>
+  <script src="todaysOrders.js"></script>
+
+
 </body>
 </html>

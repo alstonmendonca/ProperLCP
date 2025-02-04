@@ -1,19 +1,19 @@
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
+    console.log('Im inside updateMainContent', contentType);
     const billPanel = document.getElementById("bill-panel");
-
     // Menu Management
     const menuManagement = ["AddItem", "UpdateItem", "DeleteItem"];
 
     // Analytics
-    const analytics = ["SalesOverview", "TopSelling", "Trends", "OrderHistory"];
+    const analytics = ["SalesOverview", "TopSelling", "Trends","ItemSummary","SalesSummary"];
 
     // Settings
-    const settings = ["UserProfile", "ThemeToggle","TaxAndDiscount","PrinterConfig","Security","Help","Exit"];
+    const settings = ["UserProfile", "ThemeToggle","TaxAndDiscount","PrinterConfig","Security", "DeleteHistory","Help","Exit"];
 
     // Home Screen
-    if (contentType === "Home") {
+    if (contentType === "Home" || contentType === "EntryButton") {
         mainContent.innerHTML = `
             <h2>Home</h2>
             <p>Welcome to the default home page!</p>
@@ -23,6 +23,7 @@ async function updateMainContent(contentType) {
     // Fetch and display food items dynamically
     else {
         const foodItems = await ipcRenderer.invoke("get-food-items", contentType);
+        console.log('Im inside else of updateMainContent', foodItems);
 
         if (foodItems.length > 0) {
             mainContent.innerHTML = 
@@ -110,6 +111,8 @@ async function updateMainContent(contentType) {
                 "SalesOverview": "Daily, weekly, and monthly sales overview",
                 "TopSelling": "Best selling items",
                 "Trends": "Latest trends in sales",
+                "ItemSummary": "Summary of an item over a period of time",
+                "SalesSummary": "Summary of sales made over a period of time",
             };
 
             mainContent.innerHTML = `
@@ -126,6 +129,7 @@ async function updateMainContent(contentType) {
                 "TaxAndDiscount": "Set default values for tax rates and discounts",
                 "PrinterConfig": "Configure your printer",
                 "Security": "Manage security settings, Manage roles and permissions",
+                "DeleteHistory": "Delete order history",
                 "Help": "Get help and support",
                 "Exit": "Exit"
             };
@@ -138,8 +142,10 @@ async function updateMainContent(contentType) {
             `;
             billPanel.style.display = 'none'; // Hide bill panel for Settings
         } 
-        // Add First Category
-        else if (contentType === "AddFirstCategory") {
+
+        
+        else if (contentType === "Categories") {
+            console.log("I'm inside categories of left panel");
             mainContent.innerHTML = `
                 <div style="display: flex; justify-content: center; align-items: center; height: 20vh;">
                     <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer; width: 300px; height: 80px;">
@@ -147,23 +153,23 @@ async function updateMainContent(contentType) {
                     </button>
                 </div>
             `;
-            billPanel.style.display = 'none'; // Hide bill panel for Add First Category
-        } 
-        // HISTORY TAB
-        else if (contentType === 'History') {
+            billPanel.style.display = 'none';
+            
+        } else if (contentType === 'History' || contentType === "todaysOrders") {
+            console.log("I'm inside history of left panel");
             mainContent.innerHTML = `
-                <style>
-                    .date-filters {
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        justify-content: center;
-                        gap: 10px;
-                        text-align: center;
-                        margin: 20px auto;
-                    }
-                </style>
+                <h1>Todays Orders</h1>
+                <div id="todaysOrdersDiv"></div>
+            `;
+            fetchTodaysOrders(); // Automatically fetch and display orders
+            //billPanel.style.display = 'none';
+        }
 
+        // HISTORY TAB
+        else if (contentType === 'orderHistory') {
+            
+            mainContent.innerHTML = `
+                <h1>Order History</h1>
                 <div class="date-filters">
                     <label for="startDate">Start Date:</label>
                     <input type="date" id="startDate">
@@ -171,12 +177,53 @@ async function updateMainContent(contentType) {
                     <label for="endDate">End Date:</label>
                     <input type="date" id="endDate">
                     
-                    <button onclick="fetchOrderHistory()">Show History</button>
+                    <button class="showHistoryButton" onclick="fetchOrderHistory()" >Show History</button>
+                    <button onclick="exportToExcel()">Export to Excel</button>
                 </div>
-                <div id="orderHistory"></div>
+                <div id="orderHistoryDiv"></div>
             `;
-            billPanel.style.display = 'none'; // Hide bill panel for History
-        } 
+            billPanel.style.display = 'none';
+            
+        } else if (contentType === 'categoryHistory') {
+            mainContent.innerHTML = `
+                <h1>Category-wise Sales</h1>
+                <div class="date-filters">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate">
+                    
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate">
+                    
+                    <select id="categoryDropdown"></select>
+                    <button class="showHistoryButton" onclick="fetchCategoryWise()">Show History</button>
+                    <button onclick="exportToExcel('.category-wise-table', 'Category_Sales.xlsx')">Export to Excel</button>
+                </div>
+                <div id="categoryWiseDiv"></div>
+            `;
+        
+            fetchCategories(); // Fetch categories and populate the dropdown
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "deletedOrders") {
+            mainContent.innerHTML = `
+                <h1>Deleted Orders</h1>
+                <div class="date-filters">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate">
+                    
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate">
+                    
+                    <button class="showHistoryButton" id="fetchDeletedOrdersBtn">Show Deleted Orders</button>
+                    <button onclick="exportToExcel('.category-wise-table', 'Category_Sales.xlsx')">Export to Excel</button>
+                </div>
+                <div id="deletedOrdersDiv"></div>
+            `;
+
+            // Attach event listener to the button
+            document.getElementById("fetchDeletedOrdersBtn").addEventListener("click", fetchDeletedOrders);
+            billPanel.style.display = 'none';
+        }  
         //MENU TAB
         else if (contentType === "Menu") {
             displayMenu(); // Call the function from menu.js to display menu
@@ -198,7 +245,7 @@ async function updateMainContent(contentType) {
 // Function to dynamically update the left panel (category or settings buttons)
 async function updateLeftPanel(contentType) {
     const categoryPanel = document.getElementById("category-panel");
-
+    console.log("Updating left panel with content type:", contentType);
     switch (contentType) {
         case "Home":
             // Render Home-related buttons
@@ -230,20 +277,24 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
                 <button class="category" id="TopSelling" onclick="updateMainContent('TopSelling')">Top Selling</button>
                 <button class="category" id="Trends" onclick="updateMainContent('Trends')">Trends</button>
+                <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
+                <button class="category" id="SalesSummary" onclick="updateMainContent('SalesSummary')">Sales Summary</button>
             `;
             break;
 
         case "History":
             // Render History-related buttons (currently empty)
-            categoryPanel.innerHTML = ``;
+            categoryPanel.innerHTML = `
+                <button class="category" id="TodaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
+                <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
+                <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
+                <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
+            `;
             break;
 
         case "Categories":
             // Render category-related content when no categories exist
-            categoryPanel.innerHTML = `
-                <p style="text-align: center;" id="AddFirstCategory">No categories added</p>
-            `;
-            updateMainContent('AddFirstCategory');
+            categoryPanel.innerHTML = '<p>No categories available.</p>';
             break;
 
         case "Settings":
@@ -254,9 +305,12 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="TaxAndDiscount" onclick="updateMainContent('TaxAndDiscount')">Tax and Discounts</button>
                 <button class="category" id="PrinterConfig" onclick="updateMainContent('PrinterConfig')">Printer Configuration</button>
                 <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
+                <button class="category" id="DeleteHistory" onclick="updateMainContent('DeleteHistory')">Delete History</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>
             `;
             break;
     }
 }
+
+//module.exports = { updateMainContent};
