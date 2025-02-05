@@ -424,3 +424,42 @@ input[type="number"] {
     font-style: italic; /* Italicize the message */
     margin-top: 20px; /* Space above the message */
 }
+
+/* Style the category dropdown */
+#categoryDropdown {
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 220px; /* Adjust width for better readability */
+    margin-right: 40px; /* Adds spacing between dropdown and 'show history' button */
+}
+
+/* Hover effect */
+#categoryDropdown:hover {
+    border-color: #888;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .date-filters {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    #categoryDropdown, .date-filters button {
+        width: 100%; /* Full width on smaller screens */
+    }
+}
+
+/* Add space below the header */
+h1 {
+    margin-bottom: 20px; /* Adjust the spacing as needed */
+}
+
+#exportExcelButton {
+    justify-content: right;
+}

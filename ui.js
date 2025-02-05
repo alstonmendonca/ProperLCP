@@ -148,6 +148,7 @@ async function updateMainContent(contentType) {
         else if (contentType === 'History' || contentType === "todaysOrders") {
             mainContent.innerHTML = `
                 <h1>Todays Orders</h1>
+                <button id="exportExcelButton">Export to Excel</button>
                 <div id="todaysOrdersDiv"></div>
             `;
             fetchTodaysOrders();
@@ -167,7 +168,7 @@ async function updateMainContent(contentType) {
                     <input type="date" id="endDate">
                     
                     <button class="showHistoryButton" onclick="fetchOrderHistory()" >Show History</button>
-                    <button onclick="exportToExcel()">Export to Excel</button>
+                    <button id="exportExcelButton">Export to Excel</button>
                 </div>
                 <div id="orderHistoryDiv"></div>
             `;
@@ -184,7 +185,7 @@ async function updateMainContent(contentType) {
                     
                     <select id="categoryDropdown"></select>
                     <button class="showHistoryButton" onclick="fetchCategoryWise()">Show History</button>
-                    <button onclick="exportToExcel('.category-wise-table', 'Category_Sales.xlsx')">Export to Excel</button>
+                    <button id="exportExcelButton">Export to Excel</button>
                 </div>
                 <div id="categoryWiseDiv"></div>
             `;
@@ -202,7 +203,7 @@ async function updateMainContent(contentType) {
                     <input type="date" id="endDate">
                     
                     <button class="showHistoryButton" id="fetchDeletedOrdersBtn">Show Deleted Orders</button>
-                    <button onclick="exportToExcel('.category-wise-table', 'Category_Sales.xlsx')">Export to Excel</button>
+                    <button id="exportExcelButton">Export to Excel</button>
                 </div>
                 <div id="deletedOrdersDiv"></div>
             `;

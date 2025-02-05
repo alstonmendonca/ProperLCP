@@ -5,12 +5,14 @@ const { fetchDeletedOrders } = require("./deletedOrdersTable");
 const { fetchCategoryWise } = require("./categoryWiseTable");
 const { fetchCategories } = require("./categoryDropDown");
 const { fetchTodaysOrders } = require("./todaysOrders");
+const { exportTableToExcel } = require("./export"); 
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
 window.fetchCategoryWise = fetchCategoryWise;
 window.fetchCategories = fetchCategories;
 window.fetchTodaysOrders = fetchTodaysOrders;
+window.exportTableToExcel = exportTableToExcel;
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container
@@ -27,17 +29,3 @@ ipcRenderer.on('set-user-role', (event, role) => {
     }
 });
 
-// Open the 'Add Category' window when the green button is clicked
-document.body.addEventListener("click", (event) => {
-    if (event.target.id === "addCategoryBtn") {
-        ipcRenderer.send("open-add-category-window");
-    }
-});
-
-// Listen for category addition success
-ipcRenderer.on("category-added-success", () => {
-    alert("Category added successfully!");
-    // You can also update the UI dynamically to reflect the new category
-});
-
-// Make Order history available globally
