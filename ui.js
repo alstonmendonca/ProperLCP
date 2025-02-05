@@ -4,7 +4,7 @@ async function updateMainContent(contentType) {
     const billPanel = document.getElementById("bill-panel");
 
     // Menu Management
-    const menuManagement = ["AddItem", "UpdateItem", "DeleteItem"];
+    const menuManagement = ["ShowMenu","AddItem", "UpdateItem", "DeleteItem"];
 
     // Analytics
     const analytics = ["SalesOverview", "TopSelling", "Trends", "OrderHistory"];
@@ -93,6 +93,7 @@ async function updateMainContent(contentType) {
         else if (menuManagement.includes(contentType)) {
 
             let actionText = {
+                "ShowMenu":"Show the menu",
                 "AddItem": "Add an item here",
                 "UpdateItem": "Edit an existing item",
                 "DeleteItem": "Remove an item from the menu"
@@ -100,6 +101,9 @@ async function updateMainContent(contentType) {
             if (contentType === "AddItem") {
                 ipcRenderer.send("open-add-item-window"); // Send event to main process
                 return; // Stop further execution
+            }
+            else if (contentType === "ShowMenu") {
+                displayMenu(); // Call the function from menu.js to display menu
             }
             else {
                 mainContent.innerHTML = `
@@ -257,6 +261,7 @@ async function updateLeftPanel(contentType) {
 
             // Render Menu-related buttons
             categoryPanel.innerHTML = `
+                <button class="category" id="ShowMenu" onclick="updateMainContent('ShowMenu')">Menu</button>
                 <button class="category" id="AddItem" onclick="updateMainContent('AddItem')">Add Item</button>
                 <button class="category" id="UpdateItem" onclick="updateMainContent('UpdateItem')">Update Item</button>
             `;

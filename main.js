@@ -393,3 +393,5 @@ ipcMain.on("exit-app", (event) => {
         app.quit(); // Close the app
     }
 });
+
+app.commandLine.appendSwitch('ignore-certificate-errors');
