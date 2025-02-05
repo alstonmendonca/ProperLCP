@@ -236,6 +236,7 @@ async function updateLeftPanel(contentType) {
 
     switch (contentType) {
         case "Home":
+            categoryPanel.style.display = "block";
             // Render Home-related buttons
             const categories = await ipcRenderer.invoke("get-categories");
 
@@ -252,6 +253,8 @@ async function updateLeftPanel(contentType) {
             break;
 
         case "Menu":
+            categoryPanel.style.display = "block";
+
             // Render Menu-related buttons
             categoryPanel.innerHTML = `
                 <button class="category" id="AddItem" onclick="updateMainContent('AddItem')">Add Item</button>
@@ -260,6 +263,8 @@ async function updateLeftPanel(contentType) {
             break;
 
         case "Analytics":
+            categoryPanel.style.display = "block";
+
             // Render Analytics-related buttons
             categoryPanel.innerHTML = `
                 <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
@@ -269,6 +274,8 @@ async function updateLeftPanel(contentType) {
             break;
 
         case "History":
+            categoryPanel.style.display = "block";
+
             // Render History-related buttons
             categoryPanel.innerHTML = `
             <button class="category" id="TodaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
@@ -279,6 +286,8 @@ async function updateLeftPanel(contentType) {
         break;
 
         case "Categories":
+            categoryPanel.style.display = "none";
+
             // Categories
             categoryPanel.innerHTML;
             break;
@@ -286,6 +295,8 @@ async function updateLeftPanel(contentType) {
 
 
         case "Settings":
+            categoryPanel.style.display = "block";
+
             // Render Settings-related buttons
             categoryPanel.innerHTML = `
                 <button class="category" id="UserProfile" onclick="updateMainContent('UserProfile')">User Profile</button>

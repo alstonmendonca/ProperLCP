@@ -279,7 +279,7 @@ ipcMain.handle("get-menu-items", async (event) => {
     }
 });
 //DELETING MENU ITEM
-// IPC Event to Delete a Menu Item
+// IPC Event to Delete an Item
 ipcMain.handle("delete-menu-item", async (event, fid) => {
     return new Promise((resolve, reject) => {
         db.run("DELETE FROM FoodItem WHERE fid = ?", [fid], function (err) {
@@ -364,6 +364,16 @@ ipcMain.handle("add-food-item", async (event, item) => {
             }
         );
     });
+});
+
+//refresh menu
+// In main.js
+
+// Add the listener for 'refresh-menu'
+ipcMain.on('refresh-menu', (event) => {
+    // You can trigger the 'displayMenu' function in the main window
+    // Here you will call a function in your main window or refresh its content.
+    mainWindow.webContents.send('refresh-menu'); // This sends a message to the renderer to trigger menu refresh
 });
 //EXIT THE APP
 // Event listener to handle exit request

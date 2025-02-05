@@ -19,7 +19,6 @@
             padding: 8px;
             margin-top: 5px;
             box-sizing: border-box;
-
         }
         button {
             margin-top: 15px;
@@ -54,9 +53,6 @@
         <label for="cgst">CGST (%):</label>
         <input type="number" id="cgst" step="0.01" value="0">
 
-        <label for="tax">Additional Tax (%):</label>
-        <input type="number" id="tax" step="0.01" value="0">
-
         <label for="veg">Veg:</label>
         <select id="veg">
             <option value="1">Yes</option>
@@ -78,6 +74,7 @@
         <button type="submit">Add Item</button>
     </form>
 
+    <script src="menu.js"></script>
     <script>
         const { ipcRenderer } = require("electron");
 
@@ -106,15 +103,21 @@
                 cost: parseFloat(document.getElementById("cost").value),
                 sgst: parseFloat(document.getElementById("sgst").value),
                 cgst: parseFloat(document.getElementById("cgst").value),
-                tax: parseFloat(document.getElementById("tax").value),
+                tax: parseFloat(document.getElementById("sgst").value) + parseFloat(document.getElementById("cgst").value),
                 active: parseInt(document.getElementById("active").value),
                 is_on: parseInt(document.getElementById("is_on").value),
                 veg: parseInt(document.getElementById("veg").value)
             };
 
             try {
+                // Add the item to the database
                 await ipcRenderer.invoke("add-food-item", newItem);
                 alert("Item added successfully!");
+
+                // After item is added, notify the main window to refresh the menu
+                ipcRenderer.send("refresh-menu");
+
+                // Close the add item window
                 window.close();
             } catch (error) {
                 console.error("Error adding item:", error);

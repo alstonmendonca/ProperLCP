@@ -63,3 +63,10 @@ async function displayMenu() {
         console.error("Error fetching menu:", error);
     }
 }
+
+// In menu.js
+
+// Listening for the 'refresh-menu' event to trigger menu reload
+ipcRenderer.on('refresh-menu', async () => {
+    await displayMenu();
+});
