@@ -61,6 +61,14 @@ ipcRenderer.on("order-history-response", (event, data) => {
 
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
+
+
+    // Attach export button functionality
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".order-history-table");
+        });
+    }, 100);
 });
 
 // Export function so it can be used in renderer.js
