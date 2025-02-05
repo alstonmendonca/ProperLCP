@@ -1,10 +1,10 @@
 const { ipcRenderer } = require("electron");
 
 function loadCategories(categories = null) {
-    console.log("Running loadCategories()", categories); // Debugging log
+    //console.log("Running loadCategories()", categories); // Debugging log
 
     if (!categories) {
-        console.log("Requesting categories from main process..."); // Debugging log
+        //console.log("Requesting categories from main process..."); // Debugging log
         ipcRenderer.send("getCategories"); // Request categories
         return;
     }
@@ -41,7 +41,7 @@ function loadCategories(categories = null) {
         </table>
     `;
 
-    console.log("Categories UI updated successfully."); // Debugging log
+    //console.log("Categories UI updated successfully."); // Debugging log
 
     // Attach event listeners
     document.querySelectorAll(".delete-btn").forEach(button => {
@@ -56,7 +56,7 @@ function loadCategories(categories = null) {
 
 // Listen for category data from the main process
 ipcRenderer.on("categories-data", (event, categories) => {
-    console.log("Received categories:", categories);
+    //console.log("Received categories:", categories);
     loadCategories(categories); // Reuse loadCategories to avoid duplicate UI logic
 });
 module.exports = { loadCategories };

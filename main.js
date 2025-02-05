@@ -127,7 +127,7 @@ ipcMain.on("get-todays-orders", (event) => {
 
 // Listen for order history requests
 ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
-    console.log("Fetching order history...");
+    //console.log("Fetching order history...");
     
     const query = `
         SELECT 
@@ -149,7 +149,7 @@ ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
             event.reply("fetchOrderHistoryResponse", { success: false, orders: [] });
             return;
         }
-        console.log("Order history fetched:", rows); 
+        //console.log("Order history fetched:", rows); 
         event.reply("order-history-response", { success: true, orders: rows });
     });
 });
@@ -169,7 +169,7 @@ ipcMain.on("get-categories-event", (event) => {
 });
 
 ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
-    console.log("Fetching order history...");
+    //console.log("Fetching order history...");
 
     const query = `
         SELECT 
@@ -197,7 +197,7 @@ ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
             event.reply("category-wise-response", { success: false, orders: [] });
             return;
         }
-        console.log("Category wise fetched:", rows); 
+        //console.log("Category wise fetched:", rows); 
         event.reply("category-wise-response", { success: true, orders: rows });
     });
 });

@@ -14,7 +14,7 @@ function fetchOrderHistory() {
 
 // Receive the order history from the main process and update the UI
 ipcRenderer.on("order-history-response", (event, data) => {
-    console.log("Received order history:", data);
+    //console.log("Received order history:", data);
     const orders = data.orders;
     const orderHistoryDiv = document.getElementById("orderHistoryDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
