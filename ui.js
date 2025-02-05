@@ -8,9 +8,9 @@ async function updateMainContent(contentType) {
 
     // Analytics
     const analytics = ["SalesOverview", "TopSelling", "Trends", "OrderHistory"];
-
     // Settings
     const settings = ["UserProfile", "ThemeToggle","TaxAndDiscount","PrinterConfig","Security","Help","Exit"];
+    
 
     // Home Screen
     if (contentType === "Home") {
@@ -143,18 +143,7 @@ async function updateMainContent(contentType) {
             `;
             billPanel.style.display = 'none'; // Hide bill panel for Settings
         } 
-        // Add First Category
-        else if (contentType === "Categories") {
-            console.log("I'm inside categories of left panel");
-            mainContent.innerHTML = `
-                <div style="display: flex; justify-content: center; align-items: center; height: 20vh;">
-                    <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer; width: 300px; height: 80px;">
-                        Add Category
-                    </button>
-                </div>
-            `;
-            billPanel.style.display = 'none'; // Hide bill panel for Add First Category
-        } 
+        
         // HISTORY TAB
         else if (contentType === 'History' || contentType === "todaysOrders") {
             mainContent.innerHTML = `
@@ -290,12 +279,11 @@ async function updateLeftPanel(contentType) {
         break;
 
         case "Categories":
-            // Render category-related content when no categories exist
-            categoryPanel.innerHTML = `
-                <p style="text-align: center;" id="AddFirstCategory">No categories added</p>
-            `;
-            updateMainContent('AddFirstCategory');
+            // Categories
+            categoryPanel.innerHTML;
             break;
+
+
 
         case "Settings":
             // Render Settings-related buttons

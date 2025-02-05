@@ -59,18 +59,4 @@ ipcRenderer.on("categories-data", (event, categories) => {
     console.log("Received categories:", categories);
     loadCategories(categories); // Reuse loadCategories to avoid duplicate UI logic
 });
-
-function confirmDeleteCategory(catId) {
-    if (confirm("Are you sure you want to delete this category?")) {
-        ipcRenderer.send("delete-category", catId);
-    }
-}
-
-function addCategoryPrompt() {
-    const categoryName = prompt("Enter new category name:");
-    if (categoryName) {
-        ipcRenderer.send("add-category", categoryName);
-    }
-}
-
 module.exports = { loadCategories };

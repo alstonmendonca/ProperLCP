@@ -98,48 +98,6 @@ app.on("activate", () => {
         });
     }
 });
-
-let addCategoryWindow;
-
-// Handle opening the Add Category window
-ipcMain.on("open-add-category-window", () => {
-    addCategoryWindow = new BrowserWindow({
-        width: 400,
-        height: 250,
-        resizable: false,
-        title: "Add Category",
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        },
-    });
-
-    addCategoryWindow.loadFile("addCategory.html");
-
-    addCategoryWindow.on("closed", () => {
-        addCategoryWindow = null;
-    });
-});
-
-// Handle category addition
-ipcMain.on("add-category", (event, categoryName) => {
-    if (!categoryName.trim()) {
-        event.reply("category-add-failed", "Category name cannot be empty.");
-        return;
-    }
-
-    const query = "INSERT INTO Category (catname, active) VALUES (?, 1)";
-    db.run(query, [categoryName], function (err) {
-        if (err) {
-            console.error("Error adding category:", err.message);
-            event.reply("category-add-failed", "Error adding category.");
-        } else {
-            event.reply("category-added-success");
-            if (addCategoryWindow) addCategoryWindow.close();
-        }
-    });
-});
-
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {
     
