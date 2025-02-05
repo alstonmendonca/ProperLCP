@@ -8,9 +8,9 @@ async function updateMainContent(contentType) {
 
     // Analytics
     const analytics = ["SalesOverview", "TopSelling", "Trends", "OrderHistory"];
-
     // Settings
     const settings = ["UserProfile", "ThemeToggle","TaxAndDiscount","PrinterConfig","Security","Help","Exit"];
+    
 
     // Home Screen
     if (contentType === "Home") {
@@ -142,17 +142,6 @@ async function updateMainContent(contentType) {
                 <p>${settingsText[contentType]}</p>
             `;
             billPanel.style.display = 'none'; // Hide bill panel for Settings
-        } 
-        // Add First Category
-        else if (contentType === "AddFirstCategory") {
-            mainContent.innerHTML = `
-                <div style="display: flex; justify-content: center; align-items: center; height: 20vh;">
-                    <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer; width: 300px; height: 80px;">
-                        Add Category
-                    </button>
-                </div>
-            `;
-            billPanel.style.display = 'none'; // Hide bill panel for Add First Category
         } 
         
         // HISTORY TAB
@@ -289,47 +278,8 @@ async function updateLeftPanel(contentType) {
         break;
 
         case "Categories":
-            // Fetch categories from the main process
-            const cats = await ipcRenderer.invoke("get-categories");
-
-            if (cats.length > 0) {
-            // Render categories as buttons and include the "Add Category" button
-            categoryPanel.innerHTML = `
-                <div>
-                ${cats
-                    .map(
-                    (category) => `
-                        <button class="category" onclick="updateMainContent('${category.catname}')">
-                        ${category.catname}
-                        </button>`
-                    )
-                    .join("")}
-                </div>
-                <div style="text-align: center; margin-top: 20px;">
-                <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer;">
-                    Add Category
-                </button>
-                </div>
-            `;
-            } else {
-            // If no categories, show a message and the "Add Category" button
-            categoryPanel.innerHTML = `
-                <p style="text-align: center;">No categories added</p>
-                <div style="text-align: center; margin-top: 20px;">
-                <button id="addCategoryBtn" style="background-color: green; color: white; padding: 20px 40px; font-size: 20px; border: none; cursor: pointer;">
-                    Add Category
-                </button>
-                </div>
-            `;
-            }
-
-            // Remove existing event listeners for the "Add Category" button to prevent duplication
-            const addCategoryBtn = document.getElementById('addCategoryBtn');
-            addCategoryBtn?.removeEventListener('click', openAddCategoryWindow); // Remove any existing listener
-
-            // Add event listener for "Add Category" button
-            addCategoryBtn?.addEventListener('click', openAddCategoryWindow);
-
+            // Categories
+            categoryPanel.innerHTML;
             break;
 
 
