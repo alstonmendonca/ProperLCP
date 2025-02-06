@@ -1,4 +1,3 @@
-// Function to display menu items
 async function displayMenu() {
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
@@ -32,17 +31,36 @@ async function displayMenu() {
                         <p>Category: ${item.category_name}</p>
                         <p>Food ID: ${item.fid}</p>
                         <p>Price: ₹${item.cost}</p>
+
+                        <!-- Toggle Switch -->
+                        <label class="switch">
+                            <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
+                            <span class="slider round"></span>
+                        </label>
+                        <p>${item.is_on ? "Active ✅" : "Inactive ❌"}</p>
+
+                        <!-- Delete Button -->
                         <button class="delete-btn" data-fid="${item.fid}" 
-                            style="background: red; color: white; padding: 5px; border: none; cursor: pointer;">
+                            style="background: red; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
                             Delete
                         </button>
                     </div>
                 `;
             });
-            
 
             menuContent += `</div>`;
             mainContent.innerHTML = menuContent;
+
+            // Add event listeners to toggle switches
+            document.querySelectorAll(".toggle-switch").forEach(switchEl => {
+                switchEl.addEventListener("change", async (event) => {
+                    const fid = event.target.getAttribute("data-fid");
+                    const currentScrollPosition = mainContent.scrollTop; // Store current scroll position
+                    await ipcRenderer.invoke("toggle-menu-item", parseInt(fid));
+                    await displayMenu(); // Refresh menu after toggling
+                    mainContent.scrollTop = currentScrollPosition; // Restore scroll position
+                });
+            });
 
             // Add event listeners to delete buttons
             document.querySelectorAll(".delete-btn").forEach(button => {
@@ -63,8 +81,6 @@ async function displayMenu() {
         console.error("Error fetching menu:", error);
     }
 }
-
-// In menu.js
 
 // Listening for the 'refresh-menu' event to trigger menu reload
 ipcRenderer.on('refresh-menu', async () => {

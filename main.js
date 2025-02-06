@@ -254,30 +254,51 @@ ipcMain.handle("get-categories", async () => {
 // Fetch Food Items when requested from the renderer process
 ipcMain.handle("get-menu-items", async (event) => {
     const query = `
-        SELECT FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, FoodItem.sgst, FoodItem.cgst,FoodItem.veg, Category.catname AS category_name
+        SELECT FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, FoodItem.sgst, FoodItem.cgst, 
+               FoodItem.veg, FoodItem.is_on, Category.catname AS category_name
         FROM FoodItem
         JOIN Category ON FoodItem.category = Category.catid
-        WHERE FoodItem.active = 1 AND FoodItem.is_on = 1
+        WHERE FoodItem.active = 1
     `;
     
-    try {
-        // Wrapping db.all() in a promise to use async/await correctly
+        try {
         const rows = await new Promise((resolve, reject) => {
             db.all(query, (err, rows) => {
                 if (err) {
-                    reject(err); // Reject on error
+                    reject(err);
                 } else {
-                    resolve(rows); // Resolve with rows if successful
+                    resolve(rows);
                 }
             });
         });
         
-        return rows; // Return the fetched rows to the renderer process
+        return rows;
     } catch (err) {
         console.error('Error fetching food items:', err);
-        return []; // Return an empty array if an error occurs
+        return [];
     }
 });
+//toggle menu items:
+ipcMain.handle("toggle-menu-item", async (event, fid) => {
+    return new Promise((resolve, reject) => {
+        db.run(`
+            UPDATE FoodItem 
+            SET is_on = CASE WHEN is_on = 1 THEN 0 ELSE 1 END
+            WHERE fid = ?`, 
+            [fid], 
+            function (err) {
+                if (err) {
+                    console.error("Error toggling item:", err);
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            }
+        );
+    });
+});
+
+
 //DELETING MENU ITEM
 // IPC Event to Delete an Item
 ipcMain.handle("delete-menu-item", async (event, fid) => {
