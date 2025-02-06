@@ -133,6 +133,7 @@ async function updateMainContent(contentType) {
         else if (contentType === "Categories") {
             mainContent.innerHTML = `
                 <h1>Categories</h1>
+                <button id="addCategoryButton">Add Category</button>
                 <div id="categoriesTabDiv"></div>
             `;
             fetchCategoriesList();

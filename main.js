@@ -113,6 +113,20 @@ ipcMain.on("get-categories-list", (event) => {
         event.reply("categories-list-response", { success: true, categories: rows });
     });
 });
+
+ipcMain.on("delete-category", (event, categoryId) => {
+    const query = "DELETE FROM Category WHERE catid = ?";
+    
+    db.run(query, [categoryId], function (err) {
+        if (err) {
+            console.error("Error deleting category:", err.message);
+            return;
+        }
+
+        console.log(`Category ID ${categoryId} deleted successfully.`);
+        event.reply("category-deleted"); // Notify renderer to refresh UI
+    });
+});
 //---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {

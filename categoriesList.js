@@ -23,6 +23,7 @@ ipcRenderer.on("categories-list-response", (event, data) => {
                     <th>Category ID</th>
                     <th>Category Name</th>
                     <th>Active</th>
+                    <th>Remove</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,13 +35,28 @@ ipcRenderer.on("categories-list-response", (event, data) => {
                 <td>${category.catid}</td>
                 <td>${category.catname}</td>
                 <td>${category.active === 1 ? "✅ Active" : "❌ Inactive"}</td>
+                <td>
+                    <button class="remove-btn" onclick="confirmDeleteCategory(${category.catid})">➖</button>
+                </td>
             </tr>
         `;
     });
 
     tableHTML += `</tbody></table>`;
     categoriesTabDiv.innerHTML = tableHTML;
-})
+});
+
+// Function to confirm and delete category
+function confirmDeleteCategory(categoryId) {
+    if (confirm("Are you sure you want to delete this category?")) {
+        ipcRenderer.send("delete-category", categoryId);
+    }
+}
+
+// Refresh the category list after deletion
+ipcRenderer.on("category-deleted", () => {
+    fetchCategoriesList();
+});
 
 // Export function so it can be used in `renderer.js`
-module.exports = { fetchCategoriesList };
+module.exports = { fetchCategoriesList, confirmDeleteCategory };
