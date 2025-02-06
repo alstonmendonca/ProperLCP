@@ -123,6 +123,15 @@ async function updateMainContent(contentType) {
             `;
             billPanel.style.display = 'none'; // Hide bill panel for Analytics
         } 
+        else if (contentType === "Categories") {
+            mainContent.innerHTML = `
+                <h1>Categories</h1>
+                <p>Manage categories here.</p>
+            `;
+        
+            // Hide the left vertical panel
+            document.getElementById("category-panel").style.display = "none";
+        }
         // Settings
         else if (settings.includes(contentType)) {
             let settingsText = {
@@ -233,6 +242,11 @@ async function updateMainContent(contentType) {
 // Function to dynamically update the left panel (category or settings buttons)
 async function updateLeftPanel(contentType) {
     const categoryPanel = document.getElementById("category-panel");
+
+    // Ensure the panel is visible for other sections
+    if (contentType !== "Categories") {
+        categoryPanel.style.display = "block";
+    }
 
     switch (contentType) {
         case "Home":
