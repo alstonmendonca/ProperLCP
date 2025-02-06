@@ -14,7 +14,7 @@ function fetchDeletedOrders() {
 
 // Receive the deleted orders response from the main process and update the UI
 ipcRenderer.on("deleted-orders-response", (event, data) => {
-    console.log("Received deleted orders:", data);
+    //console.log("Received deleted orders:", data);
     const orders = data.orders;
     const orderHistoryDiv = document.getElementById("deletedOrdersDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content

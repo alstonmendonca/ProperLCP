@@ -6,7 +6,7 @@ function fetchTodaysOrders() {
 
 // Receive today's orders from the main process and update the UI
 ipcRenderer.on("todays-orders-response", (event, data) => {
-    console.log("Received today's orders:", data);
+    //console.log("Received today's orders:", data);
     const orders = data.orders;
     const todaysOrdersDiv = document.getElementById("todaysOrdersDiv");
     todaysOrdersDiv.innerHTML = ""; // Clear previous content

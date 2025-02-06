@@ -127,7 +127,7 @@ ipcMain.on("get-todays-orders", (event) => {
 
 // Listen for order history requests
 ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
-    console.log("Fetching order history...");
+    //console.log("Fetching order history...");
     
     const query = `
         SELECT 
@@ -149,7 +149,7 @@ ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
             event.reply("fetchOrderHistoryResponse", { success: false, orders: [] });
             return;
         }
-        console.log("Order history fetched:", rows); 
+        //console.log("Order history fetched:", rows); 
         event.reply("order-history-response", { success: true, orders: rows });
     });
 });
@@ -169,7 +169,7 @@ ipcMain.on("get-categories-event", (event) => {
 });
 
 ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
-    console.log("Fetching order history...");
+    //console.log("Fetching order history...");
 
     const query = `
         SELECT 
@@ -197,7 +197,7 @@ ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
             event.reply("category-wise-response", { success: false, orders: [] });
             return;
         }
-        console.log("Category wise fetched:", rows); 
+        //console.log("Category wise fetched:", rows); 
         event.reply("category-wise-response", { success: true, orders: rows });
     });
 });
@@ -279,7 +279,7 @@ ipcMain.handle("get-menu-items", async (event) => {
     }
 });
 //DELETING MENU ITEM
-// IPC Event to Delete a Menu Item
+// IPC Event to Delete an Item
 ipcMain.handle("delete-menu-item", async (event, fid) => {
     return new Promise((resolve, reject) => {
         db.run("DELETE FROM FoodItem WHERE fid = ?", [fid], function (err) {
@@ -365,6 +365,16 @@ ipcMain.handle("add-food-item", async (event, item) => {
         );
     });
 });
+
+//refresh menu
+// In main.js
+
+// Add the listener for 'refresh-menu'
+ipcMain.on('refresh-menu', (event) => {
+    // You can trigger the 'displayMenu' function in the main window
+    // Here you will call a function in your main window or refresh its content.
+    mainWindow.webContents.send('refresh-menu'); // This sends a message to the renderer to trigger menu refresh
+});
 //EXIT THE APP
 // Event listener to handle exit request
 ipcMain.on("exit-app", (event) => {
@@ -383,3 +393,5 @@ ipcMain.on("exit-app", (event) => {
         app.quit(); // Close the app
     }
 });
+
+app.commandLine.appendSwitch('ignore-certificate-errors');

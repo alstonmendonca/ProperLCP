@@ -21,7 +21,7 @@ function fetchCategoryWise() {
 
 // Receive the order history from the main process and update the UI
 ipcRenderer.on("category-wise-response", (event, data) => {
-    console.log("Received category wise:", data);
+    //console.log("Received category wise:", data);
     const orders = data.orders;
     const orderHistoryDiv = document.getElementById("categoryWiseDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
