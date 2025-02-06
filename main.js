@@ -87,7 +87,7 @@ app.on("activate", () => {
             width: 1200,
             height: 800,
             webPreferences: {
-                preload: path.join(__dirname, 'preload.js'),
+                preload: path.join(__dirname, 'renderer.js'),
                 contextIsolation: true,
             }
         });
@@ -98,6 +98,22 @@ app.on("activate", () => {
         });
     }
 });
+//------------------------------ CATEGORIES TAB --------------------------------
+// Listen for request to get categories
+ipcMain.on("get-categories-list", (event) => {
+    const query = "SELECT catid, catname, active FROM Category";
+    
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching categories:", err.message);
+            event.reply("categories-list-response", { success: false, categories: [] });
+            return;
+        }
+
+        event.reply("categories-list-response", { success: true, categories: rows });
+    });
+});
+//---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {
     
@@ -238,6 +254,8 @@ ipcMain.on("show-excel-export-message", (event, options) => {
         message: options.message || "Operation completed.",
     });
 });
+
+//---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 
 ipcMain.handle("get-categories", async () => {
     return new Promise((resolve, reject) => {

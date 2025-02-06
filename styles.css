@@ -394,12 +394,13 @@ input[type="number"] {
     color: white; /* White text */
     padding: 12px; /* Padding for header cells */
     text-align: left; /* Align text to the left */
+    border: 1px solid #ddd; /* Add a border */
     font-weight: bold; /* Bold text */
 }
 
 /* Table Rows */
 .order-history-table tbody tr {
-    border-bottom: 1px solid #ddd; /* Add a border between rows */
+    border-bottom: 1px solid #000000; /* Add a border between rows */
 }
 
 /* Alternate Row Colors */
@@ -462,4 +463,49 @@ h1 {
 
 #exportExcelButton {
     justify-content: right;
+}
+
+.toggle-switch {
+    cursor: pointer;
+    width: 40px;
+    height: 20px;
+    appearance: none;
+    background: red;
+    border-radius: 10px;
+    position: relative;
+}
+
+.toggle-switch:checked {
+    background: green;
+    accent-color: green;   
+}
+
+.toggle-switch::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 1px;
+    left: 2px;
+    transition: 0.3s;
+}
+
+.toggle-switch:checked::before {
+    left: 20px;
+}
+
+.edit-icon {
+    cursor: pointer;
+    margin-left: 10px;
+    color: blue;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: red;
 }

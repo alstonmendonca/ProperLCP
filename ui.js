@@ -1,3 +1,6 @@
+const { fetchCategoriesList } = require("./categoriesList");
+const { fetchTabCategories } = require("./categoriesTab");
+
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
@@ -126,16 +129,16 @@ async function updateMainContent(contentType) {
                 <p>${analyticsText[contentType]}</p>
             `;
             billPanel.style.display = 'none'; // Hide bill panel for Analytics
-        } 
+        } //--------------------------CATEGORIES---------------------------------------------------------------
         else if (contentType === "Categories") {
             mainContent.innerHTML = `
                 <h1>Categories</h1>
-                <p>Manage categories here.</p>
+                <div id="categoriesTabDiv"></div>
             `;
-        
-            // Hide the left vertical panel
-            document.getElementById("category-panel").style.display = "none";
-        }
+            fetchCategoriesList();
+            billPanel.style.display = 'none'; // Hide bill panel for History
+        }        
+        //--------------------------------CATEGORIES END HERE-----------------------------------------------------
         // Settings
         else if (settings.includes(contentType)) {
             let settingsText = {
@@ -167,8 +170,6 @@ async function updateMainContent(contentType) {
             fetchTodaysOrders();
             billPanel.style.display = 'none'; // Hide bill panel for History
         } 
-
-        // HISTORY TAB
         else if (contentType === 'orderHistory') {
             
             mainContent.innerHTML = `
