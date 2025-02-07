@@ -216,6 +216,13 @@ async function updateMainContent(contentType) {
             `;
         
             fetchCategories(); // Fetch categories and populate the dropdown
+
+            // ✅ Restore the last fetched category-wise sales history
+            const storedData = sessionStorage.getItem("categoryWiseData");
+            if (storedData) {
+                const orders = JSON.parse(storedData);
+                displayCategoryWiseSales(orders);
+            }
         }
          else if (contentType === "deletedOrders") {
             mainContent.innerHTML = `
@@ -235,6 +242,13 @@ async function updateMainContent(contentType) {
 
             // Attach event listener to the button
             document.getElementById("fetchDeletedOrdersBtn").addEventListener("click", fetchDeletedOrders);
+
+            // ✅ Restore the last fetched deleted orders history
+            const storedData = sessionStorage.getItem("deletedOrdersData");
+            if (storedData) {
+                const orders = JSON.parse(storedData);
+                displayDeletedOrders(orders);
+            }
         }
 
         //MENU TAB

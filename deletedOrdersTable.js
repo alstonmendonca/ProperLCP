@@ -12,10 +12,8 @@ function fetchDeletedOrders() {
     ipcRenderer.send("get-deleted-orders", { startDate, endDate });
 }
 
-// Receive the deleted orders response from the main process and update the UI
-ipcRenderer.on("deleted-orders-response", (event, data) => {
-    //console.log("Received deleted orders:", data);
-    const orders = data.orders;
+// Function to display deleted orders table
+function displayDeletedOrders(orders) {
     const orderHistoryDiv = document.getElementById("deletedOrdersDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
 
@@ -64,12 +62,20 @@ ipcRenderer.on("deleted-orders-response", (event, data) => {
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
 
+    // ✅ Store the fetched deleted orders in sessionStorage
+    sessionStorage.setItem("deletedOrdersData", JSON.stringify(orders));
+
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {
             exportTableToExcel(".order-history-table");
         });
     }, 100);
+}
+
+// ✅ Store deleted orders data and display it
+ipcRenderer.on("deleted-orders-response", (event, data) => {
+    displayDeletedOrders(data.orders);
 });
 
-// Export function so it can be used in renderer.js
-module.exports = { fetchDeletedOrders };
+// Export functions
+module.exports = { fetchDeletedOrders, displayDeletedOrders };
