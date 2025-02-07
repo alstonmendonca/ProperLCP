@@ -8,6 +8,7 @@ const { fetchTodaysOrders } = require("./todaysOrders");
 const { exportTableToExcel } = require("./export"); 
 const {confirmDeleteCategory} = require("./categoriesList");
 const {openEditWindow} = require("./categoriesList");
+const {displayOrderHistory} = require("./history");
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
@@ -18,6 +19,7 @@ window.exportTableToExcel = exportTableToExcel;
 window.fetchCategoriesList = fetchCategoriesList;
 window.confirmDeleteCategory = confirmDeleteCategory;
 window.openEditWindow = openEditWindow;
+window.displayOrderHistory = displayOrderHistory;
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container
