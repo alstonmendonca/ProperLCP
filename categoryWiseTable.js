@@ -19,10 +19,8 @@ function fetchCategoryWise() {
 }
 
 
-// Receive the order history from the main process and update the UI
-ipcRenderer.on("category-wise-response", (event, data) => {
-    //console.log("Received category wise:", data);
-    const orders = data.orders;
+// Function to display category-wise sales table
+function displayCategoryWiseSales(orders) {
     const orderHistoryDiv = document.getElementById("categoryWiseDiv");
     orderHistoryDiv.innerHTML = ""; // Clear previous content
 
@@ -69,13 +67,21 @@ ipcRenderer.on("category-wise-response", (event, data) => {
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
 
+    // ✅ Store the fetched category-wise sales in sessionStorage
+    sessionStorage.setItem("categoryWiseData", JSON.stringify(orders));
+
     // Attach export button functionality
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {
             exportTableToExcel(".order-history-table");
         });
     }, 100);
+}
+
+// ✅ Store category-wise sales data and display it
+ipcRenderer.on("category-wise-response", (event, data) => {
+    displayCategoryWiseSales(data.orders);
 });
 
-// Export function so it can be used in renderer.js
-module.exports = { fetchCategoryWise };
+// Export functions
+module.exports = { fetchCategoryWise, displayCategoryWiseSales };

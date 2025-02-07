@@ -191,6 +191,12 @@ async function updateMainContent(contentType) {
                 </div>
                 <div id="orderHistoryDiv"></div>
             `;
+            // ✅ Check if sessionStorage has existing data
+            const storedData = sessionStorage.getItem("orderHistoryData");
+            if (storedData) {
+                const orders = JSON.parse(storedData);
+                displayOrderHistory(orders); // Call function to display the stored table
+            }
             
         } else if (contentType === 'categoryHistory') {
             mainContent.innerHTML = `
@@ -210,6 +216,13 @@ async function updateMainContent(contentType) {
             `;
         
             fetchCategories(); // Fetch categories and populate the dropdown
+
+            // ✅ Restore the last fetched category-wise sales history
+            const storedData = sessionStorage.getItem("categoryWiseData");
+            if (storedData) {
+                const orders = JSON.parse(storedData);
+                displayCategoryWiseSales(orders);
+            }
         }
          else if (contentType === "deletedOrders") {
             mainContent.innerHTML = `
@@ -229,6 +242,13 @@ async function updateMainContent(contentType) {
 
             // Attach event listener to the button
             document.getElementById("fetchDeletedOrdersBtn").addEventListener("click", fetchDeletedOrders);
+
+            // ✅ Restore the last fetched deleted orders history
+            const storedData = sessionStorage.getItem("deletedOrdersData");
+            if (storedData) {
+                const orders = JSON.parse(storedData);
+                displayDeletedOrders(orders);
+            }
         }
 
         //MENU TAB
@@ -292,9 +312,13 @@ async function updateLeftPanel(contentType) {
 
             // Render Analytics-related buttons
             categoryPanel.innerHTML = `
+                <button class="category" id="DayEndSummary" onclick="updateMainContent('DayEndSummary')">Day End Summary</button>
+                <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
+                <button class="category" id="Trends" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
                 <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
                 <button class="category" id="TopSelling" onclick="updateMainContent('TopSelling')">Top Selling</button>
                 <button class="category" id="Trends" onclick="updateMainContent('Trends')">Trends</button>
+                <button class="category" id="Trends" onclick="updateMainContent('HourlySales')">Hourly Sales</button>
             `;
             break;
 
