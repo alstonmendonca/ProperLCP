@@ -24,7 +24,7 @@ async function displayMenu() {
 
             foodItems.forEach(item => {
                 menuContent += `
-                    <div class="food-item" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                    <div class="food-item" style="border: 1px solid #ccc; padding: 10px; text-align: center;" data-fid="${item.fid}">
                         <h3>${item.fname} <br style="line-height:5px; display:block"> 
                             ${item.veg == 1 ? "🌱" : "🍖"}
                         </h3>
@@ -37,7 +37,7 @@ async function displayMenu() {
                             <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
                             <span class="slider round"></span>
                         </label>
-                        <p>${item.is_on ? "Active ✅" : "Inactive ❌"}</p>
+                        <p class="status">${item.is_on ? "Active ✅" : "Inactive ❌"}</p>
 
                         <!-- Delete Button -->
                         <button class="delete-btn" data-fid="${item.fid}" 
@@ -57,7 +57,16 @@ async function displayMenu() {
                     const fid = event.target.getAttribute("data-fid");
                     const currentScrollPosition = mainContent.scrollTop; // Store current scroll position
                     await ipcRenderer.invoke("toggle-menu-item", parseInt(fid));
-                    await displayMenu(); // Refresh menu after toggling
+
+                    // Update the toggle switch and status directly
+                    const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                    const statusElement = foodItemElement.querySelector(".status");
+                    const isChecked = event.target.checked;
+
+                    // Update the toggle state and status text
+                    event.target.checked = isChecked; // Update the toggle switch
+                    statusElement.textContent = isChecked ? "Active ✅" : "Inactive ❌"; // Update status text
+
                     mainContent.scrollTop = currentScrollPosition; // Restore scroll position
                 });
             });
