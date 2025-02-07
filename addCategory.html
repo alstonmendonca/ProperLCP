@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .toggle-container {
+            margin-top: 10px;
+        }
+        .toggle-btn {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            border-radius: 5px;
+        }
+        .active { background-color: green; }
+        .inactive { background-color: red; }
+    </style>
+</head>
+<body>
+
+    <h2>Add New Category</h2>
+
+    <label for="categoryName">Category Name:</label>
+    <input type="text" id="categoryName" required>
+
+    <div class="toggle-container">
+        <button id="toggleActive" class="toggle-btn active">Active</button>
+    </div>
+
+    <div style="margin-top: 15px;">
+        <button id="addCategoryBtn">Add</button>
+        <button id="cancelBtn">Cancel</button>
+    </div>
+
+    <script defer src="addCategory.js"></script>
+
+</body>
+</html>

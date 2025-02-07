@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #toggleActive { padding: 10px; cursor: pointer; border-radius: 5px; }
+        .active { background-color: green; color: white; }
+        .inactive { background-color: red; color: white; }
+        .buttons { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Edit Category</h2>
+    <input type="text" id="editCategoryName" placeholder="Category Name"><br><br>
+    <button id="toggleActive" class="active">Active</button><br><br>
+    <div class="buttons">
+        <button id="saveChangesBtn">Save Changes</button>
+        <button id="cancelEditBtn">Cancel</button>
+    </div>
+    <script src="editCategory.js"></script>
+</body>
+</html>

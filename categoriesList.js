@@ -24,6 +24,7 @@ ipcRenderer.on("categories-list-response", (event, data) => {
                     <th>Category Name</th>
                     <th>Active</th>
                     <th>Remove</th>
+                    <th>Edit</th> 
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +39,9 @@ ipcRenderer.on("categories-list-response", (event, data) => {
                 <td>
                     <button class="remove-btn" onclick="confirmDeleteCategory(${category.catid})">➖</button>
                 </td>
+                <td>
+                    <button class="edit-btn" onclick="openEditWindow(${category.catid}, '${category.catname}', ${category.active})">✏️</button>
+                </td>
             </tr>
         `;
     });
@@ -46,6 +50,12 @@ ipcRenderer.on("categories-list-response", (event, data) => {
     categoriesTabDiv.innerHTML = tableHTML;
 });
 
+// Open edit category window by sending an IPC event to main.js
+function openEditWindow(catid, catname, active) {
+    ipcRenderer.send("open-edit-category-window", { catid, catname, active });
+}
+
+
 // Function to confirm and delete category
 function confirmDeleteCategory(categoryId) {
     if (confirm("Are you sure you want to delete this category?")) {
@@ -53,10 +63,16 @@ function confirmDeleteCategory(categoryId) {
     }
 }
 
-// Refresh the category list after deletion
+
+
+// Refresh the category list after deletion or update
 ipcRenderer.on("category-deleted", () => {
     fetchCategoriesList();
 });
 
+ipcRenderer.on("category-updated", () => {
+    fetchCategoriesList();
+});
+
 // Export function so it can be used in `renderer.js`
-module.exports = { fetchCategoriesList, confirmDeleteCategory };
+module.exports = { fetchCategoriesList, confirmDeleteCategory, openEditWindow };

@@ -138,6 +138,10 @@ async function updateMainContent(contentType) {
             `;
             fetchCategoriesList();
             billPanel.style.display = 'none'; // Hide bill panel for History
+
+            document.getElementById("addCategoryButton").addEventListener("click", () => {
+                ipcRenderer.send("open-add-category-window");
+            });
         }        
         //--------------------------------CATEGORIES END HERE-----------------------------------------------------
         // Settings
