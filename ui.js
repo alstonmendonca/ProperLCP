@@ -204,12 +204,7 @@ async function updateMainContent(contentType) {
             billPanel.style.display = 'none';
         }
         else if (contentType === "Help") {
-            mainContent.innerHTML = `
-                <h2>Help & Support</h2>
-                <p>Get help and support</p>
-                <div id="helpDiv"></div>
-            `;
-            billPanel.style.display = 'none';
+            loadHelpSection();
         }
         else if (contentType === "Exit") {
             ipcRenderer.send("exit-app");
