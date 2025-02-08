@@ -25,6 +25,7 @@ window.openEditWindow = openEditWindow;
 window.displayOrderHistory = displayOrderHistory;
 window.displayCategoryWiseSales = displayCategoryWiseSales;
 window.displayDeletedOrders = displayDeletedOrders;
+
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container

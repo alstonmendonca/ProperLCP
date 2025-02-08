@@ -8,6 +8,9 @@ function loadUserProfile(mainContent, billPanel) {
         <!-- Add User Buttons -->
         <button id="addUserButton" class="add-user-btn">Add User</button>
 
+        <!-- Remove User Buttons -->
+        <button id="removeUserButton" class="add-user-btn">Remove User</button>
+
         <!-- Admin Users Bar -->
         <div id="adminBar" class="admin-bar"></div>
 
@@ -22,6 +25,7 @@ function loadUserProfile(mainContent, billPanel) {
 
     // Add event listener to "Add User" button
     document.getElementById("addUserButton").addEventListener("click", openAddUserPopup);
+    document.getElementById("removeUserButton").addEventListener("click", openRemoveUserPopup);
 }
 
 // Handle response from main process
@@ -119,6 +123,11 @@ function openEditPopup(userid, uname, password) {
     });
 }
 
+// Function to open the Remove User window
+function openRemoveUserPopup() {
+    ipcRenderer.send("open-remove-user-window");
+}
+
 // Listen for "user-updated" event from main process
 ipcRenderer.on("user-updated", () => {
     document.body.querySelector(".edit-popup")?.remove(); // Close the popup
@@ -133,7 +142,7 @@ function openAddUserPopup() {
 // Listen for user added confirmation from `main.js`
 ipcRenderer.on("user-added", () => {
     document.querySelector(".popup")?.remove(); // Close the popup
-    ipcRenderer.send("get-users"); // Refresh the user list
+    ipcRenderer.send("get-users"); // **Force refresh**
 });
 
 // Listen for user addition failure

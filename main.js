@@ -401,6 +401,9 @@ ipcMain.on("add-user", (event, { uname, password, isadmin }) => {
         } else {
             console.log(`User added successfully with ID ${this.lastID}`);
             event.reply("user-added"); // Notify the frontend to refresh the user list
+
+            // **Broadcast event to refresh users in the main window**
+            mainWindow.webContents.send("get-users"); 
         }
     });
 });
@@ -428,6 +431,48 @@ ipcMain.on("open-add-user-window", () => {
         addUserWindow = null; // Reset when closed
     });
 });
+
+let removeUserWindow = null;
+
+ipcMain.on("open-remove-user-window", () => {
+    if (removeUserWindow) return; // Prevent multiple windows
+
+    removeUserWindow = new BrowserWindow({
+        width: 400,
+        height: 500,
+        title: "Remove Users",
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        }
+    });
+
+    removeUserWindow.loadFile(path.join(__dirname, "removeUser.html"));
+
+    removeUserWindow.on("closed", () => {
+        removeUserWindow = null; // Reset when closed
+    });
+});
+
+ipcMain.on("remove-users", (event, userIds) => {
+    if (userIds.length === 0) return;
+
+    const placeholders = userIds.map(() => "?").join(",");
+    const query = `DELETE FROM User WHERE userid IN (${placeholders})`;
+
+    db.run(query, userIds, function (err) {
+        if (err) {
+            console.error("Error deleting users:", err.message);
+            return;
+        }
+        console.log(`${this.changes} users deleted successfully.`);
+
+        // Notify the renderer process to refresh the list
+        event.reply("users-deleted");
+        mainWindow.webContents.send("get-users"); // Refresh user list in main UI
+    });
+});
+
 
 //----------------------------------------------SETTINGS TAB ENDS HERE--------------------------------------------
 

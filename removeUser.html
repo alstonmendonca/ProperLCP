@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Users</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        .user-list { max-width: 300px; margin: auto; text-align: left; }
+        .user-item { display: flex; justify-content: space-between; padding: 10px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; }
+        .selected { background-color: #ffcccc; } /* Highlight selected users */
+        button { padding: 10px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h3>Select Users to Remove</h3>
+    <div class="user-list" id="userList"></div>
+    <button id="removeUsers">Remove Users</button>
+    <button id="cancel">Cancel</button>
+
+    <script>
+        const { ipcRenderer } = require("electron");
+
+        let selectedUsers = new Set();
+
+        // Fetch users from the main process
+        ipcRenderer.send("get-users");
+
+        ipcRenderer.on("users-response", (event, users) => {
+            const userList = document.getElementById("userList");
+            userList.innerHTML = ""; // Clear previous content
+
+            users.forEach(user => {
+                const userItem = document.createElement("div");
+                userItem.classList.add("user-item");
+                userItem.innerHTML = `
+                    <span>${user.uname} (${user.isadmin ? "Admin" : "Staff"})</span>
+                    <input type="checkbox" data-id="${user.userid}">
+                `;
+
+                const checkbox = userItem.querySelector("input");
+
+                // Click anywhere on the box to toggle selection
+                userItem.addEventListener("click", () => {
+                    checkbox.checked = !checkbox.checked; // Toggle checkbox state
+
+                    if (checkbox.checked) {
+                        selectedUsers.add(user.userid);
+                        userItem.classList.add("selected");
+                    } else {
+                        selectedUsers.delete(user.userid);
+                        userItem.classList.remove("selected");
+                    }
+                });
+
+                // Prevent event from firing twice when clicking directly on checkbox
+                checkbox.addEventListener("click", (e) => e.stopPropagation());
+
+                userList.appendChild(userItem);
+            });
+        });
+
+        // Handle remove users
+        document.getElementById("removeUsers").addEventListener("click", () => {
+            if (selectedUsers.size === 0) {
+                alert("Select at least one user to delete.");
+                return;
+            }
+            ipcRenderer.send("remove-users", Array.from(selectedUsers));
+        });
+
+        // Close window on cancel
+        document.getElementById("cancel").addEventListener("click", () => {
+            window.close();
+        });
+
+        // Close window on successful deletion
+        ipcRenderer.on("users-deleted", () => {
+            window.close();
+        });
+
+    </script>
+</body>
+</html>
