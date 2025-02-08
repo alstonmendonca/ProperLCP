@@ -37,7 +37,7 @@ async function displayMenu() {
                             <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
                             <span class="slider round"></span>
                         </label>
-                        <p class="status">${item.is_on ? "Active ✅" : "Inactive ❌"}</p>
+                        <p class="status">${item.is_on ? "ON ✅" : "OFF ❌"}</p>
 
                         <!-- Delete Button -->
                         <button class="delete-btn" data-fid="${item.fid}" 
