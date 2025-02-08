@@ -4,7 +4,12 @@ const sqlite3 = require("sqlite3").verbose();
 
 let mainWindow;
 let userRole = null;
-
+let store; // Variable to hold electron-store instance
+// Function to initialize electron-store dynamically
+async function initStore() {
+    const { default: Store } = await import("electron-store");
+    store = new Store();
+}
 // Handle login logic and return user role
 ipcMain.handle('login', (event, password) => {
     if (password === '1212') {
@@ -23,9 +28,31 @@ const db = new sqlite3.Database('LC.db', (err) => {
         console.error("Failed to connect to the database:", err.message);
     } else {
         console.log("Connected to the SQLite database.");
+        checkAndResetFoodItems();
     }
 });
+// Function to check and reset `is_on`
+async function checkAndResetFoodItems() {
+    await initStore(); // Ensure electron-store is initialized
 
+    const lastOpenedDate = store.get("lastOpenedDate", null);
+    const currentDate = new Date().toISOString().split("T")[0]; // Get current date (YYYY-MM-DD)
+
+    if (lastOpenedDate !== currentDate) {
+        console.log("New day detected, resetting is_on column...");
+
+        db.run("UPDATE FoodItem SET is_on = 1", (err) => {
+            if (err) {
+                console.error("Failed to reset is_on:", err.message);
+            } else {
+                console.log("Successfully reset is_on for new day.");
+                store.set("lastOpenedDate", currentDate); // Update last opened date
+            }
+        });
+    } else {
+        console.log("Same day detected, no reset needed.");
+    }
+}
 //Close database connection
 // Function to close the database connection gracefully
 function closeDatabase() {
@@ -216,7 +243,66 @@ ipcMain.on("refresh-categories", (event) => {
     }
     
 });
+//Billing
+ipcMain.on("save-bill", async (event, orderData) => {
+    const { cashier, date, orderItems } = orderData;
 
+    try {
+        let totalPrice = 0, totalSGST = 0, totalCGST = 0, totalTax = 0;
+
+        // Fetch food item data and calculate totals
+        for (const { foodId, quantity } of orderItems) {
+            const row = await new Promise((resolve, reject) => {
+                db.get(`SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`, [foodId], (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+
+            let itemTotal = row.cost * quantity;
+            totalPrice += itemTotal;
+            totalSGST += (itemTotal * row.sgst) / 100;
+            totalCGST += (itemTotal * row.cgst) / 100;
+            totalTax += (itemTotal * row.tax) / 100;
+        }
+
+        // Step 1: Get the latest KOT number for the current date
+        const kotRow = await new Promise((resolve, reject) => {
+            db.get(`SELECT kot FROM Orders WHERE date = ? ORDER BY kot DESC LIMIT 1`, [date], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        let kot = kotRow ? kotRow.kot + 1 : 1; // Reset if new day, else increment
+
+        // Step 2: Insert the new order
+        const orderId = await new Promise((resolve, reject) => {
+            db.run(
+                `INSERT INTO Orders (kot, price, sgst, cgst, tax, cashier, date) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [kot, totalPrice.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), cashier, date],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve(this.lastID);
+                }
+            );
+        });
+
+        // Step 3: Insert items into OrderDetails
+        const stmt = db.prepare(`INSERT INTO OrderDetails (orderid, foodid, quantity) VALUES (?, ?, ?)`);
+        orderItems.forEach(({ foodId, quantity }) => stmt.run(orderId, foodId, quantity));
+        stmt.finalize();
+
+        console.log(`Order ${orderId} saved successfully with KOT ${kot}.`);
+
+        // Step 4: Send success response and KOT number to renderer
+        event.sender.send("bill-saved", { kot });
+
+    } catch (error) {
+        console.error("Error processing order:", error.message);
+        event.sender.send("bill-error", { error: error.message });
+    }
+});
 //---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {
@@ -487,18 +573,19 @@ ipcMain.handle("get-categories", async () => {
         });
     });
 });
-//MENU TAB FOOD ITEMS:
+//----------------------------------------------MENU TAB--------------------------------------------
 // Fetch Food Items when requested from the renderer process
-ipcMain.handle("get-menu-items", async (event) => {
+ipcMain.handle("get-menu-items", async () => {
     const query = `
-        SELECT FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, FoodItem.sgst, FoodItem.cgst, 
-               FoodItem.veg, FoodItem.is_on, Category.catname AS category_name
+        SELECT 
+            FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, 
+            FoodItem.sgst, FoodItem.cgst, FoodItem.veg, FoodItem.is_on, FoodItem.active,
+            Category.catname AS category_name
         FROM FoodItem
-        JOIN Category ON FoodItem.category = Category.catid
-        WHERE FoodItem.active = 1
+        JOIN Category ON FoodItem.category = Category.catid;
     `;
-    
-        try {
+
+    try {
         const rows = await new Promise((resolve, reject) => {
             db.all(query, (err, rows) => {
                 if (err) {
@@ -508,47 +595,107 @@ ipcMain.handle("get-menu-items", async (event) => {
                 }
             });
         });
-        
+
         return rows;
     } catch (err) {
-        console.error('Error fetching food items:', err);
+        console.error("Error fetching food items:", err);
         return [];
     }
 });
-//toggle menu items:
+
+// Toggle menu items - DAILY TOGGLE ON/OFF:
 ipcMain.handle("toggle-menu-item", async (event, fid) => {
-    return new Promise((resolve, reject) => {
-        db.run(`
-            UPDATE FoodItem 
-            SET is_on = CASE WHEN is_on = 1 THEN 0 ELSE 1 END
-            WHERE fid = ?`, 
-            [fid], 
-            function (err) {
+    try {
+        await new Promise((resolve, reject) => {
+            db.run(
+                `
+                UPDATE FoodItem 
+                SET is_on = CASE WHEN is_on = 1 THEN 0 ELSE 1 END
+                WHERE fid = ?
+                `,
+                [fid],
+                function (err) {
+                    if (err) {
+                        console.error("Error toggling item:", err);
+                        reject(err);
+                    } else {
+                        resolve(true);
+                    }
+                }
+            );
+        });
+
+        // Fetch updated value
+        const updatedItem = await new Promise((resolve, reject) => {
+            db.get("SELECT is_on FROM FoodItem WHERE fid = ?", [fid], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        return updatedItem ? updatedItem.is_on : null;
+    } catch (err) {
+        console.error("Error toggling menu item:", err);
+        return null;
+    }
+});
+
+// Toggle menu items - ACTIVE TOGGLE:
+ipcMain.handle("toggle-menu-item-active", async (event, fid) => {
+    try {
+        await new Promise((resolve, reject) => {
+            db.run(
+                `
+                UPDATE FoodItem 
+                SET active = CASE WHEN active = 1 THEN 0 ELSE 1 END
+                WHERE fid = ?
+                `,
+                [fid],
+                function (err) {
+                    if (err) {
+                        console.error("Error toggling active state:", err);
+                        reject(err);
+                    } else {
+                        resolve(true);
+                    }
+                }
+            );
+        });
+
+        // Fetch updated value
+        const updatedItem = await new Promise((resolve, reject) => {
+            db.get("SELECT active FROM FoodItem WHERE fid = ?", [fid], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        return updatedItem ? updatedItem.active : null;
+    } catch (err) {
+        console.error("Error toggling active state:", err);
+        return null;
+    }
+});
+
+// Delete Menu Item
+ipcMain.handle("delete-menu-item", async (event, fid) => {
+    try {
+        await new Promise((resolve, reject) => {
+            db.run("DELETE FROM FoodItem WHERE fid = ?", [fid], function (err) {
                 if (err) {
-                    console.error("Error toggling item:", err);
+                    console.error("Error deleting item:", err);
                     reject(err);
                 } else {
                     resolve(true);
                 }
-            }
-        );
-    });
-});
-
-
-//DELETING MENU ITEM
-// IPC Event to Delete an Item
-ipcMain.handle("delete-menu-item", async (event, fid) => {
-    return new Promise((resolve, reject) => {
-        db.run("DELETE FROM FoodItem WHERE fid = ?", [fid], function (err) {
-            if (err) {
-                console.error("Error deleting item:", err);
-                reject(err);
-            } else {
-                resolve(true);
-            }
+            });
         });
-    });
+
+        return true;
+    } catch (err) {
+        console.error("Error deleting menu item:", err);
+        return false;
+    }
 });
 
 //-------------------
