@@ -449,8 +449,7 @@ ipcMain.handle("get-menu-items", async (event) => {
         SELECT FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, FoodItem.sgst, FoodItem.cgst, 
                FoodItem.veg, FoodItem.is_on, Category.catname AS category_name
         FROM FoodItem
-        JOIN Category ON FoodItem.category = Category.catid
-        WHERE FoodItem.active = 1
+        JOIN Category ON FoodItem.category = Category.catid;
     `;
     
         try {
@@ -470,7 +469,7 @@ ipcMain.handle("get-menu-items", async (event) => {
         return [];
     }
 });
-//toggle menu items:
+//toggle menu items - DAILY TOGGLE ON/OFF:
 ipcMain.handle("toggle-menu-item", async (event, fid) => {
     return new Promise((resolve, reject) => {
         db.run(`
