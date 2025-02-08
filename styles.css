@@ -1,3 +1,10 @@
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #45a049;
+    --danger-color: #f44336;
+    --danger-hover: #d32f2f;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -53,7 +60,18 @@ body {
     border-right: 1px solid #ddd;
     display: flex;
     flex-direction: column;
-    overflow-y: auto
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    #content {
+        flex-direction: column;
+    }
+    #category-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
 }
 
 .category {
@@ -167,23 +185,6 @@ body {
     border-top: 1px solid #ddd;
 }
 
-/* Discount Section - Initially Hidden */
-#discount-section {
-    margin-top: 15px;
-    display: none;
-    padding-bottom: 10px;
-    border-top: 1px solid #ddd; /* Keeps UI neat */
-}
-
-/* Button Styling */
-button {
-    padding: 8px 12px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 #saveandprintbutton,
 #holdbutton,
 #applydiscountbutton {
@@ -201,14 +202,6 @@ button {
     border-radius: 5px;
 }
 
-#apply-discount-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-#apply-discount-btn:hover {
-    background-color: #45a049;
-}
 
 /* CSS to improve the display of discount section */
 #discount-section {
@@ -255,16 +248,12 @@ button {
     background-color: #45a049;
 }
 
-
-/* Basic styling for buttons */
-button:focus {
-    outline: none;
-}
-
 button {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: var(--primary-color);
     color: white;
+    font-size: 14px;
+    border-radius: 5px;
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -272,6 +261,10 @@ button {
 
 button:hover {
     background-color: #45a049;
+}
+
+button:focus {
+    outline: none;
 }
 
 
@@ -662,3 +655,80 @@ input:checked + .slider:before {
 }
 
 /* User Profile Styling Ends Here */
+
+/* Dark Mode Toggle Starts Here*/
+/* Toggle Switch Styling */
+/* Dark Mode Toggle Switch Styling */
+.dark-mode-toggle {
+    position: relative;
+    display: block;
+    width: 60px;
+    height: 34px;
+    margin: 20px auto;
+}
+
+.dark-mode-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.dark-mode-toggle .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.dark-mode-toggle .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.dark-mode-toggle input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+.dark-mode-toggle input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Dark Mode Styling */
+.dark-mode {
+background-color: #222;
+color: #fff;
+}
+
+.dark-mode #main-content, 
+.dark-mode #bill-panel,
+.dark-mode #category-panel,
+.dark-mode #discount-section {
+background-color: #333; /* Adjust as needed */
+color: #fff;
+}
+
+.dark-mode button {
+background-color: #555;
+color: #fff;
+}
+
+.dark-mode h2,
+.dark-mode p {
+    color: #ffffff;
+}
+
+
+/* Dark Mode Toggle Ends Here */
+
