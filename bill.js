@@ -36,6 +36,7 @@ function addToBill(itemId, itemName, price, quantity) {
 }
 
 // Function to remove an item from the bill
+// Function to remove an item from the bill
 function removeFromBill(itemId) {
     const billItem = document.getElementById(`bill-item-${itemId}`);
     if (billItem) {
@@ -44,54 +45,56 @@ function removeFromBill(itemId) {
     }
 }
 
+
+// Function to apply the discount
 // Function to apply the discount
 function applyDiscount() {
-    const discountPercentage = parseFloat(document.getElementById("discount-percentage").value);
-    const discountAmount = parseFloat(document.getElementById("discount-amount").value);
+    let discountPercentage = parseFloat(document.getElementById("discount-percentage").value) || 0;
+    let discountAmount = parseFloat(document.getElementById("discount-amount").value) || 0;
     let totalAmount = 0;
 
     // Get all the bill items
-    const billPanel = document.getElementById("bill-panel");
-    const billItems = billPanel.getElementsByClassName("bill-item");
+    const billItems = document.querySelectorAll(".bill-item");
 
-    // Calculate the total amount
-    for (let item of billItems) {
+    // Calculate the total amount before applying discounts
+    billItems.forEach(item => {
         totalAmount += parseFloat(item.querySelector(".bill-total").textContent);
-    }
+    });
 
-    // Validate discount input
-    if ((isNaN(discountPercentage) && isNaN(discountAmount)) || (discountPercentage < 0 && discountAmount < 0)) {
-        alert("Please enter a valid discount.");
+    // Ensure valid discount inputs
+    if (discountPercentage < 0 || discountAmount < 0) {
+        alert("Discount cannot be negative.");
         return;
     }
 
-    // Apply the discount based on user input
-    if (discountPercentage > 0) {
-        // Apply percentage discount
-        totalAmount -= totalAmount * (discountPercentage / 100);
+    if (discountPercentage > 0 && discountAmount > 0) {
+        alert("Please apply either a percentage discount OR a fixed amount discount, not both.");
+        return;
     }
 
-    if (discountAmount > 0) {
-        // Apply fixed amount discount
+    // Apply the discount
+    if (discountPercentage > 0) {
+        totalAmount -= totalAmount * (discountPercentage / 100);
+    } else if (discountAmount > 0) {
         totalAmount -= discountAmount;
     }
 
-    // Ensure the total doesn't go below zero
+    // Ensure total doesn't go negative
     totalAmount = Math.max(0, totalAmount);
 
-    // Format the total amount with currency formatting
+    // Format the total amount
     const formattedTotal = new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR'
     }).format(totalAmount);
 
-    // Update the total element with the discounted price
-    const totalElement = document.getElementById("total-amount");
-    totalElement.textContent = `Total: ${formattedTotal}`;
+    // Update total display
+    document.getElementById("total-amount").textContent = `Total: ${formattedTotal}`;
 
-    // Optionally, hide the discount section after applying the discount
+    // Hide discount section after applying
     document.getElementById("discount-section").style.display = 'none';
 }
+
 
 // Function to update the total amount of the bill
 function updateBillTotal() {
