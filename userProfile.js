@@ -5,6 +5,9 @@ function loadUserProfile(mainContent, billPanel) {
     mainContent.innerHTML = `
         <h2>User Profile</h2>
 
+        <!-- Add User Buttons -->
+        <button id="addUserButton" class="add-user-btn">Add User</button>
+
         <!-- Admin Users Bar -->
         <div id="adminBar" class="admin-bar"></div>
 
@@ -16,6 +19,9 @@ function loadUserProfile(mainContent, billPanel) {
 
     // Fetch users from the database
     ipcRenderer.send("get-users");
+
+    // Add event listener to "Add User" button
+    document.getElementById("addUserButton").addEventListener("click", openAddUserPopup);
 }
 
 // Handle response from main process
@@ -118,6 +124,23 @@ ipcRenderer.on("user-updated", () => {
     document.body.querySelector(".edit-popup")?.remove(); // Close the popup
     ipcRenderer.send("get-users"); // Refresh the user list
 });
+
+// Function to open Add User popup
+function openAddUserPopup() {
+    ipcRenderer.send("open-add-user-window");
+}
+
+// Listen for user added confirmation from `main.js`
+ipcRenderer.on("user-added", () => {
+    document.querySelector(".popup")?.remove(); // Close the popup
+    ipcRenderer.send("get-users"); // Refresh the user list
+});
+
+// Listen for user addition failure
+ipcRenderer.on("user-add-failed", (event, data) => {
+    alert(`Error: ${data.error}`);
+});
+
 
 
 module.exports = { loadUserProfile };

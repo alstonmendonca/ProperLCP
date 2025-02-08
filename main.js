@@ -390,6 +390,45 @@ ipcMain.on("update-user", (event, data) => {
     });
 });
 
+// Handle request to add a new user
+ipcMain.on("add-user", (event, { uname, password, isadmin }) => {
+    const query = `INSERT INTO User (uname, password, isadmin) VALUES (?, ?, ?)`;
+
+    db.run(query, [uname, password, isadmin], function (err) {
+        if (err) {
+            console.error("Error adding user:", err.message);
+            event.reply("user-add-failed", { error: err.message });
+        } else {
+            console.log(`User added successfully with ID ${this.lastID}`);
+            event.reply("user-added"); // Notify the frontend to refresh the user list
+        }
+    });
+});
+
+let addUserWindow = null; // Keep track of the window
+
+ipcMain.on("open-add-user-window", () => {
+    if (addUserWindow) {
+        return; // Prevent opening multiple windows
+    }
+
+    addUserWindow = new BrowserWindow({
+        width: 400,
+        height: 300,
+        title: "Add User",
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        }
+    });
+
+    addUserWindow.loadFile(path.join(__dirname, "addUser.html")); // Create a new HTML file for it
+
+    addUserWindow.on("closed", () => {
+        addUserWindow = null; // Reset when closed
+    });
+});
+
 //----------------------------------------------SETTINGS TAB ENDS HERE--------------------------------------------
 
 ipcMain.handle("get-categories", async () => {
