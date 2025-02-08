@@ -4,7 +4,12 @@ const sqlite3 = require("sqlite3").verbose();
 
 let mainWindow;
 let userRole = null;
-
+let store; // Variable to hold electron-store instance
+// Function to initialize electron-store dynamically
+async function initStore() {
+    const { default: Store } = await import("electron-store");
+    store = new Store();
+}
 // Handle login logic and return user role
 ipcMain.handle('login', (event, password) => {
     if (password === '1212') {
@@ -23,9 +28,31 @@ const db = new sqlite3.Database('LC.db', (err) => {
         console.error("Failed to connect to the database:", err.message);
     } else {
         console.log("Connected to the SQLite database.");
+        checkAndResetFoodItems();
     }
 });
+// Function to check and reset `is_on`
+async function checkAndResetFoodItems() {
+    await initStore(); // Ensure electron-store is initialized
 
+    const lastOpenedDate = store.get("lastOpenedDate", null);
+    const currentDate = new Date().toISOString().split("T")[0]; // Get current date (YYYY-MM-DD)
+
+    if (lastOpenedDate !== currentDate) {
+        console.log("New day detected, resetting is_on column...");
+
+        db.run("UPDATE FoodItem SET is_on = 1", (err) => {
+            if (err) {
+                console.error("Failed to reset is_on:", err.message);
+            } else {
+                console.log("Successfully reset is_on for new day.");
+                store.set("lastOpenedDate", currentDate); // Update last opened date
+            }
+        });
+    } else {
+        console.log("Same day detected, no reset needed.");
+    }
+}
 //Close database connection
 // Function to close the database connection gracefully
 function closeDatabase() {
