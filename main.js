@@ -360,6 +360,76 @@ ipcMain.on("show-excel-export-message", (event, options) => {
 });
 
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
+//---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
+
+ipcMain.on("get-users", (event) => {
+    const query = `SELECT * FROM User`;  
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Database Error:", err);
+            event.reply("users-response", []);
+            return;
+        }
+        event.reply("users-response", rows);
+    });
+});
+
+// Handle user updates
+ipcMain.on("update-user", (event, data) => {
+    const { userid, uname, password } = data;
+    const query = `UPDATE User SET uname = ?, password = ? WHERE userid = ?`;
+
+    db.run(query, [uname, password, userid], function (err) {
+        if (err) {
+            console.error("Update Error:", err);
+            event.reply("user-update-failed");
+            return;
+        }
+        console.log(`User ${userid} updated successfully.`);
+        event.reply("user-updated"); // Notify renderer process to refresh the page
+    });
+});
+
+// Handle request to add a new user
+ipcMain.on("add-user", (event, { uname, password, isadmin }) => {
+    const query = `INSERT INTO User (uname, password, isadmin) VALUES (?, ?, ?)`;
+
+    db.run(query, [uname, password, isadmin], function (err) {
+        if (err) {
+            console.error("Error adding user:", err.message);
+            event.reply("user-add-failed", { error: err.message });
+        } else {
+            console.log(`User added successfully with ID ${this.lastID}`);
+            event.reply("user-added"); // Notify the frontend to refresh the user list
+        }
+    });
+});
+
+let addUserWindow = null; // Keep track of the window
+
+ipcMain.on("open-add-user-window", () => {
+    if (addUserWindow) {
+        return; // Prevent opening multiple windows
+    }
+
+    addUserWindow = new BrowserWindow({
+        width: 400,
+        height: 300,
+        title: "Add User",
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        }
+    });
+
+    addUserWindow.loadFile(path.join(__dirname, "addUser.html")); // Create a new HTML file for it
+
+    addUserWindow.on("closed", () => {
+        addUserWindow = null; // Reset when closed
+    });
+});
+
+//----------------------------------------------SETTINGS TAB ENDS HERE--------------------------------------------
 
 ipcMain.handle("get-categories", async () => {
     return new Promise((resolve, reject) => {

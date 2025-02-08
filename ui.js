@@ -144,28 +144,57 @@ async function updateMainContent(contentType) {
             });
         }        
         //--------------------------------CATEGORIES END HERE-----------------------------------------------------
-        // Settings
-        else if (settings.includes(contentType)) {
-            let settingsText = {
-                "UserProfile": "Manage your profile, Add/Update/Delete users",
-                "ThemeToggle": "Switch between light and dark themes",
-                "TaxAndDiscount": "Set default values for tax rates and discounts",
-                "PrinterConfig": "Configure your printer",
-                "Security": "Manage security settings, Manage roles and permissions",
-                "Help": "Get help and support",
-                "Exit": "Exit"
-            };
-            if (contentType === "Exit") {
-                ipcRenderer.send("exit-app");
-            }
+        // --------------------------------SETTINGS START HERE-----------------------------------------------------
+        // SETTINGS TAB
+        else if (contentType === "UserProfile" || contentType === "Settings") {
+            loadUserProfile(mainContent, billPanel);
+        }
+        else if (contentType === "ThemeToggle") {
             mainContent.innerHTML = `
-                <h2>${contentType.replace(/([A-Z])/g, " $1")}</h2>
-                <p>${settingsText[contentType]}</p>
+                <h2>Theme Toggle</h2>
+                <p>Switch between light and dark themes</p>
+                <button id="toggleThemeButton">Toggle Theme</button>
             `;
-            billPanel.style.display = 'none'; // Hide bill panel for Settings
-        } 
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "TaxAndDiscount") {
+            mainContent.innerHTML = `
+                <h2>Tax & Discount</h2>
+                <p>Set default values for tax rates and discounts</p>
+                <div id="taxDiscountDiv"></div>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "PrinterConfig") {
+            mainContent.innerHTML = `
+                <h2>Printer Configuration</h2>
+                <p>Configure your printer</p>
+                <div id="printerConfigDiv"></div>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "Security") {
+            mainContent.innerHTML = `
+                <h2>Security Settings</h2>
+                <p>Manage security settings, roles, and permissions</p>
+                <div id="securityDiv"></div>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "Help") {
+            mainContent.innerHTML = `
+                <h2>Help & Support</h2>
+                <p>Get help and support</p>
+                <div id="helpDiv"></div>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "Exit") {
+            ipcRenderer.send("exit-app");
+        }
+    // --------------------------------SETTINGS END HERE----------------------------------------------------- 
         
-        // HISTORY TAB
+        //----------------------------------------------- HISTORY TAB------------------------------------------------
         else if (contentType === 'History' || contentType === "todaysOrders") {
             mainContent.innerHTML = `
                 <h1>Todays Orders</h1>
