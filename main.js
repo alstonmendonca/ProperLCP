@@ -360,6 +360,37 @@ ipcMain.on("show-excel-export-message", (event, options) => {
 });
 
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
+//---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
+
+ipcMain.on("get-users", (event) => {
+    const query = `SELECT * FROM User`;  
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Database Error:", err);
+            event.reply("users-response", []);
+            return;
+        }
+        event.reply("users-response", rows);
+    });
+});
+
+// Handle user updates
+ipcMain.on("update-user", (event, data) => {
+    const { userid, uname, password } = data;
+    const query = `UPDATE User SET uname = ?, password = ? WHERE userid = ?`;
+
+    db.run(query, [uname, password, userid], function (err) {
+        if (err) {
+            console.error("Update Error:", err);
+            event.reply("user-update-failed");
+            return;
+        }
+        console.log(`User ${userid} updated successfully.`);
+        event.reply("user-updated"); // Notify renderer process to refresh the page
+    });
+});
+
+//----------------------------------------------SETTINGS TAB ENDS HERE--------------------------------------------
 
 ipcMain.handle("get-categories", async () => {
     return new Promise((resolve, reject) => {

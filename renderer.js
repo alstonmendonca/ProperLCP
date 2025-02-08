@@ -11,6 +11,7 @@ const {openEditWindow} = require("./categoriesList");
 const {displayOrderHistory} = require("./history");
 const { displayCategoryWiseSales } = require("./categoryWiseTable");
 const { displayDeletedOrders } = require("./deletedOrdersTable");
+const { loadUserProfile } = require("./userProfile");
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

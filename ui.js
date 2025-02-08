@@ -147,12 +147,7 @@ async function updateMainContent(contentType) {
         // --------------------------------SETTINGS START HERE-----------------------------------------------------
         // SETTINGS TAB
         else if (contentType === "UserProfile" || contentType === "Settings") {
-            mainContent.innerHTML = `
-                <h2>User Profile</h2>
-                <p>Manage your profile, Add/Update/Delete users</p>
-                <div id="userProfileDiv"></div>
-            `;
-            billPanel.style.display = 'none'; 
+            loadUserProfile(mainContent, billPanel);
         }
         else if (contentType === "ThemeToggle") {
             mainContent.innerHTML = `
