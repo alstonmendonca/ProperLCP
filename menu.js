@@ -47,8 +47,8 @@ async function displayMenu() {
         <p class="status active-status">${item.active ? "ACTIVE ✅" : "INACTIVE ❌"}</p>
     </div>
 
-    <!-- IS_ON Toggle Switch -->
-    <div class="toggle-group" style="display: flex; flex-direction: column; align-items: center; font-size: 12px;">
+    <!-- IS_ON Toggle Switch (Initially Hidden if Not Active) -->
+    <div class="toggle-group is-on-container" style="display: ${item.active ? 'flex' : 'none'}; flex-direction: column; align-items: center; font-size: 12px;">
         <label class="switch" style="transform: scale(0.85);">
             <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
             <span class="slider round"></span>
@@ -57,6 +57,7 @@ async function displayMenu() {
     </div>
 
 </div>
+
 
             
                         <!-- Delete Button -->
@@ -101,8 +102,17 @@ async function displayMenu() {
                     const isChecked = event.target.checked;
 
                     statusElement.textContent = isChecked ? "ACTIVE ✅" : "INACTIVE ❌";
+
+                    // Show or hide the IS_ON toggle switch container
+                    const isOnContainer = foodItemElement.querySelector(".is-on-container");
+                    if (isChecked) {
+                        isOnContainer.style.display = "flex";
+                    } else {
+                        isOnContainer.style.display = "none";
+                    }
                 });
             });
+
 
             // Add event listeners to delete buttons
             document.querySelectorAll(".delete-btn").forEach((button) => {
