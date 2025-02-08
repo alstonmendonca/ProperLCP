@@ -243,7 +243,66 @@ ipcMain.on("refresh-categories", (event) => {
     }
     
 });
+//Billing
+ipcMain.on("save-bill", async (event, orderData) => {
+    const { cashier, date, orderItems } = orderData;
 
+    try {
+        let totalPrice = 0, totalSGST = 0, totalCGST = 0, totalTax = 0;
+
+        // Fetch food item data and calculate totals
+        for (const { foodId, quantity } of orderItems) {
+            const row = await new Promise((resolve, reject) => {
+                db.get(`SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`, [foodId], (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+
+            let itemTotal = row.cost * quantity;
+            totalPrice += itemTotal;
+            totalSGST += (itemTotal * row.sgst) / 100;
+            totalCGST += (itemTotal * row.cgst) / 100;
+            totalTax += (itemTotal * row.tax) / 100;
+        }
+
+        // Step 1: Get the latest KOT number for the current date
+        const kotRow = await new Promise((resolve, reject) => {
+            db.get(`SELECT kot FROM Orders WHERE date = ? ORDER BY kot DESC LIMIT 1`, [date], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        let kot = kotRow ? kotRow.kot + 1 : 1; // Reset if new day, else increment
+
+        // Step 2: Insert the new order
+        const orderId = await new Promise((resolve, reject) => {
+            db.run(
+                `INSERT INTO Orders (kot, price, sgst, cgst, tax, cashier, date) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [kot, totalPrice.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), cashier, date],
+                function (err) {
+                    if (err) reject(err);
+                    else resolve(this.lastID);
+                }
+            );
+        });
+
+        // Step 3: Insert items into OrderDetails
+        const stmt = db.prepare(`INSERT INTO OrderDetails (orderid, foodid, quantity) VALUES (?, ?, ?)`);
+        orderItems.forEach(({ foodId, quantity }) => stmt.run(orderId, foodId, quantity));
+        stmt.finalize();
+
+        console.log(`Order ${orderId} saved successfully with KOT ${kot}.`);
+
+        // Step 4: Send success response and KOT number to renderer
+        event.sender.send("bill-saved", { kot });
+
+    } catch (error) {
+        console.error("Error processing order:", error.message);
+        event.sender.send("bill-error", { error: error.message });
+    }
+});
 //---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {

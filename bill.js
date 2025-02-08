@@ -123,8 +123,32 @@ function updateBillTotal() {
 
 // Function to save and print the bill
 function saveAndPrintBill() {
+    // Get cashier ID (Assume it's set somewhere in the UI)
+    const cashier = 1; // Replace with actual cashier ID
+
+    // Get current date in YYYY-MM-DD format
+    const date = new Date().toISOString().split("T")[0];
+
+    // Get all bill items
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        alert("No items in the bill.");
+        return;
+    }
+
+    // Send order data to main process
+    ipcRenderer.send("save-bill", { cashier, date, orderItems });
+
     alert("Bill saved and sent to print!");
-    window.print(); // Opens print dialog
 }
 
 function holdBill() {
