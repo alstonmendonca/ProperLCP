@@ -469,17 +469,19 @@ ipcMain.handle("get-categories", async () => {
         });
     });
 });
-//MENU TAB FOOD ITEMS:
+//----------------------------------------------MENU TAB--------------------------------------------
 // Fetch Food Items when requested from the renderer process
-ipcMain.handle("get-menu-items", async (event) => {
+ipcMain.handle("get-menu-items", async () => {
     const query = `
-        SELECT FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, FoodItem.sgst, FoodItem.cgst, 
-               FoodItem.veg, FoodItem.is_on, Category.catname AS category_name
+        SELECT 
+            FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, 
+            FoodItem.sgst, FoodItem.cgst, FoodItem.veg, FoodItem.is_on, FoodItem.active,
+            Category.catname AS category_name
         FROM FoodItem
         JOIN Category ON FoodItem.category = Category.catid;
     `;
-    
-        try {
+
+    try {
         const rows = await new Promise((resolve, reject) => {
             db.all(query, (err, rows) => {
                 if (err) {
@@ -489,47 +491,107 @@ ipcMain.handle("get-menu-items", async (event) => {
                 }
             });
         });
-        
+
         return rows;
     } catch (err) {
-        console.error('Error fetching food items:', err);
+        console.error("Error fetching food items:", err);
         return [];
     }
 });
-//toggle menu items - DAILY TOGGLE ON/OFF:
+
+// Toggle menu items - DAILY TOGGLE ON/OFF:
 ipcMain.handle("toggle-menu-item", async (event, fid) => {
-    return new Promise((resolve, reject) => {
-        db.run(`
-            UPDATE FoodItem 
-            SET is_on = CASE WHEN is_on = 1 THEN 0 ELSE 1 END
-            WHERE fid = ?`, 
-            [fid], 
-            function (err) {
+    try {
+        await new Promise((resolve, reject) => {
+            db.run(
+                `
+                UPDATE FoodItem 
+                SET is_on = CASE WHEN is_on = 1 THEN 0 ELSE 1 END
+                WHERE fid = ?
+                `,
+                [fid],
+                function (err) {
+                    if (err) {
+                        console.error("Error toggling item:", err);
+                        reject(err);
+                    } else {
+                        resolve(true);
+                    }
+                }
+            );
+        });
+
+        // Fetch updated value
+        const updatedItem = await new Promise((resolve, reject) => {
+            db.get("SELECT is_on FROM FoodItem WHERE fid = ?", [fid], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        return updatedItem ? updatedItem.is_on : null;
+    } catch (err) {
+        console.error("Error toggling menu item:", err);
+        return null;
+    }
+});
+
+// Toggle menu items - ACTIVE TOGGLE:
+ipcMain.handle("toggle-menu-item-active", async (event, fid) => {
+    try {
+        await new Promise((resolve, reject) => {
+            db.run(
+                `
+                UPDATE FoodItem 
+                SET active = CASE WHEN active = 1 THEN 0 ELSE 1 END
+                WHERE fid = ?
+                `,
+                [fid],
+                function (err) {
+                    if (err) {
+                        console.error("Error toggling active state:", err);
+                        reject(err);
+                    } else {
+                        resolve(true);
+                    }
+                }
+            );
+        });
+
+        // Fetch updated value
+        const updatedItem = await new Promise((resolve, reject) => {
+            db.get("SELECT active FROM FoodItem WHERE fid = ?", [fid], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        return updatedItem ? updatedItem.active : null;
+    } catch (err) {
+        console.error("Error toggling active state:", err);
+        return null;
+    }
+});
+
+// Delete Menu Item
+ipcMain.handle("delete-menu-item", async (event, fid) => {
+    try {
+        await new Promise((resolve, reject) => {
+            db.run("DELETE FROM FoodItem WHERE fid = ?", [fid], function (err) {
                 if (err) {
-                    console.error("Error toggling item:", err);
+                    console.error("Error deleting item:", err);
                     reject(err);
                 } else {
                     resolve(true);
                 }
-            }
-        );
-    });
-});
-
-
-//DELETING MENU ITEM
-// IPC Event to Delete an Item
-ipcMain.handle("delete-menu-item", async (event, fid) => {
-    return new Promise((resolve, reject) => {
-        db.run("DELETE FROM FoodItem WHERE fid = ?", [fid], function (err) {
-            if (err) {
-                console.error("Error deleting item:", err);
-                reject(err);
-            } else {
-                resolve(true);
-            }
+            });
         });
-    });
+
+        return true;
+    } catch (err) {
+        console.error("Error deleting menu item:", err);
+        return false;
+    }
 });
 
 //-------------------
