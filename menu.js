@@ -23,6 +23,7 @@ async function displayMenu() {
             let menuContent = `
                 <h2>Menu</h2>
                 <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                    <button id="addNewItem" style="border: 1px solid #ccc; padding: 10px; text-align: center;">Add New Item</button>
             `;
 
             foodItems.forEach((item) => {
@@ -36,34 +37,37 @@ async function displayMenu() {
                         <p>Price: ₹${item.cost}</p>
                         
                         <!-- Toggle Switches Container -->
-<div class="toggle-container" style="display: flex; justify-content: center; gap: 18px; align-items: center;">
+                        <div class="toggle-container" style="display: flex; justify-content: center; gap: 18px; align-items: center;">
 
-    <!-- ACTIVE Toggle Switch -->
-    <div class="toggle-group" style="display: flex; flex-direction: column; align-items: center; font-size: 12px;">
-        <label class="switch" style="transform: scale(0.85);">
-            <input type="checkbox" class="active-toggle-switch" data-fid="${item.fid}" ${item.active ? "checked" : ""}>
-            <span class="slider round"></span>
-        </label>
-        <p class="status active-status">${item.active ? "ACTIVE ✅" : "INACTIVE ❌"}</p>
-    </div>
+                            <!-- ACTIVE Toggle Switch -->
+                            <div class="toggle-group" style="display: flex; flex-direction: column; align-items: center; font-size: 12px;">
+                                <label class="switch" style="transform: scale(0.85);">
+                                    <input type="checkbox" class="active-toggle-switch" data-fid="${item.fid}" ${item.active ? "checked" : ""}>
+                                    <span class="slider round"></span>
+                                </label>
+                                <p class="status active-status">${item.active ? "ACTIVE ✅" : "INACTIVE ❌"}</p>
+                            </div>
 
-    <!-- IS_ON Toggle Switch (Initially Hidden if Not Active) -->
-    <div class="toggle-group is-on-container" style="display: ${item.active ? 'flex' : 'none'}; flex-direction: column; align-items: center; font-size: 12px;">
-        <label class="switch" style="transform: scale(0.85);">
-            <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
-            <span class="slider round"></span>
-        </label>
-        <p class="status is-on-status">${item.is_on ? "ON ✅" : "OFF ❌"}</p>
-    </div>
+                            <!-- IS_ON Toggle Switch (Initially Hidden if Not Active) -->
+                            <div class="toggle-group is-on-container" style="display: ${item.active ? 'flex' : 'none'}; flex-direction: column; align-items: center; font-size: 12px;">
+                                <label class="switch" style="transform: scale(0.85);">
+                                    <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
+                                    <span class="slider round"></span>
+                                </label>
+                                <p class="status is-on-status">${item.is_on ? "ON ✅" : "OFF ❌"}</p>
+                            </div>
 
-</div>
+                        </div>
 
-
-            
                         <!-- Delete Button -->
                         <button class="delete-btn" data-fid="${item.fid}" 
                             style="background: red; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
                             Delete
+                        </button>
+                        <!-- Edit Button -->
+                        <button class="edit-btn" data-fid="${item.fid}" 
+                            style="background: grey; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
+                            Edit
                         </button>
                     </div>
                 `;
@@ -74,6 +78,12 @@ async function displayMenu() {
 
             // Restore previous scroll position
             mainContent.scrollTop = currentScrollPosition;
+            // Add event listeners to Add New Item button
+            document.querySelector("#addNewItem").addEventListener("click", async () => {
+                ipcRenderer.send("open-add-item-window"); // Send event to main process
+                return; // Stop further execution
+            });
+
 
             // Add event listeners to IS_ON toggle switches
             document.querySelectorAll(".toggle-switch").forEach((switchEl) => {
@@ -127,6 +137,99 @@ async function displayMenu() {
                     }
                 });
             });
+
+            // Add event listeners to edit buttons
+            document.querySelectorAll(".edit-btn").forEach((button) => {
+                button.addEventListener("click", async (event) => {
+                    const fid = event.target.getAttribute("data-fid");
+                    const existingPopup = document.querySelector(".edit-popup");
+
+                    // If popup already exists, remove it (toggle behavior)
+                    if (existingPopup) {
+                        document.body.removeChild(existingPopup);
+                        return; // Stop execution to prevent reopening immediately
+                    }
+
+                    const item = foodItems.find((item) => item.fid == fid);
+                    if (!item) {
+                        alert("Food item not found!");
+                        return;
+                    }
+
+                    // Create the edit popup dynamically
+                    const popup = document.createElement("div");
+                    popup.classList.add("edit-popup");
+                    popup.innerHTML = `
+                        <div class="popup-content">
+                            <h3>Edit Food Item</h3>
+                            <label>Name:</label>
+                            <input type="text" id="editFname" value="${item.fname}">
+                            <label>Price:</label>
+                            <input type="number" id="editCost" value="${item.cost}" style="width: 150px;">
+                            <label>SGST:</label>
+                            <input type="number" id="editsgst" value="${item.sgst}" min="0" style="width: 150px;">
+                            <label>CGST:</label>
+                            <input type="number" id="editcgst" value="${item.cgst}" min="0" style="width: 150px;">
+                            <label>VEG:</label>
+                            <input type="number" id="editveg" value="${item.veg}" min="0" max="1" step="1" style="width: 150px;">
+                            <div class="popup-buttons">
+                                <button id="saveChanges">Save</button>
+                                <button id="closePopup">Cancel</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(popup);
+
+                    // Close popup when clicking "Cancel"
+                    document.getElementById("closePopup").addEventListener("click", () => {
+                        document.body.removeChild(popup);
+                    });
+
+                    // Save changes
+                    document.getElementById("saveChanges").addEventListener("click", async () => {
+                        const updatedFname = document.getElementById("editFname").value.trim();
+                        const updatedCost = parseFloat(document.getElementById("editCost").value);
+                        const updatedsgst = parseFloat(document.getElementById("editsgst").value);
+                        const updatedcgst = parseFloat(document.getElementById("editcgst").value);
+                        const updatedveg = parseInt(document.getElementById("editveg").value);
+
+                        // Validate inputs
+                        if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
+                            alert("Please enter valid details.");
+                            return;
+                        }
+
+                        // Send IPC message to update the database
+                        const response = await ipcRenderer.invoke("update-food-item", {
+                            fid,
+                            fname: updatedFname,
+                            cost: updatedCost,
+                            sgst: updatedsgst,
+                            cgst: updatedcgst,
+                            veg: updatedveg
+                        });
+
+                        if (response.success) {
+                            // Remove the popup
+                            document.body.removeChild(popup);
+
+                            // Update UI dynamically
+                            const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                            if (foodItemElement) {
+                                foodItemElement.querySelector("h3").innerHTML = `${updatedFname} <br style="line-height:5px; display:block"> ${updatedveg == 1 ? "🌱" : "🍖"}`;
+                                foodItemElement.querySelector("p:nth-child(4)").textContent = `Price: ₹${updatedCost}`;
+
+                            }
+                        } else {
+                            alert(`Failed to update item: ${response.error}`);
+                        }
+                    });
+                });
+            });
+
+
+
         } else {
             mainContent.innerHTML = `<p>No items available in this category.</p>`;
         }

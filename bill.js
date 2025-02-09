@@ -45,7 +45,14 @@ function removeFromBill(itemId) {
     }
 }
 
-
+// Function to reset the bill by removing all items
+function resetBill() {
+    const billItemsList = document.getElementById("bill-items-list");
+    // Clear all items from the bill
+    billItemsList.innerHTML = '';
+    // Update the total bill amount (if you have a total display)
+    updateBillTotal();
+}
 // Function to apply the discount
 // Function to apply the discount
 function applyDiscount() {
@@ -149,6 +156,7 @@ function saveAndPrintBill() {
     ipcRenderer.send("save-bill", { cashier, date, orderItems });
 
     alert("Bill saved and sent to print!");
+    resetBill();
 }
 
 function holdBill() {

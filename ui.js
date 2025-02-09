@@ -89,33 +89,7 @@ async function updateMainContent(contentType) {
                 });
             });
         }
-        
-        
-        
-        // Menu Management
-        else if (menuManagement.includes(contentType)) {
-
-            let actionText = {
-                "ShowMenu":"Show the menu",
-                "AddItem": "Add an item here",
-                "UpdateItem": "Edit an existing item",
-                "DeleteItem": "Remove an item from the menu"
-            };
-            if (contentType === "AddItem") {
-                ipcRenderer.send("open-add-item-window"); // Send event to main process
-                return; // Stop further execution
-            }
-            else if (contentType === "ShowMenu") {
-                displayMenu(); // Call the function from menu.js to display menu
-            }
-            else {
-                mainContent.innerHTML = `
-                <h2>${contentType.replace(/([A-Z])/g, " $1")}</h2>
-                <p>${actionText[contentType]}</p>
-            `;
-            }
-            billPanel.style.display = 'none'; // Hide bill panel for Menu Management
-        } 
+        // Menu Management -----REMOVED-----------
         // Analytics
         else if (analytics.includes(contentType)) {
             let analyticsText = {
@@ -349,14 +323,7 @@ async function updateLeftPanel(contentType) {
             break;
 
         case "Menu":
-            categoryPanel.style.display = "block";
-
-            // Render Menu-related buttons
-            categoryPanel.innerHTML = `
-                <button class="category" id="ShowMenu" onclick="updateMainContent('ShowMenu')">Menu</button>
-                <button class="category" id="AddItem" onclick="updateMainContent('AddItem')">Add Item</button>
-                <button class="category" id="UpdateItem" onclick="updateMainContent('UpdateItem')">Update Item</button>
-            `;
+            categoryPanel.style.display = "none";
             break;
 
         case "Analytics":
