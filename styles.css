@@ -728,7 +728,34 @@ color: #fff;
 .dark-mode p {
     color: #ffffff;
 }
-
-
 /* Dark Mode Toggle Ends Here */
+/* The Order Histoy Context Menu */
+
+.context-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    padding: 5px;
+    border-radius: 5px;
+    width: 180px;
+}
+
+.context-option {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+}
+
+.context-option:last-child {
+    border-bottom: none;
+}
+
+.context-option:hover {
+    background: #f0f0f0;
+}
+
+/* Order History context menu ends here*/
 
