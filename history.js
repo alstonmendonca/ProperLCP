@@ -12,19 +12,16 @@ function fetchOrderHistory() {
     ipcRenderer.send("get-order-history", { startDate, endDate });
 }
 
-// Receive the order history from the main process and update the UI
 ipcRenderer.on("order-history-response", (event, data) => {
-    //console.log("Received order history:", data);
     const orders = data.orders;
     const orderHistoryDiv = document.getElementById("orderHistoryDiv");
-    orderHistoryDiv.innerHTML = ""; // Clear previous content
+    orderHistoryDiv.innerHTML = "";
 
     if (orders.length === 0) {
         orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
         return;
     }
 
-    // Create a table
     let tableHTML = `
         <table class="order-history-table">
             <thead>
@@ -45,7 +42,7 @@ ipcRenderer.on("order-history-response", (event, data) => {
 
     orders.forEach(order => {
         tableHTML += `
-            <tr>
+            <tr data-billno="${order.billno}">
                 <td>${order.billno}</td>
                 <td>${order.date}</td>
                 <td>${order.cashier_name}</td>
@@ -62,10 +59,10 @@ ipcRenderer.on("order-history-response", (event, data) => {
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
 
-    // Store data in sessionStorage
     sessionStorage.setItem("orderHistoryData", JSON.stringify(orders));
 
-    // Attach export button functionality
+    attachContextMenu();
+
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {
             exportTableToExcel(".order-history-table");
@@ -73,16 +70,51 @@ ipcRenderer.on("order-history-response", (event, data) => {
     }, 100);
 });
 
+function attachContextMenu() {
+    const tableRows = document.querySelectorAll(".order-history-table tbody tr");
+    
+    tableRows.forEach(row => {
+        row.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+
+            // Remove any existing context menu
+            document.querySelectorAll(".context-menu").forEach(menu => menu.remove());
+            
+            const billNo = row.getAttribute("data-billno");
+            const menu = document.createElement("div");
+            menu.classList.add("context-menu");
+            menu.innerHTML = `
+                <div class="context-option" id="deleteOrder">🗑️ Delete Order (Bill No: ${billNo})</div>
+                <div class="context-option">🔄 Refresh Order</div>
+                <div class="context-option">📄 View Details</div>
+            `;
+            
+            document.body.appendChild(menu);
+            menu.style.top = `${event.pageY}px`;
+            menu.style.left = `${event.pageX}px`;
+            
+            document.addEventListener("click", () => {
+                menu.remove();
+            }, { once: true });
+
+            // Handle delete order click
+            menu.querySelector("#deleteOrder").addEventListener("click", () => {
+                ipcRenderer.send("open-delete-order-window", { billNo });
+                menu.remove(); // Close context menu after click
+            });
+        });
+    });
+}
+
 function displayOrderHistory(orders) {
     const orderHistoryDiv = document.getElementById("orderHistoryDiv");
-    orderHistoryDiv.innerHTML = ""; // Clear previous content
+    orderHistoryDiv.innerHTML = "";
 
     if (orders.length === 0) {
         orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
         return;
     }
 
-    // Create a table
     let tableHTML = `
         <table class="order-history-table">
             <thead>
@@ -103,7 +135,7 @@ function displayOrderHistory(orders) {
 
     orders.forEach(order => {
         tableHTML += `
-            <tr>
+            <tr data-billno="${order.billno}">
                 <td>${order.billno}</td>
                 <td>${order.date}</td>
                 <td>${order.cashier_name}</td>
@@ -120,7 +152,8 @@ function displayOrderHistory(orders) {
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
 
-    // Attach export button functionality
+    attachContextMenu();
+
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {
             exportTableToExcel(".order-history-table");
@@ -129,5 +162,5 @@ function displayOrderHistory(orders) {
 }
 
 
-// Export function so it can be used in renderer.js
+
 module.exports = { fetchOrderHistory, displayOrderHistory };
