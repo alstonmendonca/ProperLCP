@@ -180,6 +180,4 @@ ipcRenderer.on("refresh-order-history", () => {
     }
 });
 
-
-
 module.exports = { fetchOrderHistory, displayOrderHistory };
