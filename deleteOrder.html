@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Order</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        textarea { width: 100%; height: 80px; margin-top: 10px; }
+        button { margin: 10px; padding: 8px 15px; }
+    </style>
+</head>
+<body>
+    <h3>Enter Reason for Deletion</h3>
+    <p>Bill No: <span id="billNo"></span></p>
+    <textarea id="deleteReason" placeholder="Enter reason here..."></textarea>
+    <br>
+    <button id="confirmDelete">Delete Order</button>
+    <button id="cancelDelete">Cancel</button>
+
+    <script>
+        const { ipcRenderer } = require("electron");
+    
+        let billNo = "";
+    
+        ipcRenderer.on("populate-delete-window", (event, data) => {
+            document.getElementById("billNo").innerText = data.billNo;
+            billNo = data.billNo;
+        });
+    
+        document.getElementById("confirmDelete").addEventListener("click", () => {
+            const reason = document.getElementById("deleteReason").value.trim();
+            if (!reason) {
+                alert("Please enter a reason for deletion.");
+                return;
+            }
+            ipcRenderer.send("confirm-delete-order", { billNo, reason });
+            window.close(); // Close the window after sending the request
+        });
+    
+        document.getElementById("cancelDelete").addEventListener("click", () => {
+            window.close(); // Just close the window on cancel
+        });
+    </script>
+    
+</body>
+</html>

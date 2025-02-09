@@ -211,6 +211,12 @@ async function updateMainContent(contentType) {
                 </div>
                 <div id="orderHistoryDiv"></div>
             `;
+
+            const savedStartDate = sessionStorage.getItem("orderHistoryStartDate");
+            const savedEndDate = sessionStorage.getItem("orderHistoryEndDate");
+
+            if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
+            if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
             // ✅ Check if sessionStorage has existing data
             const storedData = sessionStorage.getItem("orderHistoryData");
             if (storedData) {

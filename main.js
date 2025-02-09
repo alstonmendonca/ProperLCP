@@ -360,6 +360,86 @@ ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
     });
 });
 
+ipcMain.on("open-delete-order-window", (event, data) => {
+    const deleteWindow = new BrowserWindow({
+        width: 400,
+        height: 250,
+        modal: true,
+        parent: BrowserWindow.getFocusedWindow(),
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+
+    deleteWindow.loadFile("deleteOrder.html");
+
+    deleteWindow.webContents.once("did-finish-load", () => {
+        deleteWindow.webContents.send("populate-delete-window", data);
+    });
+});
+
+ipcMain.on("confirm-delete-order", async (event, { billNo, reason }) => {
+
+    try {
+        // Convert db.get and db.all into Promises
+        const getAsync = (query, params) => {
+            return new Promise((resolve, reject) => {
+                db.get(query, params, (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+        };
+
+        const allAsync = (query, params) => {
+            return new Promise((resolve, reject) => {
+                db.all(query, params, (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                });
+            });
+        };
+
+        // Fetch order and order details using Promises
+        const order = await getAsync("SELECT * FROM Orders WHERE billno = ?", [billNo]);
+        const orderDetails = await allAsync("SELECT * FROM OrderDetails WHERE orderid = ?", [billNo]);
+
+        if (!order) {
+            event.reply("delete-order-response", { success: false, message: "Order not found!" });
+            return;
+        }
+
+        // Insert into DeletedOrders
+        await db.run(
+            "INSERT INTO DeletedOrders (billno, date, cashier, kot, price, sgst, cgst, tax, reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [order.billno, order.date, order.cashier, order.kot, order.price, order.sgst, order.cgst, order.tax, reason]
+        );
+
+        // Insert into DeletedOrderDetails
+        for (const detail of orderDetails) {
+            await db.run(
+                "INSERT INTO DeletedOrderDetails (orderid, foodid, quantity) VALUES (?, ?, ?)",
+                [detail.orderid, detail.foodid, detail.quantity]
+            );
+        }
+
+        // Delete from Orders and OrderDetails
+        await db.run("DELETE FROM Orders WHERE billno = ?", [billNo]);
+        await db.run("DELETE FROM OrderDetails WHERE orderid = ?", [billNo]);
+
+        event.reply("delete-order-response", { success: true, message: "Order deleted successfully!" });
+        mainWindow.webContents.send("refresh-order-history");
+
+    } catch (error) {
+        console.error("Error deleting order:", error);
+        event.reply("delete-order-response", { success: false, message: "Failed to delete order." });
+    }
+});
+
+
+
+
 ipcMain.on("get-categories-event", (event) => {
 
     const query = `SELECT catid, catname FROM Category WHERE active = 1`;
