@@ -9,6 +9,10 @@ function fetchOrderHistory() {
         return;
     }
 
+    // ✅ Store dates in sessionStorage
+    sessionStorage.setItem("orderHistoryStartDate", startDate);
+    sessionStorage.setItem("orderHistoryEndDate", endDate);
+
     ipcRenderer.send("get-order-history", { startDate, endDate });
 }
 
@@ -160,6 +164,21 @@ function displayOrderHistory(orders) {
         });
     }, 100);
 }
+
+ipcRenderer.on("refresh-order-history", () => {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    // ✅ If inputs are empty, use stored values
+    if (!startDate) startDate = sessionStorage.getItem("orderHistoryStartDate");
+    if (!endDate) endDate = sessionStorage.getItem("orderHistoryEndDate");
+    
+    if (startDate && endDate) {
+        document.getElementById("startDate").value = startDate;
+        document.getElementById("endDate").value = endDate;
+        fetchOrderHistory();
+    }
+});
 
 
 
