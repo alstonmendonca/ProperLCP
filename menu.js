@@ -65,6 +65,11 @@ async function displayMenu() {
                             style="background: red; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
                             Delete
                         </button>
+                        <!-- Edit Button -->
+                        <button class="edit-btn" data-fid="${item.fid}" 
+                            style="background: grey; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
+                            Edit
+                        </button>
                     </div>
                 `;
             });
@@ -127,6 +132,78 @@ async function displayMenu() {
                     }
                 });
             });
+
+            // Add event listeners to edit buttons
+            document.querySelectorAll(".edit-btn").forEach((button) => {
+                button.addEventListener("click", async (event) => {
+                    const fid = event.target.getAttribute("data-fid");
+                    const item = foodItems.find((item) => item.fid == fid);
+
+                    if (!item) {
+                        alert("Food item not found!");
+                        return;
+                    }
+
+                    // Create the edit popup dynamically
+                    const popup = document.createElement("div");
+                    popup.classList.add("edit-popup");
+                    popup.innerHTML = `
+                        <div class="popup-content">
+                            <h3>Edit Food Item</h3>
+                            <label>Name:</label>
+                            <input type="text" id="editFname" value="${item.fname}">
+                            <label>Price:</label>
+                            <input type="number" id="editCost" value="${item.cost}">
+                            <div class="popup-buttons">
+                                <button id="saveChanges">Save</button>
+                                <button id="closePopup">Cancel</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(popup);
+
+                    // Close popup when clicking "Cancel"
+                    document.getElementById("closePopup").addEventListener("click", () => {
+                        document.body.removeChild(popup);
+                    });
+
+                    // Save changes
+                    document.getElementById("saveChanges").addEventListener("click", async () => {
+                        const updatedFname = document.getElementById("editFname").value.trim();
+                        const updatedCost = parseFloat(document.getElementById("editCost").value);
+
+                        // Validate inputs
+                        if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
+                            alert("Please enter valid details.");
+                            return;
+                        }
+
+                        // Send IPC message to update the database
+                        const response = await ipcRenderer.invoke("update-food-item", {
+                            fid,
+                            fname: updatedFname,
+                            cost: updatedCost
+                        });
+
+                        if (response.success) {
+                            // Remove the popup
+                            document.body.removeChild(popup);
+
+                            // Update UI dynamically
+                            const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                            if (foodItemElement) {
+                                foodItemElement.querySelector("h3").innerHTML = `${updatedFname} <br style="line-height:5px; display:block"> ${item.veg == 1 ? "🌱" : "🍖"}`;
+                                foodItemElement.querySelector("p:nth-child(4)").textContent = `Price: ₹${updatedCost}`;
+                            }
+                        } else {
+                            alert(`Failed to update item: ${response.error}`);
+                        }
+                    });
+                });
+            });
+
+
         } else {
             mainContent.innerHTML = `<p>No items available in this category.</p>`;
         }
