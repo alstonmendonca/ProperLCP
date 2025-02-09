@@ -216,11 +216,9 @@ async function displayMenu() {
 
                             // Update UI dynamically
                             const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
-                            if (foodItemElement) {
-                                foodItemElement.querySelector("h3").innerHTML = `${updatedFname} <br style="line-height:5px; display:block"> ${updatedveg == 1 ? "🌱" : "🍖"}`;
-                                foodItemElement.querySelector("p:nth-child(4)").textContent = `Price: ₹${updatedCost}`;
-
-                            }
+                            displayMenu(); // Reload the menu
+                            //keep scroll position
+                            mainContent.scrollTop = currentScrollPosition;
                         } else {
                             alert(`Failed to update item: ${response.error}`);
                         }
