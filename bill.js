@@ -235,3 +235,72 @@ function toggleDiscountPopup() {
         
     });
 }
+
+function displayHeld() {
+    let existingPopup = document.getElementById("heldpopup");
+
+    if (existingPopup) {
+        existingPopup.remove(); // Close the popup if it's already open
+        return;
+    }
+
+    ipcRenderer.send('get-held-orders'); // Request held orders from main process
+}
+
+ipcRenderer.on('held-orders-data', (event, heldOrders) => {
+    let popup = document.createElement("div");
+    popup.id = "heldpopup";
+    popup.classList.add("edit-popup");
+
+    let tableHTML = `
+        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 800px;">
+            <div style="width: 100%; display: flex; justify-content: flex-end;">
+                <span class="close-btn" onclick="closeHeldPopup()" style="cursor: pointer; font-size: 20px; font-weight: bold;">&times;</span>
+            </div>
+            <h3>Held Orders</h3>
+            <div style="width: 100%;"> <!-- Scrollable container -->
+            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%; ">
+
+                <table class="order-history-table">
+                    <thead>
+                        <tr>
+                            <th>Held ID</th>
+                            <th>Cashier</th>
+                            <th>Price (₹)</th>
+                            <th>SGST (₹)</th>
+                            <th>CGST (₹)</th>
+                            <th>Tax (₹)</th>
+                            <th>Food Items</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            </div>
+            </div>
+    `;
+
+    heldOrders.forEach(order => {
+        tableHTML += `
+            <tr data-heldid="${order.heldid}">
+                <td>${order.heldid}</td>
+                <td>${order.cashier_name}</td>
+                <td>${order.price.toFixed(2)}</td>
+                <td>${order.sgst.toFixed(2)}</td>
+                <td>${order.cgst.toFixed(2)}</td>
+                <td>${order.tax.toFixed(2)}</td>
+                <td>${order.food_items || "No items"}</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `</tbody></table></div></div>`;
+
+    popup.innerHTML = tableHTML;
+    document.body.appendChild(popup);
+});
+
+function closeHeldPopup() {
+    let popup = document.getElementById("heldpopup");
+    if (popup) {
+        popup.remove();
+    }
+}

@@ -759,3 +759,21 @@ color: #fff;
 
 /* Order History context menu ends here*/
 
+/* Scrollbar Styling */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px; /* Make scrollbar thinner */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light background */
+    border-radius: 10px; /* Rounded track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888; /* Scrollbar handle */
+    border-radius: 10px; /* Rounded handle */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker when hovered */
+}
