@@ -125,7 +125,7 @@ body {
     border:1px solid #555;
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling */
-    max-height: calc(100% - 250px); /* Ensures enough space for buttons */
+    max-height: calc(100% - 110px); /* Ensures enough space for buttons */
     padding-right: 10px; /* Prevents horizontal scrollbar */
 }
 
