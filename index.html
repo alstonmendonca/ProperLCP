@@ -43,22 +43,9 @@
   <!-- Buttons Section - HOLD AND SAVE AND PRINT AND APPLY DISCOUNT -->
   <div id="bill-buttons" style="margin-top: 15px;">
     <button id='saveandprintbutton' onclick="saveAndPrintBill()">Save and Print</button>
-    <button id="applydiscountbutton" onclick="toggleDiscountInputs()">Apply Discount</button>
+    <button id="applydiscountbutton" onclick="toggleDiscountPopup()">Apply Discount</button>
     <button id='holdbutton' onclick="holdBill()">Hold</button>
   </div>
-
-  <!-- Discount Section - Hidden by default -->
-  <div id="discount-section" style="margin-top: 15px; display: none;">
-    <label for="discount-percentage">Discount Percentage:</label>
-    <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" />
-    <br>
-    <label for="discount-amount">Fixed Discount (Rs.):</label>
-    <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" />
-  
-    <button id="apply-discount-btn" onclick="applyDiscount()">Apply</button>
-  </div>
-</div>
-
 
   <script src="renderer.js"></script>
   <script src="table.js"></script>

@@ -170,7 +170,12 @@ async function displayMenu() {
                             <input type="text" id="editFname" value="${item.fname}">
                             <label>Price:</label>
                             <input type="number" id="editCost" value="${item.cost}" style="width: 150px;">
-                            <label>SGST:</label>
+                            <label for="category">Category:</label>
+                            <select id="category" required style = "width: 150px; height : 35px; border-radius: 5px; border: 1px solid #ccc;
+                            font-size : 15px; text-align: center;">
+                                <option value="${item.category}">${item.category_name}</option>
+                            </select>
+                            <label style = "margin-top:7px">SGST:</label>
                             <input type="number" id="editsgst" value="${item.sgst}" min="0" style="width: 150px;">
                             <label>CGST:</label>
                             <input type="number" id="editcgst" value="${item.cgst}" min="0" style="width: 150px;">
@@ -189,7 +194,32 @@ async function displayMenu() {
                     `;
 
                     document.body.appendChild(popup);
-
+                    async function loadCategories() {
+                        try {
+                            const categories = await ipcRenderer.invoke("get-categories-for-additem");
+                            const categorySelect = document.getElementById("category");
+                    
+                            // Clear existing options except the first one
+                            categorySelect.innerHTML = '';
+                    
+                            categories.forEach(cat => {
+                                let option = document.createElement("option");
+                                option.value = cat.catid;
+                                option.textContent = cat.catname;
+                                
+                                // Preselect the existing category
+                                if (cat.catid === item.category) {
+                                    option.selected = true;
+                                }
+                    
+                                categorySelect.appendChild(option);
+                            });
+                        } catch (error) {
+                            console.error("Failed to load categories:", error);
+                        }
+                    }
+                    
+                    loadCategories(); // Call after popup is added to DOM
                     // Close popup when clicking "Cancel"
                     document.getElementById("closePopup").addEventListener("click", () => {
                         document.body.removeChild(popup);
@@ -199,6 +229,7 @@ async function displayMenu() {
                     document.getElementById("saveChanges").addEventListener("click", async () => {
                         const updatedFname = document.getElementById("editFname").value.trim();
                         const updatedCost = parseFloat(document.getElementById("editCost").value);
+                        const updatedCategory = parseFloat(document.getElementById("category").value);
                         const updatedsgst = parseFloat(document.getElementById("editsgst").value);
                         const updatedcgst = parseFloat(document.getElementById("editcgst").value);
                         const updatedveg = document.getElementById("editveg").checked ? 1 : 0; // Convert toggle state to 1 or 0
@@ -214,6 +245,7 @@ async function displayMenu() {
                             fid,
                             fname: updatedFname,
                             cost: updatedCost,
+                            category: updatedCategory,
                             sgst: updatedsgst,
                             cgst: updatedcgst,
                             veg: updatedveg

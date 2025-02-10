@@ -160,18 +160,78 @@ function saveAndPrintBill() {
 }
 
 function holdBill() {
+    // Get cashier ID (Assume it's set somewhere in the UI)
+    const cashier = 1; // Replace with actual cashier ID
+
+    // Get current date in YYYY-MM-DD format
+    const date = new Date().toISOString().split("T")[0];
+
+    // Get all bill items
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        alert("No items in the bill.");
+        return;
+    }
+
+    // Send order data to main process
+    ipcRenderer.send("hold-bill", { cashier, date, orderItems });
     alert("Bill put on hold!");
+    resetBill();
     // Add logic to hold the bill (e.g., store it in localStorage)
 }
 
 // Function to toggle the visibility of the discount inputs and apply button
-function toggleDiscountInputs() {
-    const discountSection = document.getElementById("discount-section");
-    
-    // Toggle the display style between block and none
-    if (discountSection.style.display === 'block') {
-        discountSection.style.display = 'none';
-    } else {
-        discountSection.style.display = 'block';
+function toggleDiscountPopup() {
+    let existingPopup = document.getElementById("discount-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
     }
+
+    const popup = document.createElement("div");
+    popup.id = "discount-popup";
+    popup.classList.add("edit-popup");
+
+    popup.innerHTML = `
+        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px;">
+            <h3>Apply Discount</h3>
+            
+            <label for="discount-percentage">Discount Percentage:</label>
+            <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" style="width: 75%;">
+
+            <label for="discount-amount">Fixed Discount (Rs.):</label>
+            <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" style="width: 75%;">
+
+            <br>
+
+            <div class="popup-buttons">
+                <button id="apply-discount-btn" style="margin-right: 10px;">Apply</button>
+                <button id="closePopup">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Add event listener for closing popup
+    document.getElementById("closePopup").addEventListener("click", () => {
+        popup.remove();
+    });
+
+    // Add event listener for applying discount and closing popup
+    document.getElementById("apply-discount-btn").addEventListener("click", () => {
+        console.log("Apply button clicked!"); // Debugging
+        popup.style.display = 'none'; // Close the popup
+        applyDiscount(); // Call the discount function
+        
+    });
 }
