@@ -12,6 +12,7 @@ const {displayOrderHistory} = require("./history");
 const { displayCategoryWiseSales } = require("./categoryWiseTable");
 const { displayDeletedOrders } = require("./deletedOrdersTable");
 const { loadUserProfile } = require("./userProfile");
+const {deleteOrder} = require("./deleteOrder");
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
@@ -25,7 +26,7 @@ window.openEditWindow = openEditWindow;
 window.displayOrderHistory = displayOrderHistory;
 window.displayCategoryWiseSales = displayCategoryWiseSales;
 window.displayDeletedOrders = displayDeletedOrders;
-
+window.deleteOrder = deleteOrder;
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container

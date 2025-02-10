@@ -1,6 +1,6 @@
 const { ipcRenderer } = require("electron");
 
-function attachContextMenu(tableSelector) {
+function attachContextMenu(tableSelector, sourceSection) {
     const tableRows = document.querySelectorAll(`${tableSelector} tbody tr`);
     
     tableRows.forEach(row => {
@@ -29,7 +29,7 @@ function attachContextMenu(tableSelector) {
 
             // Handle delete order click
             menu.querySelector("#deleteOrder").addEventListener("click", () => {
-                ipcRenderer.send("open-delete-order-window", { billNo });
+                ipcRenderer.send("open-delete-order-window", { billNo, source: sourceSection });
                 menu.remove(); // Close context menu after click
             });
         });

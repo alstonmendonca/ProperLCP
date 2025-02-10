@@ -1,6 +1,9 @@
 const { ipcRenderer } = require("electron");
+const { attachContextMenu } = require("./contextMenu");
+const { deleteOrder } = require("./deleteOrder");
 
 function fetchTodaysOrders() {
+    // sessionStorage.removeItem("todaysOrdersData"); // Clear old data
     ipcRenderer.send("get-todays-orders");
 }
 
@@ -37,7 +40,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
 
     orders.forEach(order => {
         tableHTML += `
-            <tr>
+            <tr data-billno="${order.billno}">
                 <td>${order.billno}</td>
                 <td>${order.date}</td>
                 <td>${order.cashier_name}</td>
@@ -59,7 +62,22 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {
             exportTableToExcel(".order-history-table");
         });
+        attachContextMenu(".order-history-table", "todaysOrders"); // Re-attach menu
     }, 100);
+});
+
+// ✅ Refresh "Today's Orders" after deletion
+ipcRenderer.on("refresh-order-history", () => {
+    console.log("Refreshing today's orders after deletion...");
+    fetchTodaysOrders(); // Re-fetch the orders
+});
+
+// ✅ Ensure that today's orders refresh when an order is deleted
+ipcRenderer.on("order-deleted", (event, { source }) => {
+    if (source === "todaysOrders") {
+        console.log("Refreshing today's orders after order deletion...");
+        fetchTodaysOrders();
+    }
 });
 
 // Export function so it can be used in `renderer.js`
