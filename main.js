@@ -441,8 +441,6 @@ ipcMain.on("confirm-delete-order", async (event, { billNo, reason }) => {
 });
 
 
-
-
 ipcMain.on("get-categories-event", (event) => {
 
     const query = `SELECT catid, catname FROM Category WHERE active = 1`;

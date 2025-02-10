@@ -212,17 +212,19 @@ async function updateMainContent(contentType) {
                 <div id="orderHistoryDiv"></div>
             `;
 
+            //Session Storage code to store the start and end date
             const savedStartDate = sessionStorage.getItem("orderHistoryStartDate");
             const savedEndDate = sessionStorage.getItem("orderHistoryEndDate");
 
             if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
             if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
-            // ✅ Check if sessionStorage has existing data
-            const storedData = sessionStorage.getItem("orderHistoryData");
-            if (storedData) {
-                const orders = JSON.parse(storedData);
-                displayOrderHistory(orders); // Call function to display the stored table
+
+            // ✅ Automatically fetch order history using stored dates
+            if (savedStartDate && savedEndDate) {
+                fetchOrderHistory(savedStartDate, savedEndDate);
             }
+
+            fetchOrderHistory(orders); // Call function to display the stored table
             
         } else if (contentType === 'categoryHistory') {
             mainContent.innerHTML = `
