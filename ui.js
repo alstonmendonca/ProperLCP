@@ -370,7 +370,6 @@ async function updateLeftPanel(contentType) {
             break;
 
 
-
         case "Settings":
             categoryPanel.style.display = "block";
 

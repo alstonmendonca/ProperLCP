@@ -23,7 +23,11 @@ async function displayMenu() {
             let menuContent = `
                 <h2>Menu</h2>
                 <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                    <button id="addNewItem" style="border: 1px solid #ccc; padding: 10px; text-align: center;">Add New Item</button>
+                    <button id="addNewItem" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                    <p style = "font-size : 100px">+</p>
+                    <br>
+                    Add New Item
+                    </button>
             `;
 
             foodItems.forEach((item) => {
@@ -160,7 +164,7 @@ async function displayMenu() {
                     const popup = document.createElement("div");
                     popup.classList.add("edit-popup");
                     popup.innerHTML = `
-                        <div class="popup-content">
+                        <div class="popup-content" style = "align-items: center; justify-content: center;">
                             <h3>Edit Food Item</h3>
                             <label>Name:</label>
                             <input type="text" id="editFname" value="${item.fname}">
@@ -171,9 +175,14 @@ async function displayMenu() {
                             <label>CGST:</label>
                             <input type="number" id="editcgst" value="${item.cgst}" min="0" style="width: 150px;">
                             <label>VEG:</label>
-                            <input type="number" id="editveg" value="${item.veg}" min="0" max="1" step="1" style="width: 150px;">
+                            <label class="switch">
+                            <input type="checkbox" id="editveg" ${item.veg == 1 ? "checked" : ""}>
+                            <span class="slider round"></span>
+                            </label>
+                            <br>
+
                             <div class="popup-buttons">
-                                <button id="saveChanges">Save</button>
+                                <button id="saveChanges" style="margin-right: 10px;">Save</button>
                                 <button id="closePopup">Cancel</button>
                             </div>
                         </div>
@@ -192,7 +201,7 @@ async function displayMenu() {
                         const updatedCost = parseFloat(document.getElementById("editCost").value);
                         const updatedsgst = parseFloat(document.getElementById("editsgst").value);
                         const updatedcgst = parseFloat(document.getElementById("editcgst").value);
-                        const updatedveg = parseInt(document.getElementById("editveg").value);
+                        const updatedveg = document.getElementById("editveg").checked ? 1 : 0; // Convert toggle state to 1 or 0
 
                         // Validate inputs
                         if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
@@ -216,11 +225,9 @@ async function displayMenu() {
 
                             // Update UI dynamically
                             const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
-                            if (foodItemElement) {
-                                foodItemElement.querySelector("h3").innerHTML = `${updatedFname} <br style="line-height:5px; display:block"> ${updatedveg == 1 ? "🌱" : "🍖"}`;
-                                foodItemElement.querySelector("p:nth-child(4)").textContent = `Price: ₹${updatedCost}`;
-
-                            }
+                            displayMenu(); // Reload the menu
+                            //keep scroll position
+                            mainContent.scrollTop = currentScrollPosition;
                         } else {
                             alert(`Failed to update item: ${response.error}`);
                         }
