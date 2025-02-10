@@ -160,7 +160,32 @@ function saveAndPrintBill() {
 }
 
 function holdBill() {
+    // Get cashier ID (Assume it's set somewhere in the UI)
+    const cashier = 1; // Replace with actual cashier ID
+
+    // Get current date in YYYY-MM-DD format
+    const date = new Date().toISOString().split("T")[0];
+
+    // Get all bill items
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        alert("No items in the bill.");
+        return;
+    }
+
+    // Send order data to main process
+    ipcRenderer.send("hold-bill", { cashier, date, orderItems });
     alert("Bill put on hold!");
+    resetBill();
     // Add logic to hold the bill (e.g., store it in localStorage)
 }
 

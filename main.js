@@ -303,6 +303,69 @@ ipcMain.on("save-bill", async (event, orderData) => {
         event.sender.send("bill-error", { error: error.message });
     }
 });
+ipcMain.on("hold-bill", async (event, orderData) => {
+    const { cashier, date, orderItems } = orderData;
+
+    try {
+        let totalPrice = 0, totalSGST = 0, totalCGST = 0, totalTax = 0;
+
+        // Fetch food item data and calculate totals
+        for (const { foodId, quantity } of orderItems) {
+            const row = await new Promise((resolve, reject) => {
+                db.get(`SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`, [foodId], (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+
+            if (!row) {
+                throw new Error(`Food item with ID ${foodId} not found.`);
+            }
+
+            let itemTotal = row.cost * quantity;
+            totalPrice += itemTotal;
+            totalSGST += (itemTotal * row.sgst) / 100;
+            totalCGST += (itemTotal * row.cgst) / 100;
+            totalTax += (itemTotal * row.tax) / 100;
+        }
+
+        // Insert the new order
+        const orderId = await new Promise((resolve, reject) => {
+            db.run(
+                `INSERT INTO HeldOrders (price, sgst, cgst, tax, cashier) VALUES (?, ?, ?, ?, ?)`,
+                [totalPrice.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), cashier], // Keeping .toFixed(2)
+                function (err) {
+                    if (err) reject(err);
+                    else resolve(this.lastID);
+                }
+            );
+        });
+
+        // Insert items into HeldOrderDetails
+        const stmt = db.prepare(`INSERT INTO HeldOrderDetails (heldid, foodid, quantity) VALUES (?, ?, ?)`);
+
+        for (const { foodId, quantity } of orderItems) {
+            await new Promise((resolve, reject) => {
+                stmt.run(orderId, foodId, quantity, (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+        }
+
+        stmt.finalize();
+
+        console.log(`Order Held Successfully`);
+
+        // Send success response
+        event.sender.send("bill-held");
+
+    } catch (error) {
+        console.error("Error processing order:", error.message);
+        event.sender.send("bill-error", { error: error.message });
+    }
+});
+
 //---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {
