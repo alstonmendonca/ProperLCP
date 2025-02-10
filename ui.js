@@ -254,11 +254,9 @@ async function updateMainContent(contentType) {
             if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
             if (savedCategory) document.getElementById("categoryDropdown").value = savedCategory;
 
-            // ✅ Restore the last fetched category-wise sales history
-            const storedData = sessionStorage.getItem("categoryWiseData");
-            if (storedData) {
-                const orders = JSON.parse(storedData);
-                displayCategoryWiseSales(orders);
+            // ✅ Automatically fetch category-wise sales using stored dates and category
+            if (savedStartDate && savedEndDate && savedCategory) {
+                fetchCategoryWise(savedStartDate, savedEndDate, savedCategory);
             }
         }
          else if (contentType === "deletedOrders") {
