@@ -780,8 +780,8 @@ ipcMain.handle("delete-menu-item", async (event, fid) => {
 //Edit Menu ITems
 ipcMain.handle("update-food-item", async (event, { fid, fname, category, cost, sgst, cgst, veg }) => {
     try {
-        const query = `UPDATE FoodItem SET fname = ?, cost = ?, sgst = ?, cgst = ?, veg = ? WHERE fid = ?`;
-        await db.run(query, [fname, cost, sgst, cgst, veg, fid]);
+        const query = `UPDATE FoodItem SET fname = ?, cost = ?, category = ?, sgst = ?, cgst = ?, veg = ? WHERE fid = ?`;
+        await db.run(query, [fname, cost, category, sgst, cgst, veg, fid]);
         return { success: true };
     } catch (error) {
         console.error("Error updating food item:", error);
