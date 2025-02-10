@@ -1,4 +1,7 @@
 const { ipcRenderer } = require("electron");
+const { attachContextMenu } = require("./contextMenu");
+const { deleteOrder } = require("./deleteOrder");
+
 
 function fetchCategoryWise() {
     const startDate = document.getElementById("startDate").value;
@@ -14,6 +17,11 @@ function fetchCategoryWise() {
         alert("Please select a category.");
         return;
     }
+
+    // ✅ Store the selected values in sessionStorage
+    sessionStorage.setItem("categoryWiseStartDate", startDate);
+    sessionStorage.setItem("categoryWiseEndDate", endDate);
+    sessionStorage.setItem("categoryWiseCategory", category);
 
     ipcRenderer.send("get-category-wise", { startDate, endDate, category });
 }
@@ -50,7 +58,7 @@ function displayCategoryWiseSales(orders) {
 
     orders.forEach(order => {
         tableHTML += `
-            <tr>
+            <tr data-billno="${order.billno}">
                 <td>${order.billno}</td>
                 <td>${order.date}</td>
                 <td>${order.cashier_name}</td>
@@ -70,6 +78,8 @@ function displayCategoryWiseSales(orders) {
     // ✅ Store the fetched category-wise sales in sessionStorage
     sessionStorage.setItem("categoryWiseData", JSON.stringify(orders));
 
+    attachContextMenu(".order-history-table");
+
     // Attach export button functionality
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {
@@ -81,6 +91,18 @@ function displayCategoryWiseSales(orders) {
 // ✅ Store category-wise sales data and display it
 ipcRenderer.on("category-wise-response", (event, data) => {
     displayCategoryWiseSales(data.orders);
+});
+
+ipcRenderer.on("refresh-order-history", () => {
+    console.log("Refreshing category-wise sales after deletion...");
+
+    const startDate = sessionStorage.getItem("categoryWiseStartDate");
+    const endDate = sessionStorage.getItem("categoryWiseEndDate");
+    const category = sessionStorage.getItem("categoryWiseCategory");
+
+    if (startDate && endDate && category) {
+        ipcRenderer.send("get-category-wise", { startDate, endDate, category });
+    }
 });
 
 // Export functions

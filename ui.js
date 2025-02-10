@@ -243,6 +243,15 @@ async function updateMainContent(contentType) {
         
             fetchCategories(); // Fetch categories and populate the dropdown
 
+            // ✅ Restore last selected start date, end date, and category
+            const savedStartDate = sessionStorage.getItem("categoryWiseStartDate");
+            const savedEndDate = sessionStorage.getItem("categoryWiseEndDate");
+            const savedCategory = sessionStorage.getItem("categoryWiseCategory");
+
+            if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
+            if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
+            if (savedCategory) document.getElementById("categoryDropdown").value = savedCategory;
+
             // ✅ Restore the last fetched category-wise sales history
             const storedData = sessionStorage.getItem("categoryWiseData");
             if (storedData) {
