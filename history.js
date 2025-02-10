@@ -2,9 +2,10 @@ const { ipcRenderer } = require("electron");
 const { attachContextMenu } = require("./contextMenu");
 const { deleteOrder } = require("./deleteOrder");
 
-function fetchOrderHistory() {
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
+function fetchOrderHistory(startDate = null, endDate = null) {
+    // Use function parameters if available; otherwise, get from input fields
+    if (!startDate) startDate = document.getElementById("startDate").value;
+    if (!endDate) endDate = document.getElementById("endDate").value;
 
     if (!startDate || !endDate) {
         alert("Please select both start and end dates.");
@@ -64,8 +65,6 @@ ipcRenderer.on("order-history-response", (event, data) => {
 
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
-
-    sessionStorage.setItem("orderHistoryData", JSON.stringify(orders));
 
     attachContextMenu(".order-history-table");
 

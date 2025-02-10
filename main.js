@@ -492,6 +492,9 @@ ipcMain.on("confirm-delete-order", async (event, { billNo, reason }) => {
         await db.run("DELETE FROM OrderDetails WHERE orderid = ?", [billNo]);
 
         event.reply("delete-order-response", { success: true, message: "Order deleted successfully!" });
+
+        // ✅ Notify the renderer process about the deletion
+        mainWindow.webContents.send("order-deleted", { source: "todaysOrders" });
         mainWindow.webContents.send("refresh-order-history");
 
     } catch (error) {
@@ -499,8 +502,6 @@ ipcMain.on("confirm-delete-order", async (event, { billNo, reason }) => {
         event.reply("delete-order-response", { success: false, message: "Failed to delete order." });
     }
 });
-
-
 
 
 ipcMain.on("get-categories-event", (event) => {

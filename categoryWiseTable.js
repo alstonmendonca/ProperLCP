@@ -3,10 +3,11 @@ const { attachContextMenu } = require("./contextMenu");
 const { deleteOrder } = require("./deleteOrder");
 
 
-function fetchCategoryWise() {
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-    const category = document.getElementById("categoryDropdown").value; // Get selected category
+function fetchCategoryWise(startDate = null, endDate = null, category = null) {
+    // Use function parameters if available; otherwise, get values from inputs
+    if (!startDate) startDate = document.getElementById("startDate").value;
+    if (!endDate) endDate = document.getElementById("endDate").value;
+    if (!category) category = document.getElementById("categoryDropdown").value;
 
     if (!startDate || !endDate) {
         alert("Please select both start and end dates.");
@@ -18,11 +19,12 @@ function fetchCategoryWise() {
         return;
     }
 
-    // ✅ Store the selected values in sessionStorage
+    // ✅ Store selected filters in sessionStorage
     sessionStorage.setItem("categoryWiseStartDate", startDate);
     sessionStorage.setItem("categoryWiseEndDate", endDate);
     sessionStorage.setItem("categoryWiseCategory", category);
 
+    // ✅ Send request to fetch fresh category-wise sales data
     ipcRenderer.send("get-category-wise", { startDate, endDate, category });
 }
 
