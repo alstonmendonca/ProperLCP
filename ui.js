@@ -90,20 +90,52 @@ async function updateMainContent(contentType) {
             });
         }
         // Menu Management -----REMOVED-----------
-        // Analytics
-        else if (analytics.includes(contentType)) {
-            let analyticsText = {
-                "SalesOverview": "Daily, weekly, and monthly sales overview",
-                "TopSelling": "Best selling items",
-                "Trends": "Latest trends in sales",
-            };
 
+        // -------------------------------------------------ANALYTICS STARTS HERE---------------------------------------------------
+        else if (contentType === "SalesOverview" || contentType === "Analytics") {
             mainContent.innerHTML = `
-                <h2>${contentType.replace(/([A-Z])/g, " $1")}</h2>
-                <p>${analyticsText[contentType]}</p>
+                <h2>Sales Overview</h2>
+                <p>Daily, weekly, and monthly sales overview.</p>
             `;
-            billPanel.style.display = 'none'; // Hide bill panel for Analytics
-        } //--------------------------CATEGORIES---------------------------------------------------------------
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "ItemSummary") {
+            mainContent.innerHTML = `
+                <h2>Item Summary</h2>
+                <p>Summary of all sold items.</p>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "DayEndSummary") {
+            mainContent.innerHTML = `
+                <h2>Day End Summary</h2>
+                <p>Summary of total sales and revenue at the end of the day.</p>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "CategoryWiseSales") {
+            mainContent.innerHTML = `
+                <h2>Category Wise Sales</h2>
+                <p>Sales breakdown by different categories.</p>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "TopSelling") {
+            mainContent.innerHTML = `
+                <h2>Top Selling Items</h2>
+                <p>List of best-selling products.</p>
+            `;
+            billPanel.style.display = 'none';
+        }
+        else if (contentType === "HourlySales") {
+            mainContent.innerHTML = `
+                <h2>Hourly Sales Trends</h2>
+                <p>Sales performance based on different hours of the day.</p>
+            `;
+            billPanel.style.display = 'none';
+        } 
+        //-----------------------------------------------ANALYTICS ENDS HERE---------------------------------------------------
+        //--------------------------CATEGORIES---------------------------------------------------------------
         else if (contentType === "Categories") {
             mainContent.innerHTML = `
                 <h1>Categories</h1>
@@ -340,12 +372,11 @@ async function updateLeftPanel(contentType) {
 
             // Render Analytics-related buttons
             categoryPanel.innerHTML = `
-                <button class="category" id="DayEndSummary" onclick="updateMainContent('DayEndSummary')">Day End Summary</button>
-                <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
-                <button class="category" id="Trends" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
                 <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
+                <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
+                <button class="category" id="DayEndSummary" onclick="updateMainContent('DayEndSummary')">Day End Summary</button>
+                <button class="category" id="Trends" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
                 <button class="category" id="TopSelling" onclick="updateMainContent('TopSelling')">Top Selling</button>
-                <button class="category" id="Trends" onclick="updateMainContent('Trends')">Trends</button>
                 <button class="category" id="Trends" onclick="updateMainContent('HourlySales')">Hourly Sales</button>
             `;
             break;

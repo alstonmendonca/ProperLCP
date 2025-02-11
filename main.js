@@ -244,6 +244,37 @@ ipcMain.on("refresh-categories", (event) => {
     
 });
 //Billing
+//DISPLAY HELD ORDERS
+ipcMain.on('get-held-orders', (event) => {
+    const heldOrdersQuery = `
+        SELECT 
+            HeldOrders.heldid, 
+            User.uname AS cashier_name, 
+            HeldOrders.price, 
+            HeldOrders.sgst, 
+            HeldOrders.cgst, 
+            HeldOrders.tax, 
+            GROUP_CONCAT(FoodItem.fname || ' (x' || HeldOrderDetails.quantity || ')', ', ') AS food_items
+        FROM HeldOrders
+        JOIN User ON HeldOrders.cashier = User.userid
+        JOIN HeldOrderDetails ON HeldOrders.heldid = HeldOrderDetails.heldid
+        JOIN FoodItem ON HeldOrderDetails.foodid = FoodItem.fid
+        GROUP BY HeldOrders.heldid
+        ORDER BY HeldOrders.heldid DESC
+    `;
+
+    db.all(heldOrdersQuery, [], (err, heldOrders) => {
+        if (err) {
+            console.error("Error fetching held orders:", err);
+            event.reply('held-orders-data', []);
+            return;
+        }
+
+        event.reply('held-orders-data', heldOrders);
+    });
+});
+
+//save bill
 ipcMain.on("save-bill", async (event, orderData) => {
     const { cashier, date, orderItems } = orderData;
 
