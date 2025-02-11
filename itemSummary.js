@@ -6,8 +6,7 @@ const { ipcRenderer } = require('electron');
 function loadItemSummary(mainContent, billPanel) {
     mainContent.innerHTML = `
         <h2>Item Summary</h2>
-        <p>Summary of all sold items.</p>
-        <div id="itemSummaryDiv"></div>
+        <div id="itemSummaryDiv" class="item-summary-container"></div>
     `;
     billPanel.style.display = 'none';
 
@@ -49,7 +48,7 @@ function displayItemSummary(items) {
 
     // Generate the table HTML
     let tableHTML = `
-        <table>
+        <table class="item-summary-table">
             <thead>
                 <tr>
                     <th onclick="sortTable('item')">Item ${getSortIndicator('item')}</th>
@@ -63,13 +62,13 @@ function displayItemSummary(items) {
     // Add rows for each category
     Object.keys(groupedItems).forEach(category => {
         tableHTML += `
-            <tr style="background-color: #f0f0f0;">
+            <tr class="category-row">
                 <td colspan="3"><strong>${category}</strong></td>
             </tr>
         `;
         groupedItems[category].forEach(item => {
             tableHTML += `
-                <tr>
+                <tr class="item-row">
                     <td>${item.item}</td>
                     <td>${item.quantity}</td>
                     <td>₹${item.revenue.toFixed(2)}</td>

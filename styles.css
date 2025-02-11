@@ -777,3 +777,53 @@ color: #fff;
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #555; /* Darker when hovered */
 }
+
+/* ANALYTICS STARTS HERE */
+/* CSS for the Item Summary Table */
+
+.item-summary-container {
+    width: 100%; /* Make the container span the full width */
+    overflow-x: auto; /* Add horizontal scroll if needed */
+    margin-top: 20px;
+}
+
+.item-summary-table {
+    width: 100%; /* Make the table span the full width */
+    border-collapse: collapse; /* Remove spacing between cells */
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+.item-summary-table th,
+.item-summary-table td {
+    padding: 12px 15px; /* Add padding to cells */
+    text-align: left; /* Align text to the left */
+    border-bottom: 1px solid #ddd; /* Add a border between rows */
+}
+
+.item-summary-table th {
+    background-color: #ece98a; /* Light gray background for headers */
+    font-weight: bold;
+    color: #333;
+    cursor: pointer; /* Show pointer cursor for clickable headers */
+}
+
+.item-summary-table th:hover {
+    background-color: #e9ecef; /* Slightly darker background on hover */
+}
+
+.category-row {
+    background-color: #bda8ef; /* Light gray background for category rows */
+    font-weight: bold;
+}
+
+.item-row:hover {
+    background-color: #f8f9fa; /* Light gray background on hover */
+}
+
+/* Add a subtle animation for hover effects */
+.item-summary-table tr {
+    transition: background-color 0.2s ease;
+}
+/* ANALYTICS ENDS HERE */
