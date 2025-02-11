@@ -131,16 +131,17 @@ app.on("activate", () => {
 ipcMain.on("get-todays-items", (event) => {
     const query = `
         SELECT 
-            FoodItem.category AS category,
+            Category.catname AS category,
             FoodItem.fname AS item,
             SUM(OrderDetails.quantity) AS quantity,
             SUM(OrderDetails.quantity * FoodItem.cost) AS revenue
         FROM Orders
         JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
         JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        JOIN Category ON FoodItem.category = Category.catid
         WHERE Orders.date = date('now', 'localtime')
-        GROUP BY FoodItem.category, FoodItem.fname
-        ORDER BY FoodItem.category ASC
+        GROUP BY Category.catname, FoodItem.fname
+        ORDER BY Category.catname ASC
     `;
 
     db.all(query, [], (err, rows) => {

@@ -64,7 +64,7 @@ function displayItemSummary(items) {
     Object.keys(groupedItems).forEach(category => {
         tableHTML += `
             <tr style="background-color: #f0f0f0;">
-                <td colspan="3"><strong>Category: ${category}</strong></td>
+                <td colspan="3"><strong>${category}</strong></td>
             </tr>
         `;
         groupedItems[category].forEach(item => {
