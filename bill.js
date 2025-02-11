@@ -202,7 +202,7 @@ function toggleDiscountPopup() {
     popup.classList.add("edit-popup");
 
     popup.innerHTML = `
-        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px;">
+        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
             <h3>Apply Discount</h3>
             
             <label for="discount-percentage">Discount Percentage:</label>
@@ -230,7 +230,7 @@ function toggleDiscountPopup() {
     // Add event listener for applying discount and closing popup
     document.getElementById("apply-discount-btn").addEventListener("click", () => {
         console.log("Apply button clicked!"); // Debugging
-        popup.style.display = 'none'; // Close the popup
+        popup.remove() // Close the popup
         applyDiscount(); // Call the discount function
         
     });
@@ -240,11 +240,11 @@ function displayHeld() {
     let existingPopup = document.getElementById("heldpopup");
 
     if (existingPopup) {
-        existingPopup.remove(); // Close the popup if it's already open
+        existingPopup.remove();
         return;
     }
 
-    ipcRenderer.send('get-held-orders'); // Request held orders from main process
+    ipcRenderer.send('get-held-orders'); // Request held orders from the main process
 }
 
 ipcRenderer.on('held-orders-data', (event, heldOrders) => {
@@ -258,9 +258,7 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
                 <span class="close-btn" onclick="closeHeldPopup()" style="cursor: pointer; font-size: 20px; font-weight: bold;">&times;</span>
             </div>
             <h3>Held Orders</h3>
-            <div style="width: 100%;"> <!-- Scrollable container -->
-            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%; ">
-
+            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%;">
                 <table class="order-history-table">
                     <thead>
                         <tr>
@@ -271,23 +269,26 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
                             <th>CGST (₹)</th>
                             <th>Tax (₹)</th>
                             <th>Food Items</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-            </div>
-            </div>
     `;
 
     heldOrders.forEach(order => {
         tableHTML += `
             <tr data-heldid="${order.heldid}">
-                <td>${order.heldid}</td>
-                <td>${order.cashier_name}</td>
-                <td>${order.price.toFixed(2)}</td>
-                <td>${order.sgst.toFixed(2)}</td>
-                <td>${order.cgst.toFixed(2)}</td>
-                <td>${order.tax.toFixed(2)}</td>
-                <td>${order.food_items || "No items"}</td>
+            <td>${order.heldid}</td>
+            <td>${order.cashier_name}</td>
+            <td>${order.price.toFixed(2)}</td>
+            <td>${order.sgst.toFixed(2)}</td>
+            <td>${order.cgst.toFixed(2)}</td>
+            <td>${order.tax.toFixed(2)}</td>
+            <td>${order.food_items || "No items"}</td>
+            <td style="display: flex; flex-direction: column; align-items: center;">
+                <button onclick="addHeldToBill(${order.heldid})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px">Add</button>
+                <button onclick="deleteHeldOrder(${order.heldid})" style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px">Delete</button>
+            </td>
             </tr>
         `;
     });
@@ -296,6 +297,36 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
 
     popup.innerHTML = tableHTML;
     document.body.appendChild(popup);
+});
+
+function addHeldToBill(heldId) {
+    ipcRenderer.send('get-held-order-details', heldId);
+}
+
+ipcRenderer.on('held-order-details-data', (event, foodDetails, heldId) => {
+    foodDetails.forEach(item => {
+        addToBill(item.foodid, item.fname, item.price, item.quantity);
+    });
+
+    // Delete the held order from the database after restoring it to the bill
+    ipcRenderer.send('delete-held-order', heldId);
+
+    closeHeldPopup(); // Close the popup after adding items
+});
+
+
+function deleteHeldOrder(heldId) {
+    if (confirm("Are you sure you want to delete this held order?")) {
+        ipcRenderer.send('delete-held-order', heldId);
+    }
+}
+
+// Handle held order deletion
+ipcRenderer.on('held-order-deleted', (event, heldId) => {
+    let row = document.querySelector(`tr[data-heldid="${heldId}"]`);
+    if (row) {
+        row.remove(); // Remove row from UI
+    }
 });
 
 function closeHeldPopup() {

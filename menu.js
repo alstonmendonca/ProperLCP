@@ -164,7 +164,7 @@ async function displayMenu() {
                     const popup = document.createElement("div");
                     popup.classList.add("edit-popup");
                     popup.innerHTML = `
-                        <div class="popup-content" style = "align-items: center; justify-content: center;">
+                        <div class="popup-content" style = "align-items: center; justify-content: center; pointer-events: auto;">
                             <h3>Edit Food Item</h3>
                             <label>Name:</label>
                             <input type="text" id="editFname" value="${item.fname}">

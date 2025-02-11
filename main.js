@@ -275,6 +275,7 @@ ipcMain.on("refresh-categories", (event) => {
     
 });
 //Billing
+//-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS
 ipcMain.on('get-held-orders', (event) => {
     const heldOrdersQuery = `
@@ -304,6 +305,65 @@ ipcMain.on('get-held-orders', (event) => {
         event.reply('held-orders-data', heldOrders);
     });
 });
+//regarding held orders:
+// Fetch held order details
+ipcMain.on('get-held-order-details', (event, heldId) => {
+    const query = `
+        SELECT 
+            GROUP_CONCAT(
+                FoodItem.fname || ' (x' || HeldOrderDetails.quantity || ')', ', '
+            ) AS food_items,
+            json_group_array(
+                json_object(
+                    'foodid', FoodItem.fid,
+                    'fname', FoodItem.fname,
+                    'price', FoodItem.cost,
+                    'quantity', HeldOrderDetails.quantity
+                )
+            ) AS food_details
+        FROM HeldOrderDetails
+        JOIN FoodItem ON HeldOrderDetails.foodid = FoodItem.fid
+        WHERE HeldOrderDetails.heldid = ?
+    `;
+
+    db.get(query, [heldId], (err, orderDetails) => {
+        if (err) {
+            console.error("Error fetching held order details:", err);
+            event.reply('held-order-details-data', [], heldId);
+            return;
+        }
+
+        // Parse JSON string from SQLite JSON functions
+        let foodDetails = orderDetails.food_details ? JSON.parse(orderDetails.food_details) : [];
+
+        event.reply('held-order-details-data', foodDetails, heldId); // Pass `heldId` back
+    });
+});
+
+
+// Delete a held order
+ipcMain.on('delete-held-order', (event, heldId) => {
+    const deleteOrderDetailsQuery = `DELETE FROM HeldOrderDetails WHERE heldid = ?`;
+    const deleteOrderQuery = `DELETE FROM HeldOrders WHERE heldid = ?`;
+
+    db.run(deleteOrderDetailsQuery, [heldId], function (err) {
+        if (err) {
+            console.error("Error deleting held order details:", err);
+            return;
+        }
+
+        db.run(deleteOrderQuery, [heldId], function (err) {
+            if (err) {
+                console.error("Error deleting held order:", err);
+                return;
+            }
+
+            event.reply('held-order-deleted', heldId);
+        });
+    });
+});
+
+
 
 //save bill
 ipcMain.on("save-bill", async (event, orderData) => {
@@ -443,7 +503,7 @@ ipcMain.on("get-todays-orders", (event) => {
         JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
         WHERE Orders.date = date('now', 'localtime')  -- Ensure correct format match
         GROUP BY Orders.billno
-        ORDER BY Orders.date DESC
+        ORDER BY Orders.billno DESC
     `;
 
     db.all(query, [], (err, rows) => {

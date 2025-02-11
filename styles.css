@@ -827,3 +827,8 @@ color: #fff;
     transition: background-color 0.2s ease;
 }
 /* ANALYTICS ENDS HERE */
+
+/*disable text selection*/
+* {
+    user-select: none; /* Prevents text selection */
+}
