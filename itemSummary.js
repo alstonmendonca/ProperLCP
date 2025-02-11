@@ -1,17 +1,21 @@
 // itemSummary.js
-
 const { ipcRenderer } = require('electron');
+const XLSX = require('xlsx'); // Import the xlsx library
 
 // Function to load the Item Summary content
 function loadItemSummary(mainContent, billPanel) {
     mainContent.innerHTML = `
         <h2>Item Summary</h2>
+        <button id="exportExcelButton">Export to Excel</button>
         <div id="itemSummaryDiv" class="item-summary-container"></div>
     `;
     billPanel.style.display = 'none';
 
     // Fetch and display item summary data
     fetchItemSummary();
+
+    // Add event listener for the Export to Excel button
+    document.getElementById("exportExcelButton").addEventListener("click", exportToExcel);
 }
 
 // Function to fetch item summary data
@@ -127,6 +131,28 @@ function getSortIndicator(sortBy) {
         return window.currentSortOrder === "asc" ? "▲" : "▼";
     }
     return "▲▼"; // Default indicator if the column is not sorted
+}
+
+// Function to export the table to Excel
+function exportToExcel() {
+    const table = document.querySelector(".item-summary-table");
+
+    if (!table) {
+        alert("No data to export.");
+        return;
+    }
+
+    // Convert the table to a worksheet
+    const worksheet = XLSX.utils.table_to_sheet(table);
+
+    // Create a new workbook and add the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Item Summary");
+
+    // Write the workbook to a file
+    XLSX.writeFile(workbook, "ItemSummary.xlsx");
+
+    alert("Exported to ItemSummary.xlsx");
 }
 
 // Export the loadItemSummary function
