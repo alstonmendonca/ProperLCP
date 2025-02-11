@@ -52,9 +52,9 @@ function displayItemSummary(items) {
         <table>
             <thead>
                 <tr>
-                    <th>Item</th>
-                    <th>Quantity</th>
-                    <th>Revenue</th>
+                    <th onclick="sortTable('item')">Item ${getSortIndicator('item')}</th>
+                    <th onclick="sortTable('quantity')">Quantity ${getSortIndicator('quantity')}</th>
+                    <th onclick="sortTable('revenue')">Revenue ${getSortIndicator('revenue')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -84,6 +84,50 @@ function displayItemSummary(items) {
     `;
 
     itemSummaryDiv.innerHTML = tableHTML;
+
+    // Add the sorting function to the window object
+    window.sortTable = (sortBy) => {
+        const sortedItems = sortItems(items, sortBy);
+        displayItemSummary(sortedItems);
+    };
+}
+
+// Function to sort items by a specific key
+function sortItems(items, sortBy) {
+    let sortOrder = window.currentSortOrder || "asc"; // Default to ascending order
+
+    // Toggle sort order if the same column is clicked again
+    if (window.currentSortBy === sortBy) {
+        sortOrder = sortOrder === "asc" ? "desc" : "asc";
+    } else {
+        sortOrder = "asc"; // Reset to ascending order if a new column is clicked
+    }
+
+    // Save the current sort state
+    window.currentSortBy = sortBy;
+    window.currentSortOrder = sortOrder;
+
+    return items.sort((a, b) => {
+        let comparison = 0;
+        if (sortBy === "item") {
+            comparison = a.item.localeCompare(b.item);
+        } else if (sortBy === "quantity") {
+            comparison = a.quantity - b.quantity;
+        } else if (sortBy === "revenue") {
+            comparison = a.revenue - b.revenue;
+        }
+
+        // Apply sort order
+        return sortOrder === "asc" ? comparison : -comparison;
+    });
+}
+
+// Function to get the sort indicator (▲ or ▼) for a column
+function getSortIndicator(sortBy) {
+    if (window.currentSortBy === sortBy) {
+        return window.currentSortOrder === "asc" ? "▲" : "▼";
+    }
+    return "▲▼"; // Default indicator if the column is not sorted
 }
 
 // Export the loadItemSummary function
