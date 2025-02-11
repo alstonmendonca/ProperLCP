@@ -1,6 +1,7 @@
 const { fetchCategoriesList } = require("./categoriesList");
 const { fetchTabCategories } = require("./categoriesTab");
 
+
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
@@ -100,11 +101,7 @@ async function updateMainContent(contentType) {
             billPanel.style.display = 'none';
         }
         else if (contentType === "ItemSummary") {
-            mainContent.innerHTML = `
-                <h2>Item Summary</h2>
-                <p>Summary of all sold items.</p>
-            `;
-            billPanel.style.display = 'none';
+            loadItemSummary(mainContent, billPanel);
         }
         else if (contentType === "DayEndSummary") {
             mainContent.innerHTML = `
