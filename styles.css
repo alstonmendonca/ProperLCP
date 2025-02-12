@@ -48,29 +48,65 @@ body {
 #content {
     display: flex;
     flex: 1;
-    padding: 20px;
+    padding: 0px;
     overflow-y: auto;
 }
 
 /* Left Vertical Panel */
 #category-panel {
-    background-color: #f4f4f4;
-    width: 200px;
-    padding: 10px;
-    border-right: 1px solid #ddd;
+    background-color: #f4f4f4; /* Light gray background */
+    width: 200px; /* Fixed width for the panel */
+    padding: 0; /* Remove padding to ensure buttons take full width */
+    border-right: 1px solid #ddd; /* Add a border to separate from main content */
     display: flex;
-    flex-direction: column;
-    overflow-y: auto;
+    flex-direction: column; /* Arrange buttons in a column */
+    height: 100vh; /* Make the panel full height of the viewport */
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
 
+/* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+#category-panel::-webkit-scrollbar {
+    display: none; /* Hide scrollbar */
+}
+
+/* Category Buttons */
+#category-panel button.category {
+    flex-grow: 1; /* Allow buttons to grow and fill available space */
+    padding: 20px; /* Increase padding for better clickability */
+    margin: 0; /* Remove margin to eliminate gaps */
+    border: none; /* Remove default button border */
+    background-color: #4CAF50; /* Dark background for buttons */
+    color: #ffffff; /* White text color */
+    text-align: center; /* Center text */
+    font-size: 16px; /* Set font size */
+    cursor: pointer; /* Show pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+    border-radius: 0; /* Remove rounded corners for perfect rectangles */
+    border-bottom: 1px solid #ddd; /* Add a thin line at the bottom of each button */
+}
+
+#category-panel button.category:last-child {
+    border-bottom: none; /* Remove the bottom border from the last button */
+}
+
+#category-panel button.category:hover {
+    background-color: #555; /* Slightly lighter background on hover */
+}
+
+#category-panel button.category:active {
+    background-color: #333; /* Darker background on click */
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     #content {
         flex-direction: column;
     }
     #category-panel {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #ddd;
+        width: 100%; /* Full width on smaller screens */
+        border-right: none; /* Remove border on smaller screens */
+        border-bottom: 1px solid #ddd; /* Add a bottom border instead */
     }
 }
 
