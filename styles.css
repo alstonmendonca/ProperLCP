@@ -233,7 +233,6 @@ body {
 }
 
 #apply-discount-btn {
-    margin-top: 10px;
     padding: 5px 10px;
     background-color: #4CAF50;
     color: white;
@@ -247,6 +246,7 @@ body {
 #apply-discount-btn:hover {
     background-color: #45a049;
 }
+
 
 button {
     padding: 10px 20px;
