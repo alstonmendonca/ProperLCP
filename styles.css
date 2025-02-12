@@ -60,9 +60,9 @@ body {
     border-right: 1px solid #ddd; /* Add a border to separate from main content */
     display: flex;
     flex-direction: column; /* Arrange buttons in a column */
-    height: 100vh; /* Make the panel full height of the viewport */
+    height: 100%; /* Make the panel full height of the viewport */
     overflow-y: auto; /* Enable vertical scrolling */
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    scrollbar-gutter: stable; 
 }
 
 /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
