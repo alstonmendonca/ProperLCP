@@ -48,7 +48,7 @@ body {
 #content {
     display: flex;
     flex: 1;
-    padding: 20px;
+    padding: 0px;
     overflow-y: auto;
 }
 
@@ -76,7 +76,7 @@ body {
     padding: 20px; /* Increase padding for better clickability */
     margin: 0; /* Remove margin to eliminate gaps */
     border: none; /* Remove default button border */
-    background-color: #444; /* Dark background for buttons */
+    background-color: #4CAF50; /* Dark background for buttons */
     color: #ffffff; /* White text color */
     text-align: center; /* Center text */
     font-size: 16px; /* Set font size */
