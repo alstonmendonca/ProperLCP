@@ -64,7 +64,7 @@ body {
     flex-direction: column; /* Arrange buttons in a column */
     height: calc(100vh - 50px); /* Full height minus top panel */
     overflow-y: auto; /* Enable vertical scrolling */
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    scrollbar-gutter: stable; /* Isn't this line pointless?? It doesn't store the scroll positions */
 }
 
 /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
@@ -274,7 +274,6 @@ body {
 }
 
 #apply-discount-btn {
-    margin-top: 10px;
     padding: 5px 10px;
     background-color: #4CAF50;
     color: white;
@@ -288,6 +287,7 @@ body {
 #apply-discount-btn:hover {
     background-color: #45a049;
 }
+
 
 button {
     padding: 10px 20px;

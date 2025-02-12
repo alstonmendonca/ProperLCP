@@ -65,17 +65,28 @@ function applyDiscount() {
 
     // Calculate the total amount before applying discounts
     billItems.forEach(item => {
-        totalAmount += parseFloat(item.querySelector(".bill-total").textContent);
+        let amountText = item.querySelector(".bill-total").textContent;
+        let amount = parseFloat(amountText.replace(/[^0-9.]/g, "")); // Extract only numeric value
+        if (!isNaN(amount)) {
+            totalAmount += amount;
+        }
     });
 
     // Ensure valid discount inputs
     if (discountPercentage < 0 || discountAmount < 0) {
         alert("Discount cannot be negative.");
+        document.getElementById("discount-percentage").value = "";
+        document.getElementById("discount-amount").value = "";
         return;
     }
 
     if (discountPercentage > 0 && discountAmount > 0) {
         alert("Please apply either a percentage discount OR a fixed amount discount, not both.");
+        return;
+    }
+
+    if (discountAmount > totalAmount) {
+        alert("Discount amount cannot exceed the total bill amount.");
         return;
     }
 
@@ -98,9 +109,13 @@ function applyDiscount() {
     // Update total display
     document.getElementById("total-amount").textContent = `Total: ${formattedTotal}`;
 
-    // Hide discount section after applying
-    document.getElementById("discount-section").style.display = 'none';
+    // Hide discount section after applying (if it exists)
+    const discountSection = document.getElementById("discount-section");
+    if (discountSection) {
+        discountSection.style.display = 'none';
+    }
 }
+
 
 
 // Function to update the total amount of the bill
@@ -214,8 +229,9 @@ function toggleDiscountPopup() {
             <br>
 
             <div class="popup-buttons">
-                <button id="apply-discount-btn" style="margin-right: 10px;">Apply</button>
-                <button id="closePopup">Cancel</button>
+                <button id="apply-discount-btn" style="margin-right: 10px; width: 90px; height: 40px;">Apply</button>
+                <button id="closePopup" style="width: 90px; height: 40px;">Cancel</button>
+
             </div>
         </div>
     `;
@@ -230,8 +246,8 @@ function toggleDiscountPopup() {
     // Add event listener for applying discount and closing popup
     document.getElementById("apply-discount-btn").addEventListener("click", () => {
         console.log("Apply button clicked!"); // Debugging
-        popup.remove() // Close the popup
         applyDiscount(); // Call the discount function
+        popup.remove(); // Close the popup
         
     });
 }
