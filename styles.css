@@ -54,13 +54,15 @@ body {
 
 /* Left Vertical Panel */
 #category-panel {
+    position: fixed;
+    left: 0;
     background-color: #f4f4f4; /* Light gray background */
     width: 200px; /* Fixed width for the panel */
     padding: 0; /* Remove padding to ensure buttons take full width */
     border-right: 1px solid #ddd; /* Add a border to separate from main content */
     display: flex;
     flex-direction: column; /* Arrange buttons in a column */
-    height: 100vh; /* Make the panel full height of the viewport */
+    height: calc(100vh - 50px); /* Full height minus top panel */
     overflow-y: auto; /* Enable vertical scrolling */
     scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
@@ -129,6 +131,8 @@ body {
 
 /* Main Content Area */
 #main-content {
+    margin-left: 200px; /* Same as category panel width */
+    margin-right: 0;
     flex: 1;
     padding: 20px;
     overflow-y: auto;
@@ -138,7 +142,8 @@ body {
 
 /* Bill Panel (Right Side) */
 #bill-panel {
-    position: relative;
+    position: fixed;
+    right: 0;
     width: 600px; /* Adjust width as needed */
     padding: 20px;
     background-color: #fff;
@@ -147,8 +152,8 @@ body {
     margin-left: 20px;
     display: flex;
     flex-direction: column;
-    height: 100%; /* Set a fixed height for scrolling */
-    overflow: hidden; /* Prevents the entire panel from scrolling */
+    height: calc(100vh - 50px); /* Full height minus the top panel */
+    overflow: auto; /* Prevents the entire panel from scrolling */
 }
 
 #bill-panel h3 {

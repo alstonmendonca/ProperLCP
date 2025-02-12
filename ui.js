@@ -7,17 +7,10 @@ async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
 
-    // Menu Management
-    const menuManagement = ["ShowMenu","AddItem", "UpdateItem", "DeleteItem"];
-
-    // Analytics
-    const analytics = ["SalesOverview", "TopSelling", "Trends", "OrderHistory"];
-    // Settings
-    const settings = ["UserProfile", "ThemeToggle","TaxAndDiscount","PrinterConfig","Security","Help","Exit"];
-    
-
     // Home Screen
     if (contentType === "Home") {
+        mainContent.style.marginLeft = "200px";
+        mainContent.style.marginRight = "600px";
         mainContent.innerHTML = `
             <h2>Home</h2>
             <p>Welcome to the default home page!</p>
@@ -94,6 +87,8 @@ async function updateMainContent(contentType) {
 
         // -------------------------------------------------ANALYTICS STARTS HERE---------------------------------------------------
         else if (contentType === "SalesOverview" || contentType === "Analytics") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
                 <h2>Sales Overview</h2>
                 <p>Daily, weekly, and monthly sales overview.</p>
@@ -134,6 +129,8 @@ async function updateMainContent(contentType) {
         //-----------------------------------------------ANALYTICS ENDS HERE---------------------------------------------------
         //--------------------------CATEGORIES---------------------------------------------------------------
         else if (contentType === "Categories") {
+            mainContent.style.marginLeft = "0px";
+            mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
                 <h1>Categories</h1>
                 <button id="addCategoryButton">Add Category</button>
@@ -150,6 +147,8 @@ async function updateMainContent(contentType) {
         // --------------------------------SETTINGS START HERE-----------------------------------------------------
         // SETTINGS TAB
         else if (contentType === "UserProfile" || contentType === "Settings") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
             loadUserProfile(mainContent, billPanel);
         }
         else if (contentType === "ThemeToggle") {
@@ -216,6 +215,8 @@ async function updateMainContent(contentType) {
         
         //----------------------------------------------- HISTORY TAB------------------------------------------------
         else if (contentType === 'History' || contentType === "todaysOrders") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
                 <h1>Todays Orders</h1>
                 <button id="exportExcelButton">Export to Excel</button>
@@ -317,6 +318,8 @@ async function updateMainContent(contentType) {
 
         //MENU TAB
         else if (contentType === "Menu") {
+            mainContent.style.marginLeft = "0px";
+            mainContent.style.marginRight = "0px";
             displayMenu(); // Call the function from menu.js to display menu
         }
         // Default Case
