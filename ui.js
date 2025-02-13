@@ -315,7 +315,14 @@ async function updateMainContent(contentType) {
                 displayDeletedOrders(orders);
             }
         }
+        else if (contentType === 'customer') {
+            mainContent.innerHTML = `
+                <h1>Customers</h1>
+                <button id="addCustomerBtn">Add Customer</button>
+            `;
+        }
 
+        //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------
         //MENU TAB
         else if (contentType === "Menu") {
             mainContent.style.marginLeft = "0px";
@@ -390,6 +397,7 @@ async function updateLeftPanel(contentType) {
             <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
             <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
             <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
+            <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
         `;
         break;
 
