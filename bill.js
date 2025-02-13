@@ -388,3 +388,119 @@ function createTextPopup(message) {
     });
 }
 
+// ------------ SAVE TO ORDER FUNCTIONALITY IS HERE ------------------
+// Function to display today's orders in a popup
+function displayTodaysOrders() {
+    let existingPopup = document.getElementById("todaysOrdersPopup");
+
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
+    }
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
+    ipcRenderer.send("get-todays-orders-for-save-to-orders"); // Request today's orders from the main process
+}
+
+// Handle response from IPC and display orders in popup
+ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
+    if (!data.success) {
+        createTextPopup("Error fetching today's orders.");
+        return;
+    }
+
+    let popup = document.createElement("div");
+    popup.id = "todaysOrdersPopup";
+    popup.classList.add("edit-popup");
+
+    let tableHTML = `
+        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 800px;">
+            <div style="width: 100%; display: flex; justify-content: flex-end;">
+                <span class="close-btn" onclick="closeTodaysOrdersPopup()" style="cursor: pointer; font-size: 20px; font-weight: bold;">&times;</span>
+            </div>
+            <h3>Today's Orders</h3>
+            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%;">
+                <table class="order-history-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Cashier</th>
+                            <th>Price (₹)</th>
+                            <th>SGST (₹)</th>
+                            <th>CGST (₹)</th>
+                            <th>Tax (₹)</th>
+                            <th>Food Items</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+
+    data.orders.forEach(order => {
+        tableHTML += `
+            <tr data-orderid="${order.billno}">
+                <td>${order.billno}</td>
+                <td>${order.cashier_name}</td>
+                <td>${order.price.toFixed(2)}</td>
+                <td>${order.sgst.toFixed(2)}</td>
+                <td>${order.cgst.toFixed(2)}</td>
+                <td>${order.tax.toFixed(2)}</td>
+                <td>${order.food_items || "No items"}</td>
+                <td>
+                    <button onclick="addToExistingOrder(${order.billno})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px">Add to Order</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `</tbody></table></div></div>`;
+    popup.innerHTML = tableHTML;
+    document.body.appendChild(popup);
+});
+
+// Function to add current bill items to an existing order
+function addToExistingOrder(orderId) {
+    // Get all bill items
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
+    // Send order data to main process
+    ipcRenderer.send("add-to-existing-order", { orderId, orderItems });
+
+    // Close the popup after adding
+    document.getElementById("todaysOrdersPopup").remove();
+    resetBill();
+    createTextPopup(`Order ${orderId} updated successfully with new items.`);
+}
+
+// Close popup function
+function closeTodaysOrdersPopup() {
+    let popup = document.getElementById("todaysOrdersPopup");
+    if (popup) popup.remove();
+}
+// ------------ SAVE TO ORDER FUNCTIONALITY ENDS HERE ------------------

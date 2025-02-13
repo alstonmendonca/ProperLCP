@@ -487,7 +487,86 @@ ipcMain.on("hold-bill", async (event, orderData) => {
         event.sender.send("bill-error", { error: error.message });
     }
 });
+// SAVE TO EXISTING ORDER
+// Fetch Today's Orders
+ipcMain.on("get-todays-orders-for-save-to-orders", (event) => {
+    
+    const query = `
+        SELECT 
+            Orders.*, 
+            User.uname AS cashier_name, 
+            GROUP_CONCAT(FoodItem.fname || ' (x' || OrderDetails.quantity || ')', ', ') AS food_items
+        FROM Orders
+        JOIN User ON Orders.cashier = User.userid
+        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        WHERE Orders.date = date('now', 'localtime')  -- Ensure correct format match
+        GROUP BY Orders.billno
+        ORDER BY Orders.billno DESC
+    `;
 
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching today's orders:", err);
+            event.reply("todays-orders-response-for-save-to-orders", { success: false, orders: [] });
+            return;
+        }
+        event.reply("todays-orders-response-for-save-to-orders", { success: true, orders: rows });
+    });
+});
+// Add items to an existing order
+ipcMain.on("add-to-existing-order", async (event, data) => {
+    const { orderId, orderItems } = data;
+
+    try {
+        let totalPrice = 0, totalSGST = 0, totalCGST = 0, totalTax = 0;
+
+        // Fetch food item data and calculate totals
+        for (const { foodId, quantity } of orderItems) {
+            const row = await new Promise((resolve, reject) => {
+                db.get(`SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`, [foodId], (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+
+            let itemTotal = row.cost * quantity;
+            totalPrice += itemTotal;
+            totalSGST += (itemTotal * row.sgst) / 100;
+            totalCGST += (itemTotal * row.cgst) / 100;
+            totalTax += (itemTotal * row.tax) / 100;
+
+            // Insert into OrderDetails if it doesn't exist, otherwise update quantity
+            db.run(
+                `INSERT INTO OrderDetails (orderid, foodid, quantity) 
+                 VALUES (?, ?, ?) 
+                 ON CONFLICT(orderid, foodid) 
+                 DO UPDATE SET quantity = quantity + ?`,
+                [orderId, foodId, quantity, quantity]
+            );
+        }
+
+        // Update the order totals
+        db.run(
+            `UPDATE Orders SET 
+             price = price + ?, 
+             sgst = sgst + ?, 
+             cgst = cgst + ?, 
+             tax = tax + ? 
+             WHERE billno = ?`,
+            [totalPrice.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), orderId]
+        );
+
+        //console.log(`Order ${orderId} updated successfully with new items.`);
+        event.sender.send("order-updated", { success: true, orderId });
+
+    } catch (error) {
+        console.error("Error updating order:", error.message);
+        event.sender.send("order-update-error", { error: error.message });
+    }
+});
+
+//------------------------------BILLING ENDS HERE--------------------------------
 //---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {

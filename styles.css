@@ -166,7 +166,7 @@ body {
     border:1px solid #555;
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling */
-    max-height: calc(100% - 110px); /* Ensures enough space for buttons */
+    max-height: calc(100% - 119px); /* Ensures enough space for buttons */
     padding-right: 10px; /* Prevents horizontal scrollbar */
 }
 
@@ -224,15 +224,10 @@ body {
     display: flex;
     justify-content: space-between;
     border-top: 1px solid #ddd;
+    gap: 10px; /* Add space between buttons */
 }
 
-#saveandprintbutton,
-#holdbutton,
-#applydiscountbutton {
-    position: relative;
-    flex-grow: 1; /* Makes sure buttons are evenly distributed */
-    margin: 0 5px;
-}
+
 
 /* Apply Discount Inputs */
 #discount-section input {
