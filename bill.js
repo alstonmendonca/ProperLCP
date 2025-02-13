@@ -163,14 +163,16 @@ function saveAndPrintBill() {
     });
 
     if (orderItems.length === 0) {
-        alert("No items in the bill.");
+        createTextPopup("No items in the bill. Please add items before proceeding.");
         return;
     }
 
     // Send order data to main process
     ipcRenderer.send("save-bill", { cashier, date, orderItems });
 
-    alert("Bill saved and sent to print!");
+    // Show confirmation popup instead of alert
+    createTextPopup("Bill saved and sent to print!");
+
     resetBill();
 }
 
@@ -193,17 +195,18 @@ function holdBill() {
     });
 
     if (orderItems.length === 0) {
-        alert("No items in the bill.");
+        createTextPopup("No items in the bill. Please add items before proceeding.");
         return;
     }
 
     // Send order data to main process
     ipcRenderer.send("hold-bill", { cashier, date, orderItems });
-    alert("Bill put on hold!");
-    resetBill();
-    // Add logic to hold the bill (e.g., store it in localStorage)
-}
 
+    // Show confirmation popup instead of alert
+    createTextPopup("Bill put on hold!");
+
+    resetBill();
+}
 // Function to toggle the visibility of the discount inputs and apply button
 function toggleDiscountPopup() {
     let existingPopup = document.getElementById("discount-popup");
@@ -351,3 +354,37 @@ function closeHeldPopup() {
         popup.remove();
     }
 }
+
+
+function createTextPopup(message) {
+    // Remove existing popup if it exists
+    let existingPopup = document.getElementById("custom-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    // Create popup container
+    const popup = document.createElement("div");
+    popup.id = "custom-popup";
+    popup.classList.add("edit-popup");
+
+    popup.innerHTML = `
+        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
+            <p>${message}</p>
+
+            <br>
+
+            <div class="popup-buttons">
+                <button id="closePopup" style="width: 90px; height: 40px;">OK</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Add event listener for closing popup
+    document.getElementById("closePopup").addEventListener("click", () => {
+        popup.remove();
+    });
+}
+
