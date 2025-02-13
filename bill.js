@@ -54,29 +54,23 @@ function resetBill() {
     updateBillTotal();
 }
 // Function to apply the discount
-// Function to apply the discount
 function applyDiscount() {
     let discountPercentage = parseFloat(document.getElementById("discount-percentage").value) || 0;
     let discountAmount = parseFloat(document.getElementById("discount-amount").value) || 0;
     let totalAmount = 0;
 
-    // Get all the bill items
     const billItems = document.querySelectorAll(".bill-item");
 
-    // Calculate the total amount before applying discounts
+    // Calculate total before applying discount
     billItems.forEach(item => {
-        let amountText = item.querySelector(".bill-total").textContent;
-        let amount = parseFloat(amountText.replace(/[^0-9.]/g, "")); // Extract only numeric value
+        let amount = parseFloat(item.querySelector(".bill-total").textContent);
         if (!isNaN(amount)) {
             totalAmount += amount;
         }
     });
 
-    // Ensure valid discount inputs
     if (discountPercentage < 0 || discountAmount < 0) {
         alert("Discount cannot be negative.");
-        document.getElementById("discount-percentage").value = "";
-        document.getElementById("discount-amount").value = "";
         return;
     }
 
@@ -90,30 +84,32 @@ function applyDiscount() {
         return;
     }
 
-    // Apply the discount
+    // Apply discount
+    let discountedTotal = totalAmount;
     if (discountPercentage > 0) {
-        totalAmount -= totalAmount * (discountPercentage / 100);
+        discountedTotal -= totalAmount * (discountPercentage / 100);
     } else if (discountAmount > 0) {
-        totalAmount -= discountAmount;
+        discountedTotal -= discountAmount;
     }
 
-    // Ensure total doesn't go negative
-    totalAmount = Math.max(0, totalAmount);
+    discountedTotal = Math.max(0, discountedTotal); // Prevent negative total
 
-    // Format the total amount
+    // Store discounted total in a hidden field for `saveAndPrintBill()`
+    let discountField = document.getElementById("discounted-total");
+    if (!discountField) {
+        discountField = document.createElement("input");
+        discountField.type = "hidden";
+        discountField.id = "discounted-total";
+        document.body.appendChild(discountField);
+    }
+    discountField.value = discountedTotal;
+
+    // Update displayed total
     const formattedTotal = new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR'
-    }).format(totalAmount);
-
-    // Update total display
+    }).format(discountedTotal);
     document.getElementById("total-amount").textContent = `Total: ${formattedTotal}`;
-
-    // Hide discount section after applying (if it exists)
-    const discountSection = document.getElementById("discount-section");
-    if (discountSection) {
-        discountSection.style.display = 'none';
-    }
 }
 
 
@@ -145,20 +141,15 @@ function updateBillTotal() {
 
 // Function to save and print the bill
 function saveAndPrintBill() {
-    // Get cashier ID (Assume it's set somewhere in the UI)
     const cashier = 1; // Replace with actual cashier ID
-
-    // Get current date in YYYY-MM-DD format
     const date = new Date().toISOString().split("T")[0];
 
-    // Get all bill items
     const billItems = document.querySelectorAll(".bill-item");
     let orderItems = [];
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
         let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
-
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
 
@@ -167,10 +158,12 @@ function saveAndPrintBill() {
         return;
     }
 
-    // Send order data to main process
-    ipcRenderer.send("save-bill", { cashier, date, orderItems });
+    // Get discounted total from hidden field
+    let discountedTotal = parseFloat(document.getElementById("discounted-total")?.value || 0);
 
-    // Show confirmation popup instead of alert
+    // Send order data to main process with discount applied
+    ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
+
     createTextPopup("Bill saved and sent to print!");
 
     resetBill();
