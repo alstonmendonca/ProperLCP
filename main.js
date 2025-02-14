@@ -365,44 +365,60 @@ ipcMain.on('delete-held-order', (event, heldId) => {
 
 
 
-//save bill
+// save bill
 ipcMain.on("save-bill", async (event, orderData) => {
-    const { cashier, date, orderItems } = orderData;
+    const { cashier, date, orderItems, totalAmount } = orderData;
 
     try {
-        let totalPrice = 0, totalSGST = 0, totalCGST = 0, totalTax = 0;
+        let totalSGST = 0, totalCGST = 0, totalTax = 0, calculatedTotalAmount = 0;
 
-        // Fetch food item data and calculate totals
+        // Fetch tax details and calculate actual total
         for (const { foodId, quantity } of orderItems) {
             const row = await new Promise((resolve, reject) => {
-                db.get(`SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`, [foodId], (err, row) => {
-                    if (err) reject(err);
-                    else resolve(row);
-                });
+                db.get(
+                    `SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`,
+                    [foodId],
+                    (err, row) => {
+                        if (err) reject(err);
+                        else resolve(row);
+                    }
+                );
             });
 
-            let itemTotal = row.cost * quantity;
-            totalPrice += itemTotal;
+            if (!row) {
+                throw new Error(`Food item with ID ${foodId} not found.`);
+            }
+
+            let itemTotal = row.cost * quantity; // Get correct item total from DB
+            calculatedTotalAmount += itemTotal; // Accumulate correct total
+
             totalSGST += (itemTotal * row.sgst) / 100;
             totalCGST += (itemTotal * row.cgst) / 100;
             totalTax += (itemTotal * row.tax) / 100;
         }
 
-        // Step 1: Get the latest KOT number for the current date
+        // If totalAmount is 0, use calculatedTotalAmount instead
+        const finalTotalAmount = totalAmount > 0 ? totalAmount : calculatedTotalAmount;
+
+        // Get the latest KOT number for the current date
         const kotRow = await new Promise((resolve, reject) => {
-            db.get(`SELECT kot FROM Orders WHERE date = ? ORDER BY kot DESC LIMIT 1`, [date], (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
+            db.get(
+                `SELECT kot FROM Orders WHERE date = ? ORDER BY kot DESC LIMIT 1`,
+                [date],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                }
+            );
         });
 
-        let kot = kotRow ? kotRow.kot + 1 : 1; // Reset if new day, else increment
+        let kot = kotRow ? kotRow.kot + 1 : 1; // Increment KOT or reset if new day
 
-        // Step 2: Insert the new order
+        // Insert the new order with correct total
         const orderId = await new Promise((resolve, reject) => {
             db.run(
                 `INSERT INTO Orders (kot, price, sgst, cgst, tax, cashier, date) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [kot, totalPrice.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), cashier, date],
+                [kot, finalTotalAmount.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), cashier, date],
                 function (err) {
                     if (err) reject(err);
                     else resolve(this.lastID);
@@ -410,14 +426,16 @@ ipcMain.on("save-bill", async (event, orderData) => {
             );
         });
 
-        // Step 3: Insert items into OrderDetails
-        const stmt = db.prepare(`INSERT INTO OrderDetails (orderid, foodid, quantity) VALUES (?, ?, ?)`);
+        // Insert items into OrderDetails
+        const stmt = db.prepare(
+            `INSERT INTO OrderDetails (orderid, foodid, quantity) VALUES (?, ?, ?)`
+        );
         orderItems.forEach(({ foodId, quantity }) => stmt.run(orderId, foodId, quantity));
         stmt.finalize();
 
         console.log(`Order ${orderId} saved successfully with KOT ${kot}.`);
 
-        // Step 4: Send success response and KOT number to renderer
+        // Send success response and KOT number to renderer
         event.sender.send("bill-saved", { kot });
 
     } catch (error) {
@@ -425,6 +443,7 @@ ipcMain.on("save-bill", async (event, orderData) => {
         event.sender.send("bill-error", { error: error.message });
     }
 });
+
 ipcMain.on("hold-bill", async (event, orderData) => {
     const { cashier, date, orderItems } = orderData;
 
@@ -487,7 +506,86 @@ ipcMain.on("hold-bill", async (event, orderData) => {
         event.sender.send("bill-error", { error: error.message });
     }
 });
+// SAVE TO EXISTING ORDER
+// Fetch Today's Orders
+ipcMain.on("get-todays-orders-for-save-to-orders", (event) => {
+    
+    const query = `
+        SELECT 
+            Orders.*, 
+            User.uname AS cashier_name, 
+            GROUP_CONCAT(FoodItem.fname || ' (x' || OrderDetails.quantity || ')', ', ') AS food_items
+        FROM Orders
+        JOIN User ON Orders.cashier = User.userid
+        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        WHERE Orders.date = date('now', 'localtime')  -- Ensure correct format match
+        GROUP BY Orders.billno
+        ORDER BY Orders.billno DESC
+    `;
 
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching today's orders:", err);
+            event.reply("todays-orders-response-for-save-to-orders", { success: false, orders: [] });
+            return;
+        }
+        event.reply("todays-orders-response-for-save-to-orders", { success: true, orders: rows });
+    });
+});
+// Add items to an existing order
+ipcMain.on("add-to-existing-order", async (event, data) => {
+    const { orderId, orderItems } = data;
+
+    try {
+        let totalPrice = 0, totalSGST = 0, totalCGST = 0, totalTax = 0;
+
+        // Fetch food item data and calculate totals
+        for (const { foodId, quantity } of orderItems) {
+            const row = await new Promise((resolve, reject) => {
+                db.get(`SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`, [foodId], (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                });
+            });
+
+            let itemTotal = row.cost * quantity;
+            totalPrice += itemTotal;
+            totalSGST += (itemTotal * row.sgst) / 100;
+            totalCGST += (itemTotal * row.cgst) / 100;
+            totalTax += (itemTotal * row.tax) / 100;
+
+            // Insert into OrderDetails if it doesn't exist, otherwise update quantity
+            db.run(
+                `INSERT INTO OrderDetails (orderid, foodid, quantity) 
+                 VALUES (?, ?, ?) 
+                 ON CONFLICT(orderid, foodid) 
+                 DO UPDATE SET quantity = quantity + ?`,
+                [orderId, foodId, quantity, quantity]
+            );
+        }
+
+        // Update the order totals
+        db.run(
+            `UPDATE Orders SET 
+             price = price + ?, 
+             sgst = sgst + ?, 
+             cgst = cgst + ?, 
+             tax = tax + ? 
+             WHERE billno = ?`,
+            [totalPrice.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), orderId]
+        );
+
+        //console.log(`Order ${orderId} updated successfully with new items.`);
+        event.sender.send("order-updated", { success: true, orderId });
+
+    } catch (error) {
+        console.error("Error updating order:", error.message);
+        event.sender.send("order-update-error", { error: error.message });
+    }
+});
+
+//------------------------------BILLING ENDS HERE--------------------------------
 //---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
 ipcMain.on("get-todays-orders", (event) => {
@@ -725,6 +823,30 @@ ipcMain.on("get-customers", (event) => {
             return;
         }
         event.reply("customers-response", { success: true, customers: rows });
+    });
+});
+
+// Clear Deleted Orders
+ipcMain.on("clear-deleted-orders", (event) => {
+    const deleteOrdersQuery = `DELETE FROM DeletedOrders`;
+    const deleteOrderDetailsQuery = `DELETE FROM DeletedOrderDetails`;
+
+    db.serialize(() => {
+        db.run(deleteOrderDetailsQuery, [], (err) => {
+            if (err) {
+                console.error("Error clearing DeletedOrderDetails:", err);
+                event.reply("clear-deleted-orders-response", { success: false });
+                return;
+            }
+            db.run(deleteOrdersQuery, [], (err) => {
+                if (err) {
+                    console.error("Error clearing DeletedOrders:", err);
+                    event.reply("clear-deleted-orders-response", { success: false });
+                    return;
+                }
+                event.reply("clear-deleted-orders-response", { success: true });
+            });
+        });
     });
 });
 

@@ -50,33 +50,53 @@ function resetBill() {
     const billItemsList = document.getElementById("bill-items-list");
     // Clear all items from the bill
     billItemsList.innerHTML = '';
-    // Update the total bill amount (if you have a total display)
+
+    // Reset total display
+    document.getElementById("total-amount").textContent = "Total: Rs. 0.00 (Your bill is empty)";
+
+    // Remove or reset the discount fields
+    let discountField = document.getElementById("discounted-total");
+    if (discountField) {
+        discountField.value = 0;
+    }
+
+    let discountPercentageInput = document.getElementById("discount-percentage");
+    let discountAmountInput = document.getElementById("discount-amount");
+    if (discountPercentageInput) {
+        discountPercentageInput.value = "";
+    }
+    if (discountAmountInput) {
+        discountAmountInput.value = "";
+    }
+
+    // Update the total bill amount
     updateBillTotal();
 }
-// Function to apply the discount
+
 // Function to apply the discount
 function applyDiscount() {
     let discountPercentage = parseFloat(document.getElementById("discount-percentage").value) || 0;
     let discountAmount = parseFloat(document.getElementById("discount-amount").value) || 0;
     let totalAmount = 0;
 
-    // Get all the bill items
     const billItems = document.querySelectorAll(".bill-item");
 
-    // Calculate the total amount before applying discounts
+    // Calculate total before applying discount
     billItems.forEach(item => {
-        let amountText = item.querySelector(".bill-total").textContent;
-        let amount = parseFloat(amountText.replace(/[^0-9.]/g, "")); // Extract only numeric value
+        let amount = parseFloat(item.querySelector(".bill-total").textContent);
         if (!isNaN(amount)) {
             totalAmount += amount;
         }
     });
 
-    // Ensure valid discount inputs
+    // Ensure previous discount is cleared before applying a new one
+    let discountField = document.getElementById("discounted-total");
+    if (discountField) {
+        discountField.value = totalAmount; // Reset before applying a new discount
+    }
+
     if (discountPercentage < 0 || discountAmount < 0) {
         alert("Discount cannot be negative.");
-        document.getElementById("discount-percentage").value = "";
-        document.getElementById("discount-amount").value = "";
         return;
     }
 
@@ -90,31 +110,33 @@ function applyDiscount() {
         return;
     }
 
-    // Apply the discount
+    // Apply discount
+    let discountedTotal = totalAmount;
     if (discountPercentage > 0) {
-        totalAmount -= totalAmount * (discountPercentage / 100);
+        discountedTotal -= totalAmount * (discountPercentage / 100);
     } else if (discountAmount > 0) {
-        totalAmount -= discountAmount;
+        discountedTotal -= discountAmount;
     }
 
-    // Ensure total doesn't go negative
-    totalAmount = Math.max(0, totalAmount);
+    discountedTotal = Math.max(0, discountedTotal); // Prevent negative total
 
-    // Format the total amount
+    // Store discounted total properly
+    if (!discountField) {
+        discountField = document.createElement("input");
+        discountField.type = "hidden";
+        discountField.id = "discounted-total";
+        document.body.appendChild(discountField);
+    }
+    discountField.value = discountedTotal;
+
+    // Update displayed total
     const formattedTotal = new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR'
-    }).format(totalAmount);
-
-    // Update total display
+    }).format(discountedTotal);
     document.getElementById("total-amount").textContent = `Total: ${formattedTotal}`;
-
-    // Hide discount section after applying (if it exists)
-    const discountSection = document.getElementById("discount-section");
-    if (discountSection) {
-        discountSection.style.display = 'none';
-    }
 }
+
 
 
 
@@ -145,34 +167,41 @@ function updateBillTotal() {
 
 // Function to save and print the bill
 function saveAndPrintBill() {
-    // Get cashier ID (Assume it's set somewhere in the UI)
     const cashier = 1; // Replace with actual cashier ID
-
-    // Get current date in YYYY-MM-DD format
     const date = new Date().toISOString().split("T")[0];
 
-    // Get all bill items
     const billItems = document.querySelectorAll(".bill-item");
     let orderItems = [];
+    let totalAmount = 0;
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
         let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
-
+        let itemTotal = parseFloat(item.querySelector(".bill-total").textContent);
+        if (!isNaN(itemTotal)) {
+            totalAmount += itemTotal;
+        }
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
 
     if (orderItems.length === 0) {
-        alert("No items in the bill.");
+        createTextPopup("No items in the bill. Please add items before proceeding.");
         return;
     }
 
-    // Send order data to main process
-    ipcRenderer.send("save-bill", { cashier, date, orderItems });
+    // Check if a discounted total exists, otherwise use the original totalAmount
+    let discountField = document.getElementById("discounted-total");
+    let discountedTotal = discountField && discountField.value ? parseFloat(discountField.value) : totalAmount;
 
-    alert("Bill saved and sent to print!");
+    // Send order data to main process with discount applied (or not)
+    ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
+
+    createTextPopup("Bill saved and sent to print!");
+
     resetBill();
 }
+
+
 
 function holdBill() {
     // Get cashier ID (Assume it's set somewhere in the UI)
@@ -193,17 +222,18 @@ function holdBill() {
     });
 
     if (orderItems.length === 0) {
-        alert("No items in the bill.");
+        createTextPopup("No items in the bill. Please add items before proceeding.");
         return;
     }
 
     // Send order data to main process
     ipcRenderer.send("hold-bill", { cashier, date, orderItems });
-    alert("Bill put on hold!");
-    resetBill();
-    // Add logic to hold the bill (e.g., store it in localStorage)
-}
 
+    // Show confirmation popup instead of alert
+    createTextPopup("Bill put on hold!");
+
+    resetBill();
+}
 // Function to toggle the visibility of the discount inputs and apply button
 function toggleDiscountPopup() {
     let existingPopup = document.getElementById("discount-popup");
@@ -351,3 +381,153 @@ function closeHeldPopup() {
         popup.remove();
     }
 }
+
+
+function createTextPopup(message) {
+    // Remove existing popup if it exists
+    let existingPopup = document.getElementById("custom-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    // Create popup container
+    const popup = document.createElement("div");
+    popup.id = "custom-popup";
+    popup.classList.add("edit-popup");
+
+    popup.innerHTML = `
+        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
+            <p>${message}</p>
+
+            <br>
+
+            <div class="popup-buttons">
+                <button id="closePopup" style="width: 90px; height: 40px;">OK</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Add event listener for closing popup
+    document.getElementById("closePopup").addEventListener("click", () => {
+        popup.remove();
+    });
+}
+
+// ------------ SAVE TO ORDER FUNCTIONALITY IS HERE ------------------
+// Function to display today's orders in a popup
+function displayTodaysOrders() {
+    let existingPopup = document.getElementById("todaysOrdersPopup");
+
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
+    }
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
+    ipcRenderer.send("get-todays-orders-for-save-to-orders"); // Request today's orders from the main process
+}
+
+// Handle response from IPC and display orders in popup
+ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
+    if (!data.success) {
+        createTextPopup("Error fetching today's orders.");
+        return;
+    }
+
+    let popup = document.createElement("div");
+    popup.id = "todaysOrdersPopup";
+    popup.classList.add("edit-popup");
+
+    let tableHTML = `
+        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 800px;">
+            <div style="width: 100%; display: flex; justify-content: flex-end;">
+                <span class="close-btn" onclick="closeTodaysOrdersPopup()" style="cursor: pointer; font-size: 20px; font-weight: bold;">&times;</span>
+            </div>
+            <h3>Today's Orders</h3>
+            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%;">
+                <table class="order-history-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Cashier</th>
+                            <th>Price (₹)</th>
+                            <th>SGST (₹)</th>
+                            <th>CGST (₹)</th>
+                            <th>Tax (₹)</th>
+                            <th>Food Items</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+
+    data.orders.forEach(order => {
+        tableHTML += `
+            <tr data-orderid="${order.billno}">
+                <td>${order.billno}</td>
+                <td>${order.cashier_name}</td>
+                <td>${order.price.toFixed(2)}</td>
+                <td>${order.sgst.toFixed(2)}</td>
+                <td>${order.cgst.toFixed(2)}</td>
+                <td>${order.tax.toFixed(2)}</td>
+                <td>${order.food_items || "No items"}</td>
+                <td>
+                    <button onclick="addToExistingOrder(${order.billno})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px">Add to Order</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `</tbody></table></div></div>`;
+    popup.innerHTML = tableHTML;
+    document.body.appendChild(popup);
+});
+
+// Function to add current bill items to an existing order
+function addToExistingOrder(orderId) {
+    // Get all bill items
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
+    // Send order data to main process
+    ipcRenderer.send("add-to-existing-order", { orderId, orderItems });
+
+    // Close the popup after adding
+    document.getElementById("todaysOrdersPopup").remove();
+    resetBill();
+    createTextPopup(`Order ${orderId} updated successfully with new items.`);
+}
+
+// Close popup function
+function closeTodaysOrdersPopup() {
+    let popup = document.getElementById("todaysOrdersPopup");
+    if (popup) popup.remove();
+}
+// ------------ SAVE TO ORDER FUNCTIONALITY ENDS HERE ------------------

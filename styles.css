@@ -10,6 +10,24 @@
     padding: 0;
     box-sizing: border-box;
 }
+/* Scrollbar for everything */
+*::-webkit-scrollbar {
+    width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
 
 body {
     font-family: Arial, sans-serif;
@@ -156,7 +174,7 @@ body {
     width: 600px; /* Adjust width as needed */
     padding: 20px;
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: 0px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
     display: flex;
@@ -175,7 +193,7 @@ body {
     border:1px solid #555;
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling */
-    max-height: calc(100% - 110px); /* Ensures enough space for buttons */
+    max-height: calc(100% - 119px); /* Ensures enough space for buttons */
     padding-right: 10px; /* Prevents horizontal scrollbar */
 }
 
@@ -233,15 +251,10 @@ body {
     display: flex;
     justify-content: space-between;
     border-top: 1px solid #ddd;
+    gap: 10px; /* Add space between buttons */
 }
 
-#saveandprintbutton,
-#holdbutton,
-#applydiscountbutton {
-    position: relative;
-    flex-grow: 1; /* Makes sure buttons are evenly distributed */
-    margin: 0 5px;
-}
+
 
 /* Apply Discount Inputs */
 #discount-section input {

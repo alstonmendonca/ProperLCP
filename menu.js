@@ -32,7 +32,7 @@ async function displayMenu() {
 
             foodItems.forEach((item) => {
                 menuContent += `
-                    <div class="food-item" style="border: 1px solid #ccc; padding: 10px; text-align: center;" data-fid="${item.fid}">
+                    <div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center;" data-fid="${item.fid}">
                         <h3>${item.fname} <br style="line-height:5px; display:block"> 
                             ${item.veg == 1 ? "🌱" : "🍖"}
                         </h3>

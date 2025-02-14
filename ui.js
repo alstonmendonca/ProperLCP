@@ -28,7 +28,7 @@ async function updateMainContent(contentType) {
                 ${foodItems 
                     .map(
                         (item) => 
-                        `<div class="food-item" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                        `<div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center;">
                             <h3>${item.fname}<br style="line-height:5px;display:block"> ${item.veg ? "🌱" : "🍖"}</h3>
                             <p>Price: ₹${item.cost}</p>
                             <div class="quantity-control">
@@ -301,12 +301,20 @@ async function updateMainContent(contentType) {
                     
                     <button class="showHistoryButton" id="fetchDeletedOrdersBtn">Show Deleted Orders</button>
                     <button id="exportExcelButton">Export to Excel</button>
+                    <button id="deletedClearHistory">Clear History</button>
                 </div>
                 <div id="deletedOrdersDiv"></div>
             `;
 
             // Attach event listener to the button
             document.getElementById("fetchDeletedOrdersBtn").addEventListener("click", fetchDeletedOrders);
+
+            // Attach event listener for Clear History button
+            document.getElementById("deletedClearHistory").addEventListener("click", () => {
+                if (confirm("Are you sure you want to permanently delete these orders?")) {
+                    clearDeletedOrders();
+                }
+            });
 
             // ✅ Restore the last fetched deleted orders history
             const storedData = sessionStorage.getItem("deletedOrdersData");
@@ -350,6 +358,21 @@ async function updateMainContent(contentType) {
     // Update left panel dynamically
     updateLeftPanel(contentType);
 }
+
+// Function to clear deleted orders
+function clearDeletedOrders() {
+    ipcRenderer.send("clear-deleted-orders");
+}
+
+ipcRenderer.on("clear-deleted-orders-response", (event, data) => {
+    if (data.success) {
+        alert("Deleted orders cleared successfully.");
+        // Optionally, refresh the displayed deleted orders
+        fetchDeletedOrders();
+    } else {
+        alert("Failed to clear deleted orders.");
+    }
+});
 
 // Function to dynamically update the left panel (category or settings buttons)
 async function updateLeftPanel(contentType) {
