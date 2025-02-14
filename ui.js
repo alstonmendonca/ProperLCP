@@ -28,7 +28,7 @@ async function updateMainContent(contentType) {
                 ${foodItems 
                     .map(
                         (item) => 
-                        `<div class="food-item" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                        `<div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center;">
                             <h3>${item.fname}<br style="line-height:5px;display:block"> ${item.veg ? "🌱" : "🍖"}</h3>
                             <p>Price: ₹${item.cost}</p>
                             <div class="quantity-control">
