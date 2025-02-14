@@ -715,7 +715,7 @@ ipcMain.on("show-excel-export-message", (event, options) => {
 ipcMain.on("get-customers", (event) => {
     const query = `
         SELECT * FROM Customer
-        ORDER BY cname ASC
+        ORDER BY cid ASC
     `;
 
     db.all(query, [], (err, rows) => {

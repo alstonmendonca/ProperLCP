@@ -2,6 +2,9 @@
 
 const { ipcRenderer } = require("electron");
 
+let currentSortBy = null; // Track the current sorted column
+let currentSortOrder = 'asc'; // Default sort order
+
 // Function to fetch customers
 function fetchCustomers() {
     console.log("Fetching customers..."); // Debugging statement
@@ -32,10 +35,10 @@ function displayCustomers(customers) {
         <table class="order-history-table">
             <thead>
                 <tr>
-                    <th class="sortable" onclick="sortCustomersTable('cid')">Customer ID ${getSortIndicator('cid')}</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Address</th>
+                    <th class="sortable" onclick="sortCustomersTable('cid')">Customer ID ${getCustomerSortIndicator('cid')}</th>
+                    <th class="sortable" onclick="sortCustomersTable('cname')">Name ${getCustomerSortIndicator('cname')}</th>
+                    <th class="sortable" onclick="sortCustomersTable('phone')">Phone ${getCustomerSortIndicator('phone')}</th>
+                    <th class="sortable" onclick="sortCustomersTable('address')">Address ${getCustomerSortIndicator('address')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,12 +60,52 @@ function displayCustomers(customers) {
 
     // Attach event listeners for sorting
     setTimeout(() => {
-        attachContextMenu(".order-history-table", "customers"); // Re-attach menu if needed
+        attachContextMenu(".order-history-table", "customer"); // Re-attach menu if needed
     }, 100);
 }
 
+// Function to sort customers by a specific column
+function sortCustomersTable(column) {
+    const customersDiv = document.getElementById("customersDiv");
+    const customers = Array.from(customersDiv.querySelectorAll("tbody tr")).map(row => {
+        return {
+            cid: row.dataset.cid,
+            cname: row.cells[1].innerText,
+            phone: row.cells[2].innerText,
+            address: row.cells[3].innerText
+        };
+    });
+
+    // Determine sort order
+    if (currentSortBy === column) {
+        currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc'; // Toggle sort order
+    } else {
+        currentSortOrder = 'asc'; // Reset to ascending if a new column is sorted
+    }
+    currentSortBy = column;
+
+    // Sort the customers
+    customers.sort((a, b) => {
+        let comparison = 0;
+        if (column === 'cid') {
+            comparison = a.cid - b.cid; // Sort by Customer ID
+        } else if (column === 'cname') {
+            comparison = a.cname.localeCompare(b.cname); // Sort by Name
+        } else if (column === 'phone') {
+            comparison = a.phone.localeCompare(b.phone); // Sort by Phone
+        } else if (column === 'address') {
+            comparison = a.address.localeCompare(b.address); // Sort by Address
+        }
+
+        return currentSortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    // Rebuild the table with sorted data
+    displayCustomers(customers);
+}
+
 // Function to get the sort indicator (▲ or ▼) for a column
-function getSortIndicator(sortBy) {
+function getCustomerSortIndicator(sortBy) {
     if (currentSortBy === sortBy) {
         return currentSortOrder === 'asc' ? '▲' : '▼';
     }
@@ -70,4 +113,4 @@ function getSortIndicator(sortBy) {
 }
 
 // Export function so it can be used in `renderer.js`
-module.exports = { fetchCustomers, displayCustomers };
+module.exports = { fetchCustomers, displayCustomers, sortCustomersTable };

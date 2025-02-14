@@ -17,6 +17,7 @@ const { loadItemSummary } = require('./itemSummary');
 const {sortTodaysOrdersTable} = require('./todaysOrders');
 const {fetchCustomers} = require('./customer');
 const {displayCustomers} = require('./customer');
+const {sortCustomersTable} = require('./customer');
 
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
