@@ -27,21 +27,30 @@ body {
     justify-content: space-evenly; /* Space buttons evenly */
     align-items: stretch;
     height: 50px; /* Adjust the height of the panel */
+    
 }
 
 .top {
     flex: 1;
-    padding: 10px 20px;
+    padding: 0px 0px;
     background-color: #444;
     color: white;
-    border: none;
+    border: 1px solid #555; /* Thin border for separation */
     cursor: pointer;
     text-align: center;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Add transition for hover effects */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+    border-radius: 0px;
 }
 
 .top:hover {
-    background-color: #555;
+    background-color: #555; /* Change background on hover */
+    transform: translateY(-2px); /* Slightly lift the button on hover */
+}
+
+.top:active {
+    background-color: #666; /* Darker background on click */
+    transform: translateY(0); /* Reset lift effect */
 }
 
 /* Container for left and main panels */
