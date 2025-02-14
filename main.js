@@ -711,6 +711,23 @@ ipcMain.on("show-excel-export-message", (event, options) => {
     });
 });
 
+// Fetch Customers
+ipcMain.on("get-customers", (event) => {
+    const query = `
+        SELECT * FROM Customer
+        ORDER BY cname ASC
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching customers:", err);
+            event.reply("customers-response", { success: false, customers: [] });
+            return;
+        }
+        event.reply("customers-response", { success: true, customers: rows });
+    });
+});
+
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

@@ -315,11 +315,19 @@ async function updateMainContent(contentType) {
                 displayDeletedOrders(orders);
             }
         }
+        else if (contentType === 'discountedOrders') {
+            mainContent.innerHTML = `
+                <h1>Discounted Orders</h1>
+                <p>View orders with discounts applied.</p>
+            `;
+        }
         else if (contentType === 'customer') {
             mainContent.innerHTML = `
                 <h1>Customers</h1>
                 <button id="addCustomerBtn">Add Customer</button>
+                <div id="customersDiv"></div>
             `;
+            fetchCustomers(); // Fetch and display customers
         }
 
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------
@@ -397,6 +405,7 @@ async function updateLeftPanel(contentType) {
             <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
             <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
             <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
+            <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
             <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
         `;
         break;
