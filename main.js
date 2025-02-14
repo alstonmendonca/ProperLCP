@@ -367,16 +367,16 @@ ipcMain.on('delete-held-order', (event, heldId) => {
 
 // save bill
 ipcMain.on("save-bill", async (event, orderData) => {
-    const { cashier, date, orderItems, totalAmount } = orderData; // Get discounted totalAmount
+    const { cashier, date, orderItems, totalAmount } = orderData;
 
     try {
-        let totalSGST = 0, totalCGST = 0, totalTax = 0;
+        let totalSGST = 0, totalCGST = 0, totalTax = 0, calculatedTotalAmount = 0;
 
-        // Fetch tax details for calculation
+        // Fetch tax details and calculate actual total
         for (const { foodId, quantity } of orderItems) {
             const row = await new Promise((resolve, reject) => {
                 db.get(
-                    `SELECT sgst, cgst, tax FROM FoodItem WHERE fid = ?`,
+                    `SELECT cost, sgst, cgst, tax FROM FoodItem WHERE fid = ?`,
                     [foodId],
                     (err, row) => {
                         if (err) reject(err);
@@ -385,11 +385,20 @@ ipcMain.on("save-bill", async (event, orderData) => {
                 );
             });
 
-            let itemTotal = (totalAmount / orderItems.length) * quantity; // Distribute discount across items
+            if (!row) {
+                throw new Error(`Food item with ID ${foodId} not found.`);
+            }
+
+            let itemTotal = row.cost * quantity; // Get correct item total from DB
+            calculatedTotalAmount += itemTotal; // Accumulate correct total
+
             totalSGST += (itemTotal * row.sgst) / 100;
             totalCGST += (itemTotal * row.cgst) / 100;
             totalTax += (itemTotal * row.tax) / 100;
         }
+
+        // If totalAmount is 0, use calculatedTotalAmount instead
+        const finalTotalAmount = totalAmount > 0 ? totalAmount : calculatedTotalAmount;
 
         // Get the latest KOT number for the current date
         const kotRow = await new Promise((resolve, reject) => {
@@ -405,11 +414,11 @@ ipcMain.on("save-bill", async (event, orderData) => {
 
         let kot = kotRow ? kotRow.kot + 1 : 1; // Increment KOT or reset if new day
 
-        // Insert the new order with discounted total
+        // Insert the new order with correct total
         const orderId = await new Promise((resolve, reject) => {
             db.run(
                 `INSERT INTO Orders (kot, price, sgst, cgst, tax, cashier, date) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [kot, totalAmount.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), cashier, date],
+                [kot, finalTotalAmount.toFixed(2), totalSGST.toFixed(2), totalCGST.toFixed(2), totalTax.toFixed(2), cashier, date],
                 function (err) {
                     if (err) reject(err);
                     else resolve(this.lastID);

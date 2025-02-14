@@ -50,9 +50,29 @@ function resetBill() {
     const billItemsList = document.getElementById("bill-items-list");
     // Clear all items from the bill
     billItemsList.innerHTML = '';
-    // Update the total bill amount (if you have a total display)
+
+    // Reset total display
+    document.getElementById("total-amount").textContent = "Total: Rs. 0.00 (Your bill is empty)";
+
+    // Remove or reset the discount fields
+    let discountField = document.getElementById("discounted-total");
+    if (discountField) {
+        discountField.value = 0;
+    }
+
+    let discountPercentageInput = document.getElementById("discount-percentage");
+    let discountAmountInput = document.getElementById("discount-amount");
+    if (discountPercentageInput) {
+        discountPercentageInput.value = "";
+    }
+    if (discountAmountInput) {
+        discountAmountInput.value = "";
+    }
+
+    // Update the total bill amount
     updateBillTotal();
 }
+
 // Function to apply the discount
 function applyDiscount() {
     let discountPercentage = parseFloat(document.getElementById("discount-percentage").value) || 0;
@@ -68,6 +88,12 @@ function applyDiscount() {
             totalAmount += amount;
         }
     });
+
+    // Ensure previous discount is cleared before applying a new one
+    let discountField = document.getElementById("discounted-total");
+    if (discountField) {
+        discountField.value = totalAmount; // Reset before applying a new discount
+    }
 
     if (discountPercentage < 0 || discountAmount < 0) {
         alert("Discount cannot be negative.");
@@ -94,8 +120,7 @@ function applyDiscount() {
 
     discountedTotal = Math.max(0, discountedTotal); // Prevent negative total
 
-    // Store discounted total in a hidden field for `saveAndPrintBill()`
-    let discountField = document.getElementById("discounted-total");
+    // Store discounted total properly
     if (!discountField) {
         discountField = document.createElement("input");
         discountField.type = "hidden";
@@ -111,6 +136,7 @@ function applyDiscount() {
     }).format(discountedTotal);
     document.getElementById("total-amount").textContent = `Total: ${formattedTotal}`;
 }
+
 
 
 
@@ -146,10 +172,15 @@ function saveAndPrintBill() {
 
     const billItems = document.querySelectorAll(".bill-item");
     let orderItems = [];
+    let totalAmount = 0;
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
         let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let itemTotal = parseFloat(item.querySelector(".bill-total").textContent);
+        if (!isNaN(itemTotal)) {
+            totalAmount += itemTotal;
+        }
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
 
@@ -158,16 +189,19 @@ function saveAndPrintBill() {
         return;
     }
 
-    // Get discounted total from hidden field
-    let discountedTotal = parseFloat(document.getElementById("discounted-total")?.value || 0);
+    // Check if a discounted total exists, otherwise use the original totalAmount
+    let discountField = document.getElementById("discounted-total");
+    let discountedTotal = discountField && discountField.value ? parseFloat(discountField.value) : totalAmount;
 
-    // Send order data to main process with discount applied
+    // Send order data to main process with discount applied (or not)
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
 
     createTextPopup("Bill saved and sent to print!");
 
     resetBill();
 }
+
+
 
 function holdBill() {
     // Get cashier ID (Assume it's set somewhere in the UI)
