@@ -9,6 +9,10 @@ function fetchDeletedOrders() {
         return;
     }
 
+    // Store the selected dates in sessionStorage
+    sessionStorage.setItem("deletedOrdersStartDate", startDate);
+    sessionStorage.setItem("deletedOrdersEndDate", endDate);
+
     ipcRenderer.send("get-deleted-orders", { startDate, endDate });
 }
 
@@ -61,9 +65,6 @@ function displayDeletedOrders(orders) {
 
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
-
-    // ✅ Store the fetched deleted orders in sessionStorage
-    sessionStorage.setItem("deletedOrdersData", JSON.stringify(orders));
 
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {

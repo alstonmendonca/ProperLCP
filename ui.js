@@ -306,21 +306,28 @@ async function updateMainContent(contentType) {
                 <div id="deletedOrdersDiv"></div>
             `;
 
+            // Restore last selected start date and end date
+            const savedStartDate = sessionStorage.getItem("deletedOrdersStartDate");
+            const savedEndDate = sessionStorage.getItem("deletedOrdersEndDate");
+
+            if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
+            if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
+
             // Attach event listener to the button
             document.getElementById("fetchDeletedOrdersBtn").addEventListener("click", fetchDeletedOrders);
 
             // Attach event listener for Clear History button
-            document.getElementById("deletedClearHistory").addEventListener("click", () => {
+            document.getElementById("deletedClearHistory").addEventListener("click", async () => {
                 if (confirm("Are you sure you want to permanently delete these orders?")) {
-                    clearDeletedOrders();
+                    await clearDeletedOrders();
+                    // Refresh the deleted orders after clearing
+                    fetchDeletedOrders();
                 }
             });
 
-            // ✅ Restore the last fetched deleted orders history
-            const storedData = sessionStorage.getItem("deletedOrdersData");
-            if (storedData) {
-                const orders = JSON.parse(storedData);
-                displayDeletedOrders(orders);
+            // Fetch deleted orders initially based on stored dates
+            if (savedStartDate && savedEndDate) {
+                fetchDeletedOrders();
             }
         }
         else if (contentType === 'discountedOrders') {
