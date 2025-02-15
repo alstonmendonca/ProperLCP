@@ -333,8 +333,11 @@ async function updateMainContent(contentType) {
         else if (contentType === 'discountedOrders') {
             mainContent.innerHTML = `
                 <h1>Discounted Orders</h1>
-                <p>View orders with discounts applied.</p>
+                <div id="discountedOrdersDiv"></div>
             `;
+
+            // Fetch discounted orders
+            fetchDiscountedOrders();
         }
         else if (contentType === 'customer') {
             mainContent.innerHTML = `

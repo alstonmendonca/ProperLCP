@@ -18,7 +18,8 @@ const {sortTodaysOrdersTable} = require('./todaysOrders');
 const {fetchCustomers} = require('./customer');
 const {displayCustomers} = require('./customer');
 const {sortCustomersTable} = require('./customer');
-
+const {fetchDiscountedOrders} = require('./discountedOrders');
+const {sortDiscountedOrdersTable} = require('./discountedOrders');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
@@ -37,7 +38,8 @@ window.loadItemSummary = loadItemSummary;
 window.sortTodaysOrdersTable = sortTodaysOrdersTable;
 window.fetchCustomers = fetchCustomers;
 window.displayCustomers = displayCustomers;
-
+window.fetchDiscountedOrders = fetchDiscountedOrders;
+window.sortDiscountedOrdersTable = sortDiscountedOrdersTable;
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container

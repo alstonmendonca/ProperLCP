@@ -850,6 +850,22 @@ ipcMain.on("clear-deleted-orders", (event) => {
     });
 });
 
+ipcMain.on("get-discounted-orders", (event) => {
+    const query = `
+        SELECT billno, discount_percentage, discount_amount
+        FROM DiscountedOrders
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching discounted orders:", err);
+            event.reply("discounted-orders-response", { success: false, orders: [] });
+            return;
+        }
+        event.reply("discounted-orders-response", { success: true, orders: rows });
+    });
+});
+
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 
