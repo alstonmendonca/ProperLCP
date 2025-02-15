@@ -21,7 +21,10 @@ async function displayMenu() {
 
         if (foodItems.length > 0) {
             let menuContent = `
-                <h2>Menu</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Menu</h2>
+                    <input type="text" id="searchBar" placeholder="Search for an item..." style="padding: 5px; border: 1px solid #ccc; border-radius: 5px; width: 300px;">
+                </div><br>
                 <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
                     <button id="addNewItem" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
                     <p style = "font-size : 100px">+</p>
@@ -138,6 +141,18 @@ async function displayMenu() {
 
                         // Remove the food item from the DOM instead of reloading everything
                         document.querySelector(`.food-item[data-fid="${fid}"]`).remove();
+                    }
+                });
+            });
+            // Add event listeners for search bar
+            document.querySelector("#searchBar").addEventListener("input", (event) => {
+                const searchQuery = event.target.value.toLowerCase();
+                document.querySelectorAll(".food-item").forEach((item) => {
+                    const foodName = item.querySelector("h3").textContent.toLowerCase();
+                    if (foodName.includes(searchQuery)) {
+                        item.style.display = "block";
+                    } else {
+                        item.style.display = "none";
                     }
                 });
             });
