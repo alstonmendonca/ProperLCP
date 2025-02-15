@@ -22,8 +22,12 @@ ipcRenderer.on("discounted-orders-response", (event, data) => {
             <thead>
                 <tr>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('billno')">Bill No ${getSortIndicator('billno')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('kot')">KOT ${getSortIndicator('kot')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('date')">Date ${getSortIndicator('date')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('Initial_price')">Initial Price (₹) ${getSortIndicator('Initial_price')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_percentage')">Discount (%) ${getSortIndicator('discount_percentage')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_amount')">Discount (₹) ${getSortIndicator('discount_amount')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('Final_Price')">Final Price (₹) ${getSortIndicator('Final_Price')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,8 +37,12 @@ ipcRenderer.on("discounted-orders-response", (event, data) => {
         tableHTML += `
             <tr>
                 <td>${order.billno}</td>
+                <td>${order.kot}</td>
+                <td>${order.date}</td>
+                <td>₹${order.Initial_price.toFixed(2)}</td>
                 <td>${order.discount_percentage.toFixed(2)}</td>
                 <td>₹${order.discount_amount.toFixed(2)}</td>
+                <td>₹${order.Final_Price.toFixed(2)}</td>
             </tr>
         `;
     });
@@ -59,8 +67,12 @@ function sortDiscountedOrdersTable(column) {
     const orders = Array.from(discountedOrdersDiv.querySelectorAll("tbody tr")).map(row => {
         return {
             billno: row.cells[0].innerText,
-            discount_percentage: parseFloat(row.cells[1].innerText),
-            discount_amount: parseFloat(row.cells[2].innerText.replace('₹', '').trim())
+            kot: row.cells[1].innerText,
+            date: row.cells[2].innerText,
+            Initial_price: parseFloat(row.cells[3].innerText.replace('₹', '').trim()),
+            discount_percentage: parseFloat(row.cells[4].innerText),
+            discount_amount: parseFloat(row.cells[5].innerText.replace('₹', '').trim()),
+            Final_Price: parseFloat(row.cells[6].innerText.replace('₹', '').trim())
         };
     });
 
@@ -77,10 +89,18 @@ function sortDiscountedOrdersTable(column) {
         let comparison = 0;
         if (column === 'billno') {
             comparison = a.billno - b.billno;
+        } else if (column === 'kot') {
+            comparison = a.kot - b.kot;
+        } else if (column === 'date') {
+            comparison = new Date(a.date) - new Date(b.date); // Sort by date
+        } else if (column === 'Initial_price') {
+            comparison = a.Initial_price - b.Initial_price;
         } else if (column === 'discount_percentage') {
             comparison = a.discount_percentage - b.discount_percentage;
         } else if (column === 'discount_amount') {
             comparison = a.discount_amount - b.discount_amount;
+        } else if (column === 'Final_Price') {
+            comparison = a.Final_Price - b.Final_Price;
         }
 
         return currentSortOrder === 'asc' ? comparison : -comparison;
@@ -92,8 +112,12 @@ function sortDiscountedOrdersTable(column) {
             <thead>
                 <tr>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('billno')">Bill No ${getSortIndicator('billno')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('kot')">KOT ${getSortIndicator('kot')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('date')">Date ${getSortIndicator('date')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('Initial_price')">Initial Price (₹) ${getSortIndicator('Initial_price')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_percentage')">Discount (%) ${getSortIndicator('discount_percentage')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_amount')">Discount (₹) ${getSortIndicator('discount_amount')}</th>
+                    <th class="sortable" onclick="sortDiscountedOrdersTable('Final_Price')">Final Price (₹) ${getSortIndicator('Final_Price')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -103,8 +127,12 @@ function sortDiscountedOrdersTable(column) {
         sortedTableHTML += `
             <tr>
                 <td>${order.billno}</td>
+                <td>${order.kot}</td>
+                <td>${order.date}</td>
+                <td>₹${order.Initial_price.toFixed(2)}</td>
                 <td>${order.discount_percentage.toFixed(2)}</td>
                 <td>₹${order.discount_amount.toFixed(2)}</td>
+                <td>₹${order.Final_Price.toFixed(2)}</td>
             </tr>
         `;
     });

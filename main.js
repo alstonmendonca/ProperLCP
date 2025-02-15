@@ -852,8 +852,16 @@ ipcMain.on("clear-deleted-orders", (event) => {
 
 ipcMain.on("get-discounted-orders", (event) => {
     const query = `
-        SELECT billno, discount_percentage, discount_amount
-        FROM DiscountedOrders
+        SELECT 
+            d.billno, 
+            o.kot, 
+            o.date,
+            d.Initial_price, 
+            d.discount_percentage, 
+            d.discount_amount, 
+            o.price AS Final_Price
+        FROM DiscountedOrders d
+        JOIN Orders o ON d.billno = o.billno
     `;
 
     db.all(query, [], (err, rows) => {
@@ -865,7 +873,6 @@ ipcMain.on("get-discounted-orders", (event) => {
         event.reply("discounted-orders-response", { success: true, orders: rows });
     });
 });
-
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 
