@@ -877,6 +877,20 @@ ipcMain.on("get-discounted-orders", (event) => {
         event.reply("discounted-orders-response", { success: true, orders: rows });
     });
 });
+
+// Clear Discounted Orders
+ipcMain.on("clear-discounted-orders", (event) => {
+    const deleteDiscountedOrdersQuery = `DELETE FROM DiscountedOrders`;
+
+    db.run(deleteDiscountedOrdersQuery, [], (err) => {
+        if (err) {
+            console.error("Error clearing DiscountedOrders:", err);
+            event.reply("clear-discounted-orders-response", { success: false });
+            return;
+        }
+        event.reply("clear-discounted-orders-response", { success: true });
+    });
+});
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

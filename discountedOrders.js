@@ -154,5 +154,20 @@ function getSortIndicator(sortBy) {
     return ''; // No indicator if the column is not sorted
 }
 
+// Function to clear discounted orders
+async function clearDiscountedOrders() {
+    return new Promise((resolve) => {
+        ipcRenderer.send("clear-discounted-orders");
+
+        ipcRenderer.once("clear-discounted-orders-response", (event, response) => {
+            if (response.success) {
+                alert("All discounted orders have been cleared.");
+            } else {
+                alert("Failed to clear discounted orders.");
+            }
+            resolve();
+        });
+    });
+}
 // Export functions
-module.exports = { fetchDiscountedOrders, sortDiscountedOrdersTable };
+module.exports = { fetchDiscountedOrders, sortDiscountedOrdersTable, clearDiscountedOrders };

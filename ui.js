@@ -333,8 +333,18 @@ async function updateMainContent(contentType) {
         else if (contentType === 'discountedOrders') {
             mainContent.innerHTML = `
                 <h1>Discounted Orders</h1>
+                <button id="discountedClearHistory">Clear History</button>
                 <div id="discountedOrdersDiv"></div>
             `;
+
+            // Attach event listener for Clear History button
+            document.getElementById("discountedClearHistory").addEventListener("click", async () => {
+                if (confirm("Are you sure you want to permanently delete all discounted orders?")) {
+                    await clearDiscountedOrders();
+                    // Refresh the discounted orders after clearing
+                    fetchDiscountedOrders();
+                }
+            });
 
             // Fetch discounted orders
             fetchDiscountedOrders();
