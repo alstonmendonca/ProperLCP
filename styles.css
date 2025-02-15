@@ -455,7 +455,16 @@ input[type="number"] {
 }
 
 /* Date Column Specific Width */
-.order-history-table th.date-column,
+.order-history-table th.date-column{
+    width: 50px; /* Set a fixed width for the Date column */
+    white-space: nowrap; /* Prevent text wrapping */
+    cursor: pointer; /* Show pointer cursor for clickable headers */
+}
+
+.order-history-table th.date-column:hover{
+    background-color: #388E3C; /* Darker green for hover effect */
+}
+
 .order-history-table td.date-column {
     width: 50px; /* Set a fixed width for the Date column */
     white-space: nowrap; /* Prevent text wrapping */
@@ -467,7 +476,7 @@ input[type="number"] {
 }
 
 /* Hover effect for sortable columns */
-.order-history-table thead th.sortable:hover {
+.order-history-table thead th.sortable:hover{
     background-color: #388E3C; /* Darker green for hover effect */
 }
 

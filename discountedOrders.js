@@ -23,11 +23,12 @@ ipcRenderer.on("discounted-orders-response", (event, data) => {
                 <tr>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('billno')">Bill No ${getSortIndicator('billno')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('kot')">KOT ${getSortIndicator('kot')}</th>
-                    <th class="sortable" onclick="sortDiscountedOrdersTable('date')">Date ${getSortIndicator('date')}</th>
+                    <th class="date-column" onclick="sortDiscountedOrdersTable('date')">Date ${getSortIndicator('date')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('Initial_price')">Initial Price (₹) ${getSortIndicator('Initial_price')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_percentage')">Discount (%) ${getSortIndicator('discount_percentage')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_amount')">Discount (₹) ${getSortIndicator('discount_amount')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('Final_Price')">Final Price (₹) ${getSortIndicator('Final_Price')}</th>
+                    <th>Food Items</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,11 +39,12 @@ ipcRenderer.on("discounted-orders-response", (event, data) => {
             <tr>
                 <td>${order.billno}</td>
                 <td>${order.kot}</td>
-                <td>${order.date}</td>
+                <td class="date-column">${order.date}</td>
                 <td>₹${order.Initial_price.toFixed(2)}</td>
                 <td>${order.discount_percentage.toFixed(2)}</td>
                 <td>₹${order.discount_amount.toFixed(2)}</td>
                 <td>₹${order.Final_Price.toFixed(2)}</td>
+                <td>${order.food_items || "No items"}</td>
             </tr>
         `;
     });
@@ -72,7 +74,8 @@ function sortDiscountedOrdersTable(column) {
             Initial_price: parseFloat(row.cells[3].innerText.replace('₹', '').trim()),
             discount_percentage: parseFloat(row.cells[4].innerText),
             discount_amount: parseFloat(row.cells[5].innerText.replace('₹', '').trim()),
-            Final_Price: parseFloat(row.cells[6].innerText.replace('₹', '').trim())
+            Final_Price: parseFloat(row.cells[6].innerText.replace('₹', '').trim()),
+            food_items: row.cells[7].innerText
         };
     });
 
@@ -113,11 +116,12 @@ function sortDiscountedOrdersTable(column) {
                 <tr>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('billno')">Bill No ${getSortIndicator('billno')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('kot')">KOT ${getSortIndicator('kot')}</th>
-                    <th class="sortable" onclick="sortDiscountedOrdersTable('date')">Date ${getSortIndicator('date')}</th>
+                    <th class="date-column" onclick="sortDiscountedOrdersTable('date')">Date ${getSortIndicator('date')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('Initial_price')">Initial Price (₹) ${getSortIndicator('Initial_price')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_percentage')">Discount (%) ${getSortIndicator('discount_percentage')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('discount_amount')">Discount (₹) ${getSortIndicator('discount_amount')}</th>
                     <th class="sortable" onclick="sortDiscountedOrdersTable('Final_Price')">Final Price (₹) ${getSortIndicator('Final_Price')}</th>
+                    <th>Food Items</th>
                 </tr>
             </thead>
             <tbody>
@@ -128,11 +132,12 @@ function sortDiscountedOrdersTable(column) {
             <tr>
                 <td>${order.billno}</td>
                 <td>${order.kot}</td>
-                <td>${order.date}</td>
+                <td class="date-column">${order.date}</td>
                 <td>₹${order.Initial_price.toFixed(2)}</td>
                 <td>${order.discount_percentage.toFixed(2)}</td>
                 <td>₹${order.discount_amount.toFixed(2)}</td>
                 <td>₹${order.Final_Price.toFixed(2)}</td>
+                <td>${order.food_items || "No items"}</td>
             </tr>
         `;
     });

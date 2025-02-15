@@ -859,9 +859,13 @@ ipcMain.on("get-discounted-orders", (event) => {
             d.Initial_price, 
             d.discount_percentage, 
             d.discount_amount, 
-            o.price AS Final_Price
+            o.price AS Final_Price,
+            GROUP_CONCAT(f.fname, ', ') AS food_items
         FROM DiscountedOrders d
         JOIN Orders o ON d.billno = o.billno
+        LEFT JOIN OrderDetails od ON d.billno = od.orderid
+        LEFT JOIN FoodItem f ON od.foodid = f.fid
+        GROUP BY d.billno, o.kot, o.date, d.Initial_price, d.discount_percentage, d.discount_amount
     `;
 
     db.all(query, [], (err, rows) => {

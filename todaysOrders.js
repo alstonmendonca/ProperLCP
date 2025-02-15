@@ -24,7 +24,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
             <thead>
                 <tr>
                     <th class="sortable" onclick="sortTodaysOrdersTable('billno')">Bill No ${getSortIndicator('billno')}</th>
-                    <th class="date-column">Date</th>
+                    <th class="-todays-date-column">Date</th>
                     <th class="sortable" onclick="sortTodaysOrdersTable('cashier')">Cashier ${getSortIndicator('cashier')}</th>
                     <th class="sortable" onclick="sortTodaysOrdersTable('kot')">KOT ${getSortIndicator('kot')}</th>
                     <th class="sortable" onclick="sortTodaysOrdersTable('price')">Price (₹) ${getSortIndicator('price')}</th>
