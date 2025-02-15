@@ -45,7 +45,7 @@ function displayCategoryWiseSales(orders) {
             <thead>
                 <tr>
                     <th>Bill No</th>
-                    <th>Date</th>
+                    <th class="date-column">Date</th>
                     <th>Cashier</th>
                     <th>KOT</th>
                     <th>Price (₹)</th>
@@ -62,7 +62,7 @@ function displayCategoryWiseSales(orders) {
         tableHTML += `
             <tr data-billno="${order.billno}">
                 <td>${order.billno}</td>
-                <td>${order.date}</td>
+                <td class="date-column">${order.date}</td>
                 <td>${order.cashier_name}</td>
                 <td>${order.kot}</td>
                 <td>${order.price.toFixed(2)}</td>

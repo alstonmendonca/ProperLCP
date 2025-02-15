@@ -24,7 +24,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
             <thead>
                 <tr>
                     <th class="sortable" onclick="sortTodaysOrdersTable('billno')">Bill No ${getSortIndicator('billno')}</th>
-                    <th>Date</th>
+                    <th class="date-column">Date</th>
                     <th class="sortable" onclick="sortTodaysOrdersTable('cashier')">Cashier ${getSortIndicator('cashier')}</th>
                     <th class="sortable" onclick="sortTodaysOrdersTable('kot')">KOT ${getSortIndicator('kot')}</th>
                     <th class="sortable" onclick="sortTodaysOrdersTable('price')">Price (₹) ${getSortIndicator('price')}</th>
@@ -41,7 +41,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
         tableHTML += `
             <tr data-billno="${order.billno}">
                 <td>${order.billno}</td>
-                <td>${order.date}</td>
+                <td class="date-column">${order.date}</td>
                 <td>${order.cashier_name}</td>
                 <td>${order.kot}</td>
                 <td>${order.price.toFixed(2)}</td>
@@ -138,7 +138,7 @@ function sortTodaysOrdersTable(column) {
         <thead>
             <tr>
                 <th class="sortable" onclick="sortTodaysOrdersTable('billno')">Bill No ${getSortIndicator('billno')}</th>
-                <th>Date</th>
+                <th class="date-column">Date</th>
                 <th class="sortable" onclick="sortTodaysOrdersTable('cashier')">Cashier ${getSortIndicator('cashier')}</th>
                 <th class="sortable" onclick="sortTodaysOrdersTable('kot')">KOT ${getSortIndicator('kot')}</th>
                 <th class="sortable" onclick="sortTodaysOrdersTable('price')">Price (₹) ${getSortIndicator('price')}</th>
@@ -155,7 +155,7 @@ function sortTodaysOrdersTable(column) {
     sortedTableHTML += `
         <tr data-billno="${order.billno}">
             <td>${order.billno}</td>
-            <td>${order.date}</td>
+            <td class="date-column">${order.date}</td>
             <td>${order.cashier}</td>
             <td>${order.kot}</td>
             <td>${order.price.toFixed(2)}</td>

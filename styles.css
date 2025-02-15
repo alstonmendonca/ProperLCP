@@ -454,6 +454,13 @@ input[type="number"] {
     font-weight: bold; /* Bold text */
 }
 
+/* Date Column Specific Width */
+.order-history-table th.date-column,
+.order-history-table td.date-column {
+    width: 50px; /* Set a fixed width for the Date column */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
 /* Only make certain columns sortable */
 .order-history-table thead th.sortable {
     cursor: pointer; /* Show pointer cursor for clickable headers */
