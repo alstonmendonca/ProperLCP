@@ -9,6 +9,10 @@ function fetchDeletedOrders() {
         return;
     }
 
+    // Store the selected dates in sessionStorage
+    sessionStorage.setItem("deletedOrdersStartDate", startDate);
+    sessionStorage.setItem("deletedOrdersEndDate", endDate);
+
     ipcRenderer.send("get-deleted-orders", { startDate, endDate });
 }
 
@@ -28,7 +32,7 @@ function displayDeletedOrders(orders) {
             <thead>
                 <tr>
                     <th>Bill No</th>
-                    <th>Date</th>
+                    <th class="date-column">Date</th>
                     <th>Cashier</th>
                     <th>KOT</th>
                     <th>Price (₹)</th>
@@ -46,7 +50,7 @@ function displayDeletedOrders(orders) {
         tableHTML += `
             <tr>
                 <td>${order.billno}</td>
-                <td>${order.date}</td>
+                <td class="date-column">${order.date}</td>
                 <td>${order.cashier_name}</td>
                 <td>${order.kot}</td>
                 <td>${order.price.toFixed(2)}</td>
@@ -61,9 +65,6 @@ function displayDeletedOrders(orders) {
 
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
-
-    // ✅ Store the fetched deleted orders in sessionStorage
-    sessionStorage.setItem("deletedOrdersData", JSON.stringify(orders));
 
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {

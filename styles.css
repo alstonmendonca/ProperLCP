@@ -45,21 +45,30 @@ body {
     justify-content: space-evenly; /* Space buttons evenly */
     align-items: stretch;
     height: 50px; /* Adjust the height of the panel */
+    
 }
 
 .top {
     flex: 1;
-    padding: 10px 20px;
+    padding: 0px 0px;
     background-color: #444;
     color: white;
-    border: none;
+    border: 1px solid #555; /* Thin border for separation */
     cursor: pointer;
     text-align: center;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Add transition for hover effects */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+    border-radius: 0px;
 }
 
 .top:hover {
-    background-color: #555;
+    background-color: #555; /* Change background on hover */
+    transform: translateY(-2px); /* Slightly lift the button on hover */
+}
+
+.top:active {
+    background-color: #666; /* Darker background on click */
+    transform: translateY(0); /* Reset lift effect */
 }
 
 /* Container for left and main panels */
@@ -165,7 +174,7 @@ body {
     width: 600px; /* Adjust width as needed */
     padding: 20px;
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: 0px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
     display: flex;
@@ -443,6 +452,32 @@ input[type="number"] {
     text-align: left; /* Align text to the left */
     border: 1px solid #ddd; /* Add a border */
     font-weight: bold; /* Bold text */
+}
+
+/* Date Column Specific Width */
+.order-history-table th.date-column{
+    width: 50px; /* Set a fixed width for the Date column */
+    white-space: nowrap; /* Prevent text wrapping */
+    cursor: pointer; /* Show pointer cursor for clickable headers */
+}
+
+.order-history-table th.date-column:hover{
+    background-color: #388E3C; /* Darker green for hover effect */
+}
+
+.order-history-table td.date-column {
+    width: 50px; /* Set a fixed width for the Date column */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Only make certain columns sortable */
+.order-history-table thead th.sortable {
+    cursor: pointer; /* Show pointer cursor for clickable headers */
+}
+
+/* Hover effect for sortable columns */
+.order-history-table thead th.sortable:hover{
+    background-color: #388E3C; /* Darker green for hover effect */
 }
 
 /* Table Rows */

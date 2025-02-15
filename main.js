@@ -809,6 +809,88 @@ ipcMain.on("show-excel-export-message", (event, options) => {
     });
 });
 
+// Fetch Customers
+ipcMain.on("get-customers", (event) => {
+    const query = `
+        SELECT * FROM Customer
+        ORDER BY cid ASC
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching customers:", err);
+            event.reply("customers-response", { success: false, customers: [] });
+            return;
+        }
+        event.reply("customers-response", { success: true, customers: rows });
+    });
+});
+
+// Clear Deleted Orders
+ipcMain.on("clear-deleted-orders", (event) => {
+    const deleteOrdersQuery = `DELETE FROM DeletedOrders`;
+    const deleteOrderDetailsQuery = `DELETE FROM DeletedOrderDetails`;
+
+    db.serialize(() => {
+        db.run(deleteOrderDetailsQuery, [], (err) => {
+            if (err) {
+                console.error("Error clearing DeletedOrderDetails:", err);
+                event.reply("clear-deleted-orders-response", { success: false });
+                return;
+            }
+            db.run(deleteOrdersQuery, [], (err) => {
+                if (err) {
+                    console.error("Error clearing DeletedOrders:", err);
+                    event.reply("clear-deleted-orders-response", { success: false });
+                    return;
+                }
+                event.reply("clear-deleted-orders-response", { success: true });
+            });
+        });
+    });
+});
+
+ipcMain.on("get-discounted-orders", (event) => {
+    const query = `
+        SELECT 
+            d.billno, 
+            o.kot, 
+            o.date,
+            d.Initial_price, 
+            d.discount_percentage, 
+            d.discount_amount, 
+            o.price AS Final_Price,
+            GROUP_CONCAT(f.fname, ', ') AS food_items
+        FROM DiscountedOrders d
+        JOIN Orders o ON d.billno = o.billno
+        LEFT JOIN OrderDetails od ON d.billno = od.orderid
+        LEFT JOIN FoodItem f ON od.foodid = f.fid
+        GROUP BY d.billno, o.kot, o.date, d.Initial_price, d.discount_percentage, d.discount_amount
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching discounted orders:", err);
+            event.reply("discounted-orders-response", { success: false, orders: [] });
+            return;
+        }
+        event.reply("discounted-orders-response", { success: true, orders: rows });
+    });
+});
+
+// Clear Discounted Orders
+ipcMain.on("clear-discounted-orders", (event) => {
+    const deleteDiscountedOrdersQuery = `DELETE FROM DiscountedOrders`;
+
+    db.run(deleteDiscountedOrdersQuery, [], (err) => {
+        if (err) {
+            console.error("Error clearing DiscountedOrders:", err);
+            event.reply("clear-discounted-orders-response", { success: false });
+            return;
+        }
+        event.reply("clear-discounted-orders-response", { success: true });
+    });
+});
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 
