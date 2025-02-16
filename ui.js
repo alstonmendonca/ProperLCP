@@ -11,12 +11,85 @@ async function updateMainContent(contentType) {
     if (contentType === "Home") {
         mainContent.style.marginLeft = "200px";
         mainContent.style.marginRight = "600px";
-        mainContent.innerHTML = `
-            <h2>Home</h2>
-            <p>Welcome to the default home page!</p>
-        `;
-        billPanel.style.display = 'block'; // Show bill panel for Home
-    } 
+    
+        // Fetch all food items
+        const foodItems = await ipcRenderer.invoke("get-all-food-items");
+    
+        if (foodItems.length > 0) {
+            mainContent.innerHTML = 
+            `<div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Menu</h2>
+                    <input type="text" id="searchBarforHome" placeholder="Search for an item..." style="padding: 5px; border: 1px solid #ccc; border-radius: 5px; width: 300px;">
+                </div><br>
+            <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                ${foodItems
+                    .map(
+                        (item) => 
+                        `<div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center;">
+                            <h3>${item.fname}<br style="line-height:5px;display:block"> ${item.veg ? "🌱" : "🍖"}</h3>
+                            <p>Price: ₹${item.cost}</p>
+                            <div class="quantity-control">
+                                <button class="decrease-quantity" data-fid="${item.fid}" 
+                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px;">-</button>
+                                <span class="quantity" id="quantity-${item.fid}">1</span>
+                                <button class="increase-quantity" data-fid="${item.fid}" 
+                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px;">+</button>
+                            </div>
+                            <button class="add-to-bill" data-fid="${item.fid}" data-fname="${item.fname}" data-price="${item.cost}"
+                            style="font-size: 17px; padding: 2px 6px; width: 55px; height: 25px; border-radius: 1px; margin-top:5px">ADD</button>
+                        </div>`
+                    )
+                    .join("")}
+            </div>`;
+    
+            billPanel.style.display = "block";
+            document.querySelector("#searchBarforHome").addEventListener("input", (event) => {
+                const searchQuery = event.target.value.toLowerCase();
+                document.querySelectorAll(".food-item").forEach((item) => {
+                    const foodName = item.querySelector("h3").textContent.toLowerCase();
+                    if (foodName.includes(searchQuery)) {
+                        item.style.display = "block";
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+            });
+    
+            // Add event listener to "ADD" buttons
+            const addToBillButtons = document.querySelectorAll(".add-to-bill");
+            addToBillButtons.forEach(button => {
+                button.addEventListener("click", (event) => {
+                    const itemId = event.target.getAttribute("data-fid");
+                    const itemName = event.target.getAttribute("data-fname");
+                    const price = parseFloat(event.target.getAttribute("data-price"));
+                    const quantity = parseInt(document.getElementById(`quantity-${itemId}`).textContent);
+                    addToBill(itemId, itemName, price, quantity);  // Pass quantity now
+                });
+            });
+    
+            // Add event listener to quantity control buttons
+            document.querySelectorAll(".decrease-quantity").forEach(button => {
+                button.addEventListener("click", (event) => {
+                    const itemId = event.target.getAttribute("data-fid");
+                    const quantityElement = document.getElementById(`quantity-${itemId}`);
+                    let currentQuantity = parseInt(quantityElement.textContent);
+                    if (currentQuantity > 1) {
+                        quantityElement.textContent = currentQuantity - 1;
+                    }
+                });
+            });
+    
+            document.querySelectorAll(".increase-quantity").forEach(button => {
+                button.addEventListener("click", (event) => {
+                    const itemId = event.target.getAttribute("data-fid");
+                    const quantityElement = document.getElementById(`quantity-${itemId}`);
+                    let currentQuantity = parseInt(quantityElement.textContent);
+                    quantityElement.textContent = currentQuantity + 1;
+                });
+            });
+        }
+    }
+    
     // Fetch and display food items dynamically
     else {
         const foodItems = await ipcRenderer.invoke("get-food-items", contentType);
@@ -376,7 +449,7 @@ async function updateMainContent(contentType) {
         }
 
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------
-        //MENU TAB
+        //----------------------------- MENU TAB STARTS HERE------------------------------------------------
         else if (contentType === "Menu") {
             mainContent.style.marginLeft = "0px";
             mainContent.style.marginRight = "0px";

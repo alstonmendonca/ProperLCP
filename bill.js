@@ -199,6 +199,7 @@ function saveAndPrintBill() {
     createTextPopup("Bill saved and sent to print!");
 
     resetBill();
+    updateMainContent("Home");
 }
 
 
@@ -233,6 +234,7 @@ function holdBill() {
     createTextPopup("Bill put on hold!");
 
     resetBill();
+    updateMainContent("Home");
 }
 // Function to toggle the visibility of the discount inputs and apply button
 function toggleDiscountPopup() {
