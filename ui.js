@@ -526,6 +526,9 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="Trends" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
                 <button class="category" id="TopSelling" onclick="updateMainContent('TopSelling')">Top Selling</button>
                 <button class="category" id="Trends" onclick="updateMainContent('HourlySales')">Hourly Sales</button>
+                <button class="category" id="MenuAnalysis" onclick="updateMainContent('MenuAnalysis')">Menu Analysis</button>
+                <button class="category" id="EmployeeAnalysis" onclick="updateMainContent('EmployeeAnalysis')">Employee Analysis</button>
+                <button class="category" id="SpecialStatistics" onclick="updateMainContent('SpecialStatistics')">Special Statistics</button>
             `;
             break;
 
@@ -537,8 +540,12 @@ async function updateLeftPanel(contentType) {
             <button class="category" id="TodaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
             <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
             <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
+            <button class="category" id="itemHistory" onclick="updateMainContent('itemHistory')">Item History</button>
             <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
             <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
+            <button class="category" id="dayWise" onclick="updateMainContent('dayWise')">Day-wise</button>
+            <button class="category" id="monthWise" onclick="updateMainContent('monthWise')">Month-wise</button>
+            <button class="category" id="yearWise" onclick="updateMainContent('yearWise')">Year-wise</button>
             <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
         `;
         break;
