@@ -25,7 +25,7 @@ async function updateMainContent(contentType) {
                 ${foodItems
                     .map(
                         (item) => 
-                        `<div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center;">
+                        `<div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center; border-radius: 20px; background: ${item.veg == 1 ? '#EFFBF0' : '#FFEBEB'};">
                             <h3>${item.fname}<br style="line-height:5px;display:block"> ${item.veg ? "🌱" : "🍖"}</h3>
                             <p>Price: ₹${item.cost}</p>
                             <div class="quantity-control">
@@ -101,7 +101,7 @@ async function updateMainContent(contentType) {
                 ${foodItems 
                     .map(
                         (item) => 
-                        `<div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center;">
+                        `<div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center; border-radius: 20px; background: ${item.veg == 1 ? '#EFFBF0' : '#FFEBEB'};">
                             <h3>${item.fname}<br style="line-height:5px;display:block"> ${item.veg ? "🌱" : "🍖"}</h3>
                             <p>Price: ₹${item.cost}</p>
                             <div class="quantity-control">
@@ -571,11 +571,18 @@ async function updateLeftPanel(contentType) {
             // Render Settings-related buttons
             categoryPanel.innerHTML = `
                 <button class="category" id="UserProfile" onclick="updateMainContent('UserProfile')">User Profile</button>
+                <button class="category" id="BusinessInfo" onclick="updateMainContent('BusinessInfo')">Business Information</button>
                 <button class="category" id="ThemeToggle" onclick="updateMainContent('ThemeToggle')">Light/Dark Mode</button>
+                <button class="category" id="DisplaySettings" onclick="updateMainContent('DisplaySettings')">Display Settings</button>
                 <button class="category" id="TaxAndDiscount" onclick="updateMainContent('TaxAndDiscount')">Tax and Discounts</button>
                 <button class="category" id="PrinterConfig" onclick="updateMainContent('PrinterConfig')">Printer Configuration</button>
+                <button class="category" id="Receipt" onclick="updateMainContent('Receipt')">Receipt</button>
+                <button class="category" id="DateAndTime" onclick="updateMainContent('DateAndTime')">Date And Time</button>
+                <button class="category" id="Currency" onclick="updateMainContent('Currency')">Currency</button>
                 <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
-                <button class="category" id="Help" onclick="updateMainContent('Help')">Help</button>
+                <button class="category" id="Notifications" onclick="updateMainContent('Notifications')">Notifications</button>
+                <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
+                <button class="category" id="SystemUpdates" onclick="updateMainContent('SystemUpdates')">System Updates</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>
             `;
             break;
