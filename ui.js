@@ -339,11 +339,10 @@ async function updateMainContent(contentType) {
 
             // Attach event listener for Clear History button
             document.getElementById("discountedClearHistory").addEventListener("click", async () => {
-                if (confirm("Are you sure you want to permanently delete all discounted orders?")) {
+                showConfirmPopup("Are you sure you want to permanently delete all discounted orders?", async () => {
                     await clearDiscountedOrders();
-                    // Refresh the discounted orders after clearing
-                    fetchDiscountedOrders();
-                }
+                    fetchDiscountedOrders(); // Refresh the discounted orders after clearing
+                });
             });
 
             // Fetch discounted orders
@@ -353,15 +352,28 @@ async function updateMainContent(contentType) {
             mainContent.innerHTML = `
                 <h1>Customers</h1>
                 <button id="addCustomerBtn">Add Customer</button>
+                <button id="clearCustomerDataBtn">Clear Customer Data</button>
                 <div id="customersDiv"></div>
             `;
 
             fetchCustomers(); // Fetch and display customers
 
+            // Remove any existing event listener before adding a new one
+            const addCustomerBtn = document.getElementById("addCustomerBtn");
+            addCustomerBtn.replaceWith(addCustomerBtn.cloneNode(true));
+
             // Add event listener for "Add Customer" button
             document.getElementById("addCustomerBtn").addEventListener("click", () => {
                 showAddCustomerPopup();
             });
+
+            document.getElementById("clearCustomerDataBtn").addEventListener("click", async () => {
+                showConfirmPopup("Are you sure you want to permanently delete all customer data?", async () => {
+                    await clearCustomerData();
+                    fetchCustomers(); // Refresh customer list
+                });
+            });
+
         }
 
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------
@@ -482,4 +494,48 @@ async function updateLeftPanel(contentType) {
             `;
             break;
     }
+}
+
+function showConfirmPopup(message, onConfirm) {
+    // Remove existing popup if any
+    if (document.getElementById("confirmPopup")) {
+        document.getElementById("confirmPopup").remove();
+    }
+
+    // Create the popup container
+    const popup = document.createElement("div");
+    popup.id = "confirmPopup";
+    popup.innerHTML = `
+        <div class="popup-content">
+            <p>${message}</p>
+            <div class="popup-buttons">
+                <button id="confirmYes">Yes</button>
+                <button id="confirmNo">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    // Style the popup
+    popup.style.position = "fixed";
+    popup.style.top = "50%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%, -50%)";
+    popup.style.backgroundColor = "white";
+    popup.style.padding = "20px";
+    popup.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    popup.style.borderRadius = "8px";
+    popup.style.zIndex = "1001";
+    popup.style.textAlign = "center";
+
+    document.body.appendChild(popup);
+
+    // Event listeners for buttons
+    document.getElementById("confirmYes").addEventListener("click", () => {
+        popup.remove();
+        onConfirm(); // Call the confirmation function
+    });
+
+    document.getElementById("confirmNo").addEventListener("click", () => {
+        popup.remove();
+    });
 }

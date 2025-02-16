@@ -26,7 +26,12 @@ function displayCustomers(customers) {
     customersDiv.innerHTML = ""; // Clear previous content
 
     if (customers.length === 0) {
-        customersDiv.innerHTML = "<p>No customers found.</p>";
+        customersDiv.innerHTML = `
+            <div class="no-customers">
+                <img src="noCustomers.png" alt="No Customers Found" class="no-customers-img">
+                <p>No customers found.</p>
+            </div>
+        `;
         return;
     }
 
@@ -58,9 +63,9 @@ function displayCustomers(customers) {
     tableHTML += `</tbody></table>`;
     customersDiv.innerHTML = tableHTML;
 
-    // Attach event listeners for sorting
+    // Attach context menu to customer rows
     setTimeout(() => {
-        attachContextMenu(".order-history-table", "customer"); // Re-attach menu if needed
+        attachContextMenu(".order-history-table", "customer");
     }, 100);
 }
 
@@ -120,5 +125,75 @@ ipcRenderer.on("customer-added-response", (event, data) => {
     }
 });
 
+ipcRenderer.on("customer-delete-response", (event, data) => {
+    if (data.success) {
+        fetchCustomers(); // Refresh the table after deletion
+    } else {
+        alert("Failed to delete customer: " + data.error);
+    }
+});
+
+ipcRenderer.on("update-customer-response", (event, data) => {
+    if (data.success) {
+        fetchCustomers(); // Refresh the table after deletion
+    } else {
+        alert("Failed to delete customer: " + data.error);
+    }
+});
+
+// Function to clear discounted orders
+async function clearCustomerData() {
+    return new Promise((resolve) => {
+        ipcRenderer.send("clear-customer-data");
+
+        ipcRenderer.once("clear-customer-data-response", (event, response) => {
+            if (response.success) {
+                showMessagePopup("Success", "All customer data has been cleared.");
+            } else {
+                showMessagePopup("Error", "Failed to clear customer data.");
+            }
+            resolve();
+        });
+    });
+}
+
+function showMessagePopup(title, message) {
+    // Remove existing popup if any
+    if (document.getElementById("messagePopup")) {
+        document.getElementById("messagePopup").remove();
+    }
+
+    // Create the popup container
+    const popup = document.createElement("div");
+    popup.id = "messagePopup";
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h2>${title}</h2>
+            <p>${message}</p>
+            <button id="closeMessagePopup">OK</button>
+        </div>
+    `;
+
+    // Style the popup (add more styling in CSS)
+    popup.style.position = "fixed";
+    popup.style.top = "50%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%, -50%)";
+    popup.style.backgroundColor = "white";
+    popup.style.padding = "20px";
+    popup.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    popup.style.borderRadius = "8px";
+    popup.style.zIndex = "1001";
+    popup.style.textAlign = "center";
+
+    document.body.appendChild(popup);
+
+    // Close popup on button click
+    document.getElementById("closeMessagePopup").addEventListener("click", () => {
+        popup.remove();
+    });
+}
+
+
 // Export function so it can be used in `renderer.js`
-module.exports = { fetchCustomers, displayCustomers, sortCustomersTable };
+module.exports = { fetchCustomers, displayCustomers, sortCustomersTable, clearCustomerData };

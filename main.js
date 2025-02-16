@@ -907,6 +907,61 @@ ipcMain.on("add-customer", (event, customerData) => {
         }
     });
 });
+
+// Handle Delete Customer
+ipcMain.on("delete-customer", (event, { customerId }) => {
+    db.run("DELETE FROM Customer WHERE cid = ?", [customerId], function (err) {
+        if (err) {
+            console.error("Error deleting customer:", err);
+            event.reply("customer-delete-response", { success: false });
+        } else {
+            console.log("Customer deleted successfully");
+            event.reply("customer-delete-response", { success: true });
+        }
+    });
+});
+
+// Handle Edit Customer
+ipcMain.on("edit-customer", (event, { customerId }) => {
+    db.get("SELECT * FROM Customer WHERE cid = ?", [customerId], (err, customer) => {
+        if (err) {
+            console.error("Error fetching customer:", err);
+            return;
+        }
+        event.reply("edit-customer-data", customer);
+    });
+});
+
+// Handle Update Customer
+ipcMain.on("update-customer", (event, updatedCustomer) => {
+    const { cid, cname, phone, address } = updatedCustomer;
+    db.run(
+        "UPDATE Customer SET cname = ?, phone = ?, address = ? WHERE cid = ?",
+        [cname, phone, address, cid],
+        function (err) {
+            if (err) {
+                console.error("Error updating customer:", err);
+                event.reply("update-customer-response", { success: false, error: err.message });
+                return;
+            }
+            event.reply("update-customer-response", { success: true });
+        }
+    );
+});
+// Clear customer Data
+ipcMain.on("clear-customer-data", (event) => {
+    const deleteDiscountedOrdersQuery = `DELETE FROM Customer`;
+
+    db.run(deleteDiscountedOrdersQuery, [], (err) => {
+        if (err) {
+            console.error("Error clearing customer data:", err);
+            event.reply("clear-customer-data-response", { success: false });
+            return;
+        }
+        event.reply("clear-customer-data-response", { success: true });
+    });
+});
+
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

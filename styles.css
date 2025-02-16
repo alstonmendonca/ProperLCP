@@ -936,34 +936,34 @@ color: #fff;
     width: 300px;
 }
 
-.popup-content {
+.add-customer-popup-content {
     display: flex;
     flex-direction: column;
 }
 
-.popup-content h2 {
+.add-customer-popup-content h2 {
     margin-bottom: 10px;
     text-align: center;
 }
 
-.popup-content label {
+.add-customer-popup-content label {
     font-weight: bold;
     margin-top: 8px;
 }
 
-.popup-content input {
+.add-customer-popup-content input {
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.popup-buttons {
+.add-customer-popup-buttons {
     display: flex;
     justify-content: space-between;
 }
 
-.popup-buttons button {
+.add-customer-popup-buttons button {
     padding: 8px 12px;
     border: none;
     cursor: pointer;
@@ -980,3 +980,222 @@ color: #fff;
     color: white;
 }
 /*Add customer Popup ends*/
+
+/* Edit customer popup starts */
+#editCustomerPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Popup content */
+.edit-customer-popup-content {
+    background: #fff;
+    padding: 20px;
+    width: 350px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Heading */
+.edit-customer-popup-content h2 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Labels */
+.edit-customer-popup-content label {
+    display: block;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 10px 0 5px;
+    color: #444;
+}
+
+/* Input fields */
+.edit-customer-popup-content input {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border 0.2s;
+}
+
+.edit-customer-popup-content input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Buttons */
+.edit-customer-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.edit-customer-popup-buttons button {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#confirmEditCustomer {
+    background: #007bff;
+    color: white;
+    margin-right: 5px;
+}
+
+#confirmEditCustomer:hover {
+    background: #0056b3;
+}
+
+#cancelEditCustomer {
+    background: #dc3545;
+    color: white;
+    margin-left: 5px;
+}
+
+#cancelEditCustomer:hover {
+    background: #b02a37;
+}
+/* Edit customer popup ends*/
+
+#messagePopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1001;
+    text-align: center;
+}
+
+#messagePopup .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#messagePopup button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#messagePopup button:hover {
+    background: #0056b3;
+}
+
+#confirmPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1001;
+    text-align: center;
+}
+
+#confirmPopup .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#confirmPopup .popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#confirmPopup button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1;
+    margin: 5px;
+}
+
+#confirmYes {
+    background: #28a745;
+    color: white;
+}
+
+#confirmYes:hover {
+    background: #218838;
+}
+
+#confirmNo {
+    background: #dc3545;
+    color: white;
+}
+
+#confirmNo:hover {
+    background: #b02a37;
+}
+
+.no-customers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    color: #555;
+    font-size: 1.2rem;
+    margin: 20px;
+}
+
+.no-customers p {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #777;
+}
+
+.no-customers-img {
+    width: 150px; /* Adjust size */
+    opacity: 0.7;
+}
