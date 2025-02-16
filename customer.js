@@ -112,5 +112,13 @@ function getCustomerSortIndicator(sortBy) {
     return ''; // No indicator if the column is not sorted
 }
 
+ipcRenderer.on("customer-added-response", (event, data) => {
+    if (data.success) {
+        fetchCustomers(); // Refresh the table
+    } else {
+        alert("Failed to add customer.");
+    }
+});
+
 // Export function so it can be used in `renderer.js`
 module.exports = { fetchCustomers, displayCustomers, sortCustomersTable };

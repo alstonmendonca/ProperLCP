@@ -921,3 +921,62 @@ color: #fff;
 * {
     user-select: none; /* Prevents text selection */
 }
+
+/*Add customer Popup starts*/
+#addCustomerPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1000;
+    width: 300px;
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-content h2 {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.popup-content label {
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.popup-content input {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-buttons button {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#confirmAddCustomer {
+    background-color: #28a745;
+    color: white;
+}
+
+#cancelAddCustomer {
+    background-color: #dc3545;
+    color: white;
+}
+/*Add customer Popup ends*/

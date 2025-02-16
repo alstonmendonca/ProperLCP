@@ -355,7 +355,13 @@ async function updateMainContent(contentType) {
                 <button id="addCustomerBtn">Add Customer</button>
                 <div id="customersDiv"></div>
             `;
+
             fetchCustomers(); // Fetch and display customers
+
+            // Add event listener for "Add Customer" button
+            document.getElementById("addCustomerBtn").addEventListener("click", () => {
+                showAddCustomerPopup();
+            });
         }
 
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------

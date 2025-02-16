@@ -891,6 +891,22 @@ ipcMain.on("clear-discounted-orders", (event) => {
         event.reply("clear-discounted-orders-response", { success: true });
     });
 });
+
+// IPC Listener to add a new customer
+ipcMain.on("add-customer", (event, customerData) => {
+    const { cname, phone, address } = customerData;
+
+    const query = `INSERT INTO Customer (cname, phone, address) VALUES (?, ?, ?)`;
+    db.run(query, [cname, phone, address], function (err) {
+        if (err) {
+            console.error("Error adding customer:", err);
+            event.reply("customer-added-response", { success: false });
+        } else {
+            console.log("Customer added successfully");
+            event.reply("customer-added-response", { success: true });
+        }
+    });
+});
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 
