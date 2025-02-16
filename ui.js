@@ -520,14 +520,18 @@ async function updateLeftPanel(contentType) {
 
             // Render Analytics-related buttons
             categoryPanel.innerHTML = `
-                <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
-                <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
                 <button class="category" id="DayEndSummary" onclick="updateMainContent('DayEndSummary')">Day End Summary</button>
+                <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
+                <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
                 <button class="category" id="Trends" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
-                <button class="category" id="TopSelling" onclick="updateMainContent('TopSelling')">Top Selling</button>
-                <button class="category" id="Trends" onclick="updateMainContent('HourlySales')">Hourly Sales</button>
+                <button class="category" id="TopSellingItems" onclick="updateMainContent('TopSellingItems')">Top Selling Items</button>
+                <button class="category" id="TopSellingCategory" onclick="updateMainContent('TopSellingCategory')">Top Selling Category</button>
+                <button class="category" id="RateOfSale" onclick="updateMainContent('RateOfSale')">Rate Of Sale</button>
                 <button class="category" id="MenuAnalysis" onclick="updateMainContent('MenuAnalysis')">Menu Analysis</button>
                 <button class="category" id="EmployeeAnalysis" onclick="updateMainContent('EmployeeAnalysis')">Employee Analysis</button>
+                <button class="category" id="Charts" onclick="updateMainContent('Charts')">Charts</button>
+                <button class="category" id="PersonalCalculator" onclick="updateMainContent('PersonalCalculator')">Personal Calculator</button>
+                <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
                 <button class="category" id="SpecialStatistics" onclick="updateMainContent('SpecialStatistics')">Special Statistics</button>
             `;
             break;
@@ -546,7 +550,10 @@ async function updateLeftPanel(contentType) {
             <button class="category" id="dayWise" onclick="updateMainContent('dayWise')">Day-wise</button>
             <button class="category" id="monthWise" onclick="updateMainContent('monthWise')">Month-wise</button>
             <button class="category" id="yearWise" onclick="updateMainContent('yearWise')">Year-wise</button>
+            <button class="category" id="filterHistory" onclick="updateMainContent('filterHistory')">Filter History</button>
             <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
+            <button class="category" id="makeATable" onclick="updateMainContent('makeATable')">Make A Table</button>
+            <button class="category" id="tablesCreated" onclick="updateMainContent('createYourTable')">Tables Created</button>
         `;
         break;
 
