@@ -35,11 +35,29 @@ function fetchItemSummary() {
 // Function to display the item summary data in a table
 function displayItemSummary(items) {
     const itemSummaryDiv = document.getElementById("itemSummaryDiv");
-
+    exportExcelButton.style.display = 'none';
     if (items.length === 0) {
-        itemSummaryDiv.innerHTML = "<p>No items sold today.</p>";
+        itemSummaryDiv.innerHTML = `
+            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin: 0;">
+                <div>
+                    <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
+                        No Orders For Today
+                    </div>
+                    <div style="font-size: 24px; margin-bottom: 40px;">
+                        Come back after placing an order!
+                    </div>
+                    <button id='goHomeButton' style="font-size: 18px; color: #fff; background-color: #1DB954; padding: 10px 20px; border: none; border-radius: 25px; text-decoration: none; cursor: pointer;">
+                        Place an Order
+                    </button>
+                </div>
+            </div>
+        `;
+        document.getElementById('goHomeButton').addEventListener('click', function () {
+            document.getElementById('Home').click();
+        });
         return;
     }
+    
 
     // Group items by category
     const groupedItems = {};

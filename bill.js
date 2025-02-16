@@ -198,8 +198,7 @@ function saveAndPrintBill() {
 
     createTextPopup("Bill saved and sent to print!");
 
-    resetBill();
-    updateMainContent("Home");
+    NewOrder();
 }
 
 
@@ -233,8 +232,7 @@ function holdBill() {
     // Show confirmation popup instead of alert
     createTextPopup("Bill put on hold!");
 
-    resetBill();
-    updateMainContent("Home");
+    NewOrder();
 }
 // Function to toggle the visibility of the discount inputs and apply button
 function toggleDiscountPopup() {
@@ -525,6 +523,7 @@ function addToExistingOrder(orderId) {
     document.getElementById("todaysOrdersPopup").remove();
     resetBill();
     createTextPopup(`Order ${orderId} updated successfully with new items.`);
+    NewOrder();
 }
 
 // Close popup function
@@ -533,3 +532,7 @@ function closeTodaysOrdersPopup() {
     if (popup) popup.remove();
 }
 // ------------ SAVE TO ORDER FUNCTIONALITY ENDS HERE ------------------
+function NewOrder() {
+    resetBill();
+    updateMainContent('Home');
+}

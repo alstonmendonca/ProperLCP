@@ -33,7 +33,14 @@
     <!-- Bill Panel (Right Side) -->
 <!-- Bill Panel (Right Side) -->
 <div id="bill-panel">
-  <h3>Bill</h3>
+  <!-- Flexbox for H3 and Reset Button -->
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+      <h3 style="margin: 0;">Bill</h3>
+      <button onclick="NewOrder()" style="font-size: 14px; padding: 5px 10px; background-color: lightgreen; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          New Order
+      </button>
+  </div>
+
   <div id="bill-items-list">
       <!-- Items will be dynamically added here -->
   </div>
@@ -42,12 +49,14 @@
 
   <!-- Buttons Section - HOLD AND SAVE AND PRINT AND APPLY DISCOUNT -->
   <div id="bill-buttons" style="margin-top: 15px;">
-    <button id='saveandprintbutton' onclick="saveAndPrintBill()">Save and Print</button>
-    <button id="applydiscountbutton" onclick="toggleDiscountPopup()">Apply Discount</button>
-    <button id='holdbutton' onclick="holdBill()">Hold</button>
-    <button id='heldorders' onclick="displayHeld()">Held Orders</button>
-    <button id='saveToOrder' onclick="displayTodaysOrders()">Save To Order</button>
+      <button id='saveandprintbutton' onclick="saveAndPrintBill()">Save and Print</button>
+      <button id="applydiscountbutton" onclick="toggleDiscountPopup()">Apply Discount</button>
+      <button id='holdbutton' onclick="holdBill()">Hold</button>
+      <button id='heldorders' onclick="displayHeld()">Held Orders</button>
+      <button id='saveToOrder' onclick="displayTodaysOrders()">Save To Order</button>
   </div>
+</div>
+
 
   <script src="renderer.js"></script>
   <script src="table.js"></script>
