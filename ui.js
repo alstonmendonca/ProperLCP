@@ -318,11 +318,10 @@ async function updateMainContent(contentType) {
 
             // Attach event listener for Clear History button
             document.getElementById("deletedClearHistory").addEventListener("click", async () => {
-                if (confirm("Are you sure you want to permanently delete these orders?")) {
+                showConfirmPopup("Are you sure you want to permanently remove all deleted Orders? This removal cannot be undone.", async () => {
                     await clearDeletedOrders();
-                    // Refresh the deleted orders after clearing
-                    fetchDeletedOrders();
-                }
+                    fetchDeletedOrders(); // Refresh the deleted orders after clearing
+                });
             });
 
             // Fetch deleted orders initially based on stored dates
