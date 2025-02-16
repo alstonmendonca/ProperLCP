@@ -433,6 +433,23 @@ ipcMain.on("save-bill", async (event, orderData) => {
         orderItems.forEach(({ foodId, quantity }) => stmt.run(orderId, foodId, quantity));
         stmt.finalize();
 
+        // Check if a discount was applied and insert into DiscountedOrders
+        if (calculatedTotalAmount > finalTotalAmount) {
+            const discountAmount = (calculatedTotalAmount - finalTotalAmount).toFixed(2);
+            const discountPercentage = ((discountAmount / calculatedTotalAmount) * 100).toFixed(2);
+
+            await new Promise((resolve, reject) => {
+                db.run(
+                    `INSERT INTO DiscountedOrders (billno, Initial_price, discount_percentage, discount_amount) VALUES (?, ?, ?, ?)`,
+                    [orderId, calculatedTotalAmount.toFixed(2), discountPercentage, discountAmount],
+                    function (err) {
+                        if (err) reject(err);
+                        else resolve();
+                    }
+                );
+            });
+        }
+
         console.log(`Order ${orderId} saved successfully with KOT ${kot}.`);
 
         // Send success response and KOT number to renderer
@@ -443,6 +460,7 @@ ipcMain.on("save-bill", async (event, orderData) => {
         event.sender.send("bill-error", { error: error.message });
     }
 });
+
 
 ipcMain.on("hold-bill", async (event, orderData) => {
     const { cashier, date, orderItems } = orderData;
