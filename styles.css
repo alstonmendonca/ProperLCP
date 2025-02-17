@@ -1199,3 +1199,86 @@ color: #fff;
     width: 150px; /* Adjust size */
     opacity: 0.7;
 }
+
+/* Sales Overview Design*/
+.sales-overview-grid {
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    gap: 20px; /* Space between boxes */
+    margin-top: 20px; /* Space above the grid */
+}
+
+/* Sales Box Styles */
+.sales-box {
+    background: linear-gradient(135deg, #4CAF50, #81C784); /* Gradient background */
+    color: white; /* Text color */
+    padding: 20px; /* Padding inside the box */
+    border-radius: 12px; /* Rounded corners */
+    text-align: center; /* Center text horizontally */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth scaling and shadow effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    height: 150px; /* Fixed height for the boxes */
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Arrange children in a column */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+}
+
+.sales-box:hover {
+    transform: translateY(-5px) scale(1.05); /* Lift effect on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+/* Sales Overview Design Ends Here*/
+
+/* Summary Div Styles */
+/* Summary Container Styles */
+.summary-container {
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+    gap: 20px; /* Space between grid items */
+    margin: 0 auto; /* Center the container */
+    max-width: 1200px; /* Maximum width for larger screens */
+    margin-top: 20px; /* Space above the grid */
+}
+
+/* Summary Div Styles */
+.summary-div {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between title and info */
+    align-items: center; /* Center items vertically */
+    background: linear-gradient(135deg, #FF9800, #FFC107); /* Gradient background */
+    color: white; /* Text color */
+    padding: 20px; /* Padding inside the box */
+    border-radius: 12px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth scaling and shadow effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    height: 100px; /* Fixed height for the boxes */
+}
+
+/* Title Styles */
+.summary-div h3 {
+    margin: 0; /* Remove default margin */
+    font-size: 18px; /* Font size for the title */
+    flex: 1; /* Allow title to take available space */
+}
+
+/* Info Styles */
+.summary-info {
+    font-size: 24px; /* Larger font size for the info */
+    font-weight: bold; /* Bold text for emphasis */
+    text-align: right; /* Align text to the right */
+    flex: 1; /* Allow info to take available space */
+}
+
+.summary-div:hover {
+    transform: translateY(-5px) scale(1.05); /* Lift effect on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Expanded State */
+.summary-div.expanded {
+    height: 150px; /* Height when expanded */
+    background: linear-gradient(135deg, #FF5722, #FF7043); /* Change gradient on expand */
+}

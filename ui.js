@@ -159,24 +159,14 @@ async function updateMainContent(contentType) {
         // Menu Management -----REMOVED-----------
 
         // -------------------------------------------------ANALYTICS STARTS HERE---------------------------------------------------
-        else if (contentType === "SalesOverview" || contentType === "Analytics") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            mainContent.innerHTML = `
-                <h2>Sales Overview</h2>
-                <p>Daily, weekly, and monthly sales overview.</p>
-            `;
-            billPanel.style.display = 'none';
+        else if (contentType === "SalesOverview") {
+            loadSalesOverview(mainContent, billPanel); // Call the sales overview function
         }
         else if (contentType === "ItemSummary") {
             loadItemSummary(mainContent, billPanel);
         }
-        else if (contentType === "DayEndSummary") {
-            mainContent.innerHTML = `
-                <h2>Day End Summary</h2>
-                <p>Summary of total sales and revenue at the end of the day.</p>
-            `;
-            billPanel.style.display = 'none';
+        else if (contentType === "DayEndSummary" || contentType === "Analytics") {
+            loadDayEndSummary(mainContent, billPanel); // Call the day end summary function
         }
         else if (contentType === "CategoryWiseSales") {
             mainContent.innerHTML = `
