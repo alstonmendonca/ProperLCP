@@ -391,7 +391,7 @@ async function updateMainContent(contentType) {
 
             // Attach event listener for Clear History button
             document.getElementById("deletedClearHistory").addEventListener("click", async () => {
-                showConfirmPopup("Are you sure you want to permanently remove all deleted Orders? This removal cannot be undone.", async () => {
+                showConfirmPopup("Are you sure you want to permanently remove all deleted Orders? This cannot be undone.", async () => {
                     await clearDeletedOrders();
                     fetchDeletedOrders(); // Refresh the deleted orders after clearing
                 });
@@ -580,6 +580,7 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="DateAndTime" onclick="updateMainContent('DateAndTime')">Date And Time</button>
                 <button class="category" id="Currency" onclick="updateMainContent('Currency')">Currency</button>
                 <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
+                <button class="category" id="CategoryColors" onclick="updateMainContent('CategoryColors')">Category Colors</button>
                 <button class="category" id="Notifications" onclick="updateMainContent('Notifications')">Notifications</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
                 <button class="category" id="SystemUpdates" onclick="updateMainContent('SystemUpdates')">System Updates</button>
