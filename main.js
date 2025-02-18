@@ -154,6 +154,40 @@ ipcMain.on("get-todays-items", (event) => {
     });
 });
 
+// IPC handler to get today's revenue
+ipcMain.handle('get-todays-revenue', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `SELECT SUM(price) AS totalRevenue FROM Orders WHERE date LIKE ?`;
+        
+        db.get(query, [`${today}%`], (err, row) => {
+            if (err) {
+                console.error("Error fetching today's revenue:", err);
+                reject(err);
+            } else {
+                resolve(row.totalRevenue || 0); // Return total revenue or 0 if null
+            }
+        });
+    });
+});
+
+// IPC handler to get today's sales count
+ipcMain.handle('get-todays-sales', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `SELECT COUNT(*) AS totalSales FROM Orders WHERE date LIKE ?`;
+        
+        db.get(query, [`${today}%`], (err, row) => {
+            if (err) {
+                console.error("Error fetching today's sales count:", err);
+                reject(err);
+            } else {
+                resolve(row.totalSales || 0); // Return total sales count or 0 if null
+            }
+        });
+    });
+});
+
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------

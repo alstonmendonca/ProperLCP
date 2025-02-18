@@ -1,7 +1,9 @@
 // dayEndSummary.js
 
+const { ipcRenderer } = require('electron'); // Import ipcRenderer for inter-process communication
+
 // Function to load the Day End Summary content
-function loadDayEndSummary(mainContent, billPanel) {
+async function loadDayEndSummary(mainContent, billPanel) {
     // Set the main content's margin to accommodate the category panel
     mainContent.style.marginLeft = "200px";
     mainContent.style.marginRight = "0px";
@@ -12,11 +14,11 @@ function loadDayEndSummary(mainContent, billPanel) {
         <div class="summary-container">
             <div class="summary-div" id="totalRevenue" onclick="handleSummaryClick('TotalRevenue')">
                 <h3>Total Revenue Today</h3>
-                <div class="summary-info">₹0.00</div> <!-- Placeholder for info -->
+                <div class="summary-info" id="revenueAmount">₹0.00</div> <!-- Placeholder for info -->
             </div>
             <div class="summary-div" id="totalSales" onclick="handleSummaryClick('TotalSales')">
                 <h3>Total Sales Today</h3>
-                <div class="summary-info">0</div> <!-- Placeholder for info -->
+                <div class="summary-info" id="salesCount">0</div> <!-- Placeholder for info -->
             </div>
             <div class="summary-div" id="mostSoldItem" onclick="handleSummaryClick('MostSoldItem')">
                 <h3>Most Sold Item Today</h3>
@@ -51,11 +53,46 @@ function loadDayEndSummary(mainContent, billPanel) {
                 <div class="summary-info">0</div> <!-- Placeholder for info -->
             </div>
         </div>
-        <!-- Add more summary divs as needed -->
     `;
 
     // Hide the bill panel
     billPanel.style.display = 'none';
+
+    // Fetch today's total revenue
+    const totalRevenue = await fetchTotalRevenueToday();
+    document.getElementById('revenueAmount').innerText = `₹${totalRevenue.toFixed(2)}`; // Update the revenue display
+
+    // Fetch today's total sales
+    const totalSales = await fetchTotalSalesToday();
+    document.getElementById('salesCount').innerText = totalSales; // Update the sales count display
+}
+
+// Function to fetch total revenue for today
+async function fetchTotalRevenueToday() {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.invoke('get-todays-revenue') // Send a request to the main process
+            .then((revenue) => {
+                resolve(revenue); // Resolve the promise with the revenue
+            })
+            .catch((error) => {
+                console.error("Error fetching today's revenue:", error);
+                resolve(0); // In case of error, return 0
+            });
+    });
+}
+
+// Function to fetch total sales for today
+async function fetchTotalSalesToday() {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.invoke('get-todays-sales') // Send a request to the main process
+            .then((salesCount) => {
+                resolve(salesCount); // Resolve the promise with the sales count
+            })
+            .catch((error) => {
+                console.error("Error fetching today's sales count:", error);
+                resolve(0); // In case of error, return 0
+            });
+    });
 }
 
 // Function to handle summary div clicks
