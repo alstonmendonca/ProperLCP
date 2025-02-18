@@ -188,6 +188,104 @@ ipcMain.handle('get-todays-sales', (event) => {
     });
 });
 
+// IPC handler to get today's tax amount
+ipcMain.handle('get-todays-tax', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `SELECT SUM(tax) AS totalTax FROM Orders WHERE date LIKE ?`;
+        
+        db.get(query, [`${today}%`], (err, row) => {
+            if (err) {
+                console.error("Error fetching today's tax amount:", err);
+                reject(err);
+            } else {
+                resolve(row.totalTax || 0); // Return total tax amount or 0 if null
+            }
+        });
+    });
+});
+
+// IPC handler to get today's discounted orders count
+ipcMain.handle('get-todays-discounted-orders', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `SELECT COUNT(*) AS discountedCount FROM DiscountedOrders WHERE billno IN (SELECT billno FROM Orders WHERE date LIKE ?)`;
+        
+        db.get(query, [`${today}%`], (err, row) => {
+            if (err) {
+                console.error("Error fetching today's discounted orders count:", err);
+                reject(err);
+            } else {
+                resolve(row.discountedCount || 0); // Return discounted orders count or 0 if null
+            }
+        });
+    });
+});
+
+// IPC handler to get today's deleted orders count
+ipcMain.handle('get-todays-deleted-orders', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `SELECT COUNT(*) AS deletedCount FROM DeletedOrders WHERE date LIKE ?`;
+        
+        db.get(query, [`${today}%`], (err, row) => {
+            if (err) {
+                console.error("Error fetching today's deleted orders count:", err);
+                reject(err);
+            } else {
+                resolve(row.deletedCount || 0); // Return deleted orders count or 0 if null
+            }
+        });
+    });
+});
+
+// IPC handler to get yesterday's revenue
+ipcMain.handle('get-yesterdays-revenue', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayDate = yesterday.toISOString().split('T')[0]; // Get yesterday's date in YYYY-MM-DD format
+        const query = `SELECT SUM(price) AS totalRevenue FROM Orders WHERE date LIKE ?`;
+        
+        db.get(query, [`${yesterdayDate}%`], (err, row) => {
+            if (err) {
+                console.error("Error fetching yesterday's revenue:", err);
+                reject(err);
+            } else {
+                resolve(row.totalRevenue || 0); // Return total revenue or 0 if null
+            }
+        });
+    });
+});
+
+// IPC handler to get today's most sold items
+ipcMain.handle('get-most-sold-items', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `
+            SELECT f.fname, SUM(od.quantity) AS totalQuantity
+            FROM OrderDetails od
+            JOIN Orders o ON od.orderid = o.billno
+            JOIN FoodItem f ON od.foodid = f.fid
+            WHERE o.date LIKE ?
+            GROUP BY f.fid
+            ORDER BY totalQuantity DESC
+            LIMIT 2
+        `;
+        
+        db.all(query, [`${today}%`], (err, rows) => {
+            if (err) {
+                console.error("Error fetching today's most sold items:", err);
+                reject(err);
+            } else {
+                const items = rows.map(row => row.fname); // Extract food names
+                resolve(items); // Return the list of most sold items
+            }
+        });
+    });
+});
+
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
