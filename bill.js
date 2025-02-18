@@ -298,56 +298,60 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
     popup.id = "heldpopup";
     popup.classList.add("edit-popup");
 
-    let tableHTML = `
-        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 800px;">
+    let popupContent = `
+        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 850px;">
             <div style="width: 100%; display: flex; justify-content: flex-end;">
                 <span class="close-btn" onclick="closeHeldPopup()" style="cursor: pointer; font-size: 20px; font-weight: bold;">&times;</span>
             </div>
             <h3>Held Orders</h3>
-            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%;">
-                <table class="order-history-table">
-                    <thead>
-                        <tr>
-                            <th>Held ID</th>
-                            <th>Cashier</th>
-                            <th>Price (₹)</th>
-                            <th>SGST (₹)</th>
-                            <th>CGST (₹)</th>
-                            <th>Tax (₹)</th>
-                            <th>Food Items</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
     `;
 
     heldOrders.forEach(order => {
-        tableHTML += `
-            <tr data-heldid="${order.heldid}">
-            <td>${order.heldid}</td>
-            <td>${order.cashier_name}</td>
-            <td>${order.price.toFixed(2)}</td>
-            <td>${order.sgst.toFixed(2)}</td>
-            <td>${order.cgst.toFixed(2)}</td>
-            <td>${order.tax.toFixed(2)}</td>
-            <td>${order.food_items || "No items"}</td>
-            <td style="display: flex; flex-direction: column; align-items: center;">
-                <button onclick="addHeldToBill(${order.heldid})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px">Add</button>
-                <button onclick="deleteHeldOrder(${order.heldid})" style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px">Delete</button>
-            </td>
-            </tr>
+        let itemsArray = order.food_items ? order.food_items.split(", ") : ["No items"];
+        let itemsGrid = "";
+
+        itemsArray.forEach(item => {
+            itemsGrid += `<div style="padding: 2px; border: 1px solid #ddd; font-size: 12px; text-align: center; flex-basis: 48%; height: 30px; display: flex; justify-content: center; align-items: center;">${item}</div>`;
+        });
+
+        popupContent += `
+            <div style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
+                <div style="border-bottom: 2px solid #333; padding-bottom: 5px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
+                    <span>HELD ID: ${order.heldid}</span>
+                    <span>KOT: ${order.kot_number || "N/A"}</span>
+                </div>
+                <div style="padding: 5px; flex-grow: 1; display: flex; flex-direction: column;">
+                    <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Cashier: ${order.cashier_name}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; flex-grow: 1; max-height: 120px; overflow-y: auto;">
+                        ${itemsGrid}
+                    </div>
+                    <div style="text-align: right; font-size: 16px; font-weight: bold; margin-top: auto;">
+                        Total: ₹${order.price.toFixed(2)}
+                    </div>
+                </div>
+                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: right; display: flex; justify-content: space-between; align-items: center; gap: 5px;">
+                    <button onclick="addHeldToBill(${order.heldid})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px; flex-grow: 1;">Add</button>
+                    <button onclick="deleteHeldOrder(${order.heldid})" style="background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px; flex-grow: 1;">Delete</button>
+                </div>
+            </div>
         `;
     });
 
-    tableHTML += `</tbody></table></div></div>`;
-
-    popup.innerHTML = tableHTML;
+    popupContent += `</div></div>`;
+    popup.innerHTML = popupContent;
     document.body.appendChild(popup);
 });
 
 function addHeldToBill(heldId) {
     ipcRenderer.send('get-held-order-details', heldId);
 }
+
+function deleteHeldOrder(heldId) {
+    // Logic for deleting a held order
+    ipcRenderer.send('delete-held-order', heldId);
+}
+
 
 ipcRenderer.on('held-order-details-data', (event, foodDetails, heldId) => {
     foodDetails.forEach(item => {
@@ -453,50 +457,81 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
     popup.id = "todaysOrdersPopup";
     popup.classList.add("edit-popup");
 
-    let tableHTML = `
-        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 800px;">
+    let popupContent = `
+        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 850px;">
             <div style="width: 100%; display: flex; justify-content: flex-end;">
                 <span class="close-btn" onclick="closeTodaysOrdersPopup()" style="cursor: pointer; font-size: 20px; font-weight: bold;">&times;</span>
             </div>
-            <h3>Today's Orders</h3>
-            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%;">
-                <table class="order-history-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Cashier</th>
-                            <th>Price (₹)</th>
-                            <th>SGST (₹)</th>
-                            <th>CGST (₹)</th>
-                            <th>Tax (₹)</th>
-                            <th>Food Items</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
     `;
 
-    data.orders.forEach(order => {
-        tableHTML += `
-            <tr data-orderid="${order.billno}">
-                <td>${order.billno}</td>
-                <td>${order.cashier_name}</td>
-                <td>${order.price.toFixed(2)}</td>
-                <td>${order.sgst.toFixed(2)}</td>
-                <td>${order.cgst.toFixed(2)}</td>
-                <td>${order.tax.toFixed(2)}</td>
-                <td>${order.food_items || "No items"}</td>
-                <td>
-                    <button onclick="addToExistingOrder(${order.billno})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:140px; height:30px">Add to Order</button>
-                </td>
-            </tr>
+    if (data.orders.length === 0) {
+        popupContent += `
+            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 50vh; width: 100%;">
+                <div style="font-size: 36px; font-weight: bold; margin-bottom: 20px;">
+                    No Orders For Today
+                </div>
+                <div style="font-size: 18px; margin-bottom: 30px;">
+                    Come back after placing an order!
+                </div>
+                <button id='goHomeButton' style="font-size: 18px; color: #fff; background-color: #1DB954; padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer;">
+                    Place an Order
+                </button>
+            </div>
         `;
-    });
+    } else {
+        popupContent += `
+            <h3>Today's Orders</h3>
+            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+        `;
 
-    tableHTML += `</tbody></table></div></div>`;
-    popup.innerHTML = tableHTML;
+        data.orders.forEach(order => {
+            let itemsArray = order.food_items ? order.food_items.split(", ") : ["No items"];
+            let itemsGrid = "";
+
+            itemsArray.forEach(item => {
+                itemsGrid += `<div style="padding: 3px; border: 1px solid #ddd; font-size: 12px; text-align: center; flex-grow: 1; flex-basis: 48%; height: 40px; display: flex; justify-content: center; align-items: center;">${item}</div>`;
+            });
+
+            popupContent += `
+                <div style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
+                    <div style="border-bottom: 2px solid #333; padding-bottom: 5px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
+                        <span>BILL NO: ${order.billno}</span>
+                        <span>KOT: ${order.kot_number || "N/A"}</span>
+                    </div>
+                    <div style="padding: 5px; flex-grow: 1; display: flex; flex-direction: column;">
+                        <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Cashier: ${order.cashier_name}</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; flex-grow: 1; max-height: 120px; overflow-y: auto;">
+                            ${itemsGrid}
+                        </div>
+                        <div style="text-align: right; font-size: 16px; font-weight: bold; margin-top: auto;">
+                            Total: ₹${order.price.toFixed(2)}
+                        </div>
+                    </div>
+                    <div style="border-top: 2px solid #333; padding-top: 5px; text-align: right;">
+                        <button onclick="addToExistingOrder(${order.billno})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:100%; height:30px">
+                            Add to Order
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        popupContent += `</div>`;
+    }
+
+    popupContent += `</div>`;
+    popup.innerHTML = popupContent;
     document.body.appendChild(popup);
+
+    if (data.orders.length === 0) {
+        document.getElementById('goHomeButton').addEventListener('click', function () {
+            document.getElementById('Home').click();
+        });
+    }
 });
+
+
+
 
 // Function to add current bill items to an existing order
 function addToExistingOrder(orderId) {
