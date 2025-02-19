@@ -83,7 +83,7 @@ body {
 #category-panel {
     position: fixed;
     left: 0;
-    background-color: #f4f4f4; /* Light gray background */
+    background-color: #cad2c5; /* Light gray background */
     width: 200px; /* Fixed width for the panel */
     padding: 0; /* Remove padding to ensure buttons take full width */
     border-right: 1px solid #ddd; /* Add a border to separate from main content */
@@ -105,14 +105,15 @@ body {
     padding: 20px; /* Increase padding for better clickability */
     margin: 0; /* Remove margin to eliminate gaps */
     border: none; /* Remove default button border */
-    background-color: #85ADD6; /* Dark background for buttons */
-    color: #ffffff; /* White text color */
+    background-color: #9A7CA2 ; /* Dark background for buttons */
+    color: #ffffff; /* Black text color */
     text-align: center; /* Center text */
     font-size: 16px; /* Set font size */
+    font-weight: bold;
     cursor: pointer; /* Show pointer cursor on hover */
     transition: background-color 0.3s ease; /* Smooth hover transition */
     border-radius: 0; /* Remove rounded corners for perfect rectangles */
-    border-bottom: 1px solid #ddd; /* Add a thin line at the bottom of each button */
+    border-bottom: 1px solid #000000; /* Add a thin line at the bottom of each button */
 }
 
 #category-panel button.category:last-child {
@@ -204,18 +205,22 @@ body {
 
 /* Bill Items */
 .bill-item {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.5fr 1fr 0.5fr 1fr auto;
     align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .bill-item-name {
     font-weight: bold;
+    text-align: left;
+    padding-left: 6px;
 }
 
 .bill-quantity, .bill-price, .bill-total {
-    margin: 0 5px;
+    text-align: center;
+    min-width: 50px;
 }
 
 .bill-item button {
@@ -226,11 +231,13 @@ body {
     padding: 5px 10px;
     font-size: 14px;
     border-radius: 5px;
+    margin-top: 2px;
 }
 
 .bill-item button:hover {
     background-color: #d32f2f;
 }
+
 
 /* Total Amount */
 #total-amount {
