@@ -205,18 +205,22 @@ body {
 
 /* Bill Items */
 .bill-item {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.5fr 1fr 0.5fr 1fr auto;
     align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .bill-item-name {
     font-weight: bold;
+    text-align: left;
+    padding-left: 6px;
 }
 
 .bill-quantity, .bill-price, .bill-total {
-    margin: 0 5px;
+    text-align: center;
+    min-width: 50px;
 }
 
 .bill-item button {
@@ -227,11 +231,13 @@ body {
     padding: 5px 10px;
     font-size: 14px;
     border-radius: 5px;
+    margin-top: 2px;
 }
 
 .bill-item button:hover {
     background-color: #d32f2f;
 }
+
 
 /* Total Amount */
 #total-amount {
