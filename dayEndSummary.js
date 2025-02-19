@@ -119,6 +119,28 @@ async function loadDayEndSummary(mainContent, billPanel) {
     
         document.getElementById('mostSoldCategory').children[1].innerText = mostSoldCategoryText; // Update the most sold categories display
     }
+
+    // Fetch today's highest revenue items
+    const highestRevenueItems = await fetchHighestRevenueItemsToday();
+    let highestRevenueText = highestRevenueItems.join(', '); // Join the items with a comma
+
+    // If there are more than 2 items, truncate the list and add "..."
+    if (highestRevenueItems.length > 2) {
+        highestRevenueText = highestRevenueText.slice(0, highestRevenueText.lastIndexOf(',')) + ', ...'; // Show only the first two items
+    }
+
+    document.getElementById('highestRevenueItem').children[1].innerText = highestRevenueText; // Update the highest revenue items display
+
+    // Fetch today's highest revenue category
+    const highestRevenueCategories = await fetchHighestRevenueCategoryToday();
+    let highestRevenueCategoriesText = highestRevenueCategories.join(', '); // Join the categories with a comma
+
+    // If there are more than 2 categories, truncate the list and add "..."
+    if (highestRevenueCategories.length > 2) {
+        highestRevenueCategoriesText = highestRevenueCategoriesText.slice(0, highestRevenueCategoriesText.lastIndexOf(',')) + ', ...'; // Show only the first two categories
+    }
+
+    document.getElementById('highestRevenueCategory').children[1].innerText = highestRevenueCategoriesText; // Update the highest revenue categories display
 }
 
 // Function to fetch total revenue for today
@@ -214,6 +236,34 @@ async function fetchMostSoldCategoriesToday() {
             })
             .catch((error) => {
                 console.error("Error fetching today's most sold categories:", error);
+                resolve([]); // In case of error, return an empty array
+            });
+    });
+}
+
+// Function to fetch highest revenue item(s) for today
+async function fetchHighestRevenueItemsToday() {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.invoke('get-highest-revenue-items') // Send a request to the main process
+            .then((items) => {
+                resolve(items); // Resolve the promise with the items
+            })
+            .catch((error) => {
+                console.error("Error fetching today's highest revenue items:", error);
+                resolve([]); // In case of error, return an empty array
+            });
+    });
+}
+
+// Function to fetch highest revenue category for today
+async function fetchHighestRevenueCategoryToday() {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.invoke('get-highest-revenue-category') // Send a request to the main process
+            .then((categories) => {
+                resolve(categories); // Resolve the promise with the categories
+            })
+            .catch((error) => {
+                console.error("Error fetching today's highest revenue category:", error);
                 resolve([]); // In case of error, return an empty array
             });
     });

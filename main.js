@@ -286,6 +286,88 @@ ipcMain.handle('get-most-sold-items', (event) => {
     });
 });
 
+// IPC handler to get today's most sold categories
+ipcMain.handle('get-most-sold-categories', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `
+            SELECT c.catname, SUM(od.quantity) AS totalQuantity
+            FROM OrderDetails od
+            JOIN Orders o ON od.orderid = o.billno
+            JOIN FoodItem f ON od.foodid = f.fid
+            JOIN Category c ON f.category = c.catid
+            WHERE o.date LIKE ?
+            GROUP BY c.catid
+            ORDER BY totalQuantity DESC
+            LIMIT 2
+        `;
+        
+        db.all(query, [`${today}%`], (err, rows) => {
+            if (err) {
+                console.error("Error fetching today's most sold categories:", err);
+                reject(err);
+            } else {
+                const categories = rows.map(row => row.catname); // Extract category names
+                resolve(categories); // Return the list of most sold categories
+            }
+        });
+    });
+});
+
+// IPC handler to get today's highest revenue items
+ipcMain.handle('get-highest-revenue-items', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `
+            SELECT f.fname, SUM(od.quantity * f.cost) AS totalRevenue
+            FROM OrderDetails od
+            JOIN Orders o ON od.orderid = o.billno
+            JOIN FoodItem f ON od.foodid = f.fid
+            WHERE o.date LIKE ?
+            GROUP BY f.fid
+            ORDER BY totalRevenue DESC
+            LIMIT 2
+        `;
+        
+        db.all(query, [`${today}%`], (err, rows) => {
+            if (err) {
+                console.error("Error fetching today's highest revenue items:", err);
+                reject(err);
+            } else {
+                const items = rows.map(row => row.fname); // Extract food names
+                resolve(items); // Return the list of highest revenue items
+            }
+        });
+    });
+});
+
+// IPC handler to get today's highest revenue category
+ipcMain.handle('get-highest-revenue-category', (event) => {
+    return new Promise((resolve, reject) => {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const query = `
+            SELECT c.catname, SUM(od.quantity * f.cost) AS totalRevenue
+            FROM OrderDetails od
+            JOIN Orders o ON od.orderid = o.billno
+            JOIN FoodItem f ON od.foodid = f.fid
+            JOIN Category c ON f.category = c.catid
+            WHERE o.date LIKE ?
+            GROUP BY c.catid
+            ORDER BY totalRevenue DESC
+        `;
+        
+        db.all(query, [`${today}%`], (err, rows) => {
+            if (err) {
+                console.error("Error fetching today's highest revenue category:", err);
+                reject(err);
+            } else {
+                const highestRevenue = rows.length > 0 ? rows[0].totalRevenue : 0; // Get the highest revenue
+                const categories = rows.filter(row => row.totalRevenue === highestRevenue).map(row => row.catname); // Get all categories with the highest revenue
+                resolve(categories); // Return the list of highest revenue categories
+            }
+        });
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
