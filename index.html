@@ -6,6 +6,18 @@
   <title>Lassi Corner Billing System</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+<style>
+  .top{
+    background-color: #2F4858;
+  }
+  #bill-buttons button{
+    background-color: #336699;
+  }
+  #upperbuttons button{
+    background-color: #75A3D1;
+  }
+  
+</style>
 <body>
   <!-- Top Horizontal Panel -->
   <div id="top-panel">
@@ -34,12 +46,18 @@
 <!-- Bill Panel (Right Side) -->
 <div id="bill-panel">
   <!-- Flexbox for H3 and Reset Button -->
-  <div style="display: flex; align-items: center; justify-content: space-between;">
-      <h3 style="margin: 0;">Bill</h3>
-      <button onclick="NewOrder()" style="font-size: 14px; padding: 5px 10px; background-color: lightgreen; color: white; border: none; border-radius: 5px; cursor: pointer;">
-          New Order
-      </button>
-  </div>
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <h3 style="margin: 0;">Bill</h3>
+    <div id='upperbuttons' style="display: flex; gap: 10px;">
+        <button onclick="NewOrder()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            New Order
+        </button>
+        <button id='heldorders' onclick="displayHeld()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Held Orders
+        </button>
+    </div>
+</div>
+
 
   <div id="bill-items-list">
       <!-- Items will be dynamically added here -->
@@ -52,7 +70,6 @@
       <button id='saveandprintbutton' onclick="saveAndPrintBill()">Save and Print</button>
       <button id="applydiscountbutton" onclick="toggleDiscountPopup()">Apply Discount</button>
       <button id='holdbutton' onclick="holdBill()">Hold</button>
-      <button id='heldorders' onclick="displayHeld()">Held Orders</button>
       <button id='saveToOrder' onclick="displayTodaysOrders()">Save To Order</button>
   </div>
 </div>

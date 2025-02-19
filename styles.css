@@ -105,7 +105,7 @@ body {
     padding: 20px; /* Increase padding for better clickability */
     margin: 0; /* Remove margin to eliminate gaps */
     border: none; /* Remove default button border */
-    background-color: #4CAF50; /* Dark background for buttons */
+    background-color: #85ADD6; /* Dark background for buttons */
     color: #ffffff; /* White text color */
     text-align: center; /* Center text */
     font-size: 16px; /* Set font size */
@@ -249,10 +249,17 @@ body {
     background: white;
     padding: 10px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Center align buttons */
     border-top: 1px solid #ddd;
-    gap: 10px; /* Add space between buttons */
+    gap: 10px; /* Space between buttons */
 }
+
+#bill-buttons button {
+    flex: 1; /* Make all buttons take equal width */
+    padding: 10px; /* Ensure good spacing inside buttons */
+    text-align: center; /* Align text properly */
+}
+
 
 
 
