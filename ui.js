@@ -9,6 +9,7 @@ async function updateMainContent(contentType) {
 
     // Home Screen
     if (contentType === "Home") {
+        mainContent.scrollTop = 0;
         mainContent.style.marginLeft = "200px";
         mainContent.style.marginRight = "600px";
     
@@ -30,13 +31,14 @@ async function updateMainContent(contentType) {
                             <p>Price: ₹${item.cost}</p>
                             <div class="quantity-control">
                                 <button class="decrease-quantity" data-fid="${item.fid}" 
-                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px;">-</button>
+                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; background-color: #774360">-</button>
                                 <span class="quantity" id="quantity-${item.fid}">1</span>
                                 <button class="increase-quantity" data-fid="${item.fid}" 
-                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px;">+</button>
+                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px;  background-color: #774360">+</button>
                             </div>
                             <button class="add-to-bill" data-fid="${item.fid}" data-fname="${item.fname}" data-price="${item.cost}"
-                            style="font-size: 17px; padding: 2px 6px; width: 55px; height: 25px; border-radius: 1px; margin-top:5px">ADD</button>
+                            style="font-size: 17px; padding: 2px 6px; width: 55px; height: 25px; border-radius: 1px; margin-top:5px; background-color: #774360;
+                            border-radius: 20px">ADD</button>
                         </div>`
                     )
                     .join("")}
@@ -106,13 +108,13 @@ async function updateMainContent(contentType) {
                             <p>Price: ₹${item.cost}</p>
                             <div class="quantity-control">
                                 <button class="decrease-quantity" data-fid="${item.fid}" 
-                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px;">-</button>
+                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; background-color: #774360;">-</button>
                                 <span class="quantity" id="quantity-${item.fid}">1</span>
                                 <button class="increase-quantity" data-fid="${item.fid}" 
-                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px;">+</button>
+                                    style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; background-color: #774360;">+</button>
                             </div>
                             <button class="add-to-bill" data-fid="${item.fid}" data-fname="${item.fname}" data-price="${item.cost}"
-                            style="font-size: 17px; padding: 2px 6px; width: 55px; height: 25px; border-radius: 1px; margin-top:5px">ADD</button>
+                            style="font-size: 17px; padding: 2px 6px; width: 55px; height: 25px; border-radius: 1px; margin-top:5px; background-color: #774360;">ADD</button>
                         </div>`
                     )
                     .join("")}
@@ -441,6 +443,7 @@ async function updateMainContent(contentType) {
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------
         //----------------------------- MENU TAB STARTS HERE------------------------------------------------
         else if (contentType === "Menu") {
+            mainContent.scrollTop = 0;
             mainContent.style.marginLeft = "0px";
             mainContent.style.marginRight = "0px";
             displayMenu(); // Call the function from menu.js to display menu

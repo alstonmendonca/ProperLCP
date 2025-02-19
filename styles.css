@@ -83,7 +83,7 @@ body {
 #category-panel {
     position: fixed;
     left: 0;
-    background-color: #f4f4f4; /* Light gray background */
+    background-color: #cad2c5; /* Light gray background */
     width: 200px; /* Fixed width for the panel */
     padding: 0; /* Remove padding to ensure buttons take full width */
     border-right: 1px solid #ddd; /* Add a border to separate from main content */
@@ -105,14 +105,15 @@ body {
     padding: 20px; /* Increase padding for better clickability */
     margin: 0; /* Remove margin to eliminate gaps */
     border: none; /* Remove default button border */
-    background-color: #85ADD6; /* Dark background for buttons */
-    color: #ffffff; /* White text color */
+    background-color: #9A7CA2 ; /* Dark background for buttons */
+    color: #ffffff; /* Black text color */
     text-align: center; /* Center text */
     font-size: 16px; /* Set font size */
+    font-weight: bold;
     cursor: pointer; /* Show pointer cursor on hover */
     transition: background-color 0.3s ease; /* Smooth hover transition */
     border-radius: 0; /* Remove rounded corners for perfect rectangles */
-    border-bottom: 1px solid #ddd; /* Add a thin line at the bottom of each button */
+    border-bottom: 1px solid #000000; /* Add a thin line at the bottom of each button */
 }
 
 #category-panel button.category:last-child {
