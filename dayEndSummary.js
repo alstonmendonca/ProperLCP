@@ -10,7 +10,14 @@ async function loadDayEndSummary(mainContent, billPanel) {
 
     // Create the HTML structure for the Day End Summary
     mainContent.innerHTML = `
-        <h2>Day End Summary</h2>
+        <div style="background: linear-gradient(90deg, #4CAF50, #81C784); padding: 20px;">
+            <h2 style="text-align: center; font-size: 3em; color: white; 
+                margin: 0; 
+                font-family: 'Arial', sans-serif; 
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+                Day End Summary
+            </h2>
+        </div>
         <div class="summary-container">
             <div class="summary-div" id="totalRevenue" onclick="handleSummaryClick('TotalRevenue')">
                 <h3>Total Revenue Today</h3>
