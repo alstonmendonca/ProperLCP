@@ -11,19 +11,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const toggleBtn = document.getElementById("toggleActive");
         toggleBtn.classList.toggle("active", isActive === 1);
-        toggleBtn.classList.toggle("inactive", isActive === 0);
-        toggleBtn.textContent = isActive === 1 ? "Active" : "Inactive";
+        updateStatusLabel(); // Update label based on initial value
+
+        document.querySelector(".close-overlay").style.display = "block";
+        document.querySelector(".modal").style.display = "block";
     });
 
-    // Toggle Active/Inactive
     document.getElementById("toggleActive").addEventListener("click", function () {
         isActive = isActive === 1 ? 0 : 1;
         this.classList.toggle("active", isActive === 1);
-        this.classList.toggle("inactive", isActive === 0);
-        this.textContent = isActive === 1 ? "Active" : "Inactive";
+        updateStatusLabel(); // Update label when toggled
     });
 
-    // Save Changes
     document.getElementById("saveChangesBtn").addEventListener("click", () => {
         const updatedName = document.getElementById("editCategoryName").value.trim();
 
@@ -35,13 +34,21 @@ document.addEventListener("DOMContentLoaded", () => {
         ipcRenderer.send("update-category", { catid, catname: updatedName, active: isActive });
     });
 
-    // Close Window on Update
     ipcRenderer.on("category-updated", () => {
-        window.close();
+        closeModal();
     });
 
-    // Cancel Edit
-    document.getElementById("cancelEditBtn").addEventListener("click", () => {
-        window.close();
-    });
+    document.getElementById("cancelEditBtn").addEventListener("click", closeModal);
 });
+
+// Function to update the status label
+function updateStatusLabel() {
+    const statusLabel = document.getElementById("toggleStatusLabel");
+    statusLabel.textContent = isActive === 1 ? "Active" : "Inactive";
+    statusLabel.style.color = isActive === 1 ? "green" : "red";
+}
+
+function closeModal() {
+    document.querySelector(".close-overlay").style.display = "none";
+    document.querySelector(".modal").style.display = "none";
+}

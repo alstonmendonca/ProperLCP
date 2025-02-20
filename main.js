@@ -400,26 +400,6 @@ ipcMain.on("delete-category", (event, categoryId) => {
     });
 });
 
-// Open Add Category Window
-let addCategoryWin; // Store the window globally
-
-ipcMain.on("open-add-category-window", () => {
-    const addCategoryWindow = new BrowserWindow({
-        width: 400,
-        height: 300,
-        modal: true,
-        parent: BrowserWindow.getFocusedWindow(),
-        resizable: false,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        }
-    });
-
-    addCategoryWindow.loadFile("addCategory.html");
-});
-
-
 // Handle Adding Category
 ipcMain.on("add-category", (event, categoryData) => {
     const { catname, active } = categoryData;
@@ -442,28 +422,6 @@ ipcMain.on("add-category", (event, categoryData) => {
     });
 });
 
-let editCategoryWin;
-
-ipcMain.on("open-edit-category-window", (event, categoryData) => {
-    const editWindow = new BrowserWindow({
-        width: 400,
-        height: 300,
-        modal: true,
-        parent: BrowserWindow.getFocusedWindow(),
-        resizable: false,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        }
-    });
-
-    editWindow.loadFile("editCategory.html");
-
-    editWindow.webContents.once("did-finish-load", () => {
-        editWindow.webContents.send("edit-category-data", categoryData);
-    });
-});
-
 // Handle Category Update
 ipcMain.on("update-category", (event, updatedData) => {
     const query = "UPDATE Category SET catname = ?, active = ? WHERE catid = ?";
@@ -476,9 +434,6 @@ ipcMain.on("update-category", (event, updatedData) => {
 
         console.log(`Category ID ${updatedData.catid} updated successfully.`);
         event.sender.send("category-updated"); // Notify edit window
-        if (mainWindow) {
-            mainWindow.webContents.send("category-updated"); // Refresh main UI
-        }
     });
 });
 

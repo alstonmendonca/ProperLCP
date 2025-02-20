@@ -7,59 +7,79 @@ async function loadDayEndSummary(mainContent, billPanel) {
     // Set the main content's margin to accommodate the category panel
     mainContent.style.marginLeft = "200px";
     mainContent.style.marginRight = "0px";
+    
 
     // Create the HTML structure for the Day End Summary
     mainContent.innerHTML = `
-        <div style="background: linear-gradient(90deg, #4CAF50, #81C784); padding: 20px;">
-            <h2 style="text-align: center; font-size: 3em; color: white; 
-                margin: 0; 
-                font-family: 'Arial', sans-serif; 
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
-                Day End Summary
-            </h2>
-        </div>
-        <div class="summary-container">
-            <div class="summary-div" id="totalRevenue" onclick="handleSummaryClick('TotalRevenue')">
-                <h3>Total Revenue Today</h3>
+    <div style="background: linear-gradient(90deg,rgb(255, 255, 255),rgb(255, 255, 255)); padding: 20px; border-radius: 40px; border-color: #464646;">
+        <h2 style="text-align: center; font-size: 3em; color: #094872; 
+            margin: 0; 
+            font-family: 'Arial', sans-serif;">
+            Day End Summary
+        </h2>
+    </div>
+    <div class="summary-container">
+        <div class="summary-div" id="totalRevenue" onclick="handleSummaryClick('TotalRevenue')">
+            <h3>Total Revenue Today</h3>
+            <div class="summary-info-container">
                 <div class="summary-info" id="revenueAmount">₹0.00</div> <!-- Placeholder for info -->
             </div>
-            <div class="summary-div" id="totalSales" onclick="handleSummaryClick('TotalSales')">
-                <h3>Total Sales Today</h3>
+        </div>
+        <div class="summary-div" id="totalSales" onclick="handleSummaryClick('TotalSales')">
+            <h3>Total Sales Today</h3>
+            <div class="summary-info-container">
                 <div class="summary-info" id="salesCount">0</div> <!-- Placeholder for info -->
             </div>
-            <div class="summary-div" id="yesterdayComparison" onclick="handleSummaryClick('YesterdayComparison')">
-                <h3>Compared To Yesterday</h3>
+        </div>
+        <div class="summary-div" id="yesterdayComparison" onclick="handleSummaryClick('YesterdayComparison')">
+            <h3>Compared To Yesterday</h3>
+            <div class="summary-info-container">
                 <div class="summary-info">0</div> <!-- Placeholder for info -->
             </div>
-            <div class="summary-div" id="totalTax" onclick="handleSummaryClick('TotalTax')">
-                <h3>Total Tax From Sales</h3>
+        </div>
+        <div class="summary-div" id="totalTax" onclick="handleSummaryClick('TotalTax')">
+            <h3>Total Tax From Sales</h3>
+            <div class="summary-info-container">
                 <div class="summary-info" id="taxAmount">0</div> <!-- Placeholder for info -->
             </div>
-            <div class="summary-div" id="discountedOrders" onclick="handleSummaryClick('DiscountedOrders')">
-                <h3>Number of Discounted Orders Today</h3>
+        </div>
+        <div class="summary-div" id="discountedOrders" onclick="handleSummaryClick('DiscountedOrders')">
+            <h3>Number of Discounted Orders Today</h3>
+            <div class="summary-info-container">
                 <div class="summary-info" id="discountedCount">0</div> <!-- Placeholder for info -->
             </div>
-            <div class="summary-div" id="deletedOrders" onclick="handleSummaryClick('DeletedOrders')">
-                <h3>Number of Deleted Orders Today</h3>
+        </div>
+        <div class="summary-div" id="deletedOrders" onclick="handleSummaryClick('DeletedOrders')">
+            <h3>Number of Deleted Orders Today</h3>
+            <div class="summary-info-container">
                 <div class="summary-info" id="deletedCount">0</div> <!-- Placeholder for info -->
             </div>
-            <div class="summary-div" id="mostSoldItem" onclick="handleSummaryClick('MostSoldItem')">
-                <h3>Most Sold Item Today</h3>
-                <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
-            </div>
-            <div class="summary-div" id="highestRevenueItem" onclick="handleSummaryClick('HighestRevenueItem')">
-                <h3>Item with Highest Revenue Today</h3>
-                <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
-            </div>
-            <div class="summary-div" id="mostSoldCategory" onclick="handleSummaryClick('MostSoldCategory')">
-                <h3>Most Sold Category</h3>
-                <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
-            </div>
-            <div class="summary-div" id="highestRevenueCategory" onclick="handleSummaryClick('HighestRevenueCategory')">
-                <h3>Category with Highest Revenue Today</h3>
+        </div>
+        <div class="summary-div" id="mostSoldItem" onclick="handleSummaryClick('MostSoldItem')">
+            <h3>Most Sold Item Today</h3>
+            <div class="summary-info-container">
                 <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
             </div>
         </div>
+        <div class="summary-div" id="highestRevenueItem" onclick="handleSummaryClick('HighestRevenueItem')">
+            <h3>Item with Highest Revenue Today</h3>
+            <div class="summary-info-container">
+                <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
+            </div>
+        </div>
+        <div class="summary-div" id="mostSoldCategory" onclick="handleSummaryClick('MostSoldCategory')">
+            <h3>Most Sold Category</h3>
+            <div class="summary-info-container">
+                <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
+            </div>
+        </div>
+        <div class="summary-div" id="highestRevenueCategory" onclick="handleSummaryClick('HighestRevenueCategory')">
+            <h3>Category with Highest Revenue Today</h3>
+            <div class="summary-info-container">
+                <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
+            </div>
+        </div>
+    </div>
     `;
 
     // Hide the bill panel
@@ -96,8 +116,11 @@ async function loadDayEndSummary(mainContent, billPanel) {
         ? `-₹${Math.abs(revenueComparison).toFixed(2)}` // Use Math.abs to show the positive value
         : '₹0.00'; // Display zero with the rupee symbol
 
-    document.getElementById('yesterdayComparison').children[1].innerText = comparisonText; // Update the comparison display
-    document.getElementById('yesterdayComparison').children[1].style.color = revenueComparison > 0 ? 'green' : revenueComparison < 0 ? 'red' : 'black'; // Update the comparison color
+    const comparisonElement = document.getElementById('yesterdayComparison').children[1];
+    comparisonElement.innerText = comparisonText; // Update the comparison display
+    comparisonElement.style.fontSize = '22px'; // Increase font size
+    comparisonElement.style.fontWeight = 'bold'; // Make the text bold
+    comparisonElement.style.color = revenueComparison > 0 ? 'green' : revenueComparison < 0 ? 'red' : 'black'; // Update the comparison color
 
     // Fetch today's most sold items
     const mostSoldItems = await fetchMostSoldItemsToday();

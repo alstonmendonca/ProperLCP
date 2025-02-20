@@ -28,6 +28,10 @@ const {clearCustomerData} = require('./customer');
 const { loadSalesOverview } = require('./salesOverview'); 
 const { loadDayEndSummary } = require('./dayEndSummary'); // Import the day end summary function
 const {handleSummaryClick} = require('./dayEndSummary'); // Import the handleSummaryClick function}
+const {openAddCategoryWindow} = require('./categoriesList');
+const {openEditCategoryPopup} = require('./categoriesList')
+const {updateStatusLabel} = require('./editCategory')
+const {openAddCategoryPopup} = require('./categoriesList')
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
@@ -59,6 +63,9 @@ window.clearCustomerData = clearCustomerData;
 window.loadSalesOverview = loadSalesOverview;
 window.loadDayEndSummary = loadDayEndSummary; 
 window.handleSummaryClick = handleSummaryClick;
+window.openEditWindow = openEditWindow;
+window.openEditCategoryPopup = openEditCategoryPopup;
+window.openAddCategoryPopup = openAddCategoryPopup;
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container
@@ -81,3 +88,4 @@ ipcRenderer.on("delete-order-response", (event, data) => {
         fetchOrderHistory(); // Refresh the order list
     }
 });
+

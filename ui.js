@@ -195,16 +195,11 @@ async function updateMainContent(contentType) {
             mainContent.style.marginLeft = "0px";
             mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
-                <h1>Categories</h1>
-                <button id="addCategoryButton">Add Category</button>
+                <h1 class="categories-title">Categories</h1>
                 <div id="categoriesTabDiv"></div>
             `;
             fetchCategoriesList();
             billPanel.style.display = 'none'; // Hide bill panel for History
-
-            document.getElementById("addCategoryButton").addEventListener("click", () => {
-                ipcRenderer.send("open-add-category-window");
-            });
         }        
         //--------------------------------CATEGORIES END HERE-----------------------------------------------------
         // --------------------------------SETTINGS START HERE-----------------------------------------------------

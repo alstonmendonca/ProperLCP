@@ -15,46 +15,36 @@ ipcRenderer.on("categories-list-response", (event, data) => {
         return;
     }
 
-    // Create a table to display categories
-    let tableHTML = `
-        <table class="order-history-table">
-            <thead>
-                <tr>
-                    <th>Category ID</th>
-                    <th>Category Name</th>
-                    <th>Active</th>
-                    <th>Remove</th>
-                    <th>Edit</th> 
-                </tr>
-            </thead>
-            <tbody>
+    // Create a grid layout for categories
+    let gridHTML = `
+        <div class="categories-grid">
+            <div class="category-box" id="addCategoryBox" onclick="openAddCategoryPopup()">
+                <h3 style="color: white;">➕ Add Category</h3>
+            </div>
     `;
 
     categories.forEach(category => {
-        tableHTML += `
-            <tr>
-                <td>${category.catid}</td>
-                <td>${category.catname}</td>
-                <td>${category.active === 1 ? "✅ Active" : "❌ Inactive"}</td>
-                <td>
+        gridHTML += `
+            <div class="category-box">
+                <h3>${category.catname}</h3>
+                <p>ID: ${category.catid}</p>
+                <p>Status: ${category.active === 1 ? "✅ Active" : "❌ Inactive"}</p>
+                <div class="category-actions">
                     <button class="remove-btn" onclick="confirmDeleteCategory(${category.catid})">➖</button>
-                </td>
-                <td>
-                    <button class="edit-btn" onclick="openEditWindow(${category.catid}, '${category.catname}', ${category.active})">✏️</button>
-                </td>
-            </tr>
+                    <button class="edit-btn" onclick="openEditCategoryPopup(${category.catid}, '${category.catname}', ${category.active})">✏️</button>
+                </div>
+            </div>
         `;
     });
 
-    tableHTML += `</tbody></table>`;
-    categoriesTabDiv.innerHTML = tableHTML;
+    gridHTML += `</div>`;
+    categoriesTabDiv.innerHTML = gridHTML;
 });
 
-// Open edit category window by sending an IPC event to main.js
-function openEditWindow(catid, catname, active) {
-    ipcRenderer.send("open-edit-category-window", { catid, catname, active });
+// Open add category window
+function openAddCategoryWindow() {
+    ipcRenderer.send("open-add-category-window");
 }
-
 
 // Function to confirm and delete category
 function confirmDeleteCategory(categoryId) {
@@ -63,7 +53,149 @@ function confirmDeleteCategory(categoryId) {
     }
 }
 
+// Open the edit category popup within the same page
+function openEditCategoryPopup(catid, catname, active) {
+    // Remove existing popup if any
+    closeModal();
 
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay");
+    overlay.addEventListener("click", closeModal);
+
+    const popup = document.createElement("div");
+    popup.classList.add("edit-popup");
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h2>Edit Category</h2>
+            <input type="text" id="editCategoryName" value="${catname}" placeholder="Category Name"><br><br>
+            <div class="toggle-container">
+                <span id="toggleStatusLabel">Inactive</span>
+                <div id="toggleActive" class="toggle-switch ${active === 1 ? "active" : ""}"></div><br><br>
+            </div>
+            <div class="buttons">
+                <button id="saveChangesBtn">Save Changes</button>
+                <button id="cancelEditBtn">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+
+    let isActive = active;
+
+    // Function to update status label
+    function updateStatusLabel() {
+        const statusLabel = document.getElementById("toggleStatusLabel");
+        statusLabel.textContent = isActive === 1 ? "Active" : "Inactive";
+        statusLabel.style.color = isActive === 1 ? "green" : "red";
+    }
+
+    // Initialize label correctly
+    updateStatusLabel();
+
+    // Toggle active/inactive status
+    document.getElementById("toggleActive").addEventListener("click", function () {
+        isActive = isActive === 1 ? 0 : 1;
+        this.classList.toggle("active", isActive === 1);
+        updateStatusLabel(); // Ensure label updates when toggled
+    });
+
+    // Save Changes
+    document.getElementById("saveChangesBtn").addEventListener("click", () => {
+        const updatedName = document.getElementById("editCategoryName").value.trim();
+
+        if (!updatedName) {
+            alert("Please enter a category name.");
+            return;
+        }
+
+        ipcRenderer.send("update-category", { catid, catname: updatedName, active: isActive });
+    });
+
+    // Cancel Edit
+    document.getElementById("cancelEditBtn").addEventListener("click", closeModal);
+}
+
+// Function to close the modal
+function closeModal() {
+    const popup = document.querySelector(".edit-popup");
+    const overlay = document.querySelector(".overlay");
+    if (popup) document.body.removeChild(popup);
+    if (overlay) document.body.removeChild(overlay);
+}
+
+// Open the add category popup within the same page
+function openAddCategoryPopup() {
+    // Remove existing popup if any
+    closeModal();
+
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay");
+    overlay.addEventListener("click", closeModal);
+
+    const popup = document.createElement("div");
+    popup.classList.add("edit-popup"); // Reusing the edit popup styling
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h2>Add Category</h2>
+            <input type="text" id="newCategoryName" placeholder="Category Name"><br><br>
+            <div class="toggle-container">
+                <span id="toggleStatusLabel">Active</span>
+                <div id="toggleActive" class="toggle-switch active"></div><br><br>
+            </div>
+            <div class="buttons">
+                <button id="addCategoryBtn">Add</button>
+                <button id="cancelAddBtn">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+
+    let isActive = 1; // Default to Active
+
+    // Function to update status label
+    function updateStatusLabel() {
+        const statusLabel = document.getElementById("toggleStatusLabel");
+        statusLabel.textContent = isActive === 1 ? "Active" : "Inactive";
+        statusLabel.style.color = isActive === 1 ? "green" : "red";
+    }
+
+    // Toggle active/inactive status
+    document.getElementById("toggleActive").addEventListener("click", function () {
+        isActive = isActive === 1 ? 0 : 1;
+        this.classList.toggle("active", isActive === 1);
+        updateStatusLabel(); 
+    });
+
+    // Add Category
+    document.getElementById("addCategoryBtn").addEventListener("click", () => {
+        const categoryName = document.getElementById("newCategoryName").value.trim();
+
+        if (!categoryName) {
+            alert("Please enter a category name.");
+            return;
+        }
+
+        ipcRenderer.send("add-category", { catname: categoryName, active: isActive });
+    });
+
+    // Cancel Add
+    document.getElementById("cancelAddBtn").addEventListener("click", closeModal);
+}
+
+// Update event listener to use the popup
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("addCategoryBox").addEventListener("click", openAddCategoryPopup);
+});
+
+// Close popup and refresh categories list when category is added
+ipcRenderer.on("category-added", () => {
+    fetchCategoriesList();
+    closeModal();
+});
 
 // Refresh the category list after deletion or update
 ipcRenderer.on("category-deleted", () => {
@@ -72,7 +204,7 @@ ipcRenderer.on("category-deleted", () => {
 
 ipcRenderer.on("category-updated", () => {
     fetchCategoriesList();
+    closeModal();
 });
 
-// Export function so it can be used in `renderer.js`
-module.exports = { fetchCategoriesList, confirmDeleteCategory, openEditWindow };
+module.exports = { fetchCategoriesList, confirmDeleteCategory, openAddCategoryPopup, openEditCategoryPopup };
