@@ -39,7 +39,6 @@ body {
 
 /* Top Horizontal Panel */
 #top-panel {
-    background-color: #333;
     color: white;
     display: flex;
     justify-content: space-evenly; /* Space buttons evenly */
@@ -51,7 +50,6 @@ body {
 .top {
     flex: 1;
     padding: 0px 0px;
-    background-color: #444;
     color: white;
     border: 1px solid #555; /* Thin border for separation */
     cursor: pointer;
@@ -83,7 +81,6 @@ body {
 #category-panel {
     position: fixed;
     left: 0;
-    background-color: #cad2c5; /* Light gray background */
     width: 200px; /* Fixed width for the panel */
     padding: 0; /* Remove padding to ensure buttons take full width */
     border-right: 1px solid #ddd; /* Add a border to separate from main content */
@@ -105,7 +102,6 @@ body {
     padding: 20px; /* Increase padding for better clickability */
     margin: 0; /* Remove margin to eliminate gaps */
     border: none; /* Remove default button border */
-    background-color: #9A7CA2 ; /* Dark background for buttons */
     color: #ffffff; /* Black text color */
     text-align: center; /* Center text */
     font-size: 16px; /* Set font size */
@@ -113,7 +109,7 @@ body {
     cursor: pointer; /* Show pointer cursor on hover */
     transition: background-color 0.3s ease; /* Smooth hover transition */
     border-radius: 0; /* Remove rounded corners for perfect rectangles */
-    border-bottom: 1px solid #000000; /* Add a thin line at the bottom of each button */
+    border-bottom: 0px solid #000000; /* Add a thin line at the bottom of each button */
 }
 
 #category-panel button.category:last-child {
@@ -1296,3 +1292,24 @@ color: #fff;
     height: 150px; /* Height when expanded */
     background: linear-gradient(135deg, #FF5722, #FF7043); /* Change gradient on expand */
 }
+
+
+/* COLOR SECTION IS HERE ----- ALL UI COLORING IS PRESENT HEERE ------------------------------------- */
+#category-panel button.category {
+    background-color: #034078;
+}
+
+.food-item button {
+    background-color: #0c3057;
+}
+#top-panel {
+    color: #edf2f4;
+}
+#top-panel button {
+    background-color: #0a1128;
+}
+#bill-buttons button {
+    background-color: rgb(95, 0, 183);
+}
+
+/*----------------------- COLORS SECTION ENDS HERE ------------------------------------------------------------------- */

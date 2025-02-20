@@ -38,14 +38,14 @@ async function updateMainContent(contentType) {
                     <p>Price: ₹${item.cost}</p>
                     <div class="quantity-control" style="display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0;">
                         <button class="decrease-quantity" data-fid="${item.fid}" 
-                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; background-color: #774360; color: white;">-</button>
+                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; color: white;">-</button>
                         <span class="quantity" id="quantity-${item.fid}">1</span>
                         <button class="increase-quantity" data-fid="${item.fid}" 
-                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; background-color: #774360; color: white;">+</button>
+                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; color: white;">+</button>
                     </div>
 
                     <button class="add-to-bill" data-fid="${item.fid}" data-fname="${item.fname}" data-price="${item.cost}"
-                        style="font-size: 17px; padding: 5px 10px; width: 100%; height: 30px; border-radius: 20px; background-color: #774360; 
+                        style="font-size: 17px; padding: 5px 10px; width: 100%; height: 30px; border-radius: 20px; 
                         color: white; margin-top: auto;">
                         ADD
                     </button>
@@ -126,14 +126,14 @@ async function updateMainContent(contentType) {
                     
                     <div class="quantity-control" style="display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0;">
                         <button class="decrease-quantity" data-fid="${item.fid}" 
-                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; background-color: #774360; color: white;">-</button>
+                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; color: white;">-</button>
                         <span class="quantity" id="quantity-${item.fid}">1</span>
                         <button class="increase-quantity" data-fid="${item.fid}" 
-                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; background-color: #774360; color: white;">+</button>
+                            style="font-size: 12px; padding: 2px 6px; width: 18px; height: 18px; border-radius: 4px; color: white;">+</button>
                     </div>
 
                     <button class="add-to-bill" data-fid="${item.fid}" data-fname="${item.fname}" data-price="${item.cost}"
-                        style="font-size: 17px; padding: 5px 10px; width: 100%; height: 30px; border-radius: 20px; background-color: #774360; 
+                        style="font-size: 17px; padding: 5px 10px; width: 100%; height: 30px; border-radius: 20px;
                         color: white; margin-top: auto;">
                         ADD
                     </button>
