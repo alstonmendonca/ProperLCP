@@ -319,7 +319,6 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
             <div style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
                 <div style="border-bottom: 2px solid #333; padding-bottom: 5px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
                     <span>HELD ID: ${order.heldid}</span>
-                    <span>KOT: ${order.kot_number || "N/A"}</span>
                 </div>
                 <div style="padding: 5px; flex-grow: 1; display: flex; flex-direction: column;">
                     <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Cashier: ${order.cashier_name}</div>
@@ -496,7 +495,7 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
                 <div style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
                     <div style="border-bottom: 2px solid #333; padding-bottom: 5px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
                         <span>BILL NO: ${order.billno}</span>
-                        <span>KOT: ${order.kot_number || "N/A"}</span>
+                        <span>KOT: ${order.kot || "N/A"}</span>
                     </div>
                     <div style="padding: 5px; flex-grow: 1; display: flex; flex-direction: column;">
                         <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Cashier: ${order.cashier_name}</div>
