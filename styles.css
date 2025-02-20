@@ -44,6 +44,7 @@ body {
     justify-content: space-evenly; /* Space buttons evenly */
     align-items: stretch;
     height: 50px; /* Adjust the height of the panel */
+    border-bottom: 2px solid #051524;
     
 }
 
@@ -51,7 +52,7 @@ body {
     flex: 1;
     padding: 0px 0px;
     color: white;
-    border: 1px solid #555; /* Thin border for separation */
+    border-right: 1px solid #ffffff; /* Thin border for separation */
     cursor: pointer;
     text-align: center;
     transition: background-color 0.3s ease, transform 0.2s ease; /* Add transition for hover effects */
@@ -160,7 +161,7 @@ body {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background-color: #fff;
+    background-color: #ffffff;
     justify-content: space-evenly;
 }
 
@@ -170,7 +171,7 @@ body {
     right: 0;
     width: 600px; /* Adjust width as needed */
     padding: 20px;
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 0px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
@@ -186,17 +187,24 @@ body {
 
 /* Scrollable Bill Items List */
 #bill-items-list {
+    padding-right: 5px;
     margin-top: 10px;
-    border:1px solid #555;
+    border: 1px solid #555;
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling */
-    max-height: calc(100% - 119px); /* Ensures enough space for buttons */
-    padding-right: 10px; /* Prevents horizontal scrollbar */
+    height: calc(100% - 119px); /* Ensures it occupies a set height */
+    min-height: 200px; /* Prevents it from collapsing when empty */
+    display: flex;
+    flex-direction: column;
 }
 
 /* Separation line between content and bill panel */
 #content > #main-content {
-    border-right: 2px solid #ddd;
+    border-right: 2px solid #c6c6c6;
+}
+/* Separation line between content and bill panel */
+#content > #category-panel {
+    border-right: 4px solid #c6c6c6;
 }
 
 /* Bill Items */
@@ -1295,21 +1303,31 @@ color: #fff;
 
 
 /* COLOR SECTION IS HERE ----- ALL UI COLORING IS PRESENT HEERE ------------------------------------- */
+#main-content,#bill-panel{
+    background: linear-gradient(135deg, #fbf9f9, #ffffff);;
+
+}
 #category-panel button.category {
-    background-color: #034078;
+    background: linear-gradient(135deg, #5DA6EA, #f3f2f8);
+    color: black;
 }
 
 .food-item button {
-    background-color: #0c3057;
+    background-color: #0C345A;
 }
 #top-panel {
     color: #edf2f4;
 }
 #top-panel button {
-    background-color: #0a1128;
+    background-color: #0D3B66;
+    color: whitesmoke;
+    font-weight: bold;
 }
 #bill-buttons button {
-    background-color: rgb(95, 0, 183);
+    background-color: #0C345A;
+}
+#upperbuttons button {
+    background-color: #0C345A;
 }
 
 /*----------------------- COLORS SECTION ENDS HERE ------------------------------------------------------------------- */
