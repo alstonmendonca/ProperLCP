@@ -344,7 +344,7 @@ button {
 }
 
 button:hover {
-    background-color: var(--secondary-color);
+    background-color: #2374a6;
 }
 
 button:focus {
@@ -1393,7 +1393,6 @@ color: #fff;
     padding: 5px 10px; /* Padding for buttons */
     border-radius: 5px; /* Rounded corners */
     cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s ease; /* Smooth hover transition */
 }
 
 .category-actions .remove-btn:hover {
@@ -1401,11 +1400,11 @@ color: #fff;
 }
 
 .category-actions .edit-btn {
-    background-color: #e8ee3c; /* Blue background for edit button */
+    background-color: #e5ea46f2; /* Blue background for edit button */
 }
 
 .category-actions .edit-btn:hover {
-    background-color: #c5ca36; /* Darker blue on hover */
+    background-color: #abb02f; /* Darker blue on hover */
 }
 
 /* Add Category Box Styles */
@@ -1422,11 +1421,13 @@ color: #fff;
     justify-content: center; /* Center content horizontally */
     align-items: center; /* Center content vertically */
     height: 160px; /* Set a fixed height for the box */
+    border: none;
 }
 
 #addCategoryBox:hover {
     transform: translateY(-5px) scale(1.05); /* Lift effect on hover */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+    background-color: #49a34c; /* Green background for the add category box */
 }
 
 /* Popup Overlay Styles */
@@ -1478,6 +1479,7 @@ color: #fff;
     background-color: white;
     border-radius: 50%;
     transition: transform 0.3s;
+
 }
 
 .toggle-switch.active::before {
@@ -1531,4 +1533,18 @@ color: #fff;
     padding-bottom: 5px;  
     width: 100%;  /* Ensures it spans the full width */
     text-align: center;  /* Ensures text is centered */
+}
+
+/* Error Popup Styles */
+.error-popup {
+    background-color: white; /* White background for the popup */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Padding inside the popup */
+    width: 300px; /* Fixed width for the popup */
+    margin: 100px auto; /* Center the popup */
+    position: relative; /* Position relative for absolute positioning of close button */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    z-index: 1000; /* Ensure it is above the overlay */
+    justify-content: center;
+    align-items: center;
 }

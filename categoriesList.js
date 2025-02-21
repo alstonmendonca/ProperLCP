@@ -94,8 +94,8 @@ function openEditCategoryPopup(catid, catname, active) {
                 <div id="toggleActive" class="toggle-switch ${active === 1 ? "active" : ""}"></div><br><br>
             </div>
             <div class="buttons">
-                <button id="saveChangesBtn">Save Changes</button>
-                <button id="cancelEditBtn">Cancel</button>
+                <button id="saveChangesBtn" style="margin-right: 20px; margin-top: 5px;">Save Changes</button>
+                <button id="cancelEditBtn" style="margin-left: 20px; margin-top: 5px;">Cancel</button>
             </div>
         </div>
     `;
@@ -196,7 +196,29 @@ function openAddCategoryPopup() {
         const categoryName = document.getElementById("newCategoryName").value.trim();
 
         if (!categoryName) {
-            alert("Please enter a category name.");
+            // Create a custom error popup
+            const errorOverlay = document.createElement("div");
+            errorOverlay.classList.add("overlay");
+            errorOverlay.addEventListener("click", closeErrorPopup);
+
+            const errorPopup = document.createElement("div");
+            errorPopup.classList.add("error-popup");
+            errorPopup.innerHTML = `
+                <div class="popup-content">
+                    <h2 style="margin-bottom: 15px;">Error</h2>
+                    <p style="margin-bottom: 15px;">Please enter a category name.</p>
+                    <div class="buttons">
+                        <button id="closeErrorBtn">OK</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(errorOverlay);
+            document.body.appendChild(errorPopup);
+
+            // Close error popup on button click
+            document.getElementById("closeErrorBtn").addEventListener("click", closeErrorPopup);
+
             return;
         }
 
@@ -227,5 +249,13 @@ ipcRenderer.on("category-updated", () => {
     fetchCategoriesList();
     closeModal();
 });
+
+// Function to close the error popup
+function closeErrorPopup() {
+    const errorPopup = document.querySelector(".error-popup");
+    const errorOverlay = document.querySelector(".overlay");
+    if (errorPopup) document.body.removeChild(errorPopup);
+    if (errorOverlay) document.body.removeChild(errorOverlay);
+}
 
 module.exports = { fetchCategoriesList, confirmDeleteCategory, openAddCategoryPopup, openEditCategoryPopup };
