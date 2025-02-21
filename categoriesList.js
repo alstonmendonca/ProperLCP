@@ -41,16 +41,37 @@ ipcRenderer.on("categories-list-response", (event, data) => {
     categoriesTabDiv.innerHTML = gridHTML;
 });
 
-// Open add category window
-function openAddCategoryWindow() {
-    ipcRenderer.send("open-add-category-window");
-}
-
 // Function to confirm and delete category
 function confirmDeleteCategory(categoryId) {
-    if (confirm("Are you sure you want to delete this category?")) {
+    // Create confirmation popup
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay");
+    overlay.addEventListener("click", closeModal); // Close on overlay click
+
+    const popup = document.createElement("div");
+    popup.classList.add("edit-popup");
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h2 style="margin-bottom: 15px;">Confirm Deletion</h2>
+            <p style="margin-bottom: 20px;">Are you sure you want to delete this category?</p>
+            <div class="buttons">
+                <button id="confirmDeleteBtn" style="margin-right: 15px;">Delete</button>
+                <button id="cancelDeleteBtn" style="margin-left: 15px;">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+
+    // Confirm deletion
+    document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
         ipcRenderer.send("delete-category", categoryId);
-    }
+        closeModal(); // Close the popup after confirming
+    });
+
+    // Cancel deletion
+    document.getElementById("cancelDeleteBtn").addEventListener("click", closeModal);
 }
 
 // Open the edit category popup within the same page
