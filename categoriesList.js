@@ -49,7 +49,7 @@ function confirmDeleteCategory(categoryId) {
     overlay.addEventListener("click", closeModal); // Close on overlay click
 
     const popup = document.createElement("div");
-    popup.classList.add("edit-popup");
+    popup.classList.add("category-edit-popup");
     popup.innerHTML = `
         <div class="popup-content">
             <h2 style="margin-bottom: 15px;">Confirm Deletion</h2>
@@ -84,7 +84,7 @@ function openEditCategoryPopup(catid, catname, active) {
     overlay.addEventListener("click", closeModal);
 
     const popup = document.createElement("div");
-    popup.classList.add("edit-popup");
+    popup.classList.add("category-edit-popup");
     popup.innerHTML = `
         <div class="popup-content">
             <h2>Edit Category</h2>
@@ -140,7 +140,7 @@ function openEditCategoryPopup(catid, catname, active) {
 
 // Function to close the modal
 function closeModal() {
-    const popup = document.querySelector(".edit-popup");
+    const popup = document.querySelector(".category-edit-popup");
     const overlay = document.querySelector(".overlay");
     if (popup) document.body.removeChild(popup);
     if (overlay) document.body.removeChild(overlay);
@@ -156,7 +156,7 @@ function openAddCategoryPopup() {
     overlay.addEventListener("click", closeModal);
 
     const popup = document.createElement("div");
-    popup.classList.add("edit-popup"); // Reusing the edit popup styling
+    popup.classList.add("category-edit-popup"); // Reusing the edit popup styling
     popup.innerHTML = `
         <div class="popup-content">
             <h2>Add Category</h2>
@@ -202,7 +202,7 @@ function openAddCategoryPopup() {
             errorOverlay.addEventListener("click", closeErrorPopup);
 
             const errorPopup = document.createElement("div");
-            errorPopup.classList.add("error-popup");
+            errorPopup.classList.add("add-category-error-popup");
             errorPopup.innerHTML = `
                 <div class="popup-content">
                     <h2 style="margin-bottom: 15px;">Error</h2>
@@ -252,7 +252,7 @@ ipcRenderer.on("category-updated", () => {
 
 // Function to close the error popup
 function closeErrorPopup() {
-    const errorPopup = document.querySelector(".error-popup");
+    const errorPopup = document.querySelector(".add-category-error-popup");
     const errorOverlay = document.querySelector(".overlay");
     if (errorPopup) document.body.removeChild(errorPopup);
     if (errorOverlay) document.body.removeChild(errorOverlay);

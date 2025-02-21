@@ -35,12 +35,12 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
     }
 
     // Create a grid layout for today's orders
-    let gridHTML = `<div class="orders-grid">`;
+    let gridHTML = `<div class="todays-orders-grid">`;
 
     orders.forEach(order => {
         gridHTML += `
-            <div class="order-box" data-billno="${order.billno}">
-                <div class="edit-button" onclick="openTodayEditOrder(${order.billno})">✏️</div>
+            <div class="todays-order-box" data-billno="${order.billno}">
+                <div class="todays-orders-edit-button" onclick="openTodayEditOrder(${order.billno})">✏️</div>
                 <h3>Bill No: ${order.billno}</h3>
                 <p>Cashier: ${order.cashier_name}</p>
                 <p>KOT: ${order.kot}</p>
@@ -57,7 +57,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
     todaysOrdersDiv.innerHTML = gridHTML;
 
     // Attach context menu to each order box
-    attachTodaysOrdersContextMenu(".order-box", "todaysOrders");
+    attachTodaysOrdersContextMenu(".todays-order-box", "todaysOrders");
 });
 
 // Function to open edit order (to be implemented later)
