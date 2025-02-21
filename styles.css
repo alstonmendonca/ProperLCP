@@ -1548,3 +1548,61 @@ color: #fff;
     justify-content: center;
     align-items: center;
 }
+
+/* Styles for the orders grid */
+.orders-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 boxes per row */
+    gap: 20px; /* Space between boxes */
+    padding: 20px; /* Padding around the grid */
+}
+
+/* Styles for each order box */
+.order-box {
+    background-color: #ffffff; /* White background */
+    border: 2px solid transparent; /* Use a transparent border to maintain size */
+    border-radius: 10px; /* Rounded corners */
+    padding: 15px; /* Padding inside the box */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    position: relative; /* Position relative for the edit button */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for border color and shadow */
+}
+
+/* Hover effect for order box */
+.order-box:hover {
+    border-color: #4CAF50; /* Change border color on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Slightly larger shadow on hover */
+}
+
+
+/* Styles for the edit button */
+.edit-button {
+    position: absolute; /* Position it at the top right */
+    top: 10px;
+    right: 10px;
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 50%; /* Circular button */
+    width: 30px; /* Width of the button */
+    height: 30px; /* Height of the button */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.edit-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Additional styles for the order box text */
+.order-box h3 {
+    margin: 0; /* Remove default margin */
+    font-size: 1.2em; /* Slightly larger font size */
+}
+
+.order-box p {
+    margin: 5px 0; /* Margin for spacing between paragraphs */
+    font-size: 0.9em; /* Font size for order details */
+}
