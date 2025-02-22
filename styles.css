@@ -246,13 +246,29 @@ body {
 }
 
 
-/* Total Amount */
+/* Total Amount & Discount Applied display */
+#total-discount-container {
+    display: flex;
+    justify-content: space-between; /* Places discount on left, total on right */
+    align-items: center; /* Aligns them vertically */
+    width: 100%;
+    margin: 10px 0;
+}
+
+#discount-applied-display {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left; /* Align discount to the left */
+}
+
 #total-amount {
     font-size: 18px;
     font-weight: bold;
-    margin: 10px 0;
-    text-align: right;
+    text-align: right; /* Align total to the right */
 }
+
+
+
 
 /* Bill Buttons - Fixed at Bottom */
 #bill-buttons {
