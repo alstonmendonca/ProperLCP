@@ -457,6 +457,41 @@ async function updateMainContent(contentType) {
             });
 
         }
+        else if(contentType === "filterHistory"){
+            mainContent.innerHTML = `
+                <h1>Filter History</h1>
+                <div id="customersDiv"></div>
+            `;
+            
+        }
+        else if(contentType === "itemHistory"){
+            mainContent.innerHTML = `
+                <h1>Item History</h1>
+                <div id="customersDiv"></div>
+            `;
+            
+        }
+        else if(contentType === "dayWise"){
+            mainContent.innerHTML = `
+                <h1>Day-Wise Order History</h1>
+                <div id="customersDiv"></div>
+            `;
+            
+        }
+        else if(contentType === "monthWise"){
+            mainContent.innerHTML = `
+                <h1>Month-Wise Order History</h1>
+                <div id="customersDiv"></div>
+            `;
+            
+        }
+        else if(contentType === "yearWise"){
+            mainContent.innerHTML = `
+                <h1>Year-Wise Order History</h1>
+                <div id="customersDiv"></div>
+            `;
+            
+        }
 
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------
         //----------------------------- MENU TAB STARTS HERE------------------------------------------------
