@@ -201,7 +201,7 @@ function saveAndPrintBill() {
     NewOrder();
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------------
 
 function holdBill() {
     // Get cashier ID (Assume it's set somewhere in the UI)

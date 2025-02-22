@@ -1149,6 +1149,29 @@ ipcMain.on("clear-customer-data", (event) => {
     });
 });
 
+// Fetch order details for a specific bill number
+ipcMain.on("get-order-details", (event, billno) => {
+    const query = `
+        SELECT 
+            OrderDetails.quantity, 
+            FoodItem.fid AS foodId, 
+            FoodItem.fname AS foodName, 
+            FoodItem.cost AS price  -- Change 'price' to 'cost'
+        FROM OrderDetails
+        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        WHERE OrderDetails.orderid = ?;
+    `;
+
+    db.all(query, [billno], (err, rows) => {
+        if (err) {
+            console.error("Error fetching order details:", err);
+            event.reply("order-details-response", { success: false, food_items: [] });
+            return;
+        }
+        event.reply("order-details-response", { success: true, food_items: rows });
+    });
+});
+
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

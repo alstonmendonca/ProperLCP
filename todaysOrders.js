@@ -60,11 +60,24 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
     attachTodaysOrdersContextMenu(".todays-order-box", "todaysOrders");
 });
 
-// Function to open edit order (to be implemented later)
+// Function to open edit order and populate the bill panel
 function openTodayEditOrder(billno) {
     console.log("Edit order for Bill No:", billno);
-    // Here you would implement the logic to open the edit order popup
+    
+    // Change the content type to Home
+    updateMainContent('Home');
+
+    // Send a request to get the food items for the selected order
+    ipcRenderer.send("get-order-details", billno);
 }
+
+// Listen for the response with order details
+ipcRenderer.on("order-details-response", (event, orderDetails) => {
+    // Assuming orderDetails contains an array of food items
+    orderDetails.food_items.forEach(item => {
+        addToBill(item.foodId, item.foodName, item.price, item.quantity);
+    });
+});
 
 // Refresh "Today's Orders" after deletion
 ipcRenderer.on("refresh-order-history", () => {
