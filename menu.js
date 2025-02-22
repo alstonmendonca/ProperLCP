@@ -86,10 +86,8 @@ async function displayMenu() {
             // Restore previous scroll position
             mainContent.scrollTop = currentScrollPosition;
             // Add event listeners to Add New Item button
-            document.querySelector("#addNewItem").addEventListener("click", async () => {
-                ipcRenderer.send("open-add-item-window"); // Send event to main process
-                return; // Stop further execution
-            });
+            document.querySelector("#addNewItem").addEventListener("click", toggleAddItemPopup);
+
 
 
             // Add event listeners to IS_ON toggle switches
@@ -135,7 +133,7 @@ async function displayMenu() {
             document.querySelectorAll(".delete-btn").forEach((button) => {
                 button.addEventListener("click", async (event) => {
                     const fid = event.target.getAttribute("data-fid");
-                    const confirmDelete = confirm("Are you sure you want to delete this item?");
+                    const confirmDelete = await createConfirmPopup("Are you sure you want to delete this item?");
                     if (confirmDelete) {
                         await ipcRenderer.invoke("delete-menu-item", parseInt(fid));
 
@@ -146,14 +144,10 @@ async function displayMenu() {
             });
             // Add event listeners for search bar
             document.querySelector("#searchBar").addEventListener("input", (event) => {
-                const searchQuery = event.target.value.toLowerCase();
+                const searchQuery = event.target.value.trim().toLowerCase();
                 document.querySelectorAll(".food-item").forEach((item) => {
-                    const foodName = item.querySelector("h3").textContent.toLowerCase();
-                    if (foodName.includes(searchQuery)) {
-                        item.style.display = "block";
-                    } else {
-                        item.style.display = "none";
-                    }
+                    const foodName = item.querySelector("h3").textContent.trim().toLowerCase();
+                    item.style.display = foodName.includes(searchQuery) ? "block" : "none";
                 });
             });
 
@@ -171,7 +165,7 @@ async function displayMenu() {
 
                     const item = foodItems.find((item) => item.fid == fid);
                     if (!item) {
-                        alert("Food item not found!");
+                        createTextPopup("Food item not found!");
                         return;
                     }
 
@@ -242,19 +236,22 @@ async function displayMenu() {
 
                     // Save changes
                     document.getElementById("saveChanges").addEventListener("click", async () => {
+                        // Store the current scroll position
+                        const currentScrollPosition = mainContent.scrollTop;
+                    
                         const updatedFname = document.getElementById("editFname").value.trim();
                         const updatedCost = parseFloat(document.getElementById("editCost").value);
                         const updatedCategory = parseFloat(document.getElementById("category").value);
                         const updatedsgst = parseFloat(document.getElementById("editsgst").value);
                         const updatedcgst = parseFloat(document.getElementById("editcgst").value);
                         const updatedveg = document.getElementById("editveg").checked ? 1 : 0; // Convert toggle state to 1 or 0
-
+                    
                         // Validate inputs
                         if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
-                            alert("Please enter valid details.");
+                            createTextPopup("Please enter valid details");
                             return;
                         }
-
+                    
                         // Send IPC message to update the database
                         const response = await ipcRenderer.invoke("update-food-item", {
                             fid,
@@ -265,18 +262,23 @@ async function displayMenu() {
                             cgst: updatedcgst,
                             veg: updatedveg
                         });
-
+                    
                         if (response.success) {
                             // Remove the popup
                             document.body.removeChild(popup);
-
+                    
                             // Update UI dynamically
                             const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
-                            displayMenu(); // Reload the menu
-                            //keep scroll position
+                            if (foodItemElement) {
+                                foodItemElement.querySelector("h3").innerHTML = `${updatedFname} <br> ${updatedveg == 1 ? "🌱" : "🍖"}`;
+                                foodItemElement.querySelector("p:nth-child(2)").textContent = `Category: ${updatedCategory}`;
+                                foodItemElement.querySelector("p:nth-child(3)").textContent = `Price: ₹${updatedCost}`;
+                            }
+                    
+                            // Restore the scroll position
                             mainContent.scrollTop = currentScrollPosition;
                         } else {
-                            alert(`Failed to update item: ${response.error}`);
+                            createTextPopup("Failed to update item");
                         }
                     });
                 });
@@ -297,3 +299,201 @@ async function displayMenu() {
 ipcRenderer.on("refresh-menu", async () => {
     await displayMenu();
 });
+function toggleAddItemPopup() {
+    let existingPopup = document.getElementById("add-item-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
+    }
+
+    const popup = document.createElement("div");
+    popup.id = "add-item-popup";
+    popup.classList.add("edit-popup");
+
+    popup.innerHTML = `
+        <div class="popup-content" style="align-items: center; justify-content: center; width: 400px; pointer-events: auto;">
+            <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px; color: #333;">Add New Food Item</h3>
+            <form id="addItemForm" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="form-group">
+                    <label for="fname" style="font-size: 14px; color: #555; margin-bottom: 5px;">Food Name:</label>
+                    <input type="text" id="fname" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="category" style="font-size: 14px; color: #555; margin-bottom: 5px;">Category:</label>
+                    <select id="category" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
+                        <option value="">Select a category</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cost" style="font-size: 14px; color: #555; margin-bottom: 5px;">Cost (₹):</label>
+                    <input type="number" id="cost" step="0.01" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="sgst" style="font-size: 14px; color: #555; margin-bottom: 5px;">SGST (%):</label>
+                    <input type="number" id="sgst" step="0.01" value="0" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="cgst" style="font-size: 14px; color: #555; margin-bottom: 5px;">CGST (%):</label>
+                    <input type="number" id="cgst" step="0.01" value="0" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="veg" style="font-size: 14px; color: #555; margin-bottom: 5px;">Veg:</label>
+                    <select id="veg" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="active" style="font-size: 14px; color: #555; margin-bottom: 5px;">Active:</label>
+                    <select id="active" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="is_on" style="font-size: 14px; color: #555; margin-bottom: 5px;">Available:</label>
+                    <select id="is_on" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <div class="popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="submit" id="addItemBtn" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Add</button>
+                    <button id="closePopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Cancel</button>
+                </div>
+            </form>
+        </div>
+        `;
+
+    document.body.appendChild(popup);
+
+    // Load categories dynamically
+    loadCategories();
+
+    // Handle form submission
+    document.getElementById("addItemForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const newItem = {
+            fname: document.getElementById("fname").value,
+            category: document.getElementById("category").value,
+            cost: parseFloat(document.getElementById("cost").value),
+            sgst: parseFloat(document.getElementById("sgst").value),
+            cgst: parseFloat(document.getElementById("cgst").value),
+            tax: parseFloat(document.getElementById("sgst").value) + parseFloat(document.getElementById("cgst").value),
+            active: parseInt(document.getElementById("active").value),
+            is_on: parseInt(document.getElementById("is_on").value),
+            veg: parseInt(document.getElementById("veg").value)
+        };
+
+        try {
+            await ipcRenderer.invoke("add-food-item", newItem);
+            createTextPopup("Item added successfully!");
+            ipcRenderer.send("refresh-menu");
+            popup.remove();
+        } catch (error) {
+            console.error("Error adding item:", error);
+            createTextPopup("Failed to add item");
+        }
+    });
+
+    // Close popup on cancel
+    document.getElementById("closePopup").addEventListener("click", () => {
+        popup.remove();
+    });
+}
+
+// Function to load categories dynamically
+async function loadCategories() {
+    try {
+        const categories = await ipcRenderer.invoke("get-categories-for-additem");
+        const categorySelect = document.getElementById("category");
+        categories.forEach(cat => {
+            let option = document.createElement("option");
+            option.value = cat.catid;
+            option.textContent = cat.catname;
+            categorySelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Failed to load categories:", error);
+    }
+}
+function createTextPopup(message) {
+    // Remove existing popup if it exists
+    let existingPopup = document.getElementById("custom-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    // Create popup container
+    const popup = document.createElement("div");
+    popup.id = "custom-popup";
+    popup.classList.add("edit-popup");
+
+    popup.innerHTML = `
+        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
+            <p>${message}</p>
+
+            <br>
+
+            <div class="popup-buttons">
+                <button id="closePopuptext" style="width: 90px; height: 40px;">OK</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Add event listener for closing popup
+    document.getElementById("closePopuptext").addEventListener("click", () => {
+        popup.remove();
+    });
+}
+
+// CREATE CONFIRM POPUP
+function createConfirmPopup(message) {
+    return new Promise((resolve) => {
+        // Remove existing popup if it exists
+        let existingPopup = document.getElementById("custom-confirm-popup");
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+
+        // Create popup container
+        const popup = document.createElement("div");
+        popup.id = "custom-confirm-popup";
+        popup.classList.add("edit-popup");
+
+        popup.innerHTML = `
+            <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
+                <p>${message}</p>
+                <br>
+                <div class="popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
+                    <button id="confirmYes" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Yes</button>
+                    <button id="confirmNo" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">No</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(popup);
+
+        // Add event listeners for buttons
+        document.getElementById("confirmYes").addEventListener("click", () => {
+            popup.remove();
+            resolve(true);
+        });
+
+        document.getElementById("confirmNo").addEventListener("click", () => {
+            popup.remove();
+            resolve(false);
+        });
+    });
+}
