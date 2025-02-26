@@ -54,6 +54,9 @@ function resetBill() {
     // Reset total display
     document.getElementById("total-amount").textContent = "Total: Rs. 0.00 (Your bill is empty)";
 
+    // Reset discount display
+    document.getElementById("discount-applied-display").textContent = "Discount: ₹0.00";
+
     // Remove or reset the discount fields
     let discountField = document.getElementById("discounted-total");
     if (discountField) {
@@ -72,6 +75,7 @@ function resetBill() {
     // Update the total bill amount
     updateBillTotal();
 }
+
 
 // Function to apply the discount
 function applyDiscount() {
@@ -134,7 +138,17 @@ function applyDiscount() {
         style: 'currency',
         currency: 'INR'
     }).format(discountedTotal);
+    
     document.getElementById("total-amount").textContent = `Total: ${formattedTotal}`;
+    
+    let discountValue = totalAmount - discountedTotal; // Calculate applied discount
+    const formattedDiscount = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR'
+    }).format(discountValue);
+    
+    document.getElementById("discount-applied-display").textContent = `Discount: ${formattedDiscount}`;
+    
 }
 
 
