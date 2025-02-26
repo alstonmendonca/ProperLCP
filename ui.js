@@ -1,6 +1,6 @@
 const { fetchCategoriesList } = require("./categoriesList");
 const { fetchTabCategories } = require("./categoriesTab");
-
+const { initializeTopSellingSection } = require("./topSelling");
 
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
@@ -200,12 +200,8 @@ async function updateMainContent(contentType) {
             `;
             billPanel.style.display = 'none';
         }
-        else if (contentType === "TopSelling") {
-            mainContent.innerHTML = `
-                <h2>Top Selling Items</h2>
-                <p>List of best-selling products.</p>
-            `;
-            billPanel.style.display = 'none';
+        else if (contentType === "TopSellingItems") {
+            loadTopSellingItems(mainContent, billPanel); // Call the top selling items function
         }
         else if (contentType === "HourlySales") {
             mainContent.innerHTML = `

@@ -34,6 +34,8 @@ const {updateStatusLabel} = require('./editCategory')
 const {openAddCategoryPopup} = require('./categoriesList')
 const {openTodayEditOrder} = require('./todaysOrders')
 const {attachTodaysOrdersContextMenu} = require('./todaysOrdersContextMenu')
+const { loadTopSellingItems } = require("./topSelling");
+const {sortTopSellingTable} = require("./topSelling");
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
@@ -68,6 +70,8 @@ window.handleSummaryClick = handleSummaryClick;
 window.openEditWindow = openEditWindow;
 window.openEditCategoryPopup = openEditCategoryPopup;
 window.openAddCategoryPopup = openAddCategoryPopup;
+
+//window.initializeTopSellingSection = initializeTopSellingSection;
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container

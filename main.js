@@ -772,6 +772,50 @@ ipcMain.on("add-to-existing-order", async (event, data) => {
     }
 });
 
+// Fetch top selling items for a specific date range
+ipcMain.on("get-top-selling-items", async (event, { startDate, endDate }) => {
+    const query = `
+        SELECT 
+            Orders.date, 
+            FoodItem.fname AS most_sold_item,
+            SUM(OrderDetails.quantity) AS total_quantity
+        FROM Orders
+        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        WHERE date(Orders.date) BETWEEN date(?) AND date(?)
+        GROUP BY Orders.date, OrderDetails.foodid
+        ORDER BY Orders.date, total_quantity DESC
+    `;
+
+    db.all(query, [startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error("Error fetching top selling items:", err);
+            event.reply("top-selling-items-response", { success: false, items: [] });
+            return;
+        }
+
+        // Process the results to get the most sold item(s) for each date
+        const topSellingItems = {};
+        rows.forEach(row => {
+            if (!topSellingItems[row.date]) {
+                topSellingItems[row.date] = { most_sold_items: [row.most_sold_item], total_quantity: row.total_quantity };
+            } else if (row.total_quantity === topSellingItems[row.date].total_quantity) {
+                topSellingItems[row.date].most_sold_items.push(row.most_sold_item); // Add to the list of most sold items
+            } else if (row.total_quantity > topSellingItems[row.date].total_quantity) {
+                topSellingItems[row.date] = { most_sold_items: [row.most_sold_item], total_quantity: row.total_quantity };
+            }
+        });
+
+        // Convert the object to an array for easier processing
+        const itemsArray = Object.keys(topSellingItems).map(date => ({
+            date,
+            most_sold_item: topSellingItems[date].most_sold_items.join(", ") // Join items with commas
+        }));
+
+        event.reply("top-selling-items-response", { success: true, items: itemsArray });
+    });
+});
+
 //------------------------------BILLING ENDS HERE--------------------------------
 //---------------------------------HISTORY TAB-------------------------------------
 // Fetch Today's Orders
