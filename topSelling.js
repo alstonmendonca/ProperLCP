@@ -24,15 +24,33 @@ function loadTopSellingItems(mainContent, billPanel) {
     // Hide the bill panel
     billPanel.style.display = 'none'; // Hide the bill panel
 
+    // Retrieve stored dates from sessionStorage
+    const savedStartDate = sessionStorage.getItem("topSellingStartDate");
+    const savedEndDate = sessionStorage.getItem("topSellingEndDate");
+
+    if (savedStartDate && savedEndDate) {
+        document.getElementById("startDate").value = savedStartDate;
+        document.getElementById("endDate").value = savedEndDate;
+
+        // Automatically fetch top selling items using stored dates
+        fetchTopSellingItems(savedStartDate, savedEndDate);
+    }
+
     // Initialize the event listener for the button
-    document.querySelector(".showTopSellingButton").addEventListener("click", fetchTopSellingItems);
+    document.querySelector(".showTopSellingButton").addEventListener("click", () => {
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        // Store dates in sessionStorage
+        sessionStorage.setItem("topSellingStartDate", startDate);
+        sessionStorage.setItem("topSellingEndDate", endDate);
+
+        fetchTopSellingItems(startDate, endDate);
+    });
 }
 
 // Function to fetch top selling items
-async function fetchTopSellingItems() {
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-
+async function fetchTopSellingItems(startDate, endDate) {
     if (!startDate || !endDate) {
         alert("Please select both start and end dates.");
         return;

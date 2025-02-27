@@ -202,6 +202,18 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "TopSellingItems") {
             loadTopSellingItems(mainContent, billPanel); // Call the top selling items function
+
+            // Retrieve stored dates from sessionStorage
+            const savedStartDate = sessionStorage.getItem("topSellingStartDate");
+            const savedEndDate = sessionStorage.getItem("topSellingEndDate");
+
+            if (savedStartDate && savedEndDate) {
+                document.getElementById("startDate").value = savedStartDate;
+                document.getElementById("endDate").value = savedEndDate;
+
+                // Automatically fetch top selling items using stored dates
+                fetchTopSellingItems(savedStartDate, savedEndDate);
+            }
         }
         else if (contentType === "HourlySales") {
             mainContent.innerHTML = `
