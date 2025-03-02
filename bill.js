@@ -210,7 +210,14 @@ function saveAndPrintBill() {
     // Send order data to main process with discount applied (or not)
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
 
-    createTextPopup("Bill saved and sent to print!");
+    // Add the glow effect to the bill panel
+    const billPanel = document.getElementById("bill-panel");
+    billPanel.classList.add("glow");
+
+    // Remove the glow effect after 2 seconds
+    setTimeout(() => {
+        billPanel.classList.remove("glow");
+    },800);
 
     NewOrder();
 }
