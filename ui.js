@@ -194,11 +194,7 @@ async function updateMainContent(contentType) {
             loadDayEndSummary(mainContent, billPanel); // Call the day end summary function
         }
         else if (contentType === "CategoryWiseSales") {
-            mainContent.innerHTML = `
-                <h2>Category Wise Sales</h2>
-                <p>Sales breakdown by different categories.</p>
-            `;
-            billPanel.style.display = 'none';
+            loadCategoryWiseSales(mainContent, billPanel); // Call the category wise sales function
         }
         else if (contentType === "TopSellingItems") {
             loadTopSellingItems(mainContent, billPanel); // Call the top selling items function

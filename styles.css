@@ -1635,3 +1635,39 @@ color: #fff;
         box-shadow: inset 0 0 0 rgba(0, 255, 0, 0); /* Fade out */
     }
 }
+
+/* Specific class for category boxes */
+.category-wise-sales-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between boxes */
+    justify-content: center; /* Center the boxes */
+    margin-top: 20px; /* Space above the boxes */
+}
+
+.category-wise-sales-box {
+    background-color: #f9f9f9; /* Light background color */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Padding inside the box */
+    width: calc(25% - 20px); /* 4 boxes per row */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center; /* Center text */
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition for hover effects */
+}
+
+.category-wise-sales-box:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+.category-wise-sales-box h3 {
+    font-size: 1.5em; /* Larger font for category name */
+    margin-bottom: 10px; /* Space below the heading */
+    color: #333; /* Darker text color */
+}
+
+.category-wise-sales-box p {
+    font-size: 1.1em; /* Slightly larger font for sales and revenue */
+    color: #555; /* Medium gray text color */
+}

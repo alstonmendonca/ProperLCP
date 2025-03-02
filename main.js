@@ -368,6 +368,20 @@ ipcMain.handle('get-highest-revenue-category', (event) => {
         });
     });
 });
+
+// New function to fetch categories for Category Wise Sales
+ipcMain.on("get-category-wise-sales-categories", (event) => {
+    const query = `SELECT catid, catname FROM Category WHERE active = 1`;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching categories for Category Wise Sales:", err);
+            event.reply("category-wise-sales-categories-response", { success: false, categories: [] });
+            return;
+        }
+        event.reply("category-wise-sales-categories-response", { success: true, categories: rows });
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
