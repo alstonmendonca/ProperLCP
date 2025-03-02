@@ -21,6 +21,14 @@ function loadTopSellingItems(mainContent, billPanel) {
         <div id="topSellingItemsDiv"></div>
     `;
 
+    // Set default dates to today's date
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    document.getElementById("startDate").value = today; // Set start date to today
+    document.getElementById("endDate").value = today; // Set end date to today
+
+    // Automatically fetch top selling items using today's date
+    fetchTopSellingItems(today, today);
+
     // Hide the bill panel
     billPanel.style.display = 'none'; // Hide the bill panel
 
