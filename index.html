@@ -43,6 +43,7 @@
         <button id='heldorders' onclick="displayHeld()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer;">
             Held Orders
         </button>
+        <button id="applydiscountbutton" onclick="toggleDiscountPopup()">Apply Discount</button>
     </div>
 </div>
 
@@ -61,7 +62,7 @@
   <!-- Buttons Section - HOLD AND SAVE AND PRINT AND APPLY DISCOUNT -->
   <div id="bill-buttons" style="margin-top: 15px;">
       <button id='saveandprintbutton' onclick="saveAndPrintBill()">Save and Print</button>
-      <button id="applydiscountbutton" onclick="toggleDiscountPopup()">Apply Discount</button>
+      <button id='savebutton' onclick="saveAndPrintBill()">Save</button>
       <button id='holdbutton' onclick="holdBill()">Hold</button>
       <button id='saveToOrder' onclick="displayTodaysOrders()">Save To Order</button>
   </div>

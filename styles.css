@@ -1341,10 +1341,6 @@ color: #fff;
     background: linear-gradient(135deg, #fbf9f9, #ffffff);;
 
 }
-#category-panel button.category {
-    background: linear-gradient(135deg, #5DA6EA, #f3f2f8);
-    color: black;
-}
 
 .food-item button {
     background-color: #0C345A;

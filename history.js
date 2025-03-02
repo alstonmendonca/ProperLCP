@@ -164,6 +164,9 @@ function sortOrderHistoryTable(column) {
 
     sortedTableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = sortedTableHTML;
+
+    // Reattach the context menu to the new rows
+    attachContextMenu(".order-history-table", "orderHistory");
 }
 
 // Function to get the sort indicator (▲ or ▼) for a column
