@@ -2,30 +2,60 @@
 function addToBill(itemId, itemName, price, quantity) {
     if (quantity > 0) {
         const totalPrice = price * quantity;
-        // Get the scrollable container for bill items:
         const billItemsList = document.getElementById("bill-items-list");
 
         let existingItem = document.getElementById(`bill-item-${itemId}`);
         if (existingItem) {
-            const quantityCell = existingItem.querySelector(".bill-quantity");
+            const quantityInput = existingItem.querySelector(".bill-quantity");
             const totalPriceCell = existingItem.querySelector(".bill-total");
-            let newQuantity = parseInt(quantityCell.textContent) + quantity;
-            quantityCell.textContent = newQuantity;
+            let newQuantity = parseInt(quantityInput.value) + quantity;
+            quantityInput.value = newQuantity;
             totalPriceCell.textContent = (price * newQuantity).toFixed(2);
         } else {
+            // Create row for bill item
             const billItemRow = document.createElement("div");
             billItemRow.classList.add("bill-item");
             billItemRow.id = `bill-item-${itemId}`;
-            billItemRow.innerHTML = `
-                <span class="bill-item-name">${itemName}</span>
-                <span class="bill-quantity">${quantity}</span>
-                x
-                <span class="bill-price">${price.toFixed(2)}</span>
-                = 
-                <span class="bill-total">${totalPrice.toFixed(2)}</span>
-                <button onclick="removeFromBill('${itemId}')">Remove</button>
-            `;
-            // Append to the scrollable container:
+
+            // Item Name
+            const itemNameSpan = document.createElement("span");
+            itemNameSpan.classList.add("bill-item-name");
+            itemNameSpan.textContent = itemName;
+
+            // Quantity Controls (input field)
+            const quantityInput = document.createElement("input");
+            quantityInput.type = "number";
+            quantityInput.classList.add("bill-quantity");
+            quantityInput.value = quantity;
+            quantityInput.min = 1;
+            quantityInput.addEventListener("input", () => updateQuantityInput(itemId, price));
+
+            // Price (with "x" before it)
+            const timesSpan = document.createElement("span");
+            timesSpan.textContent = " x ";
+
+            const priceSpan = document.createElement("span");
+            priceSpan.classList.add("bill-price");
+            priceSpan.textContent = price.toFixed(2);
+
+            // Equals Sign
+            const equalsSpan = document.createElement("span");
+            equalsSpan.textContent = " = ";
+
+            // Total Price
+            const totalSpan = document.createElement("span");
+            totalSpan.classList.add("bill-total");
+            totalSpan.textContent = totalPrice.toFixed(2);
+
+            // Remove Button
+            const removeBtn = document.createElement("button");
+            removeBtn.textContent = "Remove";
+            removeBtn.onclick = () => removeFromBill(itemId);
+
+            // Append everything in the correct order
+            billItemRow.append(itemNameSpan, quantityInput, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
+
+            // Add to bill
             billItemsList.appendChild(billItemRow);
         }
 
@@ -33,6 +63,20 @@ function addToBill(itemId, itemName, price, quantity) {
     } else {
         alert('Please select a quantity greater than 0 to add to the bill.');
     }
+}
+
+function updateQuantityInput(itemId, price) {
+    let itemRow = document.getElementById(`bill-item-${itemId}`);
+    if (!itemRow) return;
+
+    let quantityInput = itemRow.querySelector(".bill-quantity");
+    let totalPriceSpan = itemRow.querySelector(".bill-total");
+
+    let newQuantity = Math.max(1, parseInt(quantityInput.value) || 1);
+    quantityInput.value = newQuantity;
+    totalPriceSpan.textContent = (price * newQuantity).toFixed(2);
+
+    updateBillTotal();
 }
 
 // Function to remove an item from the bill
@@ -190,7 +234,7 @@ function saveAndPrintBill() {
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
-        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
         let itemTotal = parseFloat(item.querySelector(".bill-total").textContent);
         if (!isNaN(itemTotal)) {
             totalAmount += itemTotal;
