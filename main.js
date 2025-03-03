@@ -416,6 +416,35 @@ ipcMain.handle('get-category-wise-sales-data', (event, startDate, endDate) => {
         });
     });
 });
+
+// Function to fetch sales overview data
+ipcMain.handle('get-sales-overview-data', (event, startDate, endDate) => {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT 
+                date,
+                COUNT(billno) AS totalSales,
+                SUM(price) AS totalRevenue
+            FROM 
+                Orders
+            WHERE 
+                date BETWEEN ? AND ?
+            GROUP BY 
+                date
+            ORDER BY 
+                date ASC
+        `;
+
+        db.all(query, [startDate, endDate], (err, rows) => {
+            if (err) {
+                console.error("Error fetching sales overview data:", err);
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
