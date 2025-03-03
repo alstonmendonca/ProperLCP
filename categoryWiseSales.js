@@ -27,12 +27,23 @@ function loadCategoryWiseSales(mainContent, billPanel) {
     // Fetch categories from the database
     fetchCategoryWiseSalesCategories();
 
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
+
+    // Set default dates to today's date
+    document.getElementById("categoryStartDate").value = today;
+    document.getElementById("categoryEndDate").value = today;
+
     // Retrieve stored dates from sessionStorage
     const storedStartDate = sessionStorage.getItem("categoryWiseSalesStartDate");
     const storedEndDate = sessionStorage.getItem("categoryWiseSalesEndDate");
 
-    // Populate the date inputs with stored dates
-    if (storedStartDate && storedEndDate) {
+    // If no dates are stored in sessionStorage, use today's date
+    if (!storedStartDate || !storedEndDate) {
+        // Automatically fetch and display sales data for today's date
+        displayCategoryWiseSales(today, today);
+    } else {
+        // Populate the date inputs with stored dates
         document.getElementById("categoryStartDate").value = storedStartDate;
         document.getElementById("categoryEndDate").value = storedEndDate;
 
@@ -44,11 +55,11 @@ function loadCategoryWiseSales(mainContent, billPanel) {
     document.querySelector(".showCategorySalesButton").addEventListener("click", () => {
         const startDate = document.getElementById("categoryStartDate").value;
         const endDate = document.getElementById("categoryEndDate").value;
-    
+
         // Store the selected dates in sessionStorage
         sessionStorage.setItem("categoryWiseSalesStartDate", startDate);
         sessionStorage.setItem("categoryWiseSalesEndDate", endDate);
-    
+
         // Call a function to display sales data based on selected dates
         displayCategoryWiseSales(startDate, endDate);
     });
