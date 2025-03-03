@@ -133,9 +133,12 @@ async function displaySalesOverview(startDate, endDate) {
         }
 
         salesData.forEach((data) => {
+            // Format the date in "Day-Month-Year" format
+            const formattedDate = formatDate(data.date);
+
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${data.date}</td>
+                <td>${formattedDate}</td>
                 <td>${data.totalSales}</td>
                 <td>₹${data.totalRevenue.toFixed(2)}</td>
             `;
@@ -145,6 +148,15 @@ async function displaySalesOverview(startDate, endDate) {
         console.error("Error fetching sales overview data:", error);
         alert("An error occurred while fetching sales data.");
     }
+}
+
+// Function to format date in "Day-Month-Year" format
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
 }
 
 // Export the loadSalesOverview function

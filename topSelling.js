@@ -90,9 +90,12 @@ ipcRenderer.on("top-selling-items-response", (event, data) => {
     `;
 
     data.items.forEach(item => {
+        // Format the date in "Day-Month-Year" format
+        const formattedDate = formatDate(item.date);
+
         tableHTML += `
             <tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">${item.date}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${formattedDate}</td>
                 <td style="border: 1px solid #ddd; padding: 8px;">${item.most_sold_item || "No items sold"}</td>
             </tr>
         `;
@@ -127,6 +130,15 @@ function sortTopSellingTable(column) {
     // Update the sort indicator
     const sortIndicator = document.getElementById("dateSortIndicator");
     sortIndicator.innerText = currentSortOrder === 'asc' ? '▲' : '▼'; // Update the arrow
+}
+
+// Function to format date in "Day-Month-Year" format
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
 }
 
 // Export the loadTopSellingItems function
