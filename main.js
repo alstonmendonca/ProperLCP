@@ -382,6 +382,40 @@ ipcMain.on("get-category-wise-sales-categories", (event) => {
         event.reply("category-wise-sales-categories-response", { success: true, categories: rows });
     });
 });
+
+// Function to fetch category-wise sales and revenue
+ipcMain.handle('get-category-wise-sales-data', (event, startDate, endDate) => {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT 
+                Category.catid,
+                Category.catname,
+                COUNT(Orders.billno) AS totalSales,
+                SUM(Orders.price) AS totalRevenue
+            FROM 
+                Orders
+            INNER JOIN 
+                OrderDetails ON Orders.billno = OrderDetails.orderid
+            INNER JOIN 
+                FoodItem ON OrderDetails.foodid = FoodItem.fid
+            INNER JOIN 
+                Category ON FoodItem.category = Category.catid
+            WHERE 
+                Orders.date BETWEEN ? AND ?
+            GROUP BY 
+                Category.catid
+        `;
+
+        db.all(query, [startDate, endDate], (err, rows) => {
+            if (err) {
+                console.error("Error fetching category-wise sales data:", err);
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
