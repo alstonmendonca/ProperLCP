@@ -42,36 +42,65 @@ body {
 
 /* Top Horizontal Panel */
 #top-panel {
+    display: flex;
+    justify-content: space-evenly; /* Space buttons evenly */
+    align-items: center;
+    height: 50px;
+    background-color: #051524;
+    border-bottom: 2px solid #ffffff20; /* Light transparent border */
+}
+
+/* Button Styles */
+/* Top Horizontal Panel */
+#top-panel {
     color: white;
     display: flex;
     justify-content: space-evenly; /* Space buttons evenly */
     align-items: stretch;
     height: 50px; /* Adjust the height of the panel */
     border-bottom: 2px solid #051524;
-    
 }
 
+/* Button Styling */
 .top {
     flex: 1;
-    padding: 0px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Space between icon and text */
+    padding: 8px;
+    width: 100%;
     color: white;
     border-right: 1px solid #ffffff; /* Thin border for separation */
     cursor: pointer;
     text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Add transition for hover effects */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
     border-radius: 0px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
 }
 
+/* Button Hover and Active Effects */
 .top:hover {
-    background-color: #555; /* Change background on hover */
-    transform: translateY(-2px); /* Slightly lift the button on hover */
+    background-color: #555;
+    transform: translateY(-2px);
 }
 
 .top:active {
-    background-color: #666; /* Darker background on click */
-    transform: translateY(0); /* Reset lift effect */
+    background-color: #666;
+    transform: translateY(0);
 }
+
+/* SVG Icon Styling */
+.top svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.8;
+}
+
 
 /* Container for left and main panels */
 #content {
@@ -288,8 +317,11 @@ body {
     flex: 1; /* Make all buttons take equal width */
     padding: 10px; /* Ensure good spacing inside buttons */
     text-align: center; /* Align text properly */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
 }
-
 
 
 

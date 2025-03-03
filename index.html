@@ -9,13 +9,61 @@
 <body>
   <!-- Top Horizontal Panel -->
   <div id="top-panel">
-    <button class="top" id="Home" onclick="updateMainContent('Home')">Home</button>
-    <button class="top" id="Menu" onclick="updateMainContent('Menu')">Menu</button>
-    <button class="top" id="Analytics" onclick="updateMainContent('Analytics')">Analytics</button>
-    <button class="top" id="Categories" onclick="updateMainContent('Categories')">Categories</button>
-    <button class="top" id="History" onclick="updateMainContent('History')">History</button>
-    <button class="top" id="Settings" onclick="updateMainContent('Settings')">Settings</button>
-  </div>
+    <button class="top" id="Home" onclick="updateMainContent('Home')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+            <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </svg>
+        Home
+    </button>
+    <button class="top" id="Menu" onclick="updateMainContent('Menu')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+        </svg>
+        Menu
+    </button>
+    <button class="top" id="Analytics" onclick="updateMainContent('Analytics')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/><path d="M7 14l3-3 2 2 3-3 4 4"/>
+        </svg>
+        Analytics
+    </button>
+    <button class="top" id="Categories" onclick="updateMainContent('Categories')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 4h18M3 12h18M3 20h18"/>
+        </svg>
+        Categories
+    </button>
+    <button class="top" id="History" onclick="updateMainContent('History')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M12 7v5l4 2"/>
+        </svg>
+        History
+    </button>
+    <button class="top" id="Settings" onclick="updateMainContent('Settings')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+            stroke-linejoin="round" class="lucide lucide-settings">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+        </svg>
+        Settings
+    </button>
+</div>
+
+
 
   <!-- Main Content -->
   <div id="content">
@@ -37,15 +85,33 @@
   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
     <h3 style="margin: 0;">Bill</h3>
     <div id='upperbuttons' style="display: flex; gap: 10px;">
-        <button onclick="NewOrder()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <button onclick="NewOrder()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
+                <line x1="12" x2="12" y1="8" y2="16"/>
+                <line x1="8" x2="16" y1="12" y2="12"/>
+            </svg>
             New Order
         </button>
-        <button id='heldorders' onclick="displayHeld()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <button id='heldorders' onclick="displayHeld()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="10" x2="10" y1="15" y2="9"/>
+                <line x1="14" x2="14" y1="15" y2="9"/>
+            </svg>
             Held Orders
         </button>
-        <button id="applydiscountbutton" onclick="toggleDiscountPopup()">Apply Discount</button>
+        <button id="applydiscountbutton" onclick="toggleDiscountPopup()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" x2="5" y1="5" y2="19"/>
+                <circle cx="6.5" cy="6.5" r="2.5"/>
+                <circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
+            Apply Discount
+        </button>
     </div>
-</div>
+  </div>
+
 
 
   <div id="bill-items-list">
@@ -60,14 +126,46 @@
 
 
   <!-- Buttons Section - HOLD AND SAVE AND PRINT AND APPLY DISCOUNT -->
-  <div id="bill-buttons" style="margin-top: 15px;">
-      <button id='saveandprintbutton' onclick="saveAndPrintBill()">Save and Print</button>
-      <button id='savebutton' onclick="saveAndPrintBill()">Save</button>
-      <button id='holdbutton' onclick="holdBill()">Hold</button>
-      <button id='saveToOrder' onclick="displayTodaysOrders()">Save To Order</button>
-  </div>
-</div>
+<!-- Buttons Section - HOLD AND SAVE AND PRINT AND APPLY DISCOUNT -->
+<div id="bill-buttons">
+  <button id='saveandprintbutton' onclick="saveAndPrintBill()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/>
+          <rect x="6" y="14" width="12" height="8" rx="1"/>
+      </svg>
+      Save and Print
+  </button>
 
+  <button id='savebutton' onclick="saveAndPrintBill()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="13" height="7" x="8" y="3" rx="1"/>
+          <path d="m2 9 3 3-3 3"/>
+          <rect width="13" height="7" x="8" y="14" rx="1"/>
+      </svg>
+      Save
+  </button>
+
+  <button id='holdbutton' onclick="holdBill()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="14" y="4" width="4" height="16" rx="1"/>
+          <rect x="6" y="4" width="4" height="16" rx="1"/>
+      </svg>
+      Hold
+  </button>
+
+  <button id='saveToOrder' onclick="displayTodaysOrders()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 12H3"/>
+          <path d="M16 6H3"/>
+          <path d="M16 18H3"/>
+          <path d="M18 9v6"/>
+          <path d="M21 12h-6"/>
+      </svg>
+      Save To Order
+  </button>
+</div>
+</div>
 
   <script src="renderer.js"></script>
   <script src="table.js"></script>
