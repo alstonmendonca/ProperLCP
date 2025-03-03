@@ -27,11 +27,28 @@ function loadCategoryWiseSales(mainContent, billPanel) {
     // Fetch categories from the database
     fetchCategoryWiseSalesCategories();
 
+    // Retrieve stored dates from sessionStorage
+    const storedStartDate = sessionStorage.getItem("categoryWiseSalesStartDate");
+    const storedEndDate = sessionStorage.getItem("categoryWiseSalesEndDate");
+
+    // Populate the date inputs with stored dates
+    if (storedStartDate && storedEndDate) {
+        document.getElementById("categoryStartDate").value = storedStartDate;
+        document.getElementById("categoryEndDate").value = storedEndDate;
+
+        // Automatically fetch and display sales data based on stored dates
+        displayCategoryWiseSales(storedStartDate, storedEndDate);
+    }
+
     // Initialize the event listener for the button
     document.querySelector(".showCategorySalesButton").addEventListener("click", () => {
         const startDate = document.getElementById("categoryStartDate").value;
         const endDate = document.getElementById("categoryEndDate").value;
-
+    
+        // Store the selected dates in sessionStorage
+        sessionStorage.setItem("categoryWiseSalesStartDate", startDate);
+        sessionStorage.setItem("categoryWiseSalesEndDate", endDate);
+    
         // Call a function to display sales data based on selected dates
         displayCategoryWiseSales(startDate, endDate);
     });
