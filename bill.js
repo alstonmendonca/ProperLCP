@@ -281,7 +281,7 @@ function holdBill() {
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
-        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
 
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
@@ -381,7 +381,7 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
         });
 
         popupContent += `
-            <div style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
+            <div data-heldid="${order.heldid}" style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
                 <div style="border-bottom: 2px solid #333; padding-bottom: 5px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
                     <span>HELD ID: ${order.heldid}</span>
                 </div>
@@ -411,11 +411,6 @@ function addHeldToBill(heldId) {
     ipcRenderer.send('get-held-order-details', heldId);
 }
 
-function deleteHeldOrder(heldId) {
-    // Logic for deleting a held order
-    ipcRenderer.send('delete-held-order', heldId);
-}
-
 
 ipcRenderer.on('held-order-details-data', (event, foodDetails, heldId) => {
     foodDetails.forEach(item => {
@@ -437,11 +432,12 @@ function deleteHeldOrder(heldId) {
 
 // Handle held order deletion
 ipcRenderer.on('held-order-deleted', (event, heldId) => {
-    let row = document.querySelector(`tr[data-heldid="${heldId}"]`);
-    if (row) {
-        row.remove(); // Remove row from UI
+    let orderCard = document.querySelector(`#heldpopup div[data-heldid="${heldId}"]`);
+    if (orderCard) {
+        orderCard.remove(); // Remove the order card from the UI
     }
 });
+
 
 function closeHeldPopup() {
     let popup = document.getElementById("heldpopup");
@@ -497,7 +493,7 @@ function displayTodaysOrders() {
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
-        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
 
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
@@ -605,7 +601,7 @@ function addToExistingOrder(orderId) {
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
-        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
 
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
