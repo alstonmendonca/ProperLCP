@@ -561,7 +561,7 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
             let itemsGrid = "";
 
             itemsArray.forEach(item => {
-                itemsGrid += `<div style="padding: 3px; border: 1px solid #ddd; font-size: 12px; text-align: center; flex-grow: 1; flex-basis: 48%; height: 40px; display: flex; justify-content: center; align-items: center;">${item}</div>`;
+                itemsGrid += `<div style="padding: 3px; border: 1px solid #ddd; font-size: 12px; text-align: center; flex-grow: 1; flex-basis: 48%; height: 40px; display: flex; justify-content: center; align-items: center; background: #f1f1f1;">${item}</div>`;
             });
 
             popupContent += `
@@ -580,7 +580,7 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
                         </div>
                     </div>
                     <div style="border-top: 2px solid #333; padding-top: 5px; text-align: right;">
-                        <button onclick="addToExistingOrder(${order.billno})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:100%; height:30px">
+                        <button onclick="addToExistingOrder(${order.billno})" style="background-color: #1db954; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:100%; height:30px">
                             Add to Order
                         </button>
                     </div>
