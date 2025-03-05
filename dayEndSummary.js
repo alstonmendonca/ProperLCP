@@ -31,10 +31,10 @@ async function loadDayEndSummary(mainContent, billPanel) {
                 <div class="summary-info" id="salesCount">0</div> <!-- Placeholder for info -->
             </div>
         </div>
-        <div class="summary-div" id="yesterdayComparison" onclick="handleSummaryClick('YesterdayComparison')">
-            <h3>Compared To Yesterday</h3>
+        <div class="summary-div" id="yesterdaysRevenue" onclick="handleSummaryClick('YesterdaysRevenue')">
+            <h3>Yesterday's Revenue</h3>
             <div class="summary-info-container">
-                <div class="summary-info">0</div> <!-- Placeholder for info -->
+                <div class="summary-info" id="yesterdaysRevenueAmount">₹0.00</div> <!-- Placeholder for info -->
             </div>
         </div>
         <div class="summary-div" id="totalTax" onclick="handleSummaryClick('TotalTax')">
@@ -107,20 +107,13 @@ async function loadDayEndSummary(mainContent, billPanel) {
 
     // Fetch yesterday's revenue
     const yesterdaysRevenue = await fetchYesterdaysRevenue();
-    const revenueComparison = totalRevenue - yesterdaysRevenue;
 
-    // Adjust the comparison text to place the minus sign before the rupee symbol
-    const comparisonText = revenueComparison > 0 
-        ? `+₹${revenueComparison.toFixed(2)}` 
-        : revenueComparison < 0 
-        ? `-₹${Math.abs(revenueComparison).toFixed(2)}` // Use Math.abs to show the positive value
-        : '₹0.00'; // Display zero with the rupee symbol
+    // Update the yesterday's revenue display
+    const yesterdaysRevenueElement = document.getElementById('yesterdaysRevenueAmount');
+    yesterdaysRevenueElement.innerText = `₹${yesterdaysRevenue.toFixed(2)}`; // Format the revenue
+    yesterdaysRevenueElement.style.fontSize = '22px'; // Increase font size
+    yesterdaysRevenueElement.style.fontWeight = 'bold'; // Make the text bold
 
-    const comparisonElement = document.getElementById('yesterdayComparison').children[1];
-    comparisonElement.innerText = comparisonText; // Update the comparison display
-    comparisonElement.style.fontSize = '22px'; // Increase font size
-    comparisonElement.style.fontWeight = 'bold'; // Make the text bold
-    comparisonElement.style.color = revenueComparison > 0 ? 'green' : revenueComparison < 0 ? 'red' : 'black'; // Update the comparison color
 
     // Fetch today's most sold items
     const mostSoldItems = await fetchMostSoldItemsToday();

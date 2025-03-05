@@ -27,10 +27,38 @@ function loadCategoryWiseSales(mainContent, billPanel) {
     // Fetch categories from the database
     fetchCategoryWiseSalesCategories();
 
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
+
+    // Set default dates to today's date
+    document.getElementById("categoryStartDate").value = today;
+    document.getElementById("categoryEndDate").value = today;
+
+    // Retrieve stored dates from sessionStorage
+    const storedStartDate = sessionStorage.getItem("categoryWiseSalesStartDate");
+    const storedEndDate = sessionStorage.getItem("categoryWiseSalesEndDate");
+
+    // If no dates are stored in sessionStorage, use today's date
+    if (!storedStartDate || !storedEndDate) {
+        // Automatically fetch and display sales data for today's date
+        displayCategoryWiseSales(today, today);
+    } else {
+        // Populate the date inputs with stored dates
+        document.getElementById("categoryStartDate").value = storedStartDate;
+        document.getElementById("categoryEndDate").value = storedEndDate;
+
+        // Automatically fetch and display sales data based on stored dates
+        displayCategoryWiseSales(storedStartDate, storedEndDate);
+    }
+
     // Initialize the event listener for the button
     document.querySelector(".showCategorySalesButton").addEventListener("click", () => {
         const startDate = document.getElementById("categoryStartDate").value;
         const endDate = document.getElementById("categoryEndDate").value;
+
+        // Store the selected dates in sessionStorage
+        sessionStorage.setItem("categoryWiseSalesStartDate", startDate);
+        sessionStorage.setItem("categoryWiseSalesEndDate", endDate);
 
         // Call a function to display sales data based on selected dates
         displayCategoryWiseSales(startDate, endDate);
@@ -65,10 +93,40 @@ ipcRenderer.on("category-wise-sales-categories-response", (event, data) => {
 });
 
 // Function to display category sales based on selected dates
-function displayCategoryWiseSales(startDate, endDate) {
-    // Here you would typically send a request to the main process to get the sales data
-    // For now, we will just log the dates
-    console.log("Fetching sales data from", startDate, "to", endDate);
+async function displayCategoryWiseSales(startDate, endDate) {
+    if (!startDate || !endDate) {
+        alert("Please select both start and end dates.");
+        return;
+    }
+
+    try {
+        // Fetch category-wise sales data from the main process
+        const salesData = await ipcRenderer.invoke('get-category-wise-sales-data', startDate, endDate);
+
+        // Update the category boxes with the fetched data
+        const categoryBoxesDiv = document.getElementById("categoryBoxesDiv");
+        const categoryBoxes = categoryBoxesDiv.querySelectorAll(".category-wise-sales-box");
+
+        categoryBoxes.forEach((box) => {
+            const categoryName = box.querySelector("h3").innerText;
+            const totalSalesElement = box.querySelector(".total-sales");
+            const revenueElement = box.querySelector(".revenue");
+
+            // Find the matching category in the fetched data
+            const categoryData = salesData.find((data) => data.catname === categoryName);
+
+            if (categoryData) {
+                totalSalesElement.innerText = categoryData.totalSales;
+                revenueElement.innerText = `₹${categoryData.totalRevenue.toFixed(2)}`;
+            } else {
+                totalSalesElement.innerText = "0";
+                revenueElement.innerText = "₹0.00";
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching category-wise sales data:", error);
+        alert("An error occurred while fetching sales data.");
+    }
 }
 
 // Export the loadCategoryWiseSales function
