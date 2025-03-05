@@ -387,14 +387,16 @@ async function updateMainContent(contentType) {
             }
         }
          else if (contentType === "deletedOrders") {
+            const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
             mainContent.innerHTML = `
                 <h1>Deleted Orders</h1>
                 <div class="date-filters">
                     <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate">
+                    <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
                     
                     <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate">
+                    <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
                     
                     <button class="showHistoryButton" id="fetchDeletedOrdersBtn">Show Deleted Orders</button>
                     <button id="exportExcelButton">Export to Excel</button>
@@ -402,17 +404,17 @@ async function updateMainContent(contentType) {
                 </div>
                 <div id="deletedOrdersDiv"></div>
             `;
-
+        
             // Restore last selected start date and end date
             const savedStartDate = sessionStorage.getItem("deletedOrdersStartDate");
             const savedEndDate = sessionStorage.getItem("deletedOrdersEndDate");
-
+        
             if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
             if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
-
+        
             // Attach event listener to the button
             document.getElementById("fetchDeletedOrdersBtn").addEventListener("click", fetchDeletedOrders);
-
+        
             // Attach event listener for Clear History button
             document.getElementById("deletedClearHistory").addEventListener("click", async () => {
                 showConfirmPopup("Are you sure you want to permanently remove all deleted Orders? This cannot be undone.", async () => {
@@ -420,10 +422,12 @@ async function updateMainContent(contentType) {
                     fetchDeletedOrders(); // Refresh the deleted orders after clearing
                 });
             });
-
-            // Fetch deleted orders initially based on stored dates
-            if (savedStartDate && savedEndDate) {
-                fetchDeletedOrders();
+        
+            // Automatically fetch deleted orders using today's date if no saved dates
+            if (!savedStartDate && !savedEndDate) {
+                fetchDeletedOrders(); // Fetch using today's date
+            } else if (savedStartDate && savedEndDate) {
+                fetchDeletedOrders(); // Fetch using saved dates
             }
         }
         else if (contentType === 'discountedOrders') {
