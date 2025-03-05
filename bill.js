@@ -301,6 +301,21 @@ function holdBill() {
 }
 // Function to toggle the visibility of the discount inputs and apply button
 function toggleDiscountPopup() {
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
     let existingPopup = document.getElementById("discount-popup");
     if (existingPopup) {
         existingPopup.remove();
@@ -312,21 +327,18 @@ function toggleDiscountPopup() {
     popup.classList.add("edit-popup");
 
     popup.innerHTML = `
-        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
-            <h3>Apply Discount</h3>
+        <div class="popup-content" style="display: flex; flex-direction: column; max-width: 100%; width: 300px; pointer-events: auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.5em; margin-bottom: 16px; color: #333; text-align: center;">Apply Discount</h3>
             
-            <label for="discount-percentage">Discount Percentage:</label>
-            <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" style="width: 75%;">
-
-            <label for="discount-amount">Fixed Discount (Rs.):</label>
-            <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" style="width: 75%;">
-
-            <br>
-
-            <div class="popup-buttons">
-                <button id="apply-discount-btn" style="margin-right: 10px; width: 90px; height: 40px;">Apply</button>
-                <button id="closePopup" style="width: 90px; height: 40px;">Cancel</button>
-
+            <label for="discount-percentage" style="margin-bottom: 8px; font-weight: bold; color: #555;">Discount Percentage:</label>
+            <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
+        
+            <label for="discount-amount" style="margin-bottom: 8px; font-weight: bold; color: #555;">Fixed Discount (Rs.):</label>
+            <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
+        
+            <div class="popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
+                <button id="apply-discount-btn" type="button" style="width: 90px; height: 40px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Apply</button>
+                <button id="closePopup" type="button" style="width: 90px; height: 40px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Cancel</button>
             </div>
         </div>
     `;
