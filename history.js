@@ -15,7 +15,7 @@ function fetchOrderHistory(startDate = null, endDate = null) {
         return;
     }
 
-    // ✅ Store dates in sessionStorage
+    // Store dates in sessionStorage
     sessionStorage.setItem("orderHistoryStartDate", startDate);
     sessionStorage.setItem("orderHistoryEndDate", endDate);
 

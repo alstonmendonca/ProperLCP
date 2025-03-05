@@ -5,8 +5,8 @@ const { deleteOrder } = require("./deleteOrder");
 
 function fetchCategoryWise(startDate = null, endDate = null, category = null) {
     // Use function parameters if available; otherwise, get values from inputs
-    if (!startDate) startDate = document.getElementById("startDate").value;
-    if (!endDate) endDate = document.getElementById("endDate").value;
+    if (!startDate) startDate = document.getElementById("categoryStartDate").value;
+    if (!endDate) endDate = document.getElementById("categoryEndDate").value;
     if (!category) category = document.getElementById("categoryDropdown").value;
 
     if (!startDate || !endDate) {
@@ -19,12 +19,12 @@ function fetchCategoryWise(startDate = null, endDate = null, category = null) {
         return;
     }
 
-    // ✅ Store selected filters in sessionStorage
+    // Store selected filters in sessionStorage
     sessionStorage.setItem("categoryWiseStartDate", startDate);
     sessionStorage.setItem("categoryWiseEndDate", endDate);
     sessionStorage.setItem("categoryWiseCategory", category);
 
-    // ✅ Send request to fetch fresh category-wise sales data
+    // Send request to fetch fresh category-wise sales data
     ipcRenderer.send("get-category-wise", { startDate, endDate, category });
 }
 

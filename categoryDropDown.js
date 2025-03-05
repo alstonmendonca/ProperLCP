@@ -16,6 +16,11 @@ ipcRenderer.on("categories-response", (event, data) => {
         option.textContent = category.catname;
         categoryDropdown.appendChild(option);
     });
+
+    // Set the first category as the default selected value
+    if (data.categories.length > 0) {
+        categoryDropdown.value = data.categories[0].catid; // Set the first category as default
+    }
 });
 
 // Export function so it can be used in renderer.js

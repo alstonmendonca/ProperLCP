@@ -314,44 +314,48 @@ async function updateMainContent(contentType) {
         } 
         else if (contentType === 'orderHistory') {
             
+            const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
             mainContent.innerHTML = `
                 <h1>Order History</h1>
                 <div class="date-filters">
                     <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate">
+                    <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
                     
                     <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate">
+                    <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
                     
-                    <button class="showHistoryButton" onclick="fetchOrderHistory()" >Show History</button>
+                    <button class="showHistoryButton" onclick="fetchOrderHistory()">Show History</button>
                     <button id="exportExcelButton">Export to Excel</button>
                 </div>
                 <div id="orderHistoryDiv"></div>
             `;
 
-            //Session Storage code to store the start and end date
+            // Session Storage code to store the start and end date
             const savedStartDate = sessionStorage.getItem("orderHistoryStartDate");
             const savedEndDate = sessionStorage.getItem("orderHistoryEndDate");
 
             if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
             if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
 
-            // ✅ Automatically fetch order history using stored dates
-            if (savedStartDate && savedEndDate) {
+            // Automatically fetch order history using today's date if no saved dates
+            if (!savedStartDate && !savedEndDate) {
+                fetchOrderHistory(today, today); // Fetch using today's date
+            } else if (savedStartDate && savedEndDate) {
                 fetchOrderHistory(savedStartDate, savedEndDate);
             }
-
-            fetchOrderHistory(orders); // Call function to display the stored table
             
         } else if (contentType === 'categoryHistory') {
+            const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
             mainContent.innerHTML = `
-                <h1>Category-wise Sales</h1>
+                <h1>Category Wise Sales</h1>
                 <div class="date-filters">
-                    <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate">
+                    <label for="categoryStartDate">Start Date:</label>
+                    <input type="date" id="categoryStartDate" value="${today}"> <!-- Set default to today's date -->
                     
-                    <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate">
+                    <label for="categoryEndDate">End Date:</label>
+                    <input type="date" id="categoryEndDate" value="${today}"> <!-- Set default to today's date -->
                     
                     <select id="categoryDropdown"></select>
                     <button class="showHistoryButton" onclick="fetchCategoryWise()">Show History</button>
@@ -359,20 +363,26 @@ async function updateMainContent(contentType) {
                 </div>
                 <div id="categoryWiseDiv"></div>
             `;
-        
-            fetchCategories(); // Fetch categories and populate the dropdown
 
-            // ✅ Restore last selected start date, end date, and category
+            // Fetch categories and populate the dropdown
+            fetchCategories(); // This will populate the dropdown and set the default value
+
+            // Session Storage code to store the start and end date
             const savedStartDate = sessionStorage.getItem("categoryWiseStartDate");
             const savedEndDate = sessionStorage.getItem("categoryWiseEndDate");
             const savedCategory = sessionStorage.getItem("categoryWiseCategory");
 
-            if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
-            if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
+            if (savedStartDate) document.getElementById("categoryStartDate").value = savedStartDate;
+            if (savedEndDate) document.getElementById("categoryEndDate").value = savedEndDate;
             if (savedCategory) document.getElementById("categoryDropdown").value = savedCategory;
 
-            // ✅ Automatically fetch category-wise sales using stored dates and category
-            if (savedStartDate && savedEndDate && savedCategory) {
+            // Automatically fetch category-wise sales using today's date if no saved dates
+            if (!savedStartDate && !savedEndDate) {
+                // Wait for categories to be populated before fetching
+                ipcRenderer.once("categories-response", () => {
+                    fetchCategoryWise(today, today, document.getElementById("categoryDropdown").value); // Fetch using today's date
+                });
+            } else if (savedStartDate && savedEndDate && savedCategory) {
                 fetchCategoryWise(savedStartDate, savedEndDate, savedCategory);
             }
         }
