@@ -1305,6 +1305,39 @@ ipcMain.on("get-food-items-for-item-history", (event, { categoryId }) => {
         event.reply("food-items-response-for-item-history", { success: true, foodItems: rows });
     });
 });
+
+// Item History
+ipcMain.on("get-item-history", (event, { startDate, endDate, foodItem }) => {
+    const query = `
+        SELECT 
+            Orders.billno, 
+            Orders.date, 
+            User.uname AS cashier_name,  -- Corrected column name
+            Orders.kot, 
+            Orders.price, 
+            Orders.sgst,
+            Orders.cgst,
+            Orders.tax,
+            GROUP_CONCAT(FoodItem.fname || ' (x' || OrderDetails.quantity || ')', ', ') AS food_items
+        FROM Orders
+        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        JOIN User ON Orders.cashier = User.userid  -- Correct join condition
+        WHERE FoodItem.fid = ? AND date(Orders.date) BETWEEN date(?) AND date(?)
+        GROUP BY Orders.billno
+        ORDER BY Orders.date DESC;
+    `;
+
+    db.all(query, [foodItem, startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error("Error fetching item history:", err);
+            event.reply("item-history-response", { success: false, orders: [] });
+            return;
+        }
+        event.reply("item-history-response", { success: true, orders: rows });
+    });
+});
+
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

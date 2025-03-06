@@ -1,51 +1,64 @@
 const { ipcRenderer } = require("electron");
 
+let currentSortByItemHistory = null;
+let currentSortOrderItemHistory = "asc";
+
 function fetchItemHistory(startDate = null, endDate = null, foodItem = null) {
-    // Use function parameters if available; otherwise, get values from inputs
     if (!startDate) startDate = document.getElementById("itemStartDate").value;
     if (!endDate) endDate = document.getElementById("itemEndDate").value;
     if (!foodItem) foodItem = document.getElementById("foodItemDropdown").value;
 
     if (!startDate || !endDate) {
-        showPopupMessage("Please select both start and end dates."); // Custom popup message
+        showPopupMessage("Please select both start and end dates.");
         return;
     }
 
     if (!foodItem) {
-        showPopupMessage("Please select a food item."); // Custom popup message
+        showPopupMessage("Please select a food item.");
         return;
     }
 
-    // Store selected filters in sessionStorage
     sessionStorage.setItem("itemHistoryStartDate", startDate);
     sessionStorage.setItem("itemHistoryEndDate", endDate);
-    sessionStorage.setItem("itemHistoryCategory", foodItem);
+    sessionStorage.setItem("itemHistoryFood", foodItem);
 
-    // Send request to fetch item history data
     ipcRenderer.send("get-item-history", { startDate, endDate, foodItem });
 }
 
-// Function to display item history table
+ipcRenderer.on("item-history-response", (event, data) => {
+    displayItemHistory(data.orders);
+});
+
 function displayItemHistory(orders) {
     const itemHistoryDiv = document.getElementById("itemHistoryDiv");
-    itemHistoryDiv.innerHTML = ""; // Clear previous content
+    itemHistoryDiv.innerHTML = "";
 
     if (orders.length === 0) {
-        itemHistoryDiv.innerHTML = "<p>No item history found for the selected criteria.</p>";
+        itemHistoryDiv.innerHTML = `
+            <div style="text-align: center; font-family: Arial, sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin: 0;">
+                <div>
+                    <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
+                        No Orders Found!
+                    </div>
+                </div>
+            </div>
+        `;
         return;
     }
 
-    // Create a table
     let tableHTML = `
         <table class="order-history-table">
             <thead>
                 <tr>
-                    <th>Bill No</th>
-                    <th class="date-column">Date</th>
-                    <th>Cashier</th>
-                    <th>KOT</th>
-                    <th>Price (₹)</th>
-                    <th>Food Item</th>
+                    <th class="sortable" onclick="sortItemHistoryTable('billno')">Bill No ${getSortIndicatorItemHistory('billno')}</th>
+                    <th class="date-column sortable" onclick="sortItemHistoryTable('date')">Date ${getSortIndicatorItemHistory('date')}</th>
+                    <th class="sortable" onclick="sortItemHistoryTable('cashier_name')">Cashier ${getSortIndicatorItemHistory('cashier_name')}</th>
+                    <th class="sortable" onclick="sortItemHistoryTable('kot')">KOT ${getSortIndicatorItemHistory('kot')}</th>
+                    <th class="sortable" onclick="sortItemHistoryTable('price')">Price (₹) ${getSortIndicatorItemHistory('price')}</th>
+                    <th class="sortable" onclick="sortItemHistoryTable('sgst')">SGST (₹) ${getSortIndicatorItemHistory('sgst')}</th>
+                    <th class="sortable" onclick="sortItemHistoryTable('cgst')">CGST (₹) ${getSortIndicatorItemHistory('cgst')}</th>
+                    <th class="sortable" onclick="sortItemHistoryTable('tax')">Tax (₹) ${getSortIndicatorItemHistory('tax')}</th>
+                    <th>Food Items</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,10 +69,13 @@ function displayItemHistory(orders) {
             <tr>
                 <td>${order.billno}</td>
                 <td class="date-column">${order.date}</td>
-                <td>${order.cashier_name}</td>
+                <td>${order.cashier_name || "N/A"}</td>
                 <td>${order.kot}</td>
                 <td>${order.price.toFixed(2)}</td>
-                <td>${order.food_item}</td>
+                <td>${order.sgst.toFixed(2)}</td>
+                <td>${order.cgst.toFixed(2)}</td>
+                <td>${order.tax.toFixed(2)}</td>
+                <td>${order.food_items || "No items"}</td>
             </tr>
         `;
     });
@@ -68,16 +84,21 @@ function displayItemHistory(orders) {
     itemHistoryDiv.innerHTML = tableHTML;
 }
 
-// ✅ Store item history data and display it
-ipcRenderer.on("item-history-response", (event, data) => {
-    displayItemHistory(data.orders);
-});
-
-// Function to show a custom popup message
-function showPopupMessage(message) {
-    // Implement your custom popup message logic here
-    alert(message); // Replace with your custom popup implementation
+function sortItemHistoryTable(column) {
+    if (currentSortByItemHistory === column) {
+        currentSortOrderItemHistory = currentSortOrderItemHistory === "asc" ? "desc" : "asc";
+    } else {
+        currentSortByItemHistory = column;
+        currentSortOrderItemHistory = "asc";
+    }
+    fetchItemHistory();
 }
 
-// Export functions
-module.exports = { fetchItemHistory, displayItemHistory };
+function getSortIndicatorItemHistory(column) {
+    if (currentSortByItemHistory === column) {
+        return currentSortOrderItemHistory === "asc" ? "▲" : "▼";
+    }
+    return "";
+}
+
+module.exports = { fetchItemHistory, displayItemHistory, sortItemHistoryTable };

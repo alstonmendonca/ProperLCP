@@ -40,6 +40,7 @@ const {loadCategoryWiseSales} = require("./categoryWiseSales");
 const {fetchFoodItems} = require("./itemDropDown");
 const {fetchItemHistory} = require("./itemHistory");
 const {displayItemHistory} = require("./itemHistory");
+const {sortItemHistoryTable} = require("./itemHistory")
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
@@ -78,6 +79,7 @@ window.loadCategoryWiseSales = loadCategoryWiseSales;
 window.fetchFoodItems = fetchFoodItems;
 window.fetchItemHistory = fetchItemHistory;
 window.displayItemHistory = displayItemHistory;
+window.sortItemHistoryTable = sortItemHistoryTable;
 //window.initializeTopSellingSection = initializeTopSellingSection;
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {

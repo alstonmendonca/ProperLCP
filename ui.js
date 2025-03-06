@@ -527,8 +527,10 @@ async function updateMainContent(contentType) {
         
             // Attach event listener to the Show History button
             document.getElementById("fetchItemHistoryBtn").addEventListener("click", function() {
+                const startDate = document.getElementById("itemStartDate").value;
+                const endDate = document.getElementById("itemEndDate").value;
                 const foodItem = document.getElementById("foodItemDropdown").value;
-                fetchItemHistory(today, today, foodItem); // Fetch item history using today's date
+                fetchItemHistory(startDate, endDate, foodItem);
             });
         }
         else if(contentType === "dayWise"){
