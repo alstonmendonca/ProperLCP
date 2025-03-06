@@ -15,7 +15,7 @@ function fetchOrderHistory(startDate = null, endDate = null) {
         return;
     }
 
-    // ✅ Store dates in sessionStorage
+    // Store dates in sessionStorage
     sessionStorage.setItem("orderHistoryStartDate", startDate);
     sessionStorage.setItem("orderHistoryEndDate", endDate);
 
@@ -28,7 +28,18 @@ ipcRenderer.on("order-history-response", (event, data) => {
     orderHistoryDiv.innerHTML = "";
 
     if (orders.length === 0) {
-        orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
+        orderHistoryDiv.innerHTML = `
+            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin: 0;">
+                <div>
+                    <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
+                        No Orders Found!
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('goHomeButton').addEventListener('click', function () {
+            document.getElementById('Home').click();
+        });
         return;
     }
 

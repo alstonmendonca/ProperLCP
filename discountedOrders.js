@@ -12,7 +12,19 @@ ipcRenderer.on("discounted-orders-response", (event, data) => {
     discountedOrdersDiv.innerHTML = ""; // Clear previous content
 
     if (orders.length === 0) {
-        discountedOrdersDiv.innerHTML = "<p>No discounted orders found.</p>";
+        discountedOrdersDiv.innerHTML = `
+            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color:rgb(232, 232, 232); color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin: 0;">
+                <div>
+                    <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
+                        No Orders Found!
+                    </div>
+                    <img src="sadErrorFace.png" alt="No Customers Found" class="no-customers-img">                        
+                </div>
+            </div>
+        `;
+        document.getElementById('goHomeButton').addEventListener('click', function () {
+            document.getElementById('Home').click();
+        });
         return;
     }
 

@@ -28,7 +28,7 @@ function displayCustomers(customers) {
     if (customers.length === 0) {
         customersDiv.innerHTML = `
             <div class="no-customers">
-                <img src="noCustomers.png" alt="No Customers Found" class="no-customers-img">
+                <img src="sadErrorFace.png" alt="No Customers Found" class="no-customers-img">
                 <p>No customers found.</p>
             </div>
         `;

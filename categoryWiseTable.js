@@ -5,8 +5,8 @@ const { deleteOrder } = require("./deleteOrder");
 
 function fetchCategoryWise(startDate = null, endDate = null, category = null) {
     // Use function parameters if available; otherwise, get values from inputs
-    if (!startDate) startDate = document.getElementById("startDate").value;
-    if (!endDate) endDate = document.getElementById("endDate").value;
+    if (!startDate) startDate = document.getElementById("categoryStartDate").value;
+    if (!endDate) endDate = document.getElementById("categoryEndDate").value;
     if (!category) category = document.getElementById("categoryDropdown").value;
 
     if (!startDate || !endDate) {
@@ -19,12 +19,12 @@ function fetchCategoryWise(startDate = null, endDate = null, category = null) {
         return;
     }
 
-    // ✅ Store selected filters in sessionStorage
+    // Store selected filters in sessionStorage
     sessionStorage.setItem("categoryWiseStartDate", startDate);
     sessionStorage.setItem("categoryWiseEndDate", endDate);
     sessionStorage.setItem("categoryWiseCategory", category);
 
-    // ✅ Send request to fetch fresh category-wise sales data
+    // Send request to fetch fresh category-wise sales data
     ipcRenderer.send("get-category-wise", { startDate, endDate, category });
 }
 
@@ -35,7 +35,18 @@ function displayCategoryWiseSales(orders) {
     orderHistoryDiv.innerHTML = ""; // Clear previous content
 
     if (orders.length === 0) {
-        orderHistoryDiv.innerHTML = "<p>No orders found for the selected date range.</p>";
+         orderHistoryDiv.innerHTML = `
+            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin: 0;">
+                <div>
+                    <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
+                        No Orders Found!
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('goHomeButton').addEventListener('click', function () {
+            document.getElementById('Home').click();
+        });
         return;
     }
 
