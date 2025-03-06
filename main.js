@@ -1293,6 +1293,18 @@ ipcMain.on("get-order-details", (event, billno) => {
     });
 });
 
+//ItemHistory
+ipcMain.on("get-food-items-for-item-history", (event, { categoryId }) => {
+    const query = `SELECT fid, fname FROM FoodItem WHERE category = ? AND active = 1`;
+    db.all(query, [categoryId], (err, rows) => {
+        if (err) {
+            console.error("Error fetching food items:", err);
+            event.reply("food-items-response-for-item-history", { success: false, foodItems: [] });
+            return;
+        }
+        event.reply("food-items-response-for-item-history", { success: true, foodItems: rows });
+    });
+});
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

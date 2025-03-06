@@ -38,7 +38,6 @@ function attachContextMenu(tableSelector, sourceSection) {
                 const billNo = row.getAttribute("data-billno");
                 menu.innerHTML = `
                     <div class="context-option" id="deleteOrder">🗑️ Delete Order (Bill No: ${billNo})</div>
-                    <div class="context-option">🔄 Refresh Order</div>
                     <div class="context-option">📄 View Details</div>
                 `;
 
