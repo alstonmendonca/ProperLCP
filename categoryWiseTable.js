@@ -2,6 +2,8 @@ const { ipcRenderer } = require("electron");
 const { attachContextMenu } = require("./contextMenu");
 const { deleteOrder } = require("./deleteOrder");
 
+let currentSortByCategoryWise = null;
+let currentSortOrderCategoryWise = "asc";
 
 function fetchCategoryWise(startDate = null, endDate = null, category = null) {
     // Use function parameters if available; otherwise, get values from inputs
@@ -50,19 +52,21 @@ function displayCategoryWiseSales(orders) {
         return;
     }
 
+    orders.sort((a, b) => sortData(a, b, currentSortByCategoryWise, currentSortOrderCategoryWise));
+
     // Create a table
     let tableHTML = `
         <table class="order-history-table">
             <thead>
                 <tr>
-                    <th>Bill No</th>
-                    <th class="date-column">Date</th>
-                    <th>Cashier</th>
-                    <th>KOT</th>
-                    <th>Price (₹)</th>
-                    <th>SGST (₹)</th>
-                    <th>CGST (₹)</th>
-                    <th>Tax (₹)</th>
+                    <th onclick="sortCategoryWiseTable('billno')">Bill No ${getSortIndicatorCategoryWise('billno')}</th>
+                    <th onclick="sortCategoryWiseTable('date')">Date ${getSortIndicatorCategoryWise('date')}</th>
+                    <th onclick="sortCategoryWiseTable('cashier_name')">Cashier ${getSortIndicatorCategoryWise('cashier_name')}</th>
+                    <th onclick="sortCategoryWiseTable('kot')">KOT ${getSortIndicatorCategoryWise('kot')}</th>
+                    <th onclick="sortCategoryWiseTable('price')">Price (₹) ${getSortIndicatorCategoryWise('price')}</th>
+                    <th onclick="sortCategoryWiseTable('sgst')">SGST (₹) ${getSortIndicatorCategoryWise('sgst')}</th>
+                    <th onclick="sortCategoryWiseTable('cgst')">CGST (₹) ${getSortIndicatorCategoryWise('cgst')}</th>
+                    <th onclick="sortCategoryWiseTable('tax')">Tax (₹) ${getSortIndicatorCategoryWise('tax')}</th>
                     <th>Food Items</th>
                 </tr>
             </thead>
@@ -118,5 +122,36 @@ ipcRenderer.on("refresh-order-history", () => {
     }
 });
 
+function sortCategoryWiseTable(column) {
+    currentSortByCategoryWise = column;
+    currentSortOrderCategoryWise = currentSortOrderCategoryWise === "asc" ? "desc" : "asc";
+
+    // Get the existing data from sessionStorage and sort it
+    let orders = JSON.parse(sessionStorage.getItem("categoryWiseData") || "[]");
+
+    if (orders.length > 0) {
+        orders.sort((a, b) => sortData(a, b, currentSortByCategoryWise, currentSortOrderCategoryWise));
+        displayCategoryWiseSales(orders); // Redisplay sorted data
+    }
+}
+
+
+function sortData(a, b, key, order) {
+    if (!a[key] || !b[key]) return 0; // Handle undefined/null values
+
+    if (typeof a[key] === "string") {
+        return order === "asc" ? a[key].localeCompare(b[key]) : b[key].localeCompare(a[key]);
+    } else {
+        return order === "asc" ? a[key] - b[key] : b[key] - a[key];
+    }
+}
+
+function getSortIndicatorCategoryWise(column) {
+    if (currentSortByCategoryWise === column) {
+        return currentSortOrderCategoryWise === "asc" ? "▲" : "▼";
+    }
+    return "";
+}
+
 // Export functions
-module.exports = { fetchCategoryWise, displayCategoryWiseSales };
+module.exports = { fetchCategoryWise, displayCategoryWiseSales, sortCategoryWiseTable };
