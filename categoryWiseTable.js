@@ -59,14 +59,14 @@ function displayCategoryWiseSales(orders) {
         <table class="order-history-table">
             <thead>
                 <tr>
-                    <th onclick="sortCategoryWiseTable('billno')">Bill No ${getSortIndicatorCategoryWise('billno')}</th>
-                    <th onclick="sortCategoryWiseTable('date')">Date ${getSortIndicatorCategoryWise('date')}</th>
-                    <th onclick="sortCategoryWiseTable('cashier_name')">Cashier ${getSortIndicatorCategoryWise('cashier_name')}</th>
-                    <th onclick="sortCategoryWiseTable('kot')">KOT ${getSortIndicatorCategoryWise('kot')}</th>
-                    <th onclick="sortCategoryWiseTable('price')">Price (₹) ${getSortIndicatorCategoryWise('price')}</th>
-                    <th onclick="sortCategoryWiseTable('sgst')">SGST (₹) ${getSortIndicatorCategoryWise('sgst')}</th>
-                    <th onclick="sortCategoryWiseTable('cgst')">CGST (₹) ${getSortIndicatorCategoryWise('cgst')}</th>
-                    <th onclick="sortCategoryWiseTable('tax')">Tax (₹) ${getSortIndicatorCategoryWise('tax')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('billno')">Bill No ${getSortIndicatorCategoryWise('billno')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('date')">Date ${getSortIndicatorCategoryWise('date')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('cashier_name')">Cashier ${getSortIndicatorCategoryWise('cashier_name')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('kot')">KOT ${getSortIndicatorCategoryWise('kot')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('price')">Price (₹) ${getSortIndicatorCategoryWise('price')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('sgst')">SGST (₹) ${getSortIndicatorCategoryWise('sgst')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('cgst')">CGST (₹) ${getSortIndicatorCategoryWise('cgst')}</th>
+                    <th class="sortable" onclick="sortCategoryWiseTable('tax')">Tax (₹) ${getSortIndicatorCategoryWise('tax')}</th>
                     <th>Food Items</th>
                 </tr>
             </thead>

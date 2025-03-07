@@ -266,6 +266,72 @@ function saveAndPrintBill() {
     NewOrder();
 }
 
+function displayEditMode() {
+    // Hide all existing buttons
+    document.getElementById("upperbuttons").style.display = "none";
+    document.getElementById("bill-buttons").style.display = "none";
+
+    // Check if edit mode buttons already exist, if not, create them
+    let editButtonsContainer = document.getElementById("edit-buttons");
+    if (!editButtonsContainer) {
+        editButtonsContainer = document.createElement("div");
+        editButtonsContainer.id = "edit-buttons";
+        editButtonsContainer.style.display = "flex";
+        editButtonsContainer.style.justifyContent = "center";
+        editButtonsContainer.style.gap = "10px";
+        editButtonsContainer.style.marginTop = "10px";
+
+        // Save Button
+        const saveButton = document.createElement("button");
+        saveButton.textContent = "Save";
+        saveButton.id = "save-edit";
+        saveButton.onclick = exitEditMode;
+        styleButton(saveButton); // Apply button styling
+
+        // Cancel Button
+        const cancelButton = document.createElement("button");
+        cancelButton.textContent = "Cancel";
+        cancelButton.id = "cancel-edit";
+        cancelButton.onclick = exitEditMode;
+        styleButton(cancelButton); // Apply button styling
+
+        // Append buttons
+        editButtonsContainer.appendChild(saveButton);
+        editButtonsContainer.appendChild(cancelButton);
+        document.getElementById("bill-panel").appendChild(editButtonsContainer);
+    }
+
+    // Show the edit mode buttons
+    editButtonsContainer.style.display = "flex";
+}
+
+function exitEditMode() {
+    // Show original buttons
+    document.getElementById("upperbuttons").style.display = "flex";
+    document.getElementById("bill-buttons").style.display = "flex";
+
+    // Hide edit mode buttons
+    const editButtonsContainer = document.getElementById("edit-buttons");
+    if (editButtonsContainer) {
+        editButtonsContainer.style.display = "none";
+    }
+}
+
+// Function to apply button styles similar to existing ones
+function styleButton(button) {
+    button.style.fontSize = "14px";
+    button.style.padding = "5px 10px";
+    button.style.color = "white";
+    button.style.border = "none";
+    button.style.borderRadius = "5px";
+    button.style.cursor = "pointer";
+    button.style.display = "flex";
+    button.style.alignItems = "center";
+    button.style.gap = "5px";
+    button.style.backgroundColor = "#007bff"; // Same as other buttons
+}
+
+
 //---------------------------------------------------------------------------------------------------------------------------
 
 function holdBill() {
