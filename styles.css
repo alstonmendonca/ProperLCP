@@ -3,7 +3,7 @@
     --second-color: #2b89c4;
     --third-color: #b2def6;
     --fourth-color: #fbcf83d6;
-    --fifth-color: #F79D84;
+    --fifth-color: #fafafa;
     --danger-color: #f44336;
     --danger-hover: #d32f2f;
 }
@@ -968,7 +968,7 @@ color: #fff;
 }
 
 .item-summary-table th:hover {
-    background-color: var(--fifth-color); /* Slightly darker background on hover */
+    background-color: #4b7dda; /* Slightly darker background on hover */
 }
 
 .category-row {
@@ -982,7 +982,7 @@ color: #fff;
 }
 
 .item-row:hover {
-    background-color: #007bff; /* Light gray background on hover */
+    background-color: #e8e8e8; /* Light gray background on hover */
 }
 
 /* Add a subtle animation for hover effects */
