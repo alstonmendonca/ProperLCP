@@ -19,14 +19,11 @@ ipcRenderer.on("food-items-response-for-item-history", (event, data) => {
 
         // ✅ Set the first food item as the default
         foodItemDropdown.value = data.foodItems[0].fid;
-        
+
         // ✅ Enable the dropdown
         foodItemDropdown.disabled = false;
-
-        // ✅ Automatically fetch history for the default selection
-        const today = new Date().toISOString().split("T")[0];
-        fetchItemHistory(today, today, data.foodItems[0].fid);
     }
 });
+
 
 module.exports = { fetchFoodItems };

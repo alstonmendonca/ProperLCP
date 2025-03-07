@@ -578,7 +578,7 @@ input[type="number"] {
 }
 
 /* Style the category dropdown */
-#categoryDropdown {
+#categoryDropdown, #foodItemDropdown {
     padding: 8px;
     font-size: 16px;
     border: 2px solid #ccc;
@@ -591,7 +591,7 @@ input[type="number"] {
 }
 
 /* Hover effect */
-#categoryDropdown:hover {
+#categoryDropdown:hover, #foodItemDropdown:hover {
     border-color: #888;
 }
 
@@ -602,7 +602,7 @@ input[type="number"] {
         align-items: flex-start;
     }
     
-    #categoryDropdown, .date-filters button {
+    #categoryDropdown, #foodItemDropdown, .date-filters button {
         width: 100%; /* Full width on smaller screens */
     }
 }

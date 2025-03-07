@@ -489,50 +489,62 @@ async function updateMainContent(contentType) {
                 <h1>Item History</h1>
                 <div class="date-filters">
                     <label for="itemStartDate">Start Date:</label>
-                    <input type="date" id="itemStartDate" value="${today}"> <!-- Set default to today's date -->
-                    
+                    <input type="date" id="itemStartDate" value="${today}">
+        
                     <label for="itemEndDate">End Date:</label>
-                    <input type="date" id="itemEndDate" value="${today}"> <!-- Set default to today's date -->
-                    
+                    <input type="date" id="itemEndDate" value="${today}">
+        
                     <select id="categoryDropdown"></select>
-                    <select id="foodItemDropdown"></select> <!-- Food item dropdown, initially enabled -->
+                    <select id="foodItemDropdown"></select>
                     <button class="showHistoryButton" id="fetchItemHistoryBtn">Show History</button>
                     <button id="exportExcelButton">Export to Excel</button>
                 </div>
                 <div id="itemHistoryDiv"></div>
             `;
         
-            // Fetch categories and populate the dropdown
-            fetchCategories(); // This will populate the category dropdown
+            fetchCategories(); // Fetch categories and populate dropdown
         
-            // Session Storage code to store the start and end date
-            const savedStartDate = sessionStorage.getItem("itemHistoryStartDate");
-            const savedEndDate = sessionStorage.getItem("itemHistoryEndDate");
-            const savedCategory = sessionStorage.getItem("itemHistoryCategory");
+            // Restore session storage values (if any)
+            const savedStartDate = sessionStorage.getItem("itemHistoryStartDate") || today;
+            const savedEndDate = sessionStorage.getItem("itemHistoryEndDate") || today;
+            document.getElementById("itemStartDate").value = savedStartDate;
+            document.getElementById("itemEndDate").value = savedEndDate;
         
-            if (savedStartDate) document.getElementById("itemStartDate").value = savedStartDate;
-            if (savedEndDate) document.getElementById("itemEndDate").value = savedEndDate;
-            if (savedCategory) document.getElementById("categoryDropdown").value = savedCategory;
+            // Fetch initial data after food items are populated
+            ipcRenderer.once("food-items-response-for-item-history", (event, data) => {
+                if (data.success && data.foodItems.length > 0) {
+                    const firstFoodItem = data.foodItems[0].fid;
+                    document.getElementById("foodItemDropdown").value = firstFoodItem;
         
-            // Event listener for category dropdown change
-            document.getElementById("categoryDropdown").addEventListener("change", function() {
-                const selectedCategory = this.value;
-                if (selectedCategory) {
-                    fetchFoodItems(selectedCategory); // Fetch food items based on selected category
-                } else {
-                    document.getElementById("foodItemDropdown").innerHTML = ""; // Clear food items if no category is selected
-                    document.getElementById("foodItemDropdown").disabled = true; // Disable food item dropdown
+                    // ✅ Fetch and display history immediately when contentType is 'itemHistory'
+                    fetchItemHistory(savedStartDate, savedEndDate, firstFoodItem);
                 }
             });
         
-            // Attach event listener to the Show History button
-            document.getElementById("fetchItemHistoryBtn").addEventListener("click", function() {
+            // Attach event listener for category dropdown changes
+            document.getElementById("categoryDropdown").addEventListener("change", function () {
+                const selectedCategory = this.value;
+                const foodItemDropdown = document.getElementById("foodItemDropdown");
+                const itemHistoryDiv = document.getElementById("itemHistoryDiv");
+        
+                if (selectedCategory) {
+                    fetchFoodItems(selectedCategory);
+                    itemHistoryDiv.innerHTML = ""; // Clear table on category change
+                } else {
+                    foodItemDropdown.innerHTML = "";
+                    foodItemDropdown.disabled = true;
+                }
+            });
+        
+            // Attach event listener to the Show History button (Required for user-triggered updates)
+            document.getElementById("fetchItemHistoryBtn").addEventListener("click", function () {
                 const startDate = document.getElementById("itemStartDate").value;
                 const endDate = document.getElementById("itemEndDate").value;
                 const foodItem = document.getElementById("foodItemDropdown").value;
                 fetchItemHistory(startDate, endDate, foodItem);
             });
         }
+        
         else if(contentType === "dayWise"){
             mainContent.innerHTML = `
                 <h1>Day-Wise Order History</h1>
