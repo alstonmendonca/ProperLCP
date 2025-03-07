@@ -347,7 +347,7 @@ function holdBill() {
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
-        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
 
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
@@ -367,6 +367,21 @@ function holdBill() {
 }
 // Function to toggle the visibility of the discount inputs and apply button
 function toggleDiscountPopup() {
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
+
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
     let existingPopup = document.getElementById("discount-popup");
     if (existingPopup) {
         existingPopup.remove();
@@ -378,21 +393,18 @@ function toggleDiscountPopup() {
     popup.classList.add("edit-popup");
 
     popup.innerHTML = `
-        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
-            <h3>Apply Discount</h3>
+        <div class="popup-content" style="display: flex; flex-direction: column; max-width: 100%; width: 300px; pointer-events: auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.5em; margin-bottom: 16px; color: #333; text-align: center;">Apply Discount</h3>
             
-            <label for="discount-percentage">Discount Percentage:</label>
-            <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" style="width: 75%;">
-
-            <label for="discount-amount">Fixed Discount (Rs.):</label>
-            <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" style="width: 75%;">
-
-            <br>
-
-            <div class="popup-buttons">
-                <button id="apply-discount-btn" style="margin-right: 10px; width: 90px; height: 40px;">Apply</button>
-                <button id="closePopup" style="width: 90px; height: 40px;">Cancel</button>
-
+            <label for="discount-percentage" style="margin-bottom: 8px; font-weight: bold; color: #555;">Discount Percentage:</label>
+            <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
+        
+            <label for="discount-amount" style="margin-bottom: 8px; font-weight: bold; color: #555;">Fixed Discount (Rs.):</label>
+            <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
+        
+            <div class="popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
+                <button id="apply-discount-btn" type="button" style="width: 90px; height: 40px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Apply</button>
+                <button id="closePopup" type="button" style="width: 90px; height: 40px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Cancel</button>
             </div>
         </div>
     `;
@@ -447,7 +459,7 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
         });
 
         popupContent += `
-            <div style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
+            <div data-heldid="${order.heldid}" style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
                 <div style="border-bottom: 2px solid #333; padding-bottom: 5px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
                     <span>HELD ID: ${order.heldid}</span>
                 </div>
@@ -477,11 +489,6 @@ function addHeldToBill(heldId) {
     ipcRenderer.send('get-held-order-details', heldId);
 }
 
-function deleteHeldOrder(heldId) {
-    // Logic for deleting a held order
-    ipcRenderer.send('delete-held-order', heldId);
-}
-
 
 ipcRenderer.on('held-order-details-data', (event, foodDetails, heldId) => {
     foodDetails.forEach(item => {
@@ -503,11 +510,12 @@ function deleteHeldOrder(heldId) {
 
 // Handle held order deletion
 ipcRenderer.on('held-order-deleted', (event, heldId) => {
-    let row = document.querySelector(`tr[data-heldid="${heldId}"]`);
-    if (row) {
-        row.remove(); // Remove row from UI
+    let orderCard = document.querySelector(`#heldpopup div[data-heldid="${heldId}"]`);
+    if (orderCard) {
+        orderCard.remove(); // Remove the order card from the UI
     }
 });
+
 
 function closeHeldPopup() {
     let popup = document.getElementById("heldpopup");
@@ -563,7 +571,7 @@ function displayTodaysOrders() {
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
-        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
 
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
@@ -619,7 +627,7 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
             let itemsGrid = "";
 
             itemsArray.forEach(item => {
-                itemsGrid += `<div style="padding: 3px; border: 1px solid #ddd; font-size: 12px; text-align: center; flex-grow: 1; flex-basis: 48%; height: 40px; display: flex; justify-content: center; align-items: center;">${item}</div>`;
+                itemsGrid += `<div style="padding: 3px; border: 1px solid #ddd; font-size: 12px; text-align: center; flex-grow: 1; flex-basis: 48%; height: 40px; display: flex; justify-content: center; align-items: center; background: #f1f1f1;">${item}</div>`;
             });
 
             popupContent += `
@@ -638,7 +646,7 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
                         </div>
                     </div>
                     <div style="border-top: 2px solid #333; padding-top: 5px; text-align: right;">
-                        <button onclick="addToExistingOrder(${order.billno})" style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:100%; height:30px">
+                        <button onclick="addToExistingOrder(${order.billno})" style="background-color: #1db954; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:100%; height:30px">
                             Add to Order
                         </button>
                     </div>
@@ -671,7 +679,7 @@ function addToExistingOrder(orderId) {
 
     billItems.forEach(item => {
         let foodId = item.id.replace("bill-item-", ""); // Extract item ID
-        let quantity = parseInt(item.querySelector(".bill-quantity").textContent);
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
 
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });

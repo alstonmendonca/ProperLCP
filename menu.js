@@ -341,28 +341,31 @@ function toggleAddItemPopup() {
                     <input type="number" id="cgst" step="0.01" value="0" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
                 </div>
 
-                <div class="form-group">
-                    <label for="veg" style="font-size: 14px; color: #555; margin-bottom: 5px;">Veg:</label>
-                    <select id="veg" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
+                <!-- Toggle for Veg -->
+                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <label for="veg" style="font-size: 14px; color: #555;">Veg:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="veg" checked>
+                        <span class="slider round"></span>
+                    </label>
                 </div>
 
-                <div class="form-group">
-                    <label for="active" style="font-size: 14px; color: #555; margin-bottom: 5px;">Active:</label>
-                    <select id="active" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
+                <!-- Toggle for Active -->
+                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <label for="active" style="font-size: 14px; color: #555;">Active:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="active" checked>
+                        <span class="slider round"></span>
+                    </label>
                 </div>
 
-                <div class="form-group">
-                    <label for="is_on" style="font-size: 14px; color: #555; margin-bottom: 5px;">Available:</label>
-                    <select id="is_on" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
+                <!-- Toggle for Available -->
+                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <label for="is_on" style="font-size: 14px; color: #555;">Available:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="is_on" checked>
+                        <span class="slider round"></span>
+                    </label>
                 </div>
 
                 <div class="popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
@@ -371,7 +374,7 @@ function toggleAddItemPopup() {
                 </div>
             </form>
         </div>
-        `;
+    `;
 
     document.body.appendChild(popup);
 
@@ -389,10 +392,11 @@ function toggleAddItemPopup() {
             sgst: parseFloat(document.getElementById("sgst").value),
             cgst: parseFloat(document.getElementById("cgst").value),
             tax: parseFloat(document.getElementById("sgst").value) + parseFloat(document.getElementById("cgst").value),
-            active: parseInt(document.getElementById("active").value),
-            is_on: parseInt(document.getElementById("is_on").value),
-            veg: parseInt(document.getElementById("veg").value)
+            active: document.getElementById("active").checked ? 1 : 0,
+            is_on: document.getElementById("is_on").checked ? 1 : 0,
+            veg: document.getElementById("veg").checked ? 1 : 0
         };
+        
 
         try {
             await ipcRenderer.invoke("add-food-item", newItem);
