@@ -46,6 +46,10 @@ function displayItemHistory(orders) {
         return;
     }
 
+    if (currentSortByItemHistory) {
+        orders = sortOrders(orders, currentSortByItemHistory);
+    }
+
     let tableHTML = `
         <table class="order-history-table">
             <thead>
@@ -82,6 +86,20 @@ function displayItemHistory(orders) {
 
     tableHTML += `</tbody></table>`;
     itemHistoryDiv.innerHTML = tableHTML;
+}
+
+function sortOrders(orders, column) {
+    return orders.sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+
+        if (typeof valA === "string") valA = valA.toLowerCase();
+        if (typeof valB === "string") valB = valB.toLowerCase();
+
+        if (valA < valB) return currentSortOrderItemHistory === "asc" ? -1 : 1;
+        if (valA > valB) return currentSortOrderItemHistory === "asc" ? 1 : -1;
+        return 0;
+    });
 }
 
 function sortItemHistoryTable(column) {
