@@ -1185,7 +1185,7 @@ ipcMain.on("clear-deleted-orders", (event) => {
     });
 });
 
-ipcMain.on("get-discounted-orders", (event) => {
+ipcMain.on("get-discounted-orders", (event, { startDate, endDate }) => {
     const query = `
         SELECT 
             d.billno, 
@@ -1200,10 +1200,11 @@ ipcMain.on("get-discounted-orders", (event) => {
         JOIN Orders o ON d.billno = o.billno
         LEFT JOIN OrderDetails od ON d.billno = od.orderid
         LEFT JOIN FoodItem f ON od.foodid = f.fid
+        WHERE date(o.date) BETWEEN date(?) AND date(?)
         GROUP BY d.billno, o.kot, o.date, d.Initial_price, d.discount_percentage, d.discount_amount
     `;
 
-    db.all(query, [], (err, rows) => {
+    db.all(query, [startDate, endDate], (err, rows) => {
         if (err) {
             console.error("Error fetching discounted orders:", err);
             event.reply("discounted-orders-response", { success: false, orders: [] });

@@ -1,8 +1,8 @@
 const { ipcRenderer } = require("electron");
 
 // Function to fetch discounted orders
-function fetchDiscountedOrders() {
-    ipcRenderer.send("get-discounted-orders");
+function fetchDiscountedOrders(startDate, endDate) {
+    ipcRenderer.send("get-discounted-orders", { startDate, endDate });
 }
 
 // Receive discounted orders from the main process and update the UI

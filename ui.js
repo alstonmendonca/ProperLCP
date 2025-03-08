@@ -431,12 +431,24 @@ async function updateMainContent(contentType) {
             }
         }
         else if (contentType === 'discountedOrders') {
+            const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+        
             mainContent.innerHTML = `
                 <h1>Discounted Orders</h1>
-                <button id="discountedClearHistory">Clear History</button>
+                <div class="date-filters">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
+                    
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
+                    
+                    <button class="showHistoryButton" id="fetchDiscountedOrdersBtn">Show Discounted Orders</button>
+                    <button id="exportExcelButton">Export to Excel</button>
+                    <button id="discountedClearHistory">Clear History</button>
+                </div>
                 <div id="discountedOrdersDiv"></div>
             `;
-
+        
             // Attach event listener for Clear History button
             document.getElementById("discountedClearHistory").addEventListener("click", async () => {
                 showConfirmPopup("Are you sure you want to permanently delete all discounted orders?", async () => {
@@ -444,9 +456,16 @@ async function updateMainContent(contentType) {
                     fetchDiscountedOrders(); // Refresh the discounted orders after clearing
                 });
             });
-
-            // Fetch discounted orders
-            fetchDiscountedOrders();
+        
+            // Attach event listener for Show Discounted Orders button
+            document.getElementById("fetchDiscountedOrdersBtn").addEventListener("click", () => {
+                const startDate = document.getElementById("startDate").value;
+                const endDate = document.getElementById("endDate").value;
+                fetchDiscountedOrders(startDate, endDate); // Fetch orders based on selected dates
+            });
+        
+            // Fetch discounted orders for today by default
+            fetchDiscountedOrders(today, today);
         }
         else if (contentType === 'customer') {
             mainContent.innerHTML = `
