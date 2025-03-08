@@ -51,7 +51,7 @@ ipcRenderer.on("discounted-orders-response", (event, data) => {
             <tr>
                 <td>${order.billno}</td>
                 <td>${order.kot}</td>
-                <td class="date-column">${order.date}</td>
+                <td class="date-column">${formatDate(order.date)}</td>
                 <td>₹${order.Initial_price.toFixed(2)}</td>
                 <td>${order.discount_percentage.toFixed(2)}</td>
                 <td>₹${order.discount_amount.toFixed(2)}</td>
@@ -107,7 +107,10 @@ function sortDiscountedOrdersTable(column) {
         } else if (column === 'kot') {
             comparison = a.kot - b.kot;
         } else if (column === 'date') {
-            comparison = new Date(a.date) - new Date(b.date); // Sort by date
+            // Parse the formatted date (dd-mm-yy) for sorting
+            const dateA = parseFormattedDate(a.date);
+            const dateB = parseFormattedDate(b.date);
+            comparison = dateA - dateB;
         } else if (column === 'Initial_price') {
             comparison = a.Initial_price - b.Initial_price;
         } else if (column === 'discount_percentage') {
@@ -180,6 +183,21 @@ async function clearDiscountedOrders() {
             resolve();
         });
     });
+}
+
+// Function to format date from yyyy-mm-dd to dd-mm-yy
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
+    return `${day}-${month}-${year}`;
+}
+
+// Function to parse a formatted date (dd-mm-yy) into a Date object
+function parseFormattedDate(dateString) {
+    const [day, month, year] = dateString.split('-');
+    return new Date(`20${year}-${month}-${day}`); // Convert to yyyy-mm-dd format
 }
 // Export functions
 module.exports = { fetchDiscountedOrders, sortDiscountedOrdersTable, clearDiscountedOrders };

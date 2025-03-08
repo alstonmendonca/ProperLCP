@@ -61,7 +61,7 @@ function displayDeletedOrders(orders) {
         tableHTML += `
             <tr>
                 <td>${order.billno}</td>
-                <td class="date-column">${order.date}</td>
+                <td class="date-column">${formatDate(order.date)}</td>
                 <td>${order.cashier_name}</td>
                 <td>${order.kot}</td>
                 <td>${order.price.toFixed(2)}</td>
@@ -88,6 +88,15 @@ function displayDeletedOrders(orders) {
 ipcRenderer.on("deleted-orders-response", (event, data) => {
     displayDeletedOrders(data.orders);
 });
+
+// Function to format date from yyyy-mm-dd to dd-mm-yy
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
+    return `${day}-${month}-${year}`;
+}
 
 // Export functions
 module.exports = { fetchDeletedOrders, displayDeletedOrders };

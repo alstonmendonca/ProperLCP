@@ -72,7 +72,7 @@ function displayItemHistory(orders) {
         tableHTML += `
             <tr>
                 <td>${order.billno}</td>
-                <td class="date-column">${order.date}</td>
+                <td class="date-column">${formatDate(order.date)}</td>
                 <td>${order.cashier_name || "N/A"}</td>
                 <td>${order.kot}</td>
                 <td>${order.price.toFixed(2)}</td>
@@ -117,6 +117,21 @@ function getSortIndicatorItemHistory(column) {
         return currentSortOrderItemHistory === "asc" ? "▲" : "▼";
     }
     return "";
+}
+
+// Function to format date from yyyy-mm-dd to dd-mm-yy
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
+    return `${day}-${month}-${year}`;
+}
+
+// Function to parse a formatted date (dd-mm-yy) into a Date object
+function parseFormattedDate(dateString) {
+    const [day, month, year] = dateString.split('-');
+    return new Date(`20${year}-${month}-${day}`); // Convert to yyyy-mm-dd format
 }
 
 module.exports = { fetchItemHistory, displayItemHistory, sortItemHistoryTable };
