@@ -63,20 +63,30 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
 // Function to open edit order and populate the bill panel
 function openTodayEditOrder(billno) {
     console.log("Edit order for Bill No:", billno);
-    
+
     // Change the content type to Home
     updateMainContent('Home');
+
+    // Enable edit mode in the bill panel
+    displayEditMode();
 
     // Send a request to get the food items for the selected order
     ipcRenderer.send("get-order-details", billno);
 }
 
 // Listen for the response with order details
+// Listen for the response with order details
 ipcRenderer.on("order-details-response", (event, orderDetails) => {
-    // Assuming orderDetails contains an array of food items
+    // Clear the bill panel before adding items
+    resetBill();
+
+    // Add each item to the bill panel
     orderDetails.food_items.forEach(item => {
         addToBill(item.foodId, item.foodName, item.price, item.quantity);
     });
+
+    // Update the total amount
+    updateBillTotal();
 });
 
 // Refresh "Today's Orders" after deletion

@@ -285,7 +285,7 @@ function displayEditMode() {
         const saveButton = document.createElement("button");
         saveButton.textContent = "Save";
         saveButton.id = "save-edit";
-        saveButton.onclick = exitEditMode;
+        saveButton.onclick = saveEdit;
         styleButton(saveButton); // Apply button styling
 
         // Cancel Button
@@ -305,6 +305,12 @@ function displayEditMode() {
     editButtonsContainer.style.display = "flex";
 }
 
+function saveEdit() {
+    // Logic to save the edited order
+    console.log("Save edit functionality to be implemented.");
+    exitEditMode(); // Exit edit mode after saving
+}
+
 function exitEditMode() {
     // Show original buttons
     document.getElementById("upperbuttons").style.display = "flex";
@@ -315,6 +321,9 @@ function exitEditMode() {
     if (editButtonsContainer) {
         editButtonsContainer.style.display = "none";
     }
+
+    // Clear the bill panel
+    resetBill();
 }
 
 // Function to apply button styles similar to existing ones

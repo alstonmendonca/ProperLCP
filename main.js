@@ -1302,22 +1302,22 @@ ipcMain.on("clear-customer-data", (event) => {
 ipcMain.on("get-order-details", (event, billno) => {
     const query = `
         SELECT 
-            OrderDetails.quantity, 
-            FoodItem.fid AS foodId, 
-            FoodItem.fname AS foodName, 
-            FoodItem.cost AS price  -- Change 'price' to 'cost'
+            OrderDetails.foodid AS foodId,
+            FoodItem.fname AS foodName,
+            FoodItem.cost AS price,
+            OrderDetails.quantity AS quantity
         FROM OrderDetails
         JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
-        WHERE OrderDetails.orderid = ?;
+        WHERE OrderDetails.orderid = ?
     `;
 
     db.all(query, [billno], (err, rows) => {
         if (err) {
             console.error("Error fetching order details:", err);
-            event.reply("order-details-response", { success: false, food_items: [] });
+            event.reply("order-details-response", { food_items: [] });
             return;
         }
-        event.reply("order-details-response", { success: true, food_items: rows });
+        event.reply("order-details-response", { food_items: rows });
     });
 });
 
