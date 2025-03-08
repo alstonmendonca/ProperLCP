@@ -433,14 +433,18 @@ async function updateMainContent(contentType) {
         else if (contentType === 'discountedOrders') {
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
         
+            // Retrieve stored dates from sessionStorage (or use today's date as default)
+            const storedStartDate = sessionStorage.getItem("discountedOrdersStartDate") || today;
+            const storedEndDate = sessionStorage.getItem("discountedOrdersEndDate") || today;
+        
             mainContent.innerHTML = `
                 <h1>Discounted Orders</h1>
                 <div class="date-filters">
                     <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
+                    <input type="date" id="startDate" value="${storedStartDate}"> <!-- Set default to stored or today's date -->
                     
                     <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
+                    <input type="date" id="endDate" value="${storedEndDate}"> <!-- Set default to stored or today's date -->
                     
                     <button class="showHistoryButton" id="fetchDiscountedOrdersBtn">Show Discounted Orders</button>
                     <button id="exportExcelButton">Export to Excel</button>
@@ -453,7 +457,18 @@ async function updateMainContent(contentType) {
             document.getElementById("discountedClearHistory").addEventListener("click", async () => {
                 showConfirmPopup("Are you sure you want to permanently delete all discounted orders?", async () => {
                     await clearDiscountedOrders();
-                    fetchDiscountedOrders(); // Refresh the discounted orders after clearing
+        
+                    // Reset dates to today's date
+                    const today = new Date().toISOString().split("T")[0];
+                    sessionStorage.setItem("discountedOrdersStartDate", today);
+                    sessionStorage.setItem("discountedOrdersEndDate", today);
+        
+                    // Update the date inputs
+                    document.getElementById("startDate").value = today;
+                    document.getElementById("endDate").value = today;
+        
+                    // Refresh the discounted orders
+                    fetchDiscountedOrders(today, today);
                 });
             });
         
@@ -461,11 +476,22 @@ async function updateMainContent(contentType) {
             document.getElementById("fetchDiscountedOrdersBtn").addEventListener("click", () => {
                 const startDate = document.getElementById("startDate").value;
                 const endDate = document.getElementById("endDate").value;
-                fetchDiscountedOrders(startDate, endDate); // Fetch orders based on selected dates
+        
+                if (startDate > endDate) {
+                    alert("Start date cannot be later than end date.");
+                    return;
+                }
+        
+                // Save the selected dates to sessionStorage
+                sessionStorage.setItem("discountedOrdersStartDate", startDate);
+                sessionStorage.setItem("discountedOrdersEndDate", endDate);
+        
+                // Fetch orders based on selected dates
+                fetchDiscountedOrders(startDate, endDate);
             });
         
-            // Fetch discounted orders for today by default
-            fetchDiscountedOrders(today, today);
+            // Fetch discounted orders for the stored or default dates
+            fetchDiscountedOrders(storedStartDate, storedEndDate);
         }
         else if (contentType === 'customer') {
             mainContent.innerHTML = `
