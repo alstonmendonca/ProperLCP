@@ -278,8 +278,9 @@ function displayEditMode() {
         editButtonsContainer.id = "edit-buttons";
         editButtonsContainer.style.display = "flex";
         editButtonsContainer.style.justifyContent = "center";
-        editButtonsContainer.style.gap = "10px";
-        editButtonsContainer.style.marginTop = "10px";
+        editButtonsContainer.style.gap = "20px"; // Increased gap between buttons
+        editButtonsContainer.style.marginTop = "20px"; // Increased margin
+        editButtonsContainer.style.width = "100%"; // Full width for better alignment
 
         // Save Button
         const saveButton = document.createElement("button");
@@ -347,16 +348,28 @@ function exitEditMode() {
 
 // Function to apply button styles similar to existing ones
 function styleButton(button) {
-    button.style.fontSize = "14px";
-    button.style.padding = "5px 10px";
+    button.style.fontSize = "16px";
+    button.style.padding = "10px 20px";
     button.style.color = "white";
     button.style.border = "none";
-    button.style.borderRadius = "5px";
+    button.style.borderRadius = "8px";
     button.style.cursor = "pointer";
     button.style.display = "flex";
     button.style.alignItems = "center";
-    button.style.gap = "5px";
-    button.style.backgroundColor = "#007bff"; // Same as other buttons
+    button.style.justifyContent = "center";
+    button.style.gap = "10px";
+    button.style.backgroundColor = "#0C345A";
+    button.style.width = "150px";
+    button.style.transition = "background-color 0.3s ease";
+
+    // Add hover effect
+    button.addEventListener("mouseenter", () => {
+        button.style.backgroundColor = "#0A2A4A"; // Darker shade on hover
+    });
+
+    button.addEventListener("mouseleave", () => {
+        button.style.backgroundColor = "#0C345A"; // Restore original color
+    });
 }
 
 
