@@ -1366,6 +1366,46 @@ ipcMain.on("get-item-history", (event, { startDate, endDate, foodItem }) => {
     });
 });
 
+ipcMain.on("update-order", (event, { billno, orderItems }) => {
+    // Delete existing order details for the bill
+    const deleteQuery = `DELETE FROM OrderDetails WHERE orderid = ?`;
+    db.run(deleteQuery, [billno], (err) => {
+        if (err) {
+            console.error("Error deleting existing order details:", err);
+            event.reply("update-order-response", { success: false });
+            return;
+        }
+
+        // Insert the updated order details
+        const insertQuery = `INSERT INTO OrderDetails (orderid, foodid, quantity) VALUES (?, ?, ?)`;
+        const statements = orderItems.map(item => {
+            return new Promise((resolve, reject) => {
+                db.run(insertQuery, [billno, item.foodId, item.quantity], (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        });
+
+        // Execute all insert statements
+        Promise.all(statements)
+            .then(() => {
+                console.log("Order updated successfully.");
+                event.reply("update-order-response", { success: true });
+
+                // Refresh the Today's Orders section
+                event.sender.send("refresh-order-history");
+            })
+            .catch((err) => {
+                console.error("Error updating order details:", err);
+                event.reply("update-order-response", { success: false });
+            });
+    });
+});
+
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

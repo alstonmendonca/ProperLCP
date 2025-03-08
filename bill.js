@@ -306,11 +306,30 @@ function displayEditMode() {
 }
 
 function saveEdit() {
-    // Logic to save the edited order
-    console.log("Save edit functionality to be implemented.");
-    exitEditMode(); // Exit edit mode after saving
-}
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
 
+    // Collect the updated items from the bill panel
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    // Get the bill number of the order being edited
+    const billno = sessionStorage.getItem("editingBillNo");
+
+    if (!billno) {
+        alert("No order is being edited.");
+        return;
+    }
+
+    // Send the updated order details to the main process
+    ipcRenderer.send("update-order", { billno, orderItems });
+
+    // Exit edit mode
+    exitEditMode();
+}
 function exitEditMode() {
     // Show original buttons
     document.getElementById("upperbuttons").style.display = "flex";

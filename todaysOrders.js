@@ -64,6 +64,9 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
 function openTodayEditOrder(billno) {
     console.log("Edit order for Bill No:", billno);
 
+    // Store the bill number in sessionStorage
+    sessionStorage.setItem("editingBillNo", billno);
+
     // Change the content type to Home
     updateMainContent('Home');
 
