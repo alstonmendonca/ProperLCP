@@ -3,6 +3,7 @@
     --second-color: #2b89c4;
     --third-color: #b2def6;
     --fourth-color: #fbcf83d6;
+    --item-summary-header-hover:#2f93d0;
     --fifth-color: #fafafa;
     --danger-color: #f44336;
     --danger-hover: #d32f2f;
@@ -968,7 +969,7 @@ color: #fff;
 }
 
 .item-summary-table th:hover {
-    background-color: #4b7dda; /* Slightly darker background on hover */
+    background-color: var(--item-summary-header-hover); /* Slightly darker background on hover */
 }
 
 .category-row {

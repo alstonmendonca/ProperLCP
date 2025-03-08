@@ -1,33 +1,57 @@
-// itemSummary.js
 const { ipcRenderer } = require('electron');
 const XLSX = require('xlsx'); // Import the xlsx library
 
 // Function to load the Item Summary content
+// Function to load the Item Summary content
 function loadItemSummary(mainContent, billPanel) {
+    const savedStartDate = sessionStorage.getItem("itemSummaryStartDate") || getToday();
+    const savedEndDate = sessionStorage.getItem("itemSummaryEndDate") || getToday();
+
     mainContent.innerHTML = `
         <h2>Item Summary</h2>
-        <button id="exportExcelButton">Export to Excel</button>
+        <div class="date-filters">
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" value="${savedStartDate}"> <!-- Set default to saved date -->
+            
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" value="${savedEndDate}"> <!-- Set default to saved date -->
+            
+            <button id="showSummaryButton">Show Summary</button>
+            <button id="exportExcelButton">Export to Excel</button>
+        </div>
         <div id="itemSummaryDiv" class="item-summary-container"></div>
     `;
     billPanel.style.display = 'none';
 
     // Fetch and display item summary data
-    fetchItemSummary();
+    fetchItemSummary(savedStartDate, savedEndDate); // Automatically fetch summary for saved dates
+
+    // Add event listener for the Show Summary button
+    document.getElementById("showSummaryButton").addEventListener("click", function() {
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        // Store dates in session storage
+        sessionStorage.setItem("itemSummaryStartDate", startDate);
+        sessionStorage.setItem("itemSummaryEndDate", endDate);
+
+        fetchItemSummary(startDate, endDate); // Fetch item summary for the selected date range
+    });
 
     // Add event listener for the Export to Excel button
     document.getElementById("exportExcelButton").addEventListener("click", exportToExcel);
 }
 
-// Function to fetch item summary data
-function fetchItemSummary() {
-    ipcRenderer.send("get-todays-items");
+// Function to fetch item summary data for a specific date range
+function fetchItemSummary(startDate, endDate) {
+    ipcRenderer.send("get-item-summary", { startDate, endDate });
 
-    ipcRenderer.on("todays-items-response", (event, data) => {
+    ipcRenderer.on("item-summary-response", (event, data) => {
         if (data.success) {
             const items = data.items;
             displayItemSummary(items);
         } else {
-            console.error("Failed to fetch today's items.");
+            console.error("Failed to fetch item summary.");
         }
     });
 }
@@ -35,37 +59,31 @@ function fetchItemSummary() {
 // Function to display the item summary data in a table
 function displayItemSummary(items) {
     const itemSummaryDiv = document.getElementById("itemSummaryDiv");
-    exportExcelButton.style.display = 'none';
+    itemSummaryDiv.innerHTML = ""; // Clear previous content
+
     if (items.length === 0) {
         itemSummaryDiv.innerHTML = `
             <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin: 0;">
                 <div>
                     <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
-                        No Orders For Today
+                        No Items Found for Selected Dates
                     </div>
                     <div style="font-size: 24px; margin-bottom: 40px;">
-                        Come back after placing an order!
+                        Please try a different date range.
                     </div>
-                    <button id='goHomeButton' style="font-size: 18px; color: #fff; background-color: #1DB954; padding: 10px 20px; border: none; border-radius: 25px; text-decoration: none; cursor: pointer;">
-                        Place an Order
-                    </button>
                 </div>
             </div>
         `;
-        document.getElementById('goHomeButton').addEventListener('click', function () {
-            document.getElementById('Home').click();
-        });
         return;
     }
-    
 
-    // Group items by category
+    // Group items by category name
     const groupedItems = {};
     items.forEach(item => {
-        if (!groupedItems[item.category]) {
-            groupedItems[item.category] = [];
+        if (!groupedItems[item.categoryName]) {
+            groupedItems[item.categoryName] = [];
         }
-        groupedItems[item.category].push(item);
+        groupedItems[item.categoryName].push(item);
     });
 
     // Generate the table HTML
@@ -148,7 +166,7 @@ function getSortIndicator(sortBy) {
     if (window.currentSortBy === sortBy) {
         return window.currentSortOrder === "asc" ? "▲" : "▼";
     }
-    return "▲▼"; // Default indicator if the column is not sorted
+    return ""; // No indicator if the column is not sorted
 }
 
 // Function to export the table to Excel
@@ -171,6 +189,15 @@ function exportToExcel() {
     XLSX.writeFile(workbook, "ItemSummary.xlsx");
 
     alert("Exported to ItemSummary.xlsx");
+}
+
+// Utility function to get today's date in YYYY-MM-DD format
+function getToday() {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const yyyy = today.getFullYear();
+    return `${yyyy}-${mm}-${dd}`;
 }
 
 // Export the loadItemSummary function

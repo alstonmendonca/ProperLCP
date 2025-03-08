@@ -128,6 +128,33 @@ app.on("activate", () => {
 
 //----------------------------------------------ANALYTICS STARTS HERE--------------------------------------------------------------
 // Fetch Today's Items for Item Summary
+// Item Summary
+ipcMain.on("get-item-summary", (event, { startDate, endDate }) => {
+    const query = `
+        SELECT 
+            FoodItem.fname AS item, 
+            SUM(OrderDetails.quantity) AS quantity, 
+            SUM(OrderDetails.quantity * FoodItem.cost) AS revenue,
+            FoodItem.category,
+            Category.catname AS categoryName
+        FROM Orders
+        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        JOIN Category ON FoodItem.category = Category.catid
+        WHERE date(Orders.date) BETWEEN date(?) AND date(?)
+        GROUP BY FoodItem.fid
+        ORDER BY Category.catname, FoodItem.fname
+    `;
+
+    db.all(query, [startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error("Error fetching item summary:", err);
+            event.reply("item-summary-response", { success: false, items: [] });
+            return;
+        }
+        event.reply("item-summary-response", { success: true, items: rows });
+    });
+});
 ipcMain.on("get-todays-items", (event) => {
     const query = `
         SELECT 
