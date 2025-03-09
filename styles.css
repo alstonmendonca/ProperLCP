@@ -3,7 +3,8 @@
     --second-color: #2b89c4;
     --third-color: #b2def6;
     --fourth-color: #fbcf83d6;
-    --item-summary-header-hover:#2f93d0;
+    --all-table-header-color: #0D3B66 ;
+    --all-table-header-hover: #11487b;
     --fifth-color: #fafafa;
     --danger-color: #f44336;
     --danger-hover: #d32f2f;
@@ -516,7 +517,7 @@ input[type="number"] {
 
 /* Table Header */
 .order-history-table thead th {
-    background-color: var(--second-color); /* Green header */
+    background-color: var(--all-table-header-color); /* Green header */
     color: white; /* White text */
     padding: 12px; /* Padding for header cells */
     text-align: left; /* Align text to the left */
@@ -532,7 +533,7 @@ input[type="number"] {
 }
 
 .order-history-table th.date-column:hover{
-    background-color: #388E3C; /* Darker green for hover effect */
+    background-color: var(--all-table-header-hover); 
 }
 
 .order-history-table td.date-column {
@@ -547,7 +548,7 @@ input[type="number"] {
 
 /* Hover effect for sortable columns */
 .order-history-table thead th.sortable:hover{
-    background-color: #388E3C; /* Darker green for hover effect */
+    background-color: var(--all-table-header-hover); 
 }
 
 /* Table Rows */
@@ -957,14 +958,14 @@ color: #fff;
 }
 
 .item-summary-table th {
-    background-color: var(--first-color); /* Light gray background for headers */
+    background-color: var(--all-table-header-color); /* Light gray background for headers */
     font-weight: bold;
     color: white;
     cursor: pointer; /* Show pointer cursor for clickable headers */
 }
 
 .item-summary-table th:hover {
-    background-color: var(--item-summary-header-hover); /* Slightly darker background on hover */
+    background-color: var(--all-table-header-hover); /* Slightly darker background on hover */
 }
 
 .category-row {
@@ -1400,7 +1401,7 @@ color: #fff;
 
 /* Category Box Styles */
 .category-box {
-    background-color: var(--second-color); /* Green background for category boxes */
+    background-color: #0D3B66; /* Green background for category boxes */
     color: white; /* White text color */
     font-size: 20px;
     padding: 20px; /* Padding inside the box */
@@ -1700,7 +1701,6 @@ color: #fff;
     color: #555; /* Medium gray text color */
 }
 
-
 #exportExcelButton {
     background-color: #1DB954; /* Green background */
     color: white; /* White text */
@@ -1718,13 +1718,13 @@ color: #fff;
 
 /* Center the header and make it visually appealing */
 .todays-orders-header, .order-history-header, .category-history-header, .deleted-orders-header, .discounted-orders-header, .item-history-header,
-.item-summary-header, .category-wise-sales-header, .top-selling-items-header, .top-selling-categories-header {
+.item-summary-header, .category-wise-sales-header, .top-selling-items-header, .top-selling-categories-header, .day-end-summary-header {
     text-align: center; /* Center the content */
     margin-bottom: 20px; /* Add some spacing below the header */
 }
 
 .todays-orders-header h1, .order-history-header h1, .category-history-header h1, .deleted-orders-header h1, .discounted-orders-header h1, .item-history-header h1,
-.item-summary-header h2, .category-wise-sales-header h2, .top-selling-items-header h2, .top-selling-categories-header h2{
+.item-summary-header h2, .category-wise-sales-header h2, .top-selling-items-header h2, .top-selling-categories-header h2, .day-end-summary-header h2{
     font-size: 2.5rem; /* Increase font size */
     font-weight: bold; /* Make it bold */
     color: #2c3e50; /* Use a dark, professional color */
@@ -1732,7 +1732,7 @@ color: #fff;
     text-transform: uppercase; /* Uppercase the text for emphasis */
     letter-spacing: 2px; /* Add spacing between letters */
     padding-bottom: 10px; /* Add padding to create space for the border */
-    border-bottom: 3px solid #1DB954; /* Add a green line underneath the title */
+    border-bottom: 3px solid #0D3B66; /* Add a blue line underneath the title */
 }
 
 /* Style the date filters section */

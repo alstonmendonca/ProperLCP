@@ -83,7 +83,7 @@ ipcRenderer.on("top-selling-items-response", (event, data) => {
     let tableHTML = `
         <table class="top-selling-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
             <thead>
-                <tr style="background-color: #4CAF50; color: white;">
+                <tr style="background-color: #0D3B66; color: white;">
                     <th style="padding: 10px; cursor: pointer;" onclick="sortTopSellingTable('date')">Date <span id="dateSortIndicator">▲</span></th>
                     <th style="padding: 10px;">Most Sold Item</th>
                 </tr>

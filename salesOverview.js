@@ -16,7 +16,7 @@ function loadSalesOverview(mainContent, billPanel) {
             text-transform: uppercase; /* Uppercase the text for emphasis */
             letter-spacing: 2px; /* Add spacing between letters */
             padding-bottom: 10px; /* Add padding to create space for the border */
-            border-bottom: 3px solid #1DB954; /* Add a green line underneath the title */
+            border-bottom: 3px solid #0D3B66; /* Add a green line underneath the title */
             text-align: center; /* Center the content -->
         ">Sales Overview</h2>
         <div class="date-filters">
@@ -32,9 +32,9 @@ function loadSalesOverview(mainContent, billPanel) {
             <table id="salesTable">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Total Sales</th>
-                        <th>Total Revenue</th>
+                        <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('date')">Date <span id="dateSortIndicator">▲</span></th>
+                        <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('sales')">Total Sales <span id="salesSortIndicator"></span></th>
+                        <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('revenue')">Total Revenue <span id="revenueSortIndicator"></span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -168,6 +168,75 @@ async function displaySalesOverview(startDate, endDate) {
     }
 }
 
+let currentSortColumn = null; // Track the currently sorted column
+let currentSortOrder = 'asc'; // Default sort order
+
+// Function to sort the sales overview table
+function sortSalesOverviewTable(column) {
+    const table = document.querySelector("#salesTable tbody");
+    const rows = Array.from(table.rows);
+
+    // Toggle sort order if the same column is clicked again
+    if (currentSortColumn === column) {
+        currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortColumn = column;
+        currentSortOrder = 'asc'; // Reset to ascending for a new column
+    }
+
+    // Sort rows based on the selected column
+    rows.sort((a, b) => {
+        const cellA = a.cells[column === 'date' ? 0 : column === 'sales' ? 1 : 2].innerText;
+        const cellB = b.cells[column === 'date' ? 0 : column === 'sales' ? 1 : 2].innerText;
+
+        if (column === 'date') {
+            const dateA = parseFormattedDate(cellA);
+            const dateB = parseFormattedDate(cellB);
+            return currentSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        } else if (column === 'sales' || column === 'revenue') {
+            const valueA = parseFloat(cellA.replace(/[^0-9.]/g, '')); // Remove non-numeric characters
+            const valueB = parseFloat(cellB.replace(/[^0-9.]/g, ''));
+            return currentSortOrder === 'asc' ? valueA - valueB : valueB - valueA;
+        }
+    });
+
+    // Clear the table body and append sorted rows
+    while (table.firstChild) {
+        table.removeChild(table.firstChild);
+    }
+    rows.forEach(row => table.appendChild(row));
+
+    // Update the sort indicators
+    updateSortIndicators(column);
+}
+
+// Function to update the sort indicators
+function updateSortIndicators(column) {
+    const dateSortIndicator = document.getElementById("dateSortIndicator");
+    const salesSortIndicator = document.getElementById("salesSortIndicator");
+    const revenueSortIndicator = document.getElementById("revenueSortIndicator");
+
+    // Reset all indicators
+    dateSortIndicator.innerText = "";
+    salesSortIndicator.innerText = "";
+    revenueSortIndicator.innerText = "";
+
+    // Set the indicator for the current column
+    if (column === 'date') {
+        dateSortIndicator.innerText = currentSortOrder === 'asc' ? '▲' : '▼';
+    } else if (column === 'sales') {
+        salesSortIndicator.innerText = currentSortOrder === 'asc' ? '▲' : '▼';
+    } else if (column === 'revenue') {
+        revenueSortIndicator.innerText = currentSortOrder === 'asc' ? '▲' : '▼';
+    }
+}
+
+// Function to parse a formatted date (DD-MM-YYYY) into a Date object
+function parseFormattedDate(dateString) {
+    const [day, month, year] = dateString.split("-");
+    return new Date(`${year}-${month}-${day}`); // Convert to YYYY-MM-DD format
+}
+
 // Function to format date in "Day-Month-Year" format
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -178,4 +247,4 @@ function formatDate(dateString) {
 }
 
 // Export the loadSalesOverview function
-module.exports = { loadSalesOverview };
+module.exports = { loadSalesOverview, sortSalesOverviewTable };

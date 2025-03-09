@@ -44,6 +44,7 @@ const {sortItemHistoryTable} = require("./itemHistory");
 const {sortCategoryWiseTable} = require("./categoryWiseTable");
 const {loadTopSellingCategories} = require("./topSellingCategory");
 const {sortTopSellingCategoriesTable} = require("./topSellingCategory");
+const {sortSalesOverviewTable} = require('./salesOverview'); 
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

@@ -11,10 +11,8 @@ async function loadDayEndSummary(mainContent, billPanel) {
 
     // Create the HTML structure for the Day End Summary
     mainContent.innerHTML = `
-    <div style="background: linear-gradient(90deg,rgb(255, 255, 255),rgb(255, 255, 255)); padding: 20px; border-radius: 40px; border-color: #464646;">
-        <h2 style="text-align: center; font-size: 3em; color: #094872; 
-            margin: 0; 
-            font-family: 'Arial', sans-serif;">
+    <div class="day-end-summary-header">
+        <h2 >
             Day End Summary
         </h2>
     </div>
