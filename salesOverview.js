@@ -17,8 +17,7 @@ function loadSalesOverview(mainContent, billPanel) {
             letter-spacing: 2px; /* Add spacing between letters */
             padding-bottom: 10px; /* Add padding to create space for the border */
             border-bottom: 3px solid #1DB954; /* Add a green line underneath the title */
-            text-align: center; /* Center the content */
-        
+            text-align: center; /* Center the content -->
         ">Sales Overview</h2>
         <div class="date-filters">
             <label for="salesStartDate">Start Date:</label>
@@ -96,11 +95,19 @@ function loadSalesOverview(mainContent, billPanel) {
     // Hide the bill panel
     billPanel.style.display = 'none';
 
+    // Set default dates to today's date
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    document.getElementById("salesStartDate").value = today; // Set start date to today
+    document.getElementById("salesEndDate").value = today; // Set end date to today
+
+    // Automatically fetch and display sales data for today's date
+    displaySalesOverview(today, today);
+
     // Retrieve stored dates from sessionStorage
     const storedStartDate = sessionStorage.getItem("salesOverviewStartDate");
     const storedEndDate = sessionStorage.getItem("salesOverviewEndDate");
 
-    // Populate the date inputs with stored dates
+    // Populate the date inputs with stored dates (if available)
     if (storedStartDate && storedEndDate) {
         document.getElementById("salesStartDate").value = storedStartDate;
         document.getElementById("salesEndDate").value = storedEndDate;

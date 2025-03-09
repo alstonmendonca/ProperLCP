@@ -211,6 +211,21 @@ async function updateMainContent(contentType) {
                 fetchTopSellingItems(savedStartDate, savedEndDate);
             }
         }
+        else if (contentType === "TopSellingCategory") {
+            loadTopSellingCategories(mainContent, billPanel); // Call the top selling categories function
+        
+            // Retrieve stored dates from sessionStorage
+            const savedStartDate = sessionStorage.getItem("topSellingStartDate");
+            const savedEndDate = sessionStorage.getItem("topSellingEndDate");
+        
+            if (savedStartDate && savedEndDate) {
+                document.getElementById("startDate").value = savedStartDate;
+                document.getElementById("endDate").value = savedEndDate;
+        
+                // Automatically fetch top selling categories using stored dates
+                fetchTopSellingCategories(savedStartDate, savedEndDate);
+            }
+        }
         else if (contentType === "HourlySales") {
             mainContent.innerHTML = `
                 <h2>Hourly Sales Trends</h2>
@@ -218,6 +233,7 @@ async function updateMainContent(contentType) {
             `;
             billPanel.style.display = 'none';
         } 
+        
         //-----------------------------------------------ANALYTICS ENDS HERE---------------------------------------------------
         //--------------------------CATEGORIES---------------------------------------------------------------
         else if (contentType === "Categories") {

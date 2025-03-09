@@ -474,6 +474,57 @@ ipcMain.handle('get-sales-overview-data', (event, startDate, endDate) => {
         });
     });
 });
+
+// Fetch top selling categories for a specific date range
+ipcMain.on("get-top-selling-categories", async (event, { startDate, endDate }) => {
+    const query = `
+        SELECT 
+            Orders.date,
+            Category.catname AS category_name,
+            SUM(OrderDetails.quantity) AS total_quantity
+        FROM Orders
+        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        JOIN Category ON FoodItem.category = Category.catid
+        WHERE date(Orders.date) BETWEEN date(?) AND date(?)
+        GROUP BY Orders.date, Category.catid
+        ORDER BY Orders.date, total_quantity DESC
+    `;
+
+    db.all(query, [startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error("Error fetching top selling categories:", err);
+            event.reply("top-selling-categories-response", { success: false, categories: [] });
+            return;
+        }
+
+        // Process the results to get the top-selling category for each date
+        const topSellingCategories = {};
+        rows.forEach(row => {
+            if (!topSellingCategories[row.date]) {
+                topSellingCategories[row.date] = {
+                    category_name: row.category_name,
+                    total_quantity: row.total_quantity,
+                };
+            } else if (row.total_quantity > topSellingCategories[row.date].total_quantity) {
+                topSellingCategories[row.date] = {
+                    category_name: row.category_name,
+                    total_quantity: row.total_quantity,
+                };
+            }
+        });
+
+        // Convert the object to an array for easier processing
+        const categoriesArray = Object.keys(topSellingCategories).map(date => ({
+            date,
+            category_name: topSellingCategories[date].category_name,
+            total_quantity: topSellingCategories[date].total_quantity,
+        }));
+
+        // Send the top selling categories to the renderer process
+        event.reply("top-selling-categories-response", { success: true, categories: categoriesArray });
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
