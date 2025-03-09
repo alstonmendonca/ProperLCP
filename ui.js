@@ -240,7 +240,9 @@ async function updateMainContent(contentType) {
             mainContent.style.marginLeft = "0px";
             mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
-                <h1 class="categories-title">Categories</h1>
+                <div class="categories-title">
+                    <h2>Categories</h2>
+                </div>
                 <div id="categoriesTabDiv"></div>
             `;
             fetchCategoriesList();
@@ -521,9 +523,11 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === 'customer') {
             mainContent.innerHTML = `
-                <h1>Customers</h1>
-                <button id="addCustomerBtn">Add Customer</button>
-                <button id="clearCustomerDataBtn">Clear Customer Data</button>
+                <div class="customer-header">
+                    <h2>Customers</h2>
+                    <button id="addCustomerBtn">Add Customer</button>
+                    <button id="clearCustomerDataBtn">Clear Customer Data</button>
+                </div>
                 <div id="customersDiv"></div>
             `;
 

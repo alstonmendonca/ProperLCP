@@ -195,9 +195,6 @@ function applyDiscount() {
     
 }
 
-
-
-
 // Function to update the total amount of the bill
 function updateBillTotal() {
     const billItemsList = document.getElementById("bill-items-list");
@@ -222,6 +219,48 @@ function updateBillTotal() {
     }
 }
 
+// Function to only save the bill
+function saveBill() {
+    const cashier = 1; // Replace with actual cashier ID
+    const date = new Date().toISOString().split("T")[0];
+
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+    let totalAmount = 0;
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
+        let itemTotal = parseFloat(item.querySelector(".bill-total").textContent);
+        if (!isNaN(itemTotal)) {
+            totalAmount += itemTotal;
+        }
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
+    // Check if a discounted total exists, otherwise use the original totalAmount
+    let discountField = document.getElementById("discounted-total");
+    let discountedTotal = discountField && discountField.value ? parseFloat(discountField.value) : totalAmount;
+
+    // Send order data to main process with discount applied (or not)
+    ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
+
+    // Add the glow effect to the bill panel
+    const billPanel = document.getElementById("bill-panel");
+    billPanel.classList.add("glow");
+
+    // Remove the glow effect after 2 seconds
+    setTimeout(() => {
+        billPanel.classList.remove("glow");
+    },800);
+
+    NewOrder();
+}
 
 // Function to save and print the bill
 function saveAndPrintBill() {
