@@ -8,15 +8,17 @@ function loadTopSellingItems(mainContent, billPanel) {
 
     // Create the HTML structure for the Top Selling Items
     mainContent.innerHTML = `
-        <h2>Top Selling Items</h2>
-        <div class="date-filters">
-            <label for="startDate">Start Date:</label>
-            <input type="date" id="startDate">
-            
-            <label for="endDate">End Date:</label>
-            <input type="date" id="endDate">
-            
-            <button class="showTopSellingButton">Show Top Selling</button>
+        <div class="top-selling-items-header">
+            <h2>Top Selling Items</h2>
+            <div class="date-filters">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate">
+                
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate">
+                
+                <button class="showTopSellingButton">Show Top Selling</button>
+            </div>
         </div>
         <div id="topSellingItemsDiv"></div>
     `;
@@ -113,8 +115,8 @@ function sortTopSellingTable(column) {
 
     // Sort rows based on the date column
     rows.sort((a, b) => {
-        const dateA = new Date(a.cells[0].innerText);
-        const dateB = new Date(b.cells[0].innerText);
+        const dateA = parseFormattedDate(a.cells[0].innerText); // Parse formatted date
+        const dateB = parseFormattedDate(b.cells[0].innerText); // Parse formatted date
         return currentSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
     });
 
@@ -130,6 +132,12 @@ function sortTopSellingTable(column) {
     // Update the sort indicator
     const sortIndicator = document.getElementById("dateSortIndicator");
     sortIndicator.innerText = currentSortOrder === 'asc' ? '▲' : '▼'; // Update the arrow
+}
+
+// Function to parse a formatted date (DD-MM-YYYY) into a Date object
+function parseFormattedDate(dateString) {
+    const [day, month, year] = dateString.split("-");
+    return new Date(`${year}-${month}-${day}`); // Convert to YYYY-MM-DD format
 }
 
 // Function to format date in "Day-Month-Year" format

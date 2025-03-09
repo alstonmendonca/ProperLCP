@@ -8,7 +8,18 @@ function loadSalesOverview(mainContent, billPanel) {
 
     // Create the HTML structure for the Sales Overview
     mainContent.innerHTML = `
-        <h2>Sales Overview</h2>
+        <h2 class="salesOverviewTitle" style="
+            font-size: 2.5rem; /* Increase font size */
+            font-weight: bold; /* Make it bold */
+            color: #2c3e50; /* Use a dark, professional color */
+            margin-bottom: 20px; /* Add spacing below the heading */
+            text-transform: uppercase; /* Uppercase the text for emphasis */
+            letter-spacing: 2px; /* Add spacing between letters */
+            padding-bottom: 10px; /* Add padding to create space for the border */
+            border-bottom: 3px solid #1DB954; /* Add a green line underneath the title */
+            text-align: center; /* Center the content */
+        
+        ">Sales Overview</h2>
         <div class="date-filters">
             <label for="salesStartDate">Start Date:</label>
             <input type="date" id="salesStartDate">

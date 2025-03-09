@@ -8,16 +8,18 @@ function loadItemSummary(mainContent, billPanel) {
     const savedEndDate = sessionStorage.getItem("itemSummaryEndDate") || getToday();
 
     mainContent.innerHTML = `
-        <h2>Item Summary</h2>
-        <div class="date-filters">
-            <label for="startDate">Start Date:</label>
-            <input type="date" id="startDate" value="${savedStartDate}"> <!-- Set default to saved date -->
-            
-            <label for="endDate">End Date:</label>
-            <input type="date" id="endDate" value="${savedEndDate}"> <!-- Set default to saved date -->
-            
-            <button id="showSummaryButton">Show Summary</button>
-            <button id="exportExcelButton">Export to Excel</button>
+        <div class="item-summary-header">
+            <h2>Item Summary</h2>
+            <div class="date-filters">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" value="${savedStartDate}"> <!-- Set default to saved date -->
+                
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" value="${savedEndDate}"> <!-- Set default to saved date -->
+                
+                <button id="showSummaryButton">Show Summary</button>
+                <button id="exportExcelButton">Export to Excel</button>
+            </div>
         </div>
         <div id="itemSummaryDiv" class="item-summary-container"></div>
     `;

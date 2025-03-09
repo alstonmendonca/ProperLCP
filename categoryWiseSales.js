@@ -8,15 +8,17 @@ function loadCategoryWiseSales(mainContent, billPanel) {
 
     // Create the HTML structure for Category Wise Sales
     mainContent.innerHTML = `
-        <h2>Category Wise Sales</h2>
-        <div class="date-filters">
-            <label for="categoryStartDate">Start Date:</label>
-            <input type="date" id="categoryStartDate">
-            
-            <label for="categoryEndDate">End Date:</label>
-            <input type="date" id="categoryEndDate">
-            
-            <button class="showCategorySalesButton">Show Sales</button>
+        <div class="category-wise-sales-header">
+            <h2>Category Wise Sales</h2>
+            <div class="date-filters">
+                <label for="categoryStartDate">Start Date:</label>
+                <input type="date" id="categoryStartDate">
+                
+                <label for="categoryEndDate">End Date:</label>
+                <input type="date" id="categoryEndDate">
+                
+                <button class="showCategorySalesButton">Show Sales</button>
+            </div>
         </div>
         <div id="categoryBoxesDiv" class="category-wise-sales-boxes"></div>
     `;
