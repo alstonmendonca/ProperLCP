@@ -613,11 +613,6 @@ h1 {
     margin-bottom: 20px; /* Adjust the spacing as needed */
 }
 
-#exportExcelButton {
-    justify-content: right;
-}
-
-
 .toggle-switch {
     cursor: pointer;
     width: 40px;
@@ -1703,4 +1698,89 @@ color: #fff;
 .category-wise-sales-box p {
     font-size: 1.1em; /* Slightly larger font for sales and revenue */
     color: #555; /* Medium gray text color */
+}
+
+
+#exportExcelButton {
+    background-color: #1DB954; /* Green background */
+    color: white; /* White text */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    font-size: 1rem; /* Set font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+#exportExcelButton:hover {
+    background-color: #17a84b; /* Darker green on hover */
+}
+
+/* Center the header and make it visually appealing */
+.todays-orders-header, .order-history-header, .category-history-header, .deleted-orders-header, .discounted-orders-header, .item-history-header {
+    text-align: center; /* Center the content */
+    margin-bottom: 20px; /* Add some spacing below the header */
+}
+
+.todays-orders-header h1, .order-history-header h1, .category-history-header h1, .deleted-orders-header h1, .discounted-orders-header h1, .item-history-header h1{
+    font-size: 2.5rem; /* Increase font size */
+    font-weight: bold; /* Make it bold */
+    color: #2c3e50; /* Use a dark, professional color */
+    margin-bottom: 20px; /* Add spacing below the heading */
+    text-transform: uppercase; /* Uppercase the text for emphasis */
+    letter-spacing: 2px; /* Add spacing between letters */
+    padding-bottom: 10px; /* Add padding to create space for the border */
+    border-bottom: 3px solid #1DB954; /* Add a green line underneath the title */
+}
+
+/* Style the date filters section */
+.date-filters {
+    display: flex;
+    justify-content: center; /* Center the filters horizontally */
+    align-items: center; /* Align items vertically */
+    gap: 10px; /* Add spacing between elements */
+    margin-bottom: 20px; /* Add spacing below the filters */
+}
+
+.date-filters label {
+    font-size: 1rem;
+    color: #2c3e50; /* Match the heading color */
+}
+
+.date-filters input[type="date"] {
+    padding: 5px;
+    font-size: 1rem;
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.date-filters select {
+    padding: 5px;
+    font-size: 1rem;
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.date-filters button {
+    background-color: #1DB954; /* Green background */
+    color: white; /* White text */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    font-size: 1rem; /* Set font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.date-filters button:hover {
+    background-color: #17a84b; /* Darker green on hover */
+}
+
+/* Specific style for the "Clear History" button */
+#deletedClearHistory, #discountedClearHistory {
+    background-color: #e74c3c; /* Red background for clear history button */
+}
+
+#deletedClearHistory:hover, #discountedClearHistory:hover {
+    background-color: #c0392b; /* Darker red on hover */
 }

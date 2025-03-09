@@ -305,8 +305,10 @@ async function updateMainContent(contentType) {
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
-                <h1>Todays Orders</h1>
-                <button id="exportExcelButton">Export to Excel</button>
+                <div class="todays-orders-header">
+                    <h1>Today's Orders</h1>
+                    <button id="exportExcelButton">Export to Excel</button>
+                </div>
                 <div id="todaysOrdersDiv"></div>
             `;
             fetchTodaysOrders();
@@ -317,16 +319,18 @@ async function updateMainContent(contentType) {
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
             mainContent.innerHTML = `
-                <h1>Order History</h1>
-                <div class="date-filters">
-                    <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
-                    
-                    <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
-                    
-                    <button class="showHistoryButton" onclick="fetchOrderHistory()">Show History</button>
-                    <button id="exportExcelButton">Export to Excel</button>
+                <div class="order-history-header">
+                    <h1>Order History</h1>
+                    <div class="date-filters">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
+                        
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
+                        
+                        <button class="showHistoryButton" onclick="fetchOrderHistory()">Show History</button>
+                        <button id="exportExcelButton">Export to Excel</button>
+                    </div>
                 </div>
                 <div id="orderHistoryDiv"></div>
             `;
@@ -349,17 +353,19 @@ async function updateMainContent(contentType) {
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
             mainContent.innerHTML = `
-                <h1>Category Wise Sales</h1>
-                <div class="date-filters">
-                    <label for="categoryStartDate">Start Date:</label>
-                    <input type="date" id="categoryStartDate" value="${today}"> <!-- Set default to today's date -->
-                    
-                    <label for="categoryEndDate">End Date:</label>
-                    <input type="date" id="categoryEndDate" value="${today}"> <!-- Set default to today's date -->
-                    
-                    <select id="categoryDropdown"></select>
-                    <button class="showHistoryButton" onclick="fetchCategoryWise()">Show History</button>
-                    <button id="exportExcelButton">Export to Excel</button>
+                <div class="category-history-header">
+                    <h1>Category Wise Sales</h1>
+                    <div class="date-filters">
+                        <label for="categoryStartDate">Start Date:</label>
+                        <input type="date" id="categoryStartDate" value="${today}"> <!-- Set default to today's date -->
+                        
+                        <label for="categoryEndDate">End Date:</label>
+                        <input type="date" id="categoryEndDate" value="${today}"> <!-- Set default to today's date -->
+                        
+                        <select id="categoryDropdown"></select>
+                        <button class="showHistoryButton" onclick="fetchCategoryWise()">Show History</button>
+                        <button id="exportExcelButton">Export to Excel</button>
+                    </div>
                 </div>
                 <div id="categoryWiseDiv"></div>
             `;
@@ -390,17 +396,19 @@ async function updateMainContent(contentType) {
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
             mainContent.innerHTML = `
-                <h1>Deleted Orders</h1>
-                <div class="date-filters">
-                    <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
-                    
-                    <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
-                    
-                    <button class="showHistoryButton" id="fetchDeletedOrdersBtn">Show Deleted Orders</button>
-                    <button id="exportExcelButton">Export to Excel</button>
-                    <button id="deletedClearHistory">Clear History</button>
+                <div class="deleted-orders-header">
+                    <h1>Deleted Orders</h1>
+                    <div class="date-filters">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" value="${today}"> <!-- Set default to today's date -->
+                        
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" value="${today}"> <!-- Set default to today's date -->
+                        
+                        <button class="showHistoryButton" id="fetchDeletedOrdersBtn">Show Deleted Orders</button>
+                        <button id="exportExcelButton">Export to Excel</button>
+                        <button id="deletedClearHistory">Clear History</button>
+                    </div>
                 </div>
                 <div id="deletedOrdersDiv"></div>
             `;
@@ -438,17 +446,19 @@ async function updateMainContent(contentType) {
             const storedEndDate = sessionStorage.getItem("discountedOrdersEndDate") || today;
         
             mainContent.innerHTML = `
-                <h1>Discounted Orders</h1>
-                <div class="date-filters">
-                    <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate" value="${storedStartDate}"> <!-- Set default to stored or today's date -->
-                    
-                    <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate" value="${storedEndDate}"> <!-- Set default to stored or today's date -->
-                    
-                    <button class="showHistoryButton" id="fetchDiscountedOrdersBtn">Show Discounted Orders</button>
-                    <button id="exportExcelButton">Export to Excel</button>
-                    <button id="discountedClearHistory">Clear History</button>
+                <div class="discounted-orders-header">
+                    <h1>Discounted Orders</h1>
+                    <div class="date-filters">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" value="${storedStartDate}"> <!-- Set default to stored or today's date -->
+                        
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" value="${storedEndDate}"> <!-- Set default to stored or today's date -->
+                        
+                        <button class="showHistoryButton" id="fetchDiscountedOrdersBtn">Show Discounted Orders</button>
+                        <button id="exportExcelButton">Export to Excel</button>
+                        <button id="discountedClearHistory">Clear History</button>
+                    </div>
                 </div>
                 <div id="discountedOrdersDiv"></div>
             `;
@@ -531,18 +541,20 @@ async function updateMainContent(contentType) {
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
         
             mainContent.innerHTML = `
-                <h1>Item History</h1>
-                <div class="date-filters">
-                    <label for="itemStartDate">Start Date:</label>
-                    <input type="date" id="itemStartDate" value="${today}">
-        
-                    <label for="itemEndDate">End Date:</label>
-                    <input type="date" id="itemEndDate" value="${today}">
-        
-                    <select id="categoryDropdown"></select>
-                    <select id="foodItemDropdown"></select>
-                    <button class="showHistoryButton" id="fetchItemHistoryBtn">Show History</button>
-                    <button id="exportExcelButton">Export to Excel</button>
+                <div class="item-history-header">
+                    <h1>Item History</h1>
+                    <div class="date-filters">
+                        <label for="itemStartDate">Start Date:</label>
+                        <input type="date" id="itemStartDate" value="${today}">
+                        
+                        <label for="itemEndDate">End Date:</label>
+                        <input type="date" id="itemEndDate" value="${today}">
+                        
+                        <select id="categoryDropdown"></select>
+                        <select id="foodItemDropdown"></select>
+                        <button class="showHistoryButton" id="fetchItemHistoryBtn">Show History</button>
+                        <button id="exportExcelButton">Export to Excel</button>
+                    </div>
                 </div>
                 <div id="itemHistoryDiv"></div>
             `;
