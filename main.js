@@ -1,6 +1,8 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
+const escpos = require("escpos"); // Install escpos library: npm install escpos
+escpos.USB = require("escpos-usb"); // USB printer support
 
 let mainWindow;
 let userRole = null;
@@ -547,7 +549,30 @@ ipcMain.on("refresh-categories", (event) => {
     }
     
 });
-//Billing
+//----------------------------------------------------BILLING----------------------------------------------------------
+// Handle print-bill event
+// Handle print-bill event
+ipcMain.on("print-bill", (event, escPosCommands) => {
+    try {
+        const device = new escpos.USB(); // Replace with your printer's USB vendor ID and product ID if needed
+        const printer = new escpos.Printer(device);
+
+        device.open(() => {
+            printer
+                .raw(Buffer.from(escPosCommands, "utf8")) // Send ESC/POS commands
+                .cut() // Cut paper
+                .close(); // Close the connection
+        });
+    } catch (error) {
+        // Show a popup if the printer is not found
+        dialog.showMessageBox({
+            type: "error",
+            title: "Printer Not Found",
+            message: "The thermal printer is not connected. Please connect the printer and try again.",
+            buttons: ["OK"],
+        });
+    }
+});
 //-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS
 ipcMain.on('get-held-orders', (event) => {

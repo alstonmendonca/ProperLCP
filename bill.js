@@ -254,6 +254,12 @@ function saveAndPrintBill() {
     // Send order data to main process with discount applied (or not)
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
 
+    // Generate ESC/POS commands for printing
+    const escPosCommands = generateEscPosCommands(billItems, discountedTotal);
+
+    // Send ESC/POS commands to the printer
+    ipcRenderer.send("print-bill", escPosCommands);
+
     // Add the glow effect to the bill panel
     const billPanel = document.getElementById("bill-panel");
     billPanel.classList.add("glow");
@@ -264,6 +270,49 @@ function saveAndPrintBill() {
     },800);
 
     NewOrder();
+}
+
+// Function to generate ESC/POS commands for the bill
+function generateEscPosCommands(billItems, totalAmount) {
+    let commands = [];
+
+    // Initialize printer
+    commands.push("\x1B\x40"); // Initialize printer
+
+    // Print header (Lassi Corner)
+    commands.push("\x1B\x61\x01"); // Center align
+    commands.push("\x1D\x21\x11"); // Double height and width
+    commands.push("Lassi Corner\n");
+    commands.push("\x1D\x21\x00"); // Reset text size
+    commands.push("\x1B\x61\x00"); // Left align
+
+    // Print bill items
+    commands.push("\x1B\x45\x01"); // Bold on
+    commands.push("Item\tQty\tPrice\n");
+    commands.push("\x1B\x45\x00"); // Bold off
+
+    billItems.forEach(item => {
+        const itemName = item.querySelector(".bill-item-name").textContent;
+        const quantity = item.querySelector(".bill-quantity").value;
+        const totalPrice = item.querySelector(".bill-total").textContent;
+
+        commands.push(`${itemName}\t${quantity}\t${totalPrice}\n`);
+    });
+
+    // Print total
+    commands.push("\x1B\x45\x01"); // Bold on
+    commands.push(`Total: Rs. ${totalAmount.toFixed(2)}\n`);
+    commands.push("\x1B\x45\x00"); // Bold off
+
+    // Print footer (Thank you for visiting)
+    commands.push("\x1B\x61\x01"); // Center align
+    commands.push("Thank you for visiting!\n");
+    commands.push("\x1B\x61\x00"); // Left align
+
+    // Cut paper
+    commands.push("\x1D\x56\x41\x10"); // Partial cut
+
+    return commands.join("");
 }
 
 // Edit-Mode Bill Panel Starts Here------------------------------------------------------------------------------

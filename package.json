@@ -10,6 +10,8 @@
     },
     "dependencies": {
         "electron-store": "^10.0.1",
+        "escpos": "^3.0.0-alpha.6",
+        "escpos-usb": "^3.0.0-alpha.4",
         "sqlite3": "^5.1.7",
         "xlsx": "^0.18.5"
     }
