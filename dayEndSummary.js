@@ -43,18 +43,6 @@ async function loadDayEndSummary(mainContent, billPanel) {
                 <div class="summary-info" id="taxAmount">0</div> <!-- Placeholder for info -->
             </div>
         </div>
-        <div class="summary-div" id="discountedOrders" onclick="handleSummaryClick('DiscountedOrders')">
-            <h3>Number of Discounted Orders Today</h3>
-            <div class="summary-info-container">
-                <div class="summary-info" id="discountedCount">0</div> <!-- Placeholder for info -->
-            </div>
-        </div>
-        <div class="summary-div" id="deletedOrders" onclick="handleSummaryClick('DeletedOrders')">
-            <h3>Number of Deleted Orders Today</h3>
-            <div class="summary-info-container">
-                <div class="summary-info" id="deletedCount">0</div> <!-- Placeholder for info -->
-            </div>
-        </div>
         <div class="summary-div" id="mostSoldItem" onclick="handleSummaryClick('MostSoldItem')">
             <h3>Most Sold Item Today</h3>
             <div class="summary-info-container">
@@ -77,6 +65,18 @@ async function loadDayEndSummary(mainContent, billPanel) {
             <h3>Category with Highest Revenue Today</h3>
             <div class="summary-info-container">
                 <div class="summary-info">Item Name</div> <!-- Placeholder for info -->
+            </div>
+        </div>
+        <div class="summary-div" id="discountedOrders" onclick="handleSummaryClick('DiscountedOrders')">
+            <h3>Number of Discounted Orders Today</h3>
+            <div class="summary-info-container">
+                <div class="summary-info" id="discountedCount">0</div> <!-- Placeholder for info -->
+            </div>
+        </div>
+        <div class="summary-div" id="deletedOrders" onclick="handleSummaryClick('DeletedOrders')">
+            <h3>Number of Deleted Orders Today</h3>
+            <div class="summary-info-container">
+                <div class="summary-info" id="deletedCount">0</div> <!-- Placeholder for info -->
             </div>
         </div>
     </div>

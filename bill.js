@@ -266,6 +266,7 @@ function saveAndPrintBill() {
     NewOrder();
 }
 
+// Edit-Mode Bill Panel Starts Here------------------------------------------------------------------------------
 function displayEditMode() {
     // Hide all existing buttons
     document.getElementById("upperbuttons").style.display = "none";
@@ -371,7 +372,7 @@ function styleButton(button) {
         button.style.backgroundColor = "#0C345A"; // Restore original color
     });
 }
-
+// Edit-mode Bill panel ends here-------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------------
 

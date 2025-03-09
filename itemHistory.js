@@ -86,6 +86,12 @@ function displayItemHistory(orders) {
 
     tableHTML += `</tbody></table>`;
     itemHistoryDiv.innerHTML = tableHTML;
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".order-history-table");
+        });
+    }, 100);
 }
 
 function sortOrders(orders, column) {

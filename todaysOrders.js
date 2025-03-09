@@ -1,6 +1,7 @@
 const { ipcRenderer } = require("electron");
 const { attachTodaysOrdersContextMenu } = require("./todaysOrdersContextMenu");
 const { deleteOrder } = require("./deleteOrder");
+const { exportTableToExcel } = require("./export");
 
 function fetchTodaysOrders() {
     ipcRenderer.send("get-todays-orders");
@@ -58,7 +59,70 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
 
     // Attach context menu to each order box
     attachTodaysOrdersContextMenu(".todays-order-box", "todaysOrders");
+
+    // Add event listener for the export button
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTodaysOrdersToExcel(orders);
+        });
+    }, 100);
 });
+
+// Function to export today's orders to Excel
+function exportTodaysOrdersToExcel(orders) {
+    // Create a table element
+    const table = document.createElement("table");
+    table.classList.add("order-history-table");
+
+    // Create the table header
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    const headers = ["Bill No", "Date", "Cashier", "KOT", "Price (₹)", "SGST (₹)", "CGST (₹)", "Tax (₹)", "Food Items"];
+
+    headers.forEach(headerText => {
+        const th = document.createElement("th");
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Create the table body
+    const tbody = document.createElement("tbody");
+
+    orders.forEach(order => {
+        const row = document.createElement("tr");
+        const date = new Date().toISOString().split("T")[0]; // Today's date
+
+        const cells = [
+            order.billno,
+            date,
+            order.cashier_name,
+            order.kot,
+            order.price.toFixed(2),
+            order.sgst.toFixed(2),
+            order.cgst.toFixed(2),
+            order.tax.toFixed(2),
+            order.food_items || "No items"
+        ];
+
+        cells.forEach(cellText => {
+            const td = document.createElement("td");
+            td.textContent = cellText;
+            row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+
+    // Append the table to the body (temporarily) to export it
+    document.body.appendChild(table);
+    exportTableToExcel(".order-history-table", "todays_orders.xlsx");
+    document.body.removeChild(table); // Remove the table after export
+}
 
 // Function to open edit order and populate the bill panel
 function openTodayEditOrder(billno) {
