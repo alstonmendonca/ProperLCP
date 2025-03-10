@@ -398,7 +398,7 @@ ipcMain.handle('get-highest-revenue-category', (event) => {
     });
 });
 
-// New function to fetch categories for Category Wise Sales
+// Fetch categories for Category Wise Sales
 ipcMain.on("get-category-wise-sales-categories", (event) => {
     const query = `SELECT catid, catname FROM Category WHERE active = 1`;
 
@@ -419,8 +419,8 @@ ipcMain.handle('get-category-wise-sales-data', (event, startDate, endDate) => {
             SELECT 
                 Category.catid,
                 Category.catname,
-                COUNT(Orders.billno) AS totalSales,
-                SUM(Orders.price) AS totalRevenue
+                SUM(OrderDetails.quantity) AS totalSales,
+                SUM(OrderDetails.quantity * FoodItem.cost) AS totalRevenue
             FROM 
                 Orders
             INNER JOIN 

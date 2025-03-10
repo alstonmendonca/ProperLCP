@@ -1704,14 +1704,14 @@ color: #fff;
 /* Center the header and make it visually appealing */
 .todays-orders-header, .order-history-header, .category-history-header, .deleted-orders-header, .discounted-orders-header, .item-history-header,
 .item-summary-header, .category-wise-sales-header, .top-selling-items-header, .top-selling-categories-header, .day-end-summary-header, .categories-title,
-.customer-header {
+.customer-header, .business-info-header, .theme-toggle-header {
     text-align: center; /* Center the content */
     margin-bottom: 20px; /* Add some spacing below the header */
 }
 
 .todays-orders-header h1, .order-history-header h1, .category-history-header h1, .deleted-orders-header h1, .discounted-orders-header h1, .item-history-header h1,
 .item-summary-header h2, .category-wise-sales-header h2, .top-selling-items-header h2, .top-selling-categories-header h2, .day-end-summary-header h2,
-.categories-title h2, .customer-header h2{
+.categories-title h2, .customer-header h2, .business-info-header h1, .theme-toggle-header h2{
     font-size: 2.5rem; /* Increase font size */
     font-weight: bold; /* Make it bold */
     color: #2c3e50; /* Use a dark, professional color */

@@ -256,9 +256,21 @@ async function updateMainContent(contentType) {
             mainContent.style.marginRight = "0px";
             loadUserProfile(mainContent, billPanel);
         }
+        else if (contentType === "BusinessInfo") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            mainContent.innerHTML = `
+                <div class="business-info-header">
+                    <h1>Business Information</h1>
+                </div>
+            `
+            
+        }
         else if (contentType === "ThemeToggle") {
             mainContent.innerHTML = `
-                <h2>Theme Toggle</h2>
+                <div class="theme-toggle-header">
+                    <h2>Theme Toggle</h2>
+                </div>
                 <p>Switch between light and dark themes</p>
                 <label class="dark-mode-toggle">
                     <input type="checkbox" id="darkModeToggle">
