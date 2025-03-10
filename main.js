@@ -1753,7 +1753,11 @@ ipcMain.handle("get-all-food-items", async () => {
         const query = `
             SELECT f.fid, f.fname, f.cost, f.veg 
             FROM FoodItem f 
-            WHERE f.active = 1 AND f.is_on = 1
+            JOIN Category c ON f.category = c.catid
+            WHERE f.active = 1 
+            AND f.is_on = 1 
+            AND c.active = 1;
+
         `;
         db.all(query, [], (err, rows) => {
             if (err) {
