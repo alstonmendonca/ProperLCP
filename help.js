@@ -3,7 +3,9 @@ function loadHelpSection() {
     const billPanel = document.getElementById("bill-panel");
 
     mainContent.innerHTML = `
-        <h2>Help & Support</h2>
+        <div class='section-title'>
+            <h2>Help & Support</h2>
+        </div>
         <p>Need assistance? Contact us through the details below:</p>
         
         <h3>Contact Information</h3>

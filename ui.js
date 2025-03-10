@@ -240,7 +240,7 @@ async function updateMainContent(contentType) {
             mainContent.style.marginLeft = "0px";
             mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
-                <div class="categories-title">
+                <div class='section-title'>
                     <h2>Categories</h2>
                 </div>
                 <div id="categoriesTabDiv"></div>
@@ -260,15 +260,14 @@ async function updateMainContent(contentType) {
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
             mainContent.innerHTML = `
-                <div class="business-info-header">
-                    <h1>Business Information</h1>
+                <div class='section-title'>
+                    <h2>Business Information</h2>
                 </div>
             `
-            
         }
         else if (contentType === "ThemeToggle") {
             mainContent.innerHTML = `
-                <div class="theme-toggle-header">
+                <div class='section-title'>
                     <h2>Theme Toggle</h2>
                 </div>
                 <p>Switch between light and dark themes</p>
@@ -298,29 +297,61 @@ async function updateMainContent(contentType) {
                 }
             });
         }
+        else if (contentType === "DisplaySettings") {
+            mainContent.innerHTML = `
+                <div class='section-title'>
+                    <h2>Display Settings</h2>
+                </div>
+                <p>Settings for display</p>
+            `;
+        }
         else if (contentType === "TaxAndDiscount") {
             mainContent.innerHTML = `
-                <h2>Tax & Discount</h2>
-                <p>Set default values for tax rates and discounts</p>
-                <div id="taxDiscountDiv"></div>
+                <div class='section-title'>
+                    <h2>Tax and Discount</h2>
+                </div>
+                <p>Settings for display</p>
             `;
-            billPanel.style.display = 'none';
         }
         else if (contentType === "PrinterConfig") {
             mainContent.innerHTML = `
-                <h2>Printer Configuration</h2>
-                <p>Configure your printer</p>
-                <div id="printerConfigDiv"></div>
+                <div class='section-title'>
+                    <h2>Printer Configuration</h2>
+                </div>
+                <p>Settings for display</p>
             `;
-            billPanel.style.display = 'none';
+        }
+        else if (contentType === "Receipt") {
+            mainContent.innerHTML = `
+                <div class='section-title'>
+                    <h2>Receipt</h2>
+                </div>
+                <p>Settings for display</p>
+            `;
+        }
+        else if (contentType === "DateAndTime") {
+            mainContent.innerHTML = `
+                <div class='section-title'>
+                    <h2>Date And Time</h2>
+                </div>
+                <p>Settings for display</p>
+            `;
+        }
+        else if (contentType === "Currency") {
+            mainContent.innerHTML = `
+                <div class='section-title'>
+                    <h2>Currency</h2>
+                </div>
+                <p>Settings for display</p>
+            `;
         }
         else if (contentType === "Security") {
             mainContent.innerHTML = `
-                <h2>Security Settings</h2>
-                <p>Manage security settings, roles, and permissions</p>
-                <div id="securityDiv"></div>
+                <div class='section-title'>
+                    <h2>Security</h2>
+                </div>
+                <p>Settings for display</p>
             `;
-            billPanel.style.display = 'none';
         }
         else if (contentType === "Help") {
             loadHelpSection();
@@ -789,8 +820,6 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="DateAndTime" onclick="updateMainContent('DateAndTime')">Date And Time</button>
                 <button class="category" id="Currency" onclick="updateMainContent('Currency')">Currency</button>
                 <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
-                <button class="category" id="CategoryColors" onclick="updateMainContent('CategoryColors')">Category Colors</button>
-                <button class="category" id="Notifications" onclick="updateMainContent('Notifications')">Notifications</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
                 <button class="category" id="SystemUpdates" onclick="updateMainContent('SystemUpdates')">System Updates</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>

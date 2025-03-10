@@ -3,7 +3,9 @@ const { ipcRenderer } = require("electron");
 // Function to load the User Profile UI
 function loadUserProfile(mainContent, billPanel) {
     mainContent.innerHTML = `
-        <h2>User Profile</h2>
+        <div class="display-settings-header">
+            <h2>User Profile</h2>
+        </div>
 
         <!-- Add User Buttons -->
         <button id="addUserButton" class="add-user-btn">Add User</button>
