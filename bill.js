@@ -416,10 +416,19 @@ function saveEdit() {
 
     // Send the updated order details to the main process
     ipcRenderer.send("update-order", { billno, orderItems });
-
-    // Exit edit mode
-    exitEditMode();
 }
+
+// Listen for update response
+ipcRenderer.on("update-order-response", (event, response) => {
+    if (response.success) {
+        alert("Order updated successfully!");
+        exitEditMode();
+        ipcRenderer.send("get-todays-orders"); // Refresh today's orders
+    } else {
+        alert("Failed to update order. Please try again.");
+    }
+});
+
 function exitEditMode() {
     // Show original buttons
     document.getElementById("upperbuttons").style.display = "flex";
@@ -797,9 +806,6 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
         });
     }
 });
-
-
-
 
 // Function to add current bill items to an existing order
 function addToExistingOrder(orderId) {

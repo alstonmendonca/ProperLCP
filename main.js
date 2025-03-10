@@ -1467,13 +1467,53 @@ ipcMain.on("update-order", (event, { billno, orderItems }) => {
         });
 
         // Execute all insert statements
+        // Execute all insert statements
         Promise.all(statements)
             .then(() => {
-                console.log("Order updated successfully.");
-                event.reply("update-order-response", { success: true });
+                console.log("Order items updated successfully.");
 
-                // Refresh the Today's Orders section
-                event.sender.send("refresh-order-history");
+                // Recalculate the total price, SGST, CGST, and tax
+                const totalQuery = `
+                    SELECT 
+                        SUM(f.cost * od.quantity) AS total_price,
+                        SUM(f.sgst * od.quantity) AS total_sgst,
+                        SUM(f.cgst * od.quantity) AS total_cgst
+                    FROM OrderDetails od
+                    JOIN FoodItem f ON od.foodid = f.fid
+                    WHERE od.orderid = ?;
+                `;
+
+                db.get(totalQuery, [billno], (err, row) => {
+                    if (err) {
+                        console.error("Error calculating total price:", err);
+                        event.reply("update-order-response", { success: false });
+                        return;
+                    }
+
+                    if (row) {
+                        const { total_price, total_sgst, total_cgst } = row;
+                        const total_tax = total_sgst + total_cgst;
+
+                        // Update the Orders table with the new price, sgst, cgst, and tax
+                        const updateOrderQuery = `
+                            UPDATE Orders
+                            SET price = ?, sgst = ?, cgst = ?, tax = ?
+                            WHERE billno = ?;
+                        `;
+                        db.run(updateOrderQuery, [total_price, total_sgst, total_cgst, total_tax, billno], (err) => {
+                            if (err) {
+                                console.error("Error updating order totals:", err);
+                                event.reply("update-order-response", { success: false });
+                            } else {
+                                console.log("Order totals updated successfully.");
+                                event.reply("update-order-response", { success: true });
+
+                                // Refresh the "Today's Orders" section
+                                event.sender.send("refresh-order-history");
+                            }
+                        });
+                    }
+                });
             })
             .catch((err) => {
                 console.error("Error updating order details:", err);
