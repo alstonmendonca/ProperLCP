@@ -1571,52 +1571,7 @@ ipcMain.on("add-user", (event, { uname, password, isadmin }) => {
     });
 });
 
-let addUserWindow = null; // Keep track of the window
-
-ipcMain.on("open-add-user-window", () => {
-    if (addUserWindow) {
-        return; // Prevent opening multiple windows
-    }
-
-    addUserWindow = new BrowserWindow({
-        width: 400,
-        height: 300,
-        title: "Add User",
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        }
-    });
-
-    addUserWindow.loadFile(path.join(__dirname, "addUser.html")); // Create a new HTML file for it
-
-    addUserWindow.on("closed", () => {
-        addUserWindow = null; // Reset when closed
-    });
-});
-
-let removeUserWindow = null;
-
-ipcMain.on("open-remove-user-window", () => {
-    if (removeUserWindow) return; // Prevent multiple windows
-
-    removeUserWindow = new BrowserWindow({
-        width: 400,
-        height: 500,
-        title: "Remove Users",
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        }
-    });
-
-    removeUserWindow.loadFile(path.join(__dirname, "removeUser.html"));
-
-    removeUserWindow.on("closed", () => {
-        removeUserWindow = null; // Reset when closed
-    });
-});
-
+// Handle request to remove users
 ipcMain.on("remove-users", (event, userIds) => {
     if (userIds.length === 0) return;
 
@@ -1635,7 +1590,6 @@ ipcMain.on("remove-users", (event, userIds) => {
         mainWindow.webContents.send("get-users"); // Refresh user list in main UI
     });
 });
-
 
 //----------------------------------------------SETTINGS TAB ENDS HERE--------------------------------------------
 

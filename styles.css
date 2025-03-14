@@ -711,57 +711,6 @@ input:checked + .slider:before {
     transform: translateX(18px);
 }
 
-/*User Profile Styling*/
-/* Admin Section */
-.admin-bar {
-    background-color: #f0f0f0;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.admin-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.admin-box {
-    background-color: #d1e7dd;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    flex: 1;
-    min-width: 150px;
-    text-align: center;
-}
-
-/* Staff Section */
-.staff-grid {
-    margin-top: 20px;
-}
-
-.staff-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
-    max-width: 800px; /* Prevents overly large grid */
-}
-
-.staff-box {
-    background-color: #ffebcc;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
-}
-
-.staff-box:hover {
-    transform: scale(1.05);
-}
-
 /* Popup Styling */
 .menu-edit-popup {
     position: fixed;
@@ -808,8 +757,6 @@ input:checked + .slider:before {
     background-color: red;
     color: white;
 }
-
-/* User Profile Styling Ends Here */
 
 /* Dark Mode Toggle Starts Here*/
 /* Toggle Switch Styling */
@@ -1773,3 +1720,140 @@ color: #fff;
 #deletedClearHistory:hover, #discountedClearHistory:hover {
     background-color: #c0392b; /* Darker red on hover */
 }
+
+/*User Profile Section Starts here */ 
+/* Admin Section */
+.admin-bar {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.admin-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+}
+
+.admin-box {
+    background-color: #d1e7dd;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Staff Section */
+.staff-grid {
+    margin-top: 20px;
+}
+
+.staff-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+}
+
+.staff-box {
+    background-color: #ffebcc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.staff-box:hover {
+    transform: scale(1.05);
+}
+
+/* Popup Styling */
+.edit-user-popup, .add-user-popup, .remove-user-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.user-popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+}
+
+.user-popup-content h3 {
+    margin-top: 0;
+}
+
+.user-popup-content input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.user-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.user-popup-buttons button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#saveChanges, #confirmAddUser, #removeUsers {
+    background-color: green;
+    color: white;
+}
+
+#closePopup {
+    background-color: red;
+    color: white;
+}
+
+/* Remove User Popup Styling */
+.user-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.user-item.selected {
+    background-color: #ffcccc;
+}
+
+.user-item input {
+    margin-right: 10px;
+}
+
+.user-item label {
+    cursor: pointer;
+}
+
+/* User Profile Section ENDS HERE */
