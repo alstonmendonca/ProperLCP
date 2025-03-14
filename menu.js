@@ -171,9 +171,9 @@ async function displayMenu() {
 
                     // Create the edit popup dynamically
                     const popup = document.createElement("div");
-                    popup.classList.add("edit-popup");
+                    popup.classList.add("menu-edit-popup");
                     popup.innerHTML = `
-                        <div class="popup-content" style = "align-items: center; justify-content: center; pointer-events: auto;">
+                        <div class="menu-popup-content" style = "align-items: center; justify-content: center; pointer-events: auto;">
                             <h3>Edit Food Item</h3>
                             <label>Name:</label>
                             <input type="text" id="editFname" value="${item.fname}">
@@ -195,7 +195,7 @@ async function displayMenu() {
                             </label>
                             <br>
 
-                            <div class="popup-buttons">
+                            <div class="menu-popup-buttons">
                                 <button id="saveChanges" style="margin-right: 10px;">Save</button>
                                 <button id="closePopup">Cancel</button>
                             </div>
@@ -308,10 +308,10 @@ function toggleAddItemPopup() {
 
     const popup = document.createElement("div");
     popup.id = "add-item-popup";
-    popup.classList.add("edit-popup");
+    popup.classList.add("menu-edit-popup");
 
     popup.innerHTML = `
-        <div class="popup-content" style="align-items: center; justify-content: center; width: 400px; pointer-events: auto;">
+        <div class="menu-popup-content" style="align-items: center; justify-content: center; width: 400px; pointer-events: auto;">
             <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px; color: #333;">Add New Food Item</h3>
             <form id="addItemForm" style="display: flex; flex-direction: column; gap: 15px;">
                 <div class="form-group">
@@ -368,7 +368,7 @@ function toggleAddItemPopup() {
                     </label>
                 </div>
 
-                <div class="popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <div class="menu-popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                     <button type="submit" id="addItemBtn" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Add</button>
                     <button id="closePopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Cancel</button>
                 </div>
@@ -440,15 +440,15 @@ function createTextPopup(message) {
     // Create popup container
     const popup = document.createElement("div");
     popup.id = "custom-popup";
-    popup.classList.add("edit-popup");
+    popup.classList.add("menu-edit-popup");
 
     popup.innerHTML = `
-        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
+        <div class="menu-popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
             <p>${message}</p>
 
             <br>
 
-            <div class="popup-buttons">
+            <div class="menu-popup-buttons">
                 <button id="closePopuptext" style="width: 90px; height: 40px;">OK</button>
             </div>
         </div>
@@ -474,13 +474,13 @@ function createConfirmPopup(message) {
         // Create popup container
         const popup = document.createElement("div");
         popup.id = "custom-confirm-popup";
-        popup.classList.add("edit-popup");
+        popup.classList.add("menu-edit-popup");
 
         popup.innerHTML = `
-            <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
+            <div class="menu-popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
                 <p>${message}</p>
                 <br>
-                <div class="popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
+                <div class="menu-popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
                     <button id="confirmYes" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Yes</button>
                     <button id="confirmNo" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">No</button>
                 </div>

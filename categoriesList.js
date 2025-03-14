@@ -51,7 +51,7 @@ function confirmDeleteCategory(categoryId) {
     const popup = document.createElement("div");
     popup.classList.add("category-edit-popup");
     popup.innerHTML = `
-        <div class="popup-content">
+        <div class="category-popup-content">
             <h2 style="margin-bottom: 15px;">Confirm Deletion</h2>
             <p style="margin-bottom: 20px;">Are you sure you want to delete this category?</p>
             <div class="buttons">
@@ -86,7 +86,7 @@ function openEditCategoryPopup(catid, catname, active) {
     const popup = document.createElement("div");
     popup.classList.add("category-edit-popup");
     popup.innerHTML = `
-        <div class="popup-content">
+        <div class="category-popup-content">
             <h2>Edit Category</h2>
             <input type="text" id="editCategoryName" value="${catname}" placeholder="Category Name"><br><br>
             <div class="toggle-container">
@@ -158,7 +158,7 @@ function openAddCategoryPopup() {
     const popup = document.createElement("div");
     popup.classList.add("category-edit-popup"); // Reusing the edit popup styling
     popup.innerHTML = `
-        <div class="popup-content">
+        <div class="category-popup-content">
             <h2>Add Category</h2>
             <input type="text" id="newCategoryName" placeholder="Category Name"><br><br>
             <div class="toggle-container">
@@ -204,7 +204,7 @@ function openAddCategoryPopup() {
             const errorPopup = document.createElement("div");
             errorPopup.classList.add("add-category-error-popup");
             errorPopup.innerHTML = `
-                <div class="popup-content">
+                <div class="category-popup-content">
                     <h2 style="margin-bottom: 15px;">Error</h2>
                     <p style="margin-bottom: 15px;">Please enter a category name.</p>
                     <div class="buttons">

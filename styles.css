@@ -763,7 +763,7 @@ input:checked + .slider:before {
 }
 
 /* Popup Styling */
-.edit-popup {
+.menu-edit-popup {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -775,24 +775,24 @@ input:checked + .slider:before {
     z-index: 1000;
 }
 
-.popup-content {
+.menu-popup-content {
     display: flex;
     flex-direction: column;
 }
 
-.popup-content input {
+.menu-popup-content input {
     margin-bottom: 10px;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-.popup-buttons {
+.menu-popup-buttons {
     display: flex;
     justify-content: space-between;
 }
 
-.popup-buttons button {
+.menu-popup-buttons button {
     padding: 8px 15px;
     border: none;
     border-radius: 5px;
@@ -1550,7 +1550,7 @@ color: #fff;
     color: white;
 }
 
-.popup-content input {
+.category-popup-content input {
     width: 100%;
     padding: 8px;
     font-size: 16px;
