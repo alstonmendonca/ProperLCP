@@ -1728,6 +1728,7 @@ color: #fff;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 .admin-container {
@@ -1737,11 +1738,16 @@ color: #fff;
 }
 
 .admin-box {
-    background-color: #d1e7dd;
+    background-color: #0D3B66;
+    color: rgb(225, 221, 221);
     padding: 10px;
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
+}
+
+.admin-box:hover{
+    background-color: #11487b;
 }
 
 /* Staff Section */
@@ -1756,8 +1762,9 @@ color: #fff;
 }
 
 .staff-box {
-    background-color: #ffebcc;
-    padding: 10px;
+    background-color: #0D3B66;
+    color: rgb(225, 221, 221);
+    padding: 20px;
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -1767,6 +1774,7 @@ color: #fff;
 
 .staff-box:hover {
     transform: scale(1.05);
+    background-color: #11487b;
 }
 
 /* Popup Styling */
@@ -1832,20 +1840,29 @@ color: #fff;
     max-height: 300px;
     overflow-y: auto;
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .user-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
+    background-color: #f9f9f9;
+    padding: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 5px;
+    text-align: center;
     cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.user-item:hover {
+    background-color: #f1f1f1;
+    transform: scale(1.02);
 }
 
 .user-item.selected {
     background-color: #ffcccc;
+    border-color: #ff9999;
 }
 
 .user-item input {

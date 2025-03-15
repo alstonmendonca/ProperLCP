@@ -46,7 +46,7 @@ ipcRenderer.on("users-response", (event, users) => {
     // Display admins inside the rectangular bar
     if (admins.length > 0) {
         adminBar.innerHTML = `
-            <h3>Admins</h3>
+            <h3 style="margin-bottom: 15px;">Admins</h3>
             <div class="admin-container">
                 ${admins.map(admin => `
                     <div class="admin-box">
@@ -63,7 +63,7 @@ ipcRenderer.on("users-response", (event, users) => {
     // Display staff inside a grid
     if (staff.length > 0) {
         staffGrid.innerHTML = `
-            <h3>Staff Members</h3>
+            <h3 style="margin-bottom: 15px;">Staff Members</h3>
             <div class="staff-container">
                 ${staff.map(staffMember => `
                     <div class="staff-box" data-id="${staffMember.userid}" data-uname="${staffMember.uname}" data-password="${staffMember.password}">
@@ -218,16 +218,14 @@ function openRemoveUserPopup() {
         users.forEach(user => {
             const userItem = document.createElement("div");
             userItem.classList.add("user-item");
+            userItem.setAttribute("data-id", user.userid); // Store user ID for selection
             userItem.innerHTML = `
-                <input type="checkbox" data-id="${user.userid}" id="user-${user.userid}">
-                <label for="user-${user.userid}">${user.uname} (${user.isadmin ? "Admin" : "Staff"})</label>
+                <span>${user.uname} (${user.isadmin ? "Admin" : "Staff"})</span>
             `;
 
             // Toggle selection on click
             userItem.addEventListener("click", () => {
-                const checkbox = userItem.querySelector("input");
-                checkbox.checked = !checkbox.checked;
-                userItem.classList.toggle("selected", checkbox.checked);
+                userItem.classList.toggle("selected");
             });
 
             userList.appendChild(userItem);
@@ -236,8 +234,8 @@ function openRemoveUserPopup() {
 
     // Handle remove users
     popup.querySelector("#removeUsers").addEventListener("click", () => {
-        const selectedUsers = Array.from(popup.querySelectorAll("input[type='checkbox']:checked"))
-            .map(checkbox => checkbox.getAttribute("data-id"));
+        const selectedUsers = Array.from(popup.querySelectorAll(".user-item.selected"))
+            .map(userItem => userItem.getAttribute("data-id"));
 
         if (selectedUsers.length === 0) {
             alert("Please select at least one user to remove.");
@@ -259,6 +257,15 @@ function openRemoveUserPopup() {
         }
     });
 }
+
+// Listen for "users-deleted" event from main process
+ipcRenderer.on("users-deleted", () => {
+    // Close the Remove User Popup
+    document.querySelector(".remove-user-popup")?.remove();
+
+    // Refresh the user list in the mainContent
+    ipcRenderer.send("get-users");
+});
 
 // Listen for "user-updated" event from main process
 ipcRenderer.on("user-updated", () => {
