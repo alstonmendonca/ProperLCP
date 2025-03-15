@@ -1746,10 +1746,6 @@ color: #fff;
     text-align: center;
 }
 
-.admin-box:hover{
-    background-color: #11487b;
-}
-
 /* Staff Section */
 .staff-grid {
     margin-top: 20px;
@@ -1798,18 +1794,21 @@ color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 400px;
     max-width: 90%;
+    overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 .user-popup-content h3 {
     margin-top: 0;
+    margin-bottom: 15px;
 }
 
 .user-popup-content input {
     width: 100%;
     padding: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    margin-top: 5px;
 }
 
 .user-popup-buttons {
@@ -1843,6 +1842,7 @@ color: #fff;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%; /* Ensure it doesn't overflow horizontally */
 }
 
 .user-item {
@@ -1853,6 +1853,8 @@ color: #fff;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.2s ease;
+    width: 100%; /* Ensure it doesn't overflow horizontally */
+    box-sizing: border-box; /* Include padding and border in the width */
 }
 
 .user-item:hover {
@@ -1871,6 +1873,71 @@ color: #fff;
 
 .user-item label {
     cursor: pointer;
+}
+
+.add-user-btn{
+    margin-right: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/*Toggle Switch for the user section*/
+/* User Toggle Switch Styling */
+.user-toggle-switch-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    margin: 0 10px;
+}
+
+.user-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.user-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.user-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .user-slider {
+    background-color: #0D3B66;
+}
+
+input:checked + .user-slider:before {
+    transform: translateX(26px);
+}
+
+#user-roleLabel {
+    font-weight: bold;
+    color: #0D3B66;
 }
 
 /* User Profile Section ENDS HERE */

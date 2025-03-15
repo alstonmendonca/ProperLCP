@@ -46,7 +46,7 @@ ipcRenderer.on("users-response", (event, users) => {
     // Display admins inside the rectangular bar
     if (admins.length > 0) {
         adminBar.innerHTML = `
-            <h3 style="margin-bottom: 15px;">Admins</h3>
+            <h2 style="margin-bottom: 15px; text-align: center;">ADMINS</h2>
             <div class="admin-container">
                 ${admins.map(admin => `
                     <div class="admin-box">
@@ -63,7 +63,7 @@ ipcRenderer.on("users-response", (event, users) => {
     // Display staff inside a grid
     if (staff.length > 0) {
         staffGrid.innerHTML = `
-            <h3 style="margin-bottom: 15px;">Staff Members</h3>
+            <h2 style="margin-top: 30px; margin-bottom: 15px; text-align: center;">STAFF MEMBERS</h2>
             <div class="staff-container">
                 ${staff.map(staffMember => `
                     <div class="staff-box" data-id="${staffMember.userid}" data-uname="${staffMember.uname}" data-password="${staffMember.password}">
@@ -132,6 +132,15 @@ function openEditPopup(userid, uname, password) {
     });
 }
 
+// Listen for "user-updated" event from main process
+ipcRenderer.on("user-updated", () => {
+    // Close the Edit User Popup
+    document.querySelector(".edit-user-popup")?.remove();
+
+    // Refresh the user list in the mainContent
+    ipcRenderer.send("get-users");
+});
+
 // Function to open the Add User popup
 function openAddUserPopup() {
     const popup = document.createElement("div");
@@ -143,7 +152,14 @@ function openAddUserPopup() {
             <input type="text" id="newUname" placeholder="Enter username">
             <label>Password:</label>
             <input type="password" id="newPassword" placeholder="Enter password">
-            <button id="roleToggle" class="toggle-btn" data-role="staff">Staff</button>
+            <div class="user-toggle-switch-container">
+                <label>Role:</label>
+                <label class="user-toggle-switch">
+                    <input type="checkbox" id="user-roleToggle">
+                    <span class="user-slider"></span>
+                </label>
+                <span id="user-roleLabel">Staff</span>
+            </div>
             <div class="user-popup-buttons">
                 <button id="confirmAddUser">Add User</button>
                 <button id="closePopup">Cancel</button>
@@ -154,16 +170,14 @@ function openAddUserPopup() {
     document.body.appendChild(popup);
 
     // Toggle role between Admin and Staff
-    const roleToggleBtn = popup.querySelector("#roleToggle");
-    roleToggleBtn.addEventListener("click", () => {
-        if (roleToggleBtn.getAttribute("data-role") === "staff") {
-            roleToggleBtn.setAttribute("data-role", "admin");
-            roleToggleBtn.textContent = "Admin";
-            roleToggleBtn.style.backgroundColor = "red";
+    const roleToggle = popup.querySelector("#user-roleToggle");
+    const roleLabel = popup.querySelector("#user-roleLabel");
+
+    roleToggle.addEventListener("change", () => {
+        if (roleToggle.checked) {
+            roleLabel.textContent = "Admin";
         } else {
-            roleToggleBtn.setAttribute("data-role", "staff");
-            roleToggleBtn.textContent = "Staff";
-            roleToggleBtn.style.backgroundColor = "blue";
+            roleLabel.textContent = "Staff";
         }
     });
 
@@ -171,7 +185,7 @@ function openAddUserPopup() {
     popup.querySelector("#confirmAddUser").addEventListener("click", () => {
         const uname = popup.querySelector("#newUname").value.trim();
         const password = popup.querySelector("#newPassword").value.trim();
-        const isadmin = roleToggleBtn.getAttribute("data-role") === "admin" ? 1 : 0;
+        const isadmin = roleToggle.checked ? 1 : 0;
 
         if (uname && password) {
             ipcRenderer.send("add-user", { uname, password, isadmin });
@@ -265,12 +279,6 @@ ipcRenderer.on("users-deleted", () => {
 
     // Refresh the user list in the mainContent
     ipcRenderer.send("get-users");
-});
-
-// Listen for "user-updated" event from main process
-ipcRenderer.on("user-updated", () => {
-    document.body.querySelector(".edit-popup")?.remove(); // Close the popup
-    ipcRenderer.send("get-users"); // Refresh the user list
 });
 
 // Listen for user added confirmation from `main.js`
