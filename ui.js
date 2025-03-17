@@ -314,12 +314,7 @@ async function updateMainContent(contentType) {
             `;
         }
         else if (contentType === "PrinterConfig") {
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Printer Configuration</h2>
-                </div>
-                <p>Settings for display</p>
-            `;
+            loadPrinterConfig(mainContent);
         }
         else if (contentType === "Receipt") {
             mainContent.innerHTML = `
