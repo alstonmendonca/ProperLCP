@@ -1419,7 +1419,6 @@ color: #fff;
 }
 
 /* Popup Overlay Styles */
-/* Popup Overlay Styles */
 .overlay {
     position: fixed;
     top: 0;
@@ -1617,6 +1616,19 @@ color: #fff;
     font-size: 24px; /* Size of the close button */
     cursor: pointer; /* Pointer cursor */
 }
+
+/* Styles for the food items list */
+.food-items-list {
+    list-style-type: none; /* Remove default bullet points */
+    padding: 0; /* Remove default padding */
+    margin: 10px 0; /* Margin for spacing */
+}
+
+.food-items-list li {
+    padding: 5px 0; /* Padding for each item */
+    border-bottom: 1px solid #ddd; /* Light border for separation */
+}
+
 
 /* Animation for fade-in effect */
 @keyframes fadeIn {

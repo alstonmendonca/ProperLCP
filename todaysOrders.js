@@ -9,8 +9,8 @@ function fetchTodaysOrders() {
 // Function to create and show the enlarged order details
 function showOrderDetails(order) {
     const orderDetailsHTML = `
-        <div class="order-details-modal">
-            <div class="order-details-content">
+        <div class="order-details-modal" onclick="closeOrderDetails(event)">
+            <div class="order-details-content" onclick="event.stopPropagation();">
                 <span class="close-button" onclick="closeOrderDetails()">&times;</span>
                 <h3>Order Details for Bill No: ${order.billno}</h3>
                 <p>Cashier: ${order.cashier_name}</p>
@@ -20,7 +20,7 @@ function showOrderDetails(order) {
                 <p>CGST: ₹${order.cgst.toFixed(2)}</p>
                 <p>Tax: ₹${order.tax.toFixed(2)}</p>
                 <h4>Food Items:</h4>
-                <ul>
+                <ul class="food-items-list">
                     ${order.food_items.split(', ').map(item => `<li>${item}</li>`).join('')}
                 </ul>
             </div>
@@ -32,13 +32,12 @@ function showOrderDetails(order) {
 }
 
 // Function to close the order details modal
-function closeOrderDetails() {
+function closeOrderDetails(event) {
     const modal = document.querySelector('.order-details-modal');
     if (modal) {
         modal.remove();
     }
 }
-
 // Receive today's orders from the main process and update the UI
 ipcRenderer.on("todays-orders-response", (event, data) => {
     const orders = data.orders;
