@@ -1941,3 +1941,67 @@ input:checked + .user-slider:before {
 }
 
 /* User Profile Section ENDS HERE */
+/* Delete Order popup in todaysOrders STARTS HERE*/
+/* Delete Order Popup Styling */
+.delete-order-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.delete-order-popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    max-width: 90%;
+}
+
+.delete-order-popup-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.delete-order-popup-content label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.delete-order-popup-content input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.delete-order-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.delete-order-popup-buttons button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#confirmDeleteOrder {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+#cancelDeleteOrder {
+    background-color: #ccc;
+    color: black;
+}
+/* Delete Order Popup for todays orders ENDS HERE*/

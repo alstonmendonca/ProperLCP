@@ -1,6 +1,5 @@
 const { ipcRenderer } = require("electron");
 const { attachTodaysOrdersContextMenu } = require("./todaysOrdersContextMenu");
-const { deleteOrder } = require("./deleteOrder");
 const { exportTableToExcel } = require("./export");
 
 function fetchTodaysOrders() {

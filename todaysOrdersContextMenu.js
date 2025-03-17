@@ -22,7 +22,7 @@ function attachTodaysOrdersContextMenu(selector) {
 
             // Handle delete order
             menu.querySelector("#deleteOrder").addEventListener("click", () => {
-                ipcRenderer.send("open-delete-order-window", { billNo, source: "todaysOrders" });
+                openDeleteOrderPopup(billNo, "todaysOrders");
                 menu.remove();
             });
 
@@ -37,6 +37,48 @@ function attachTodaysOrdersContextMenu(selector) {
                 menu.remove();
             }, { once: true });
         });
+    });
+}
+
+// Function to open the delete order popup
+function openDeleteOrderPopup(billNo, sourceSection) {
+    const popup = document.createElement("div");
+    popup.classList.add("delete-order-popup");
+    popup.innerHTML = `
+        <div class="delete-order-popup-content">
+            <h3>Delete Order</h3>
+            <label>Reason for Deletion:</label>
+            <input type="text" id="deleteReason" placeholder="Enter reason">
+            <div class="delete-order-popup-buttons">
+                <button id="confirmDeleteOrder">Delete</button>
+                <button id="cancelDeleteOrder">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Handle confirm delete
+    popup.querySelector("#confirmDeleteOrder").addEventListener("click", () => {
+        const reason = popup.querySelector("#deleteReason").value.trim();
+        if (reason) {
+            ipcRenderer.send("confirm-delete-order", { billNo, reason, source: sourceSection });
+            document.body.removeChild(popup);
+        } else {
+            alert("Please enter a reason for deletion.");
+        }
+    });
+
+    // Handle cancel delete
+    popup.querySelector("#cancelDeleteOrder").addEventListener("click", () => {
+        document.body.removeChild(popup);
+    });
+
+    // Close popup when clicking outside
+    popup.addEventListener("click", (e) => {
+        if (e.target === popup) {
+            document.body.removeChild(popup);
+        }
     });
 }
 

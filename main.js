@@ -1054,27 +1054,7 @@ ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
     });
 });
 
-ipcMain.on("open-delete-order-window", (event, data) => {
-    const deleteWindow = new BrowserWindow({
-        width: 400,
-        height: 250,
-        modal: true,
-        parent: BrowserWindow.getFocusedWindow(),
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        }
-    });
-
-    deleteWindow.loadFile("deleteOrder.html");
-
-    deleteWindow.webContents.once("did-finish-load", () => {
-        deleteWindow.webContents.send("populate-delete-window", data);
-    });
-});
-
-ipcMain.on("confirm-delete-order", async (event, { billNo, reason }) => {
-
+ipcMain.on("confirm-delete-order", async (event, { billNo, reason, source }) => {
     try {
         // Convert db.get and db.all into Promises
         const getAsync = (query, params) => {
@@ -1125,7 +1105,7 @@ ipcMain.on("confirm-delete-order", async (event, { billNo, reason }) => {
         event.reply("delete-order-response", { success: true, message: "Order deleted successfully!" });
 
         // ✅ Notify the renderer process about the deletion
-        mainWindow.webContents.send("order-deleted", { source: "todaysOrders" });
+        mainWindow.webContents.send("order-deleted", { source });
         mainWindow.webContents.send("refresh-order-history");
 
     } catch (error) {
@@ -1133,7 +1113,6 @@ ipcMain.on("confirm-delete-order", async (event, { billNo, reason }) => {
         event.reply("delete-order-response", { success: false, message: "Failed to delete order." });
     }
 });
-
 
 ipcMain.on("get-categories-event", (event) => {
 
