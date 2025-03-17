@@ -266,36 +266,7 @@ async function updateMainContent(contentType) {
             `
         }
         else if (contentType === "ThemeToggle") {
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Theme Toggle</h2>
-                </div>
-                <p>Switch between light and dark themes</p>
-                <label class="dark-mode-toggle">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider"></span>
-                </label>
-            `;
-            
-            billPanel.style.display = 'none';
-
-            const toggleButton = document.getElementById("darkModeToggle");
-
-            // Check if dark mode was previously enabled
-            if (localStorage.getItem("theme") === "dark") {
-                document.body.classList.add("dark-mode");
-                toggleButton.checked = true;
-            }
-
-            toggleButton.addEventListener("change", () => {
-                if (toggleButton.checked) {
-                    document.body.classList.add("dark-mode");
-                    localStorage.setItem("theme", "dark"); // Store theme in local storage
-                } else {
-                    document.body.classList.remove("dark-mode");
-                    localStorage.setItem("theme", "light");
-                }
-            });
+            loadThemeToggle(mainContent, billPanel); // Call the theme toggle function
         }
         else if (contentType === "DisplaySettings") {
             mainContent.innerHTML = `

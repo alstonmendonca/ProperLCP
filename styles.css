@@ -103,7 +103,6 @@ body {
     stroke-width: 1.8;
 }
 
-
 /* Container for left and main panels */
 #content {
     display: flex;
@@ -298,9 +297,6 @@ body {
     text-align: right; /* Align total to the right */
 }
 
-
-
-
 /* Bill Buttons - Fixed at Bottom */
 #bill-buttons {
     position: absolute;
@@ -380,7 +376,6 @@ body {
 #apply-discount-btn:hover {
     background-color: var(--secondary-color);
 }
-
 
 button {
     padding: 10px 20px;
@@ -758,79 +753,6 @@ input:checked + .slider:before {
     color: white;
 }
 
-/* Dark Mode Toggle Starts Here*/
-/* Toggle Switch Styling */
-/* Dark Mode Toggle Switch Styling */
-.dark-mode-toggle {
-    position: relative;
-    display: block;
-    width: 60px;
-    height: 34px;
-    margin: 20px auto;
-}
-
-.dark-mode-toggle input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.dark-mode-toggle .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
-}
-
-.dark-mode-toggle .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-}
-
-.dark-mode-toggle input:checked + .slider {
-    background-color: var(--second-color);
-}
-
-.dark-mode-toggle input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* Dark Mode Styling */
-.dark-mode {
-background-color: #222;
-color: #fff;
-}
-
-.dark-mode #main-content, 
-.dark-mode #bill-panel,
-.dark-mode #category-panel,
-.dark-mode #discount-section {
-background-color: #333; /* Adjust as needed */
-color: #fff;
-}
-
-.dark-mode button {
-background-color: #555;
-color: #fff;
-}
-
-.dark-mode h2,
-.dark-mode p {
-    color: #ffffff;
-}
-/* Dark Mode Toggle Ends Here */
 /* The Order Histoy Context Menu */
 
 .context-menu {
@@ -2070,3 +1992,75 @@ input:checked + .user-slider:before {
     color: black;
 }
 /* Delete Order Popup for todays orders ENDS HERE*/
+/* Toggle Switch Styling */
+/* Dark Mode Toggle Switch Styling */
+.dark-mode-toggle {
+    position: relative;
+    display: block;
+    width: 600px; /* Increased width to 600px */
+    height: 120px; /* Increased height to 120px */
+    margin: 20px auto;
+}
+
+.dark-mode-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.dark-mode-toggle .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 60px; /* Adjusted for larger toggle */
+}
+
+.dark-mode-toggle .slider:before {
+    position: absolute;
+    content: "";
+    height: 100px; /* Increased height to 100px */
+    width: 100px; /* Increased width to 100px */
+    left: 10px; /* Adjusted for centering */
+    bottom: 10px; /* Adjusted for centering */
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%; /* Keep it circular */
+}
+
+.dark-mode-toggle input:checked + .slider {
+    background-color: var(--second-color);
+}
+
+.dark-mode-toggle input:checked + .slider:before {
+    transform: translateX(480px); /* Adjusted for new width */
+}
+
+/* Dark Mode Styling */
+.dark-mode {
+background-color: #222;
+color: #fff;
+}
+
+.dark-mode #main-content, 
+.dark-mode #bill-panel,
+.dark-mode #category-panel,
+.dark-mode #discount-section {
+background-color: #333; /* Adjust as needed */
+color: #fff;
+}
+
+.dark-mode button {
+background-color: #555;
+color: #fff;
+}
+
+.dark-mode h2,
+.dark-mode p {
+    color: #ffffff;
+}
+/* Dark Mode Toggle Ends Here */
