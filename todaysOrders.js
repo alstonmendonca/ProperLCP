@@ -6,6 +6,39 @@ function fetchTodaysOrders() {
     ipcRenderer.send("get-todays-orders");
 }
 
+// Function to create and show the enlarged order details
+function showOrderDetails(order) {
+    const orderDetailsHTML = `
+        <div class="order-details-modal">
+            <div class="order-details-content">
+                <span class="close-button" onclick="closeOrderDetails()">&times;</span>
+                <h3>Order Details for Bill No: ${order.billno}</h3>
+                <p>Cashier: ${order.cashier_name}</p>
+                <p>KOT: ${order.kot}</p>
+                <p>Price: ₹${order.price.toFixed(2)}</p>
+                <p>SGST: ₹${order.sgst.toFixed(2)}</p>
+                <p>CGST: ₹${order.cgst.toFixed(2)}</p>
+                <p>Tax: ₹${order.tax.toFixed(2)}</p>
+                <h4>Food Items:</h4>
+                <ul>
+                    ${order.food_items.split(', ').map(item => `<li>${item}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+    `;
+
+    // Append the modal to the body
+    document.body.insertAdjacentHTML('beforeend', orderDetailsHTML);
+}
+
+// Function to close the order details modal
+function closeOrderDetails() {
+    const modal = document.querySelector('.order-details-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
 // Receive today's orders from the main process and update the UI
 ipcRenderer.on("todays-orders-response", (event, data) => {
     const orders = data.orders;
@@ -40,7 +73,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
     orders.forEach(order => {
         gridHTML += `
             <div class="todays-order-box" data-billno="${order.billno}">
-                <div class="todays-orders-edit-button" onclick="openTodayEditOrder(${order.billno})">✏️</div>
+                <div class="todays-orders-edit-button" onclick="event.stopPropagation(); openTodayEditOrder(${order.billno})">✏️</div>
                 <h3>Bill No: ${order.billno}</h3>
                 <p>Cashier: ${order.cashier_name}</p>
                 <p>KOT: ${order.kot}</p>
@@ -58,6 +91,13 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
 
     // Attach context menu to each order box
     attachTodaysOrdersContextMenu(".todays-order-box", "todaysOrders");
+
+    // Add event listeners to order boxes dynamically
+    document.querySelectorAll(".todays-order-box").forEach((orderBox, index) => {
+        orderBox.addEventListener("click", () => {
+            showOrderDetails(orders[index]); // Pass the correct order object
+        });
+    });
 
     // Add event listener for the export button
     setTimeout(() => {
@@ -141,7 +181,6 @@ function openTodayEditOrder(billno) {
 }
 
 // Listen for the response with order details
-// Listen for the response with order details
 ipcRenderer.on("order-details-response", (event, orderDetails) => {
     // Clear the bill panel before adding items
     resetBill();
@@ -168,4 +207,4 @@ ipcRenderer.on("order-deleted", (event, { source }) => {
 });
 
 // Export function so it can be used in `renderer.js`
-module.exports = { fetchTodaysOrders, openTodayEditOrder };
+module.exports = { fetchTodaysOrders, openTodayEditOrder, showOrderDetails, closeOrderDetails };

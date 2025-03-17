@@ -47,6 +47,8 @@ const {sortTopSellingCategoriesTable} = require("./topSellingCategory");
 const {sortSalesOverviewTable} = require('./salesOverview'); 
 const {sortDeletedOrdersTable} = require('./deletedOrdersTable');
 const {loadPrinterConfig} = require('./printerConfig');
+const {showOrderDetails} = require('./todaysOrders');
+const {closeOrderDetails} = require('./todaysOrders');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
@@ -87,7 +89,7 @@ window.fetchItemHistory = fetchItemHistory;
 window.displayItemHistory = displayItemHistory;
 window.sortItemHistoryTable = sortItemHistoryTable;
 window.sortCategoryWiseTable = sortCategoryWiseTable;
-//window.initializeTopSellingSection = initializeTopSellingSection;
+
 // Listen for the 'set-user-role' message from the main process
 ipcRenderer.on('set-user-role', (event, role) => {
     const content = document.getElementById('content'); // Assuming this is the main container
