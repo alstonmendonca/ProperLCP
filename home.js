@@ -1,5 +1,3 @@
-// home.js
-
 const { ipcRenderer } = require("electron");
 
 // Function to load the Home section

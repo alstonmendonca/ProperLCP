@@ -40,7 +40,9 @@ async function updateMainContent(contentType) {
 
         if (foodItems.length > 0) {
             mainContent.innerHTML = 
-    `<h2>${contentType}</h2>
+    `<div class="homeFoodTitle">
+        <h2>${contentType}</h2>
+    </div>
     <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
         ${foodItems 
             .map(
@@ -678,7 +680,7 @@ async function updateLeftPanel(contentType) {
 
             // Render History-related buttons
             categoryPanel.innerHTML = `
-            <button class="category" id="TodaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
+            <button class="category" id="todaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
             <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
             <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
             <button class="category" id="itemHistory" onclick="updateMainContent('itemHistory')">Item History</button>

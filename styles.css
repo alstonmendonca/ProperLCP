@@ -1680,6 +1680,17 @@ input:checked + .slider:before {
     text-transform: uppercase; /* Uppercase the text for emphasis */
     letter-spacing: 2px; /* Add spacing between letters */
 }
+.homeFoodTitle h2{
+    text-align: center; /* Center the content */
+    font-size: 1.8rem; /* Increase font size */
+    font-weight: bold; /* Make it bold */
+    color: #2c3e50; /* Use a dark, professional color */
+    margin-bottom: 20px; /* Add spacing below the heading */
+    text-transform: uppercase; /* Uppercase the text for emphasis */
+    letter-spacing: 2px; /* Add spacing between letters */
+    padding-bottom: 8px; /* Add padding to create space for the border */
+    border-bottom: 3px solid #0D3B66; /* Add a blue line underneath the title */
+}
 /* Style the date filters section */
 .date-filters {
     display: flex;
