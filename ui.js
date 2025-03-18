@@ -19,9 +19,8 @@ async function updateMainContent(contentType) {
         if (foodItems.length > 0) {
             mainContent.innerHTML = 
     `<div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2>Menu</h2>
-        <input type="text" id="searchBarforHome" placeholder="Search for an item..." 
-            style="padding: 5px; border: 1px solid #ccc; border-radius: 5px; width: 300px;">
+        <input type="text" id="searchBarforHome" placeholder="Search..." 
+            style="padding: 10px; border: 2px solid #ccc; border-radius: 20px; width: 900px;">
     </div><br>
     <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
         ${foodItems

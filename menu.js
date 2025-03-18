@@ -21,12 +21,13 @@ async function displayMenu() {
 
         if (foodItems.length > 0) {
             let menuContent = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                
+                <div class="section-title">
                     <h2>Menu</h2>
-                    <input type="text" id="searchBar" placeholder="Search for an item..." style="padding: 5px; border: 1px solid #ccc; border-radius: 5px; width: 300px;">
-                </div><br>
+                </div>
+                <input type="text" id="searchBar" placeholder="Search..." style="padding: 10px; border: 2px solid #ccc; border-radius: 25px; width: 1490px; margin-bottom: 15px;">
                 <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                    <button id="addNewItem" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                    <button id="addNewItem" style="border: 1px solid #ccc; padding: 10px; text-align: center; background-color: #4CAF50;">
                     <p style = "font-size : 100px">+</p>
                     <br>
                     Add New Item

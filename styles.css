@@ -1334,7 +1334,11 @@ input:checked + .slider:before {
     border: none;
 }
 
-#addCategoryBox:hover {
+#addNewItem{
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth scaling and shadow effect */
+}
+
+#addCategoryBox:hover, #addNewItem:hover {
     transform: translateY(-5px) scale(1.05); /* Lift effect on hover */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
     background-color: #49a34c; /* Green background for the add category box */

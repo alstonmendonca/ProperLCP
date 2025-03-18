@@ -19,7 +19,7 @@ ipcRenderer.on("categories-list-response", (event, data) => {
     let gridHTML = `
         <div class="categories-grid">
             <div class="category-box" id="addCategoryBox" onclick="openAddCategoryPopup()">
-                <h3 style="color: white;">➕ Add Category</h3>
+                <p style = "font-size : 100px">+</p>     
             </div>
     `;
 
