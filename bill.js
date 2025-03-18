@@ -61,7 +61,7 @@ function addToBill(itemId, itemName, price, quantity) {
 
         updateBillTotal();
     } else {
-        alert('Please select a quantity greater than 0 to add to the bill.');
+        createTextPopup("Please select a quantity greater than 0 to add to the bill.")
     }
 }
 
@@ -144,17 +144,17 @@ function applyDiscount() {
     }
 
     if (discountPercentage < 0 || discountAmount < 0) {
-        alert("Discount cannot be negative.");
+        createTextPopup("Discount cannot be negative.");
         return;
     }
 
     if (discountPercentage > 0 && discountAmount > 0) {
-        alert("Please apply either a percentage discount OR a fixed amount discount, not both.");
+        createTextPopup("Please apply either a percentage discount OR a fixed amount discount, not both.");
         return;
     }
 
     if (discountAmount > totalAmount) {
-        alert("Discount amount cannot exceed the total bill amount.");
+        createTextPopup("Discount amount cannot exceed the total bill amount.");
         return;
     }
 
@@ -410,7 +410,7 @@ function saveEdit() {
     const billno = sessionStorage.getItem("editingBillNo");
 
     if (!billno) {
-        alert("No order is being edited.");
+        createTextPopup("No order is being edited")
         return;
     }
 
@@ -421,11 +421,11 @@ function saveEdit() {
 // Listen for update response
 ipcRenderer.on("update-order-response", (event, response) => {
     if (response.success) {
-        alert("Order updated successfully!");
+        createTextPopup("Order updated successfully!");
         exitEditMode();
         ipcRenderer.send("get-todays-orders"); // Refresh today's orders
     } else {
-        alert("Failed to update order. Please try again.");
+        createTextPopup("Failed to update order. Please try again.")
     }
 });
 
@@ -499,7 +499,7 @@ function holdBill() {
     // Send order data to main process
     ipcRenderer.send("hold-bill", { cashier, date, orderItems });
 
-    // Show confirmation popup instead of alert
+    // Show confirmation popup
     createTextPopup("Bill put on hold!");
 
     NewOrder();
