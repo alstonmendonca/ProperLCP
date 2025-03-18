@@ -50,6 +50,7 @@ const {loadPrinterConfig} = require('./printerConfig');
 const {showOrderDetails} = require('./todaysOrders');
 const {closeOrderDetails} = require('./todaysOrders');
 const {loadThemeToggle} = require('./themeToggle');
+
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

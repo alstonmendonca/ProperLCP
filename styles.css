@@ -42,66 +42,8 @@ body {
     overflow: hidden;
 }
 
-/* Top Horizontal Panel */
-#top-panel {
-    display: flex;
-    justify-content: space-evenly; /* Space buttons evenly */
-    align-items: center;
-    height: 50px;
-    background-color: #051524;
-    border-bottom: 2px solid #ffffff20; /* Light transparent border */
-}
-
 /* Button Styles */
-/* Top Horizontal Panel */
-#top-panel {
-    color: white;
-    display: flex;
-    justify-content: space-evenly; /* Space buttons evenly */
-    align-items: stretch;
-    height: 50px; /* Adjust the height of the panel */
-    border-bottom: 2px solid #051524;
-}
 
-/* Button Styling */
-.top {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px; /* Space between icon and text */
-    padding: 8px;
-    width: 100%;
-    color: white;
-    border-right: 1px solid #ffffff; /* Thin border for separation */
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    border-radius: 0px;
-    background: none;
-    border: none;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-/* Button Hover and Active Effects */
-.top:hover {
-    background-color: #555;
-    transform: translateY(-2px);
-}
-
-.top:active {
-    background-color: #666;
-    transform: translateY(0);
-}
-
-/* SVG Icon Styling */
-.top svg {
-    width: 20px;
-    height: 20px;
-    stroke-width: 1.8;
-}
 
 /* Container for left and main panels */
 #content {
@@ -1243,19 +1185,74 @@ input:checked + .slider:before {
 .food-item button {
     background-color: #0C345A;
 }
+
+#bill-buttons button {
+    background-color: #0C345A;
+}
+#upperbuttons button {
+    background-color: #0C345A;
+}
+
+/* Top Horizontal Panel */
+/* Button Styling */
+
 #top-panel {
     color: #edf2f4;
+    display: flex;
+    justify-content: space-evenly; /* Space buttons evenly */
+    align-items: stretch;
+    height: 50px; /* Adjust the height of the panel */
+    border-bottom: 2px solid #051524;
 }
 #top-panel button {
     background-color: #0D3B66;
     color: whitesmoke;
     font-weight: bold;
 }
-#bill-buttons button {
-    background-color: #0C345A;
+.top {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Space between icon and text */
+    padding: 8px;
+    width: 100%;
+    color: white;
+    border-right: 1px solid #ffffff; /* Thin border for separation */
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    border-radius: 0px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
 }
-#upperbuttons button {
-    background-color: #0C345A;
+
+/* Button Hover and Active Effects */
+.top:hover {
+    background-color: #555;
+    transform: translateY(-2px);
+}
+
+.top:active {
+    background-color: #666;
+    transform: translateY(0);
+}
+
+/* Active Button Style */
+#top-panel .top.active {
+    background-color: #145088; /* Highlight color */
+    color: white;
+    font-weight: bold;
+}
+
+/* SVG Icon Styling */
+.top svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.8;
 }
 
 /*----------------------- COLORS SECTION ENDS HERE ------------------------------------------------------------------- */

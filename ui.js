@@ -7,6 +7,22 @@ async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
 
+    // List of top-panel button IDs
+    const topPanelButtons = ["Home", "Menu", "History", "Categories", "Analytics", "Settings"];
+
+    // Check if the clicked button is a top-panel button
+    if (topPanelButtons.includes(contentType)) {
+        // Remove the 'active' class from all top-panel buttons
+        const topButtons = document.querySelectorAll("#top-panel .top");
+        topButtons.forEach(button => button.classList.remove("active"));
+
+        // Add the 'active' class to the clicked button
+        const clickedButton = document.getElementById(contentType);
+        if (clickedButton) {
+            clickedButton.classList.add("active");
+        }
+    }
+
     // Home Screen
     if (contentType === "Home") {
         mainContent.scrollTop = 0;
@@ -836,3 +852,4 @@ function showConfirmPopup(message, onConfirm) {
         popup.remove();
     });
 }
+
