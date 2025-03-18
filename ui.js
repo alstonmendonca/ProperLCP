@@ -1,6 +1,4 @@
 const { fetchCategoriesList } = require("./categoriesList");
-const { fetchTabCategories } = require("./categoriesTab");
-const { initializeTopSellingSection } = require("./topSelling");
 
 // Function to handle category button clicks
 async function updateMainContent(contentType) {

@@ -1668,7 +1668,18 @@ input:checked + .slider:before {
     padding-bottom: 10px; /* Add padding to create space for the border */
     border-bottom: 3px solid #0D3B66; /* Add a blue line underneath the title */
 }
-
+.menu-section-title{
+    text-align: center; /* Center the content */
+    margin-bottom: 5px; /* Add some spacing below the header */
+}
+.menu-section-title h2{
+    font-size: 2.5rem; /* Increase font size */
+    font-weight: bold; /* Make it bold */
+    color: #2c3e50; /* Use a dark, professional color */
+    margin-bottom: 10px; /* Add spacing below the heading */
+    text-transform: uppercase; /* Uppercase the text for emphasis */
+    letter-spacing: 2px; /* Add spacing between letters */
+}
 /* Style the date filters section */
 .date-filters {
     display: flex;
