@@ -23,6 +23,15 @@ async function updateMainContent(contentType) {
         }
     }
 
+    // Handle highlighting for category panel buttons
+    const categoryButtons = document.querySelectorAll("#category-panel .category");
+    categoryButtons.forEach(button => button.classList.remove("active"));
+
+    const clickedCategoryButton = document.getElementById(contentType);
+    if (clickedCategoryButton) {
+        clickedCategoryButton.classList.add("active");
+    }
+
     // Home Screen
     if (contentType === "Home") {
         mainContent.scrollTop = 0;
@@ -744,7 +753,7 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="DayEndSummary" onclick="updateMainContent('DayEndSummary')">Day End Summary</button>
                 <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
                 <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
-                <button class="category" id="Trends" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
+                <button class="category" id="CategoryWiseSales" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
                 <button class="category" id="TopSellingItems" onclick="updateMainContent('TopSellingItems')">Top Selling Items</button>
                 <button class="category" id="TopSellingCategory" onclick="updateMainContent('TopSellingCategory')">Top Selling Category</button>
                 <button class="category" id="RateOfSale" onclick="updateMainContent('RateOfSale')">Rate Of Sale</button>
@@ -780,11 +789,7 @@ async function updateLeftPanel(contentType) {
 
         case "Categories":
             categoryPanel.style.display = "none";
-
-            // Categories
-            categoryPanel.innerHTML;
             break;
-
 
         case "Settings":
             categoryPanel.style.display = "block";
@@ -806,6 +811,15 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>
             `;
             break;
+    }
+
+    // Highlight the active category button
+    const categoryButtons = document.querySelectorAll("#category-panel .category");
+    categoryButtons.forEach(button => button.classList.remove("active"));
+
+    const activeCategoryButton = document.getElementById(contentType);
+    if (activeCategoryButton) {
+        activeCategoryButton.classList.add("active");
     }
 }
 

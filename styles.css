@@ -128,7 +128,17 @@ body {
     background-color: #ccc;
     color: #333;
 }
-
+/* Active Category Button Style */
+#category-panel .category.active {
+    background-color: #1DB954; /* Highlight color */
+    color: white;
+    font-weight: bold;
+}
+#category-panel .category.active:hover {
+    background-color: #1DB954; /* Highlight color */
+    color: white;
+    font-weight: bold;
+}
 /* Main Content Area */
 #main-content {
     margin-left: 200px; /* Same as category panel width */
