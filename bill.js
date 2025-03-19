@@ -837,7 +837,15 @@ function addToExistingOrder(orderId) {
     // Close the popup after adding
     document.getElementById("todaysOrdersPopup").remove();
     resetBill();
-    createTextPopup(`Order ${orderId} updated successfully with new items.`);
+    // Add the glow effect to the bill panel
+    const billPanel = document.getElementById("bill-panel");
+    billPanel.classList.add("glow");
+
+    // Remove the glow effect after 2 seconds
+    setTimeout(() => {
+        billPanel.classList.remove("glow");
+    },800);
+    
     NewOrder();
 }
 
