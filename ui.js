@@ -267,8 +267,9 @@ async function updateMainContent(contentType) {
             mainContent.innerHTML = `
                 <div class="todays-orders-header">
                     <h1>Today's Orders</h1>
-                    <button id="exportExcelButton">Export to Excel</button>
                 </div>
+                    <button id="exportExcelButton">Export to Excel</button>
+                
                 <div id="todaysOrdersDiv"></div>
             `;
             fetchTodaysOrders();

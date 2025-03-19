@@ -603,19 +603,37 @@ ipcMain.on("refresh-categories", (event) => {
 //----------------------------------------------------BILLING----------------------------------------------------------
 // Handle print-bill event
 // Handle print-bill event
+// Handle print-bill event
 ipcMain.on("print-bill", (event, escPosCommands) => {
     try {
-        const device = new escpos.USB(); // Replace with your printer's USB vendor ID and product ID if needed
+        // Replace with your printer's USB vendor ID and product ID
+        const device = new escpos.USB(1317, 42752); // TVS RP 3220 STAR
         const printer = new escpos.Printer(device);
 
-        device.open(() => {
+        device.open((error) => {
+            if (error) {
+                console.error("Failed to open printer:", error);
+                dialog.showMessageBox({
+                    type: "error",
+                    title: "Printer Error",
+                    message: "Failed to connect to the printer. Please check the connection and try again.",
+                    buttons: ["OK"],
+                });
+                return;
+            }
+
+            console.log("Printer connected successfully. Sending commands...");
+
+            // Send ESC/POS commands
             printer
                 .raw(Buffer.from(escPosCommands, "utf8")) // Send ESC/POS commands
                 .cut() // Cut paper
-                .close(); // Close the connection
+                .close(() => {
+                    console.log("Printing completed successfully.");
+                });
         });
     } catch (error) {
-        // Show a popup if the printer is not found
+        console.error("Printer error:", error);
         dialog.showMessageBox({
             type: "error",
             title: "Printer Not Found",

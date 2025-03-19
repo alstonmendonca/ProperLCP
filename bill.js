@@ -499,8 +499,14 @@ function holdBill() {
     // Send order data to main process
     ipcRenderer.send("hold-bill", { cashier, date, orderItems });
 
-    // Show confirmation popup
-    createTextPopup("Bill put on hold!");
+    // Add the glow effect to the bill panel
+    const billPanel = document.getElementById("bill-panel");
+    billPanel.classList.add("glow");
+
+    // Remove the glow effect after 2 seconds
+    setTimeout(() => {
+        billPanel.classList.remove("glow");
+    },800);
 
     NewOrder();
 }
