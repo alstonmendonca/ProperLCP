@@ -1,4 +1,3 @@
-const { fetchCategoriesList } = require("./categoriesList");
 
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
@@ -157,40 +156,12 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "TopSellingCategory") {
             loadTopSellingCategories(mainContent, billPanel); // Call the top selling categories function
-        
-            // Retrieve stored dates from sessionStorage
-            const savedStartDate = sessionStorage.getItem("topSellingStartDate");
-            const savedEndDate = sessionStorage.getItem("topSellingEndDate");
-        
-            if (savedStartDate && savedEndDate) {
-                document.getElementById("startDate").value = savedStartDate;
-                document.getElementById("endDate").value = savedEndDate;
-        
-                // Automatically fetch top selling categories using stored dates
-                fetchTopSellingCategories(savedStartDate, savedEndDate);
-            }
         }
-        else if (contentType === "HourlySales") {
-            mainContent.innerHTML = `
-                <h2>Hourly Sales Trends</h2>
-                <p>Sales performance based on different hours of the day.</p>
-            `;
-            billPanel.style.display = 'none';
-        } 
         
         //-----------------------------------------------ANALYTICS ENDS HERE---------------------------------------------------
         //--------------------------CATEGORIES---------------------------------------------------------------
         else if (contentType === "Categories") {
-            mainContent.style.marginLeft = "0px";
-            mainContent.style.marginRight = "0px";
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Categories</h2>
-                </div>
-                <div id="categoriesTabDiv"></div>
-            `;
-            fetchCategoriesList();
-            billPanel.style.display = 'none'; // Hide bill panel for History
+            loadCategories(mainContent, billPanel);
         }        
         //--------------------------------CATEGORIES END HERE-----------------------------------------------------
         // --------------------------------SETTINGS START HERE-----------------------------------------------------
@@ -210,7 +181,7 @@ async function updateMainContent(contentType) {
             `
         }
         else if (contentType === "ThemeToggle") {
-            loadThemeToggle(mainContent, billPanel); // Call the theme toggle function
+            loadThemeToggle(mainContent, billPanel); 
         }
         else if (contentType === "DisplaySettings") {
             mainContent.innerHTML = `
@@ -480,33 +451,7 @@ async function updateMainContent(contentType) {
             fetchDiscountedOrders(storedStartDate, storedEndDate);
         }
         else if (contentType === 'customer') {
-            mainContent.innerHTML = `
-                <div class="customer-header">
-                    <h2>Customers</h2>
-                    <button id="addCustomerBtn">Add Customer</button>
-                    <button id="clearCustomerDataBtn">Clear Customer Data</button>
-                </div>
-                <div id="customersDiv"></div>
-            `;
-
-            fetchCustomers(); // Fetch and display customers
-
-            // Remove any existing event listener before adding a new one
-            const addCustomerBtn = document.getElementById("addCustomerBtn");
-            addCustomerBtn.replaceWith(addCustomerBtn.cloneNode(true));
-
-            // Add event listener for "Add Customer" button
-            document.getElementById("addCustomerBtn").addEventListener("click", () => {
-                showAddCustomerPopup();
-            });
-
-            document.getElementById("clearCustomerDataBtn").addEventListener("click", async () => {
-                showConfirmPopup("Are you sure you want to permanently delete all customer data?", async () => {
-                    await clearCustomerData();
-                    fetchCustomers(); // Refresh customer list
-                });
-            });
-
+            loadCustomers(mainContent);
         }
         else if(contentType === "filterHistory"){
             mainContent.innerHTML = `
