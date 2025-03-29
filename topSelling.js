@@ -23,43 +23,37 @@ function loadTopSellingItems(mainContent, billPanel) {
         <div id="topSellingItemsDiv"></div>
     `;
 
-    // Set default dates to today's date
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    document.getElementById("startDate").value = today; // Set start date to today
-    document.getElementById("endDate").value = today; // Set end date to today
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
+    
+    // Retrieve stored dates from sessionStorage or use today's date as default
+    const startDate = sessionStorage.getItem("topSellingStartDate") || today;
+    const endDate = sessionStorage.getItem("topSellingEndDate") || today;
 
-    // Automatically fetch top selling items using today's date
-    fetchTopSellingItems(today, today);
+    // Set the date inputs
+    document.getElementById("startDate").value = startDate;
+    document.getElementById("endDate").value = endDate;
+
+    // Automatically fetch top selling items using the dates
+    fetchTopSellingItems(startDate, endDate);
 
     // Hide the bill panel
-    billPanel.style.display = 'none'; // Hide the bill panel
-
-    // Retrieve stored dates from sessionStorage
-    const savedStartDate = sessionStorage.getItem("topSellingStartDate");
-    const savedEndDate = sessionStorage.getItem("topSellingEndDate");
-
-    if (savedStartDate && savedEndDate) {
-        document.getElementById("startDate").value = savedStartDate;
-        document.getElementById("endDate").value = savedEndDate;
-
-        // Automatically fetch top selling items using stored dates
-        fetchTopSellingItems(savedStartDate, savedEndDate);
-    }
+    billPanel.style.display = 'none';
 
     // Initialize the event listener for the button
     document.querySelector(".showTopSellingButton").addEventListener("click", () => {
-        const startDate = document.getElementById("startDate").value;
-        const endDate = document.getElementById("endDate").value;
+        const newStartDate = document.getElementById("startDate").value;
+        const newEndDate = document.getElementById("endDate").value;
 
         // Store dates in sessionStorage
-        sessionStorage.setItem("topSellingStartDate", startDate);
-        sessionStorage.setItem("topSellingEndDate", endDate);
+        sessionStorage.setItem("topSellingStartDate", newStartDate);
+        sessionStorage.setItem("topSellingEndDate", newEndDate);
 
-        fetchTopSellingItems(startDate, endDate);
+        fetchTopSellingItems(newStartDate, newEndDate);
     });
 }
 
-// Function to fetch top selling items
+// Rest of the file remains the same...
 async function fetchTopSellingItems(startDate, endDate) {
     if (!startDate || !endDate) {
         alert("Please select both start and end dates.");
@@ -70,7 +64,6 @@ async function fetchTopSellingItems(startDate, endDate) {
     ipcRenderer.send("get-top-selling-items", { startDate, endDate });
 }
 
-// Listen for the response with top selling items
 ipcRenderer.on("top-selling-items-response", (event, data) => {
     const topSellingItemsDiv = document.getElementById("topSellingItemsDiv");
     topSellingItemsDiv.innerHTML = ""; // Clear previous content
@@ -92,9 +85,7 @@ ipcRenderer.on("top-selling-items-response", (event, data) => {
     `;
 
     data.items.forEach(item => {
-        // Format the date in "Day-Month-Year" format
         const formattedDate = formatDate(item.date);
-
         tableHTML += `
             <tr>
                 <td style="border: 1px solid #ddd; padding: 8px;">${formattedDate}</td>
@@ -107,47 +98,39 @@ ipcRenderer.on("top-selling-items-response", (event, data) => {
     topSellingItemsDiv.innerHTML = tableHTML;
 });
 
-let currentSortOrder = 'asc'; // Default sort order
+let currentSortOrder = 'asc';
 
 function sortTopSellingTable(column) {
     const table = document.querySelector(".top-selling-table tbody");
     const rows = Array.from(table.rows);
 
-    // Sort rows based on the date column
     rows.sort((a, b) => {
-        const dateA = parseFormattedDate(a.cells[0].innerText); // Parse formatted date
-        const dateB = parseFormattedDate(b.cells[0].innerText); // Parse formatted date
+        const dateA = parseFormattedDate(a.cells[0].innerText);
+        const dateB = parseFormattedDate(b.cells[0].innerText);
         return currentSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
     });
 
-    // Clear the table body and append sorted rows
     while (table.firstChild) {
         table.removeChild(table.firstChild);
     }
     rows.forEach(row => table.appendChild(row));
 
-    // Toggle sort order for next click
     currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
-
-    // Update the sort indicator
     const sortIndicator = document.getElementById("dateSortIndicator");
-    sortIndicator.innerText = currentSortOrder === 'asc' ? '▲' : '▼'; // Update the arrow
+    sortIndicator.innerText = currentSortOrder === 'asc' ? '▲' : '▼';
 }
 
-// Function to parse a formatted date (DD-MM-YYYY) into a Date object
 function parseFormattedDate(dateString) {
     const [day, month, year] = dateString.split("-");
-    return new Date(`${year}-${month}-${day}`); // Convert to YYYY-MM-DD format
+    return new Date(`${year}-${month}-${day}`);
 }
 
-// Function to format date in "Day-Month-Year" format
 function formatDate(dateString) {
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
 }
 
-// Export the loadTopSellingItems function
 module.exports = { loadTopSellingItems, sortTopSellingTable };

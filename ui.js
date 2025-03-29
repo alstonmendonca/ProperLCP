@@ -7,8 +7,13 @@ async function updateMainContent(contentType) {
 
     // List of top-panel button IDs
     const topPanelButtons = ["Home", "Menu", "History", "Categories", "Analytics", "Settings"];
-
-    // Check if the clicked button is a top-panel button
+    const historyButtons = [
+        'todaysOrders', 'orderHistory', 'categoryHistory', 'itemHistory', 
+        'deletedOrders', 'discountedOrders', 'dayWise', 'monthWise', 
+        'yearWise', 'filterHistory', 'customer', 'makeATable', 'tablesCreated'
+    ];
+    
+    // Highlight top panel button for any top-level section
     if (topPanelButtons.includes(contentType)) {
         // Remove the 'active' class from all top-panel buttons
         const topButtons = document.querySelectorAll("#top-panel .top");
@@ -19,6 +24,24 @@ async function updateMainContent(contentType) {
         if (clickedButton) {
             clickedButton.classList.add("active");
         }
+    }
+
+    // Special case: When clicking the History top panel button
+    if (contentType === "History") {
+        // Get the last viewed history sub-section or default to todaysOrders
+        const lastHistoryButton = sessionStorage.getItem('lastHistoryButton') || 'todaysOrders';
+        
+        // First update the left panel to show History buttons
+        updateLeftPanel("History");
+        
+        // Then update the content with the last viewed sub-section
+        updateMainContent(lastHistoryButton);
+        return; // Exit early since we're handling the content update in the recursive call
+    }
+    
+    // Store the last clicked History button if we're in History section
+    if (historyButtons.includes(contentType)) {
+        sessionStorage.setItem('lastHistoryButton', contentType);
     }
 
     // Handle highlighting for category panel buttons
@@ -130,19 +153,7 @@ async function updateMainContent(contentType) {
             loadCategoryWiseSales(mainContent, billPanel); // Call the category wise sales function
         }
         else if (contentType === "TopSellingItems") {
-            loadTopSellingItems(mainContent, billPanel); // Call the top selling items function
-
-            // Retrieve stored dates from sessionStorage
-            const savedStartDate = sessionStorage.getItem("topSellingStartDate");
-            const savedEndDate = sessionStorage.getItem("topSellingEndDate");
-
-            if (savedStartDate && savedEndDate) {
-                document.getElementById("startDate").value = savedStartDate;
-                document.getElementById("endDate").value = savedEndDate;
-
-                // Automatically fetch top selling items using stored dates
-                fetchTopSellingItems(savedStartDate, savedEndDate);
-            }
+            loadTopSellingItems(mainContent, billPanel);
         }
         else if (contentType === "TopSellingCategory") {
             loadTopSellingCategories(mainContent, billPanel); // Call the top selling categories function
@@ -261,22 +272,26 @@ async function updateMainContent(contentType) {
     // --------------------------------SETTINGS END HERE----------------------------------------------------- 
         
         //----------------------------------------------- HISTORY TAB------------------------------------------------
-        else if (contentType === 'History' || contentType === "todaysOrders") {
+        else if (contentType === "History" || contentType === "todaysOrders") {
+            // Apply margins for all history views
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; // Hide bill panel for History
             mainContent.innerHTML = `
                 <div class="todays-orders-header">
                     <h1>Today's Orders</h1>
                 </div>
-                    <button id="exportExcelButton">Export to Excel</button>
-                
+                <button id="exportExcelButton">Export to Excel</button>
                 <div id="todaysOrdersDiv"></div>
             `;
             fetchTodaysOrders();
-            billPanel.style.display = 'none'; // Hide bill panel for History
-        } 
+        }
+
         else if (contentType === 'orderHistory') {
-            
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; // Hide bill panel for History
+
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
             mainContent.innerHTML = `
@@ -624,115 +639,6 @@ ipcRenderer.on("clear-deleted-orders-response", (event, data) => {
     }
 });
 
-// Function to dynamically update the left panel (category or settings buttons)
-async function updateLeftPanel(contentType) {
-    const categoryPanel = document.getElementById("category-panel");
-
-    // Ensure the panel is visible for other sections
-    if (contentType !== "Categories") {
-        categoryPanel.style.display = "block";
-    }
-
-    switch (contentType) {
-        case "Home":
-            categoryPanel.style.display = "block";
-            // Render Home-related buttons
-            const categories = await ipcRenderer.invoke("get-categories");
-
-            if (categories.length > 0) {
-                categoryPanel.innerHTML = categories
-                    .map(
-                        (category) =>
-                            `<button class="category" id="${category.catname}" onclick="updateMainContent('${category.catname}')">${category.catname}</button>`
-                    )
-                    .join("");
-            } else {
-                categoryPanel.innerHTML = "<p>No categories found.</p>";
-            }
-            break;
-
-        case "Menu":
-            categoryPanel.style.display = "none";
-            break;
-
-        case "Analytics":
-            categoryPanel.style.display = "block";
-
-            // Render Analytics-related buttons
-            categoryPanel.innerHTML = `
-                <button class="category" id="DayEndSummary" onclick="updateMainContent('DayEndSummary')">Day End Summary</button>
-                <button class="category" id="ItemSummary" onclick="updateMainContent('ItemSummary')">Item Summary</button>
-                <button class="category" id="SalesOverview" onclick="updateMainContent('SalesOverview')">Sales Overview</button>
-                <button class="category" id="CategoryWiseSales" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
-                <button class="category" id="TopSellingItems" onclick="updateMainContent('TopSellingItems')">Top Selling Items</button>
-                <button class="category" id="TopSellingCategory" onclick="updateMainContent('TopSellingCategory')">Top Selling Category</button>
-                <button class="category" id="RateOfSale" onclick="updateMainContent('RateOfSale')">Rate Of Sale</button>
-                <button class="category" id="MenuAnalysis" onclick="updateMainContent('MenuAnalysis')">Menu Analysis</button>
-                <button class="category" id="EmployeeAnalysis" onclick="updateMainContent('EmployeeAnalysis')">Employee Analysis</button>
-                <button class="category" id="Charts" onclick="updateMainContent('Charts')">Charts</button>
-                <button class="category" id="PersonalCalculator" onclick="updateMainContent('PersonalCalculator')">Personal Calculator</button>
-                <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
-                <button class="category" id="SpecialStatistics" onclick="updateMainContent('SpecialStatistics')">Special Statistics</button>
-            `;
-            break;
-
-        case "History":
-            categoryPanel.style.display = "block";
-
-            // Render History-related buttons
-            categoryPanel.innerHTML = `
-            <button class="category" id="todaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
-            <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
-            <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
-            <button class="category" id="itemHistory" onclick="updateMainContent('itemHistory')">Item History</button>
-            <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
-            <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
-            <button class="category" id="dayWise" onclick="updateMainContent('dayWise')">Day-wise</button>
-            <button class="category" id="monthWise" onclick="updateMainContent('monthWise')">Month-wise</button>
-            <button class="category" id="yearWise" onclick="updateMainContent('yearWise')">Year-wise</button>
-            <button class="category" id="filterHistory" onclick="updateMainContent('filterHistory')">Filter History</button>
-            <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
-            <button class="category" id="makeATable" onclick="updateMainContent('makeATable')">Make A Table</button>
-            <button class="category" id="tablesCreated" onclick="updateMainContent('createYourTable')">Tables Created</button>
-        `;
-        break;
-
-        case "Categories":
-            categoryPanel.style.display = "none";
-            break;
-
-        case "Settings":
-            categoryPanel.style.display = "block";
-
-            // Render Settings-related buttons
-            categoryPanel.innerHTML = `
-                <button class="category" id="UserProfile" onclick="updateMainContent('UserProfile')">User Profile</button>
-                <button class="category" id="BusinessInfo" onclick="updateMainContent('BusinessInfo')">Business Information</button>
-                <button class="category" id="ThemeToggle" onclick="updateMainContent('ThemeToggle')">Light/Dark Mode</button>
-                <button class="category" id="DisplaySettings" onclick="updateMainContent('DisplaySettings')">Display Settings</button>
-                <button class="category" id="TaxAndDiscount" onclick="updateMainContent('TaxAndDiscount')">Tax and Discounts</button>
-                <button class="category" id="PrinterConfig" onclick="updateMainContent('PrinterConfig')">Printer Configuration</button>
-                <button class="category" id="Receipt" onclick="updateMainContent('Receipt')">Receipt</button>
-                <button class="category" id="DateAndTime" onclick="updateMainContent('DateAndTime')">Date And Time</button>
-                <button class="category" id="Currency" onclick="updateMainContent('Currency')">Currency</button>
-                <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
-                <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
-                <button class="category" id="SystemUpdates" onclick="updateMainContent('SystemUpdates')">System Updates</button>
-                <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>
-            `;
-            break;
-    }
-
-    // Highlight the active category button
-    const categoryButtons = document.querySelectorAll("#category-panel .category");
-    categoryButtons.forEach(button => button.classList.remove("active"));
-
-    const activeCategoryButton = document.getElementById(contentType);
-    if (activeCategoryButton) {
-        activeCategoryButton.classList.add("active");
-    }
-}
-
 function showConfirmPopup(message, onConfirm) {
     // Remove existing popup if any
     if (document.getElementById("confirmPopup")) {
@@ -776,4 +682,3 @@ function showConfirmPopup(message, onConfirm) {
         popup.remove();
     });
 }
-

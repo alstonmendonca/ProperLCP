@@ -603,41 +603,47 @@ ipcMain.on("refresh-categories", (event) => {
 //----------------------------------------------------BILLING----------------------------------------------------------
 // Handle print-bill event
 // Handle print-bill event
-// Handle print-bill event
-ipcMain.on("print-bill", (event, escPosCommands) => {
+ipcMain.on("print-bill", async (event, escPosCommands) => {
     try {
-        // Replace with your printer's USB vendor ID and product ID
-        const device = new escpos.USB(1317, 42752); // TVS RP 3220 STAR
+        const escpos = require('escpos');
+        escpos.USB = require('escpos-usb');
+        
+        // Try to find the printer automatically
+        const device = new escpos.USB();
+        // OR if you need to specify VID/PID
+        // const device = new escpos.USB(1317, 42752);
+        
         const printer = new escpos.Printer(device);
 
         device.open((error) => {
             if (error) {
-                console.error("Failed to open printer:", error);
+                console.error("Printer connection error:", error);
                 dialog.showMessageBox({
                     type: "error",
                     title: "Printer Error",
-                    message: "Failed to connect to the printer. Please check the connection and try again.",
+                    message: `Failed to connect to printer: ${error.message}`,
                     buttons: ["OK"],
                 });
                 return;
             }
 
-            console.log("Printer connected successfully. Sending commands...");
-
-            // Send ESC/POS commands
             printer
-                .raw(Buffer.from(escPosCommands, "utf8")) // Send ESC/POS commands
-                .cut() // Cut paper
-                .close(() => {
-                    console.log("Printing completed successfully.");
+                .raw(Buffer.from(escPosCommands, "utf8"))
+                .cut()
+                .close((err) => {
+                    if (err) {
+                        console.error("Print error:", err);
+                    } else {
+                        console.log("Printing completed successfully.");
+                    }
                 });
         });
     } catch (error) {
-        console.error("Printer error:", error);
+        console.error("Printing failed:", error);
         dialog.showMessageBox({
             type: "error",
-            title: "Printer Not Found",
-            message: "The thermal printer is not connected. Please connect the printer and try again.",
+            title: "Print Error",
+            message: `Printing failed: ${error.message}`,
             buttons: ["OK"],
         });
     }
@@ -820,7 +826,7 @@ ipcMain.on("save-bill", async (event, orderData) => {
         console.log(`Order ${orderId} saved successfully with KOT ${kot}.`);
 
         // Send success response and KOT number to renderer
-        event.sender.send("bill-saved", { kot });
+        event.sender.send("bill-saved", { kot,orderId });
 
     } catch (error) {
         console.error("Error processing order:", error.message);

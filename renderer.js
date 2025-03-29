@@ -51,7 +51,7 @@ const {showOrderDetails} = require('./todaysOrders');
 const {closeOrderDetails} = require('./todaysOrders');
 const {loadThemeToggle} = require('./themeToggle');
 const {loadHome} = require('./home');
-
+const { updateLeftPanel } = require("./leftPanel"); // Add this import
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

@@ -293,66 +293,118 @@ function saveAndPrintBill() {
     // Send order data to main process with discount applied (or not)
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
 
-    // Generate ESC/POS commands for printing
-    const escPosCommands = generateEscPosCommands(billItems, discountedTotal);
+    // Listen for the saved bill response to get the KOT number
+    ipcRenderer.once("bill-saved", (event, { kot, orderId }) => {
+        console.log(`Bill saved successfully with KOT: ${kot}`);
 
-    // Send ESC/POS commands to the printer
-    ipcRenderer.send("print-bill", escPosCommands);
+        // Generate and print the bill
+        const escPosCommands = generateEscPosCommands(billItems, discountedTotal, kot, orderId);
+        ipcRenderer.send("print-bill", escPosCommands);
 
-    // Add the glow effect to the bill panel
-    const billPanel = document.getElementById("bill-panel");
-    billPanel.classList.add("glow");
+        // Add the glow effect to the bill panel
+        const billPanel = document.getElementById("bill-panel");
+        billPanel.classList.add("glow");
 
-    // Remove the glow effect after 2 seconds
-    setTimeout(() => {
-        billPanel.classList.remove("glow");
-    },800);
+        // Remove the glow effect after 2 seconds
+        setTimeout(() => {
+            billPanel.classList.remove("glow");
+        }, 800);
 
-    NewOrder();
+        NewOrder();
+    });
+
+    // Handle any errors during bill saving
+    ipcRenderer.once("bill-error", (event, { error }) => {
+        console.error("Error saving bill:", error);
+        createTextPopup(`Error saving bill: ${error}`);
+    });
 }
 
 // Function to generate ESC/POS commands for the bill
-function generateEscPosCommands(billItems, totalAmount) {
+function generateEscPosCommands(billItems, totalAmount, kot, orderId) {
     let commands = [];
 
-    // Initialize printer
+    // ===================== CUSTOMER RECEIPT =====================
     commands.push("\x1B\x40"); // Initialize printer
-
-    // Print header (Lassi Corner)
+    
+    // Restaurant Header
     commands.push("\x1B\x61\x01"); // Center align
     commands.push("\x1D\x21\x11"); // Double height and width
-    commands.push("Lassi Corner\n");
+    commands.push("THE LASSI CORNER\n");
     commands.push("\x1D\x21\x00"); // Reset text size
+    
+    // Address/Contact Info
+    commands.push("SJEC, VAMANJOOR\n");
+    commands.push("\x1B\x21\x10"); // Bold medium
+    commands.push(`Token No: ${kot}\n`);
+    commands.push("\x1B\x21\x00"); // Reset text
+    
+    // Order Info
     commands.push("\x1B\x61\x00"); // Left align
-
-    // Print bill items
+    commands.push(`Date: ${new Date().toLocaleString()}\n`);
+    commands.push("BILL NUMBER: " + orderId + "\n");
+    commands.push("-".repeat(32) + "\n");
+    
+    // Item Header
     commands.push("\x1B\x45\x01"); // Bold on
-    commands.push("Item\tQty\tPrice\n");
+    commands.push("ITEM          QTY  PRICE\n");
     commands.push("\x1B\x45\x00"); // Bold off
-
+    
+    // Item List
     billItems.forEach(item => {
-        const itemName = item.querySelector(".bill-item-name").textContent;
-        const quantity = item.querySelector(".bill-quantity").value;
-        const totalPrice = item.querySelector(".bill-total").textContent;
-
-        commands.push(`${itemName}\t${quantity}\t${totalPrice}\n`);
+        const name = item.querySelector(".bill-item-name").textContent;
+        const qty = item.querySelector(".bill-quantity").value.padStart(3);
+        const price = item.querySelector(".bill-total").textContent.padStart(8);
+        
+        // Format with fixed widths for alignment
+        commands.push(`${name.substring(0, 14).padEnd(14)}${qty}${price}\n`);
     });
-
-    // Print total
+    
+    // Total
+    commands.push("-".repeat(32) + "\n");
     commands.push("\x1B\x45\x01"); // Bold on
-    commands.push(`Total: Rs. ${totalAmount.toFixed(2)}\n`);
+    commands.push(`TOTAL: Rs. ${totalAmount.toFixed(2).padStart(10)}\n`);
     commands.push("\x1B\x45\x00"); // Bold off
-
-    // Print footer (Thank you for visiting)
+    
+    // Footer
     commands.push("\x1B\x61\x01"); // Center align
-    commands.push("Thank you for visiting!\n");
-    commands.push("\x1B\x61\x00"); // Left align
-
-    // Cut paper
+    commands.push("\nThank you for visiting!\n");
+    
+    
+    // ===================== KITCHEN RECEIPT (KOT) =====================
     commands.push("\x1D\x56\x41\x10"); // Partial cut
-
+    commands.push("\x1B\x61\x01"); // Center align
+    commands.push("\x1D\x21\x11"); // Double height
+    commands.push("KITCHEN ORDER\n");
+    commands.push("\x1D\x21\x00"); // Normal text
+    
+    // KOT Info
+    commands.push(`KOT #: ${kot}\n`);
+    commands.push(`Time: ${new Date().toLocaleTimeString()}\n`);
+    commands.push("-".repeat(32) + "\n");
+    
+    // Kitchen Items
+    commands.push("\x1B\x61\x00"); // Left align
+    commands.push("\x1B\x45\x01"); // Bold on
+    commands.push("ITEM          QTY\n");
+    commands.push("\x1B\x45\x00"); // Bold off
+    
+    billItems.forEach(item => {
+        const name = item.querySelector(".bill-item-name").textContent;
+        const qty = item.querySelector(".bill-quantity").value.padStart(3);
+        commands.push(`${name.substring(0, 14).padEnd(14)}${qty}\n`);
+    });
+    
+    // Special Instructions
+    commands.push("-".repeat(32) + "\n");
+    commands.push("NOTES: \n\n\n"); // Space for handwritten notes
+    
+    // Final Cut
+    commands.push("\x1D\x56\x41\x10"); // Partial cut
+    
     return commands.join("");
 }
+
 
 // Edit-Mode Bill Panel Starts Here------------------------------------------------------------------------------
 function displayEditMode() {

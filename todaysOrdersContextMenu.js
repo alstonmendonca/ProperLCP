@@ -16,7 +16,7 @@ function attachTodaysOrdersContextMenu(selector) {
             const billNo = box.getAttribute("data-billno");
             menu.innerHTML = `
                 <div class="context-option" id="deleteOrder">🗑️ Delete Order (Bill No: ${billNo})</div>
-                <div class="context-option">🔄 Refresh Order</div>
+                <div class="context-option">🔄 Print Bill (Bill No: ${billNo})</div>
                 <div class="context-option">📄 View Details</div>
             `;
 
