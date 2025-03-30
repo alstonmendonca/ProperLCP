@@ -1521,49 +1521,80 @@ input:checked + .slider:before {
 
 /* Styles for the order details modal */
 .order-details-modal {
-    position: fixed; /* Fixed position */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-    display: flex; /* Center the content */
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure it is on top */
-    animation: fadeIn 0.3s; /* Fade-in effect */
+    z-index: 1000;
+    animation: fadeIn 0.3s;
 }
 
 .order-details-content {
-    background-color: #fff; /* White background for the content */
-    border-radius: 10px; /* Rounded corners */
-    padding: 20px; /* Padding inside the modal */
-    width: 80%; /* Width of the modal */
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    /* HIGHLIGHT: You can adjust these dimensions as needed */
+    width: 80%; /* Default width */
     max-width: 600px; /* Maximum width */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
-    position: relative; /* Position relative for the close button */
+    height: 80%; /* Default height */
+    max-height: 700px; /* Maximum height */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    line-height: 1.5;
+    /* Add scrolling to content */
+    display: flex;
+    flex-direction: column;
+}
+
+.order-details-body {
+    overflow-y: auto; /* Enable vertical scrolling */
+    flex-grow: 1; /* Take up remaining space */
+    padding-right: 10px; /* Prevent content from touching scrollbar */
+}
+
+/* Custom scrollbar styling */
+.order-details-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.order-details-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.order-details-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.order-details-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .close-button {
-    position: absolute; /* Position the close button */
+    position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 24px; /* Size of the close button */
-    cursor: pointer; /* Pointer cursor */
+    font-size: 24px;
+    cursor: pointer;
 }
 
 /* Styles for the food items list */
 .food-items-list {
-    list-style-type: none; /* Remove default bullet points */
-    padding: 0; /* Remove default padding */
-    margin: 10px 0; /* Margin for spacing */
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
 }
 
 .food-items-list li {
-    padding: 5px 0; /* Padding for each item */
-    border-bottom: 1px solid #ddd; /* Light border for separation */
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
 }
-
 
 /* Animation for fade-in effect */
 @keyframes fadeIn {

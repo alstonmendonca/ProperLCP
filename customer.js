@@ -4,7 +4,10 @@ let currentSortBy = null;
 let currentSortOrder = 'asc';
 
 // Main function to load customers content
-function loadCustomers(mainContent) {
+function loadCustomers(mainContent, billPanel) {
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none';
     // Set up the HTML structure
     mainContent.innerHTML = `
         <div class="customer-header">

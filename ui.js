@@ -297,6 +297,9 @@ async function updateMainContent(contentType) {
             }
             
         } else if (contentType === 'categoryHistory') {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; // Hide bill panel for History
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
             mainContent.innerHTML = `
@@ -340,6 +343,9 @@ async function updateMainContent(contentType) {
             }
         }
          else if (contentType === "deletedOrders") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; // Hide bill panel for History
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
             mainContent.innerHTML = `
@@ -386,6 +392,9 @@ async function updateMainContent(contentType) {
             }
         }
         else if (contentType === 'discountedOrders') {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
         
             // Retrieve stored dates from sessionStorage (or use today's date as default)
@@ -451,9 +460,12 @@ async function updateMainContent(contentType) {
             fetchDiscountedOrders(storedStartDate, storedEndDate);
         }
         else if (contentType === 'customer') {
-            loadCustomers(mainContent);
+            loadCustomers(mainContent, billPanel);
         }
         else if(contentType === "filterHistory"){
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
                 <h1>Filter History</h1>
                 <div id="customersDiv"></div>
@@ -461,6 +473,9 @@ async function updateMainContent(contentType) {
             
         }
         else if (contentType === 'itemHistory') {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; // Hide bill panel for History
             const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
         
             mainContent.innerHTML = `
@@ -526,6 +541,9 @@ async function updateMainContent(contentType) {
         }
         
         else if(contentType === "dayWise"){
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
                 <h1>Day-Wise Order History</h1>
                 <div id="customersDiv"></div>
@@ -533,6 +551,9 @@ async function updateMainContent(contentType) {
             
         }
         else if(contentType === "monthWise"){
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
                 <h1>Month-Wise Order History</h1>
                 <div id="customersDiv"></div>
@@ -540,6 +561,9 @@ async function updateMainContent(contentType) {
             
         }
         else if(contentType === "yearWise"){
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
                 <h1>Year-Wise Order History</h1>
                 <div id="customersDiv"></div>

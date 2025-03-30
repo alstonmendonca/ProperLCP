@@ -6,23 +6,24 @@ function fetchTodaysOrders() {
     ipcRenderer.send("get-todays-orders");
 }
 
-// Function to create and show the enlarged order details
 function showOrderDetails(order) {
     const orderDetailsHTML = `
         <div class="order-details-modal" onclick="closeOrderDetails(event)">
             <div class="order-details-content" onclick="event.stopPropagation();">
                 <span class="close-button" onclick="closeOrderDetails()">&times;</span>
-                <h3>Order Details for Bill No: ${order.billno}</h3>
-                <p>Cashier: ${order.cashier_name}</p>
-                <p>KOT: ${order.kot}</p>
-                <p>Price: ₹${order.price.toFixed(2)}</p>
-                <p>SGST: ₹${order.sgst.toFixed(2)}</p>
-                <p>CGST: ₹${order.cgst.toFixed(2)}</p>
-                <p>Tax: ₹${order.tax.toFixed(2)}</p>
-                <h4>Food Items:</h4>
-                <ul class="food-items-list">
-                    ${order.food_items.split(', ').map(item => `<li>${item}</li>`).join('')}
-                </ul>
+                <div class="order-details-body">
+                    <h3>Order Details for Bill No: ${order.billno}</h3>
+                    <p>Cashier: ${order.cashier_name}</p>
+                    <p>KOT: ${order.kot}</p>
+                    <p>Price: ₹${order.price.toFixed(2)}</p>
+                    <p>SGST: ₹${order.sgst.toFixed(2)}</p>
+                    <p>CGST: ₹${order.cgst.toFixed(2)}</p>
+                    <p>Tax: ₹${order.tax.toFixed(2)}</p>
+                    <h4>Food Items:</h4>
+                    <ul class="food-items-list">
+                        ${order.food_items.split(', ').map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
             </div>
         </div>
     `;
