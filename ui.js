@@ -9,7 +9,7 @@ async function updateMainContent(contentType) {
     const historyButtons = [
         'todaysOrders', 'orderHistory', 'categoryHistory', 'itemHistory', 
         'deletedOrders', 'discountedOrders', 'dayWise', 'monthWise', 
-        'yearWise', 'filterHistory', 'customer', 'makeATable', 'tablesCreated'
+        'yearWise', 'filterHistory', 'customer', 'makeATable', 'yourTables'
     ];
     
     // Highlight top panel button for any top-level section
@@ -569,6 +569,24 @@ async function updateMainContent(contentType) {
                 <div id="customersDiv"></div>
             `;
             
+        }
+        else if(contentType === "makeATable"){
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
+            mainContent.innerHTML = `
+                <h1>Make Your Own Table</h1>
+                <div id="makeATableDiv"></div>
+            `;
+        }
+        else if(contentType === "yourTables"){
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
+            mainContent.innerHTML = `
+                <h1>Your Tables</h1>
+                <div id="yourTablesDiv"></div>
+            `;
         }
 
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------

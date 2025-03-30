@@ -16,7 +16,7 @@ function loadSalesOverview(mainContent, billPanel) {
             text-transform: uppercase; /* Uppercase the text for emphasis */
             letter-spacing: 2px; /* Add spacing between letters */
             padding-bottom: 10px; /* Add padding to create space for the border */
-            border-bottom: 3px solid #0D3B66; /* Add a green line underneath the title */
+            border-bottom: 3px solid #0D3B66; /* Add a line underneath the title */
             text-align: center; /* Center the content -->
         ">Sales Overview</h2>
         <div class="date-filters">
@@ -49,15 +49,20 @@ function loadSalesOverview(mainContent, billPanel) {
                 margin-top: 20px;
                 font-family: Arial, sans-serif;
             }
-            #salesTable th, #salesTable td {
+            #salesTable td {
                 padding: 12px;
                 text-align: left;
-                border-bottom: 1px solid #ddd;
+                border: 1px solid #ddd;
             }
             #salesTable th {
-                background-color: #094872;
+                padding: 12px;
+                text-align: left;
+                background-color: #0D3B66;
                 color: white;
                 font-weight: bold;
+            }
+            #salesTable th:hover {
+                background-color: #11487b;
             }
             #salesTable tr:hover {
                 background-color: #f5f5f5;

@@ -153,15 +153,16 @@ async function displayMenu() {
             });
 
             // Add event listeners to edit buttons
+            // Add event listeners to edit buttons
             document.querySelectorAll(".edit-btn").forEach((button) => {
                 button.addEventListener("click", async (event) => {
                     const fid = event.target.getAttribute("data-fid");
-                    const existingPopup = document.querySelector(".edit-popup");
+                    const existingPopup = document.querySelector(".menu-edit-popup-overlay");
 
                     // If popup already exists, remove it (toggle behavior)
                     if (existingPopup) {
                         document.body.removeChild(existingPopup);
-                        return; // Stop execution to prevent reopening immediately
+                        return;
                     }
 
                     const item = foodItems.find((item) => item.fid == fid);
@@ -170,40 +171,51 @@ async function displayMenu() {
                         return;
                     }
 
-                    // Create the edit popup dynamically
-                    const popup = document.createElement("div");
-                    popup.classList.add("menu-edit-popup");
-                    popup.innerHTML = `
-                        <div class="menu-popup-content" style = "align-items: center; justify-content: center; pointer-events: auto;">
+                    // Create the popup overlay and content
+                    const popupOverlay = document.createElement("div");
+                    popupOverlay.classList.add("menu-edit-popup-overlay");
+
+                    const popupContent = document.createElement("div");
+                    popupContent.classList.add("menu-edit-popup");
+                    popupContent.innerHTML = `
+                        <div class="menu-popup-content">
                             <h3>Edit Food Item</h3>
                             <label>Name:</label>
                             <input type="text" id="editFname" value="${item.fname}">
                             <label>Price:</label>
-                            <input type="number" id="editCost" value="${item.cost}" style="width: 150px;">
+                            <input type="number" id="editCost" value="${item.cost}">
                             <label for="category">Category:</label>
-                            <select id="category" required style = "width: 150px; height : 35px; border-radius: 5px; border: 1px solid #ccc;
-                            font-size : 15px; text-align: center;">
+                            <select id="category" required>
                                 <option value="${item.category}">${item.category_name}</option>
                             </select>
-                            <label style = "margin-top:7px">SGST:</label>
-                            <input type="number" id="editsgst" value="${item.sgst}" min="0" style="width: 150px;">
+                            <label>SGST:</label>
+                            <input type="number" id="editsgst" value="${item.sgst}" min="0">
                             <label>CGST:</label>
-                            <input type="number" id="editcgst" value="${item.cgst}" min="0" style="width: 150px;">
+                            <input type="number" id="editcgst" value="${item.cgst}" min="0">
                             <label>VEG:</label>
                             <label class="switch">
-                            <input type="checkbox" id="editveg" ${item.veg == 1 ? "checked" : ""}>
-                            <span class="slider round"></span>
+                                <input type="checkbox" id="editveg" ${item.veg == 1 ? "checked" : ""}>
+                                <span class="slider round"></span>
                             </label>
                             <br>
-
                             <div class="menu-popup-buttons">
-                                <button id="saveChanges" style="margin-right: 10px;">Save</button>
+                                <button id="saveChanges">Save</button>
                                 <button id="closePopup">Cancel</button>
                             </div>
                         </div>
                     `;
 
-                    document.body.appendChild(popup);
+                    popupOverlay.appendChild(popupContent);
+                    document.body.appendChild(popupOverlay);
+
+                    // Close when clicking outside the content
+                    popupOverlay.addEventListener("click", (e) => {
+                        if (e.target === popupOverlay) {
+                            document.body.removeChild(popupOverlay);
+                        }
+                    });
+
+                    // Load categories for dropdown
                     async function loadCategories() {
                         try {
                             const categories = await ipcRenderer.invoke("get-categories-for-additem");
@@ -229,15 +241,15 @@ async function displayMenu() {
                         }
                     }
                     
-                    loadCategories(); // Call after popup is added to DOM
+                    loadCategories();
+
                     // Close popup when clicking "Cancel"
                     document.getElementById("closePopup").addEventListener("click", () => {
-                        document.body.removeChild(popup);
+                        document.body.removeChild(popupOverlay);
                     });
 
                     // Save changes
                     document.getElementById("saveChanges").addEventListener("click", async () => {
-                        // Store the current scroll position
                         const currentScrollPosition = mainContent.scrollTop;
                     
                         const updatedFname = document.getElementById("editFname").value.trim();
@@ -245,7 +257,7 @@ async function displayMenu() {
                         const updatedCategory = parseFloat(document.getElementById("category").value);
                         const updatedsgst = parseFloat(document.getElementById("editsgst").value);
                         const updatedcgst = parseFloat(document.getElementById("editcgst").value);
-                        const updatedveg = document.getElementById("editveg").checked ? 1 : 0; // Convert toggle state to 1 or 0
+                        const updatedveg = document.getElementById("editveg").checked ? 1 : 0;
                     
                         // Validate inputs
                         if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
@@ -266,7 +278,7 @@ async function displayMenu() {
                     
                         if (response.success) {
                             // Remove the popup
-                            document.body.removeChild(popup);
+                            document.body.removeChild(popupOverlay);
                     
                             // Update UI dynamically
                             const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
