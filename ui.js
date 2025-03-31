@@ -252,7 +252,7 @@ async function updateMainContent(contentType) {
                 <div class="todays-orders-header">
                     <h1>Today's Orders</h1>
                 </div>
-                <button id="exportExcelButton">Export to Excel</button>
+                <button style="margin-left: 20px;" id="exportExcelButton">Export to Excel</button>
                 <div id="todaysOrdersDiv"></div>
             `;
             fetchTodaysOrders();

@@ -602,7 +602,6 @@ ipcMain.on("refresh-categories", (event) => {
 });
 //----------------------------------------------------BILLING----------------------------------------------------------
 // Handle print-bill event
-// Handle print-bill event
 ipcMain.on("print-bill", async (event, escPosCommands) => {
     try {
         const escpos = require('escpos');
