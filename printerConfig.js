@@ -1,13 +1,13 @@
-const usbDetect = require('usb');
+const usb = require('usb');
 
-// Function to load the Printer Configuration content
-async function loadPrinterConfig(mainContent, billPanel) {
+function loadPrinterConfig(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
     mainContent.style.marginRight = "0px";
     billPanel.style.display = 'none';
 
     try {
-        const devices = await usbDetect.find();
+        // Get all connected USB devices
+        const devices = usb.getDeviceList();
         
         let deviceListHTML = `
             <div class='section-title'>
@@ -20,11 +20,11 @@ async function loadPrinterConfig(mainContent, billPanel) {
             deviceListHTML += `<li>No USB devices found.</li>`;
         } else {
             devices.forEach(device => {
+                const deviceDescriptor = device.deviceDescriptor;
                 deviceListHTML += `
                     <li>
-                        Name: ${device.deviceName || 'Unknown'}, 
-                        Vendor ID: 0x${device.vendorId.toString(16)}, 
-                        Product ID: 0x${device.productId.toString(16)}
+                        Vendor ID: 0x${deviceDescriptor.idVendor.toString(16)}, 
+                        Product ID: 0x${deviceDescriptor.idProduct.toString(16)}
                     </li>
                 `;
             });
@@ -38,19 +38,4 @@ async function loadPrinterConfig(mainContent, billPanel) {
     }
 }
 
-
-// Function to get the device name from the string descriptor
-function getDeviceName(device) {
-    return new Promise((resolve, reject) => {
-        device.getStringDescriptor(device.deviceDescriptor.iProduct, (err, name) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(name || "Unknown Device");
-            }
-        });
-    });
-}
-
-// Export the loadPrinterConfig function
 module.exports = { loadPrinterConfig };
