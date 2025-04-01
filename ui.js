@@ -19,7 +19,7 @@ async function updateMainContent(contentType) {
     const settingsButtons = [
         'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 
         'TaxAndDiscount', 'PrinterConfig', 'Receipt',
-        'DateAndTime', 'Currency', 'Security', 'Help'
+        'DateAndTime', 'Currency', 'Security', 'Help', 'SystemUpdates'
     ];
     
     // Highlight top panel button for any top-level section
@@ -293,6 +293,17 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "Help") {
             loadHelpSection();
+        }
+        else if (contentType === "SystemUpdates") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
+            mainContent.innerHTML = `
+                <div class='section-title'>
+                    <h2>System Updates</h2>
+                </div>
+                <p>Check for Updates at this link: {link will be provided later}</p>
+            `;
         }
         else if (contentType === "Exit") {
             ipcRenderer.send("exit-app");

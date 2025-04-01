@@ -1,61 +1,43 @@
-const usb = require('usb'); // Make sure to install the usb package
+const usbDetect = require('usb');
 
 // Function to load the Printer Configuration content
 async function loadPrinterConfig(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
     mainContent.style.marginRight = "0px";
     billPanel.style.display = 'none';
-    // Get the list of USB devices
-    const devices = usb.getDeviceList();
 
-    // Create HTML content for displaying devices
-    let deviceListHTML = `
-        <div class='section-title'>
-            <h2>Connected USB Devices</h2>
-        </div>
-        <ul>
-    `;
+    try {
+        const devices = await usbDetect.find();
+        
+        let deviceListHTML = `
+            <div class='section-title'>
+                <h2>Connected USB Devices</h2>
+            </div>
+            <ul>
+        `;
 
-    if (devices.length === 0) {
-        deviceListHTML += `<li>No USB devices found.</li>`;
-    } else {
-        // Iterate through each device and get its details
-        for (const device of devices) {
-            try {
-                // Open the device to access its descriptors
-                device.open();
-                
-                // Get the device name (string descriptor)
-                const deviceName = await getDeviceName(device);
-                
+        if (devices.length === 0) {
+            deviceListHTML += `<li>No USB devices found.</li>`;
+        } else {
+            devices.forEach(device => {
                 deviceListHTML += `
                     <li>
-                        Name: ${deviceName}, 
-                        Vendor ID: ${device.deviceDescriptor.idVendor}, 
-                        Product ID: ${device.deviceDescriptor.idProduct}, 
-                        Device Class: ${device.deviceDescriptor.bDeviceClass}
+                        Name: ${device.deviceName || 'Unknown'}, 
+                        Vendor ID: 0x${device.vendorId.toString(16)}, 
+                        Product ID: 0x${device.productId.toString(16)}
                     </li>
                 `;
-            } catch (error) {
-                console.error(`Error retrieving device info: ${error}`);
-                deviceListHTML += `
-                    <li>
-                        Error retrieving info for Vendor ID: ${device.deviceDescriptor.idVendor}, 
-                        Product ID: ${device.deviceDescriptor.idProduct}
-                    </li>
-                `;
-            } finally {
-                // Close the device after accessing its descriptors
-                device.close();
-            }
+            });
         }
-    }
 
-    deviceListHTML += `</ul>`;
-    
-    // Update the main content with the device list
-    mainContent.innerHTML = deviceListHTML;
+        deviceListHTML += `</ul>`;
+        mainContent.innerHTML = deviceListHTML;
+    } catch (error) {
+        console.error('Error detecting USB devices:', error);
+        mainContent.innerHTML = `<div class='error'>Error detecting USB devices: ${error.message}</div>`;
+    }
 }
+
 
 // Function to get the device name from the string descriptor
 function getDeviceName(device) {
