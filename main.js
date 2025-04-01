@@ -2,7 +2,9 @@ const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const escpos = require("escpos"); // Install escpos library: npm install escpos
+const fs = require('fs');
 escpos.USB = require("escpos-usb"); // USB printer support
+const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
 
 let mainWindow;
 let userRole = null;
@@ -647,6 +649,69 @@ ipcMain.on("print-bill", async (event, escPosCommands) => {
         });
     }
 });
+
+// Load receipt format
+ipcMain.handle('get-receipt-format', async () => {
+    try {
+        if (fs.existsSync(RECEIPT_FORMAT_PATH)) {
+            return JSON.parse(fs.readFileSync(RECEIPT_FORMAT_PATH, 'utf8'));
+        }
+        return {};
+    } catch (error) {
+        console.error('Error loading receipt format:', error);
+        return {};
+    }
+});
+
+// Save receipt format
+ipcMain.handle('save-receipt-format', (event, format) => {
+    try {
+        fs.writeFileSync(RECEIPT_FORMAT_PATH, JSON.stringify(format, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error saving receipt format:', error);
+        return false;
+    }
+});
+
+// Test print
+ipcMain.on('test-print-receipt', (event, format) => {
+    // Simulate bill items for test print
+    const testItems = [
+        { name: 'Test Item 1', quantity: 1, price: 100.00 },
+        { name: 'Test Item 2', quantity: 2, price: 50.00 }
+    ];
+    
+    // Generate ESC/POS commands using the custom format
+    const commands = generateCustomEscPos(format, testItems, 200.00, 'TEST123', 'TEST456');
+    event.sender.send('print-bill', commands);
+});
+
+function generateCustomEscPos(format, items, totalAmount, kot, orderId) {
+    // Format items for receipt
+    const formattedItems = items.map(item => 
+        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
+    ).join('\n');
+    
+    // Replace variables in the format
+    let customerReceipt = format.customerReceipt
+        .replace(/{{shopName}}/g, "THE LASSI CORNER")
+        .replace(/{{shopAddress}}/g, "SJEC, VAMANJOOR")
+        .replace(/{{kotNumber}}/g, kot)
+        .replace(/{{orderId}}/g, orderId)
+        .replace(/{{dateTime}}/g, new Date().toLocaleString())
+        .replace(/{{items}}/g, formattedItems)
+        .replace(/{{totalAmount}}/g, totalAmount.toFixed(2));
+    
+    let kotReceipt = format.kotReceipt
+        .replace(/{{kotNumber}}/g, kot)
+        .replace(/{{dateTime}}/g, new Date().toLocaleTimeString())
+        .replace(/{{items}}/g, items.map(item => 
+            `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
+        ).join('\n'));
+    
+    return customerReceipt + kotReceipt;
+}
 //-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS
 ipcMain.on('get-held-orders', (event) => {

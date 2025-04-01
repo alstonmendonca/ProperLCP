@@ -203,12 +203,7 @@ async function updateMainContent(contentType) {
             loadPrinterConfig(mainContent);
         }
         else if (contentType === "Receipt") {
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Receipt</h2>
-                </div>
-                <p>Settings for display</p>
-            `;
+            loadReceiptEditor(mainContent);
         }
         else if (contentType === "DateAndTime") {
             mainContent.innerHTML = `

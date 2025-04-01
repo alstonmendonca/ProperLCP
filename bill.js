@@ -320,89 +320,43 @@ function saveAndPrintBill() {
     });
 }
 
-// Function to generate ESC/POS commands for the bill
+// Modify the generateEscPosCommands function in bill.js
 function generateEscPosCommands(billItems, totalAmount, kot, orderId) {
-    let commands = [];
-
-    // ===================== CUSTOMER RECEIPT =====================
-    commands.push("\x1B\x40"); // Initialize printer
+    // Get the custom format
+    const format = ipcRenderer.sendSync('get-receipt-format');
     
-    // Restaurant Header
-    commands.push("\x1B\x61\x01"); // Center align
-    commands.push("\x1D\x21\x11"); // Double height and width
-    commands.push("THE LASSI CORNER\n");
-    commands.push("\x1D\x21\x00"); // Reset text size
-    
-    // Address/Contact Info
-    commands.push("SJEC, VAMANJOOR\n");
-    commands.push("\x1B\x21\x10"); // Bold medium
-    commands.push(`Token No: ${kot}\n`);
-    commands.push("\x1B\x21\x00"); // Reset text
-    
-    // Order Info
-    commands.push("\x1B\x61\x00"); // Left align
-    commands.push(`Date: ${new Date().toLocaleString()}\n`);
-    commands.push("BILL NUMBER: " + orderId + "\n");
-    commands.push("-".repeat(32) + "\n");
-    
-    // Item Header
-    commands.push("\x1B\x45\x01"); // Bold on
-    commands.push("ITEM          QTY  PRICE\n");
-    commands.push("\x1B\x45\x00"); // Bold off
-    
-    // Item List
-    billItems.forEach(item => {
+    // Format items for receipt
+    const formattedItems = Array.from(billItems).map(item => {
         const name = item.querySelector(".bill-item-name").textContent;
         const qty = item.querySelector(".bill-quantity").value.padStart(3);
         const price = item.querySelector(".bill-total").textContent.padStart(8);
-        
-        // Format with fixed widths for alignment
-        commands.push(`${name.substring(0, 14).padEnd(14)}${qty}${price}\n`);
-    });
+        return `${name.substring(0, 14).padEnd(14)}${qty}${price}`;
+    }).join('\n');
     
-    // Total
-    commands.push("-".repeat(32) + "\n");
-    commands.push("\x1B\x45\x01"); // Bold on
-    commands.push(`TOTAL: Rs. ${totalAmount.toFixed(2).padStart(10)}\n`);
-    commands.push("\x1B\x45\x00"); // Bold off
+    // Generate commands using custom format or default if not set
+    let customerReceipt = format.customerReceipt || getDefaultCustomerFormat();
+    let kotReceipt = format.kotReceipt || getDefaultKOTFormat();
     
-    // Footer
-    commands.push("\x1B\x61\x01"); // Center align
-    commands.push("\nThank you for visiting!\n");
+    // Replace variables
+    customerReceipt = customerReceipt
+        .replace(/{{shopName}}/g, "THE LASSI CORNER")
+        .replace(/{{shopAddress}}/g, "SJEC, VAMANJOOR")
+        .replace(/{{kotNumber}}/g, kot)
+        .replace(/{{orderId}}/g, orderId)
+        .replace(/{{dateTime}}/g, new Date().toLocaleString())
+        .replace(/{{items}}/g, formattedItems)
+        .replace(/{{totalAmount}}/g, totalAmount.toFixed(2));
     
+    kotReceipt = kotReceipt
+        .replace(/{{kotNumber}}/g, kot)
+        .replace(/{{dateTime}}/g, new Date().toLocaleTimeString())
+        .replace(/{{items}}/g, Array.from(billItems).map(item => {
+            const name = item.querySelector(".bill-item-name").textContent;
+            const qty = item.querySelector(".bill-quantity").value.padStart(3);
+            return `${name.substring(0, 14).padEnd(14)}${qty}`;
+        }).join('\n'));
     
-    // ===================== KITCHEN RECEIPT (KOT) =====================
-    commands.push("\x1D\x56\x41\x10"); // Partial cut
-    commands.push("\x1B\x61\x01"); // Center align
-    commands.push("\x1D\x21\x11"); // Double height
-    commands.push("KITCHEN ORDER\n");
-    commands.push("\x1D\x21\x00"); // Normal text
-    
-    // KOT Info
-    commands.push(`KOT #: ${kot}\n`);
-    commands.push(`Time: ${new Date().toLocaleTimeString()}\n`);
-    commands.push("-".repeat(32) + "\n");
-    
-    // Kitchen Items
-    commands.push("\x1B\x61\x00"); // Left align
-    commands.push("\x1B\x45\x01"); // Bold on
-    commands.push("ITEM          QTY\n");
-    commands.push("\x1B\x45\x00"); // Bold off
-    
-    billItems.forEach(item => {
-        const name = item.querySelector(".bill-item-name").textContent;
-        const qty = item.querySelector(".bill-quantity").value.padStart(3);
-        commands.push(`${name.substring(0, 14).padEnd(14)}${qty}\n`);
-    });
-    
-    // Special Instructions
-    commands.push("-".repeat(32) + "\n");
-    commands.push("NOTES: \n\n\n"); // Space for handwritten notes
-    
-    // Final Cut
-    commands.push("\x1D\x56\x41\x10"); // Partial cut
-    
-    return commands.join("");
+    return customerReceipt + kotReceipt;
 }
 
 
