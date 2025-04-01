@@ -2,6 +2,10 @@ function loadHelpSection() {
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
 
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none';
+
     mainContent.innerHTML = `
         <div class='section-title'>
             <h2>Help & Support</h2>
@@ -25,5 +29,4 @@ function loadHelpSection() {
         <div id="helpDiv"></div>
     `;
 
-    billPanel.style.display = 'none';
 }

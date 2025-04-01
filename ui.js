@@ -4,6 +4,7 @@ async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
 
+//--------------------------------------- CATEGORY PANEL AND TOP PANEL SESSION STORAGE STARTS HERE ----------------------------------------
     // List of top-panel button IDs
     const topPanelButtons = ["Home", "Menu", "History", "Categories", "Analytics", "Settings"];
     const historyButtons = [
@@ -14,6 +15,11 @@ async function updateMainContent(contentType) {
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
         'TopSellingCategory', 'CategoryWiseSales'
+    ];
+    const settingsButtons = [
+        'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 
+        'TaxAndDiscount', 'PrinterConfig', 'Receipt',
+        'DateAndTime', 'Currency', 'Security', 'Help'
     ];
     
     // Highlight top panel button for any top-level section
@@ -65,6 +71,24 @@ async function updateMainContent(contentType) {
         sessionStorage.setItem('lastAnalyticsButton', contentType);
     }
 
+    // Special case: When clicking the Analytics top panel button
+    if (contentType === "Settings") {
+        // Get the last viewed Analytics sub-section or default to todaysOrders
+        const lastSettingsButton = sessionStorage.getItem('lastSettingsButton') || 'UserProfile';
+        
+        // First update the left panel to show History buttons
+        updateLeftPanel("Settings");
+        
+        // Then update the content with the last viewed sub-section
+        updateMainContent(lastSettingsButton);
+        return; // Exit early since we're handling the content update in the recursive call
+    }
+    
+    // Store the last clicked History button if we're in History section
+    if (settingsButtons.includes(contentType)) {
+        sessionStorage.setItem('lastSettingsButton', contentType);
+    }
+
     // Handle highlighting for category panel buttons
     const categoryButtons = document.querySelectorAll("#category-panel .category");
     categoryButtons.forEach(button => button.classList.remove("active"));
@@ -73,7 +97,7 @@ async function updateMainContent(contentType) {
     if (clickedCategoryButton) {
         clickedCategoryButton.classList.add("active");
     }
-
+//--------------------------------------- CATEGORY PANEL AND TOP PANEL SESSION STORAGE ENDS HERE ----------------------------------------
     // Home Screen
     if (contentType === "Home") {
         await loadHome(mainContent, billPanel);
@@ -196,6 +220,7 @@ async function updateMainContent(contentType) {
         else if (contentType === "BusinessInfo") {
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
                 <div class='section-title'>
                     <h2>Business Information</h2>
@@ -206,6 +231,9 @@ async function updateMainContent(contentType) {
             loadThemeToggle(mainContent, billPanel); 
         }
         else if (contentType === "DisplaySettings") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
             mainContent.innerHTML = `
                 <div class='section-title'>
                     <h2>Display Settings</h2>
@@ -214,6 +242,9 @@ async function updateMainContent(contentType) {
             `;
         }
         else if (contentType === "TaxAndDiscount") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
             mainContent.innerHTML = `
                 <div class='section-title'>
                     <h2>Tax and Discount</h2>
@@ -222,12 +253,15 @@ async function updateMainContent(contentType) {
             `;
         }
         else if (contentType === "PrinterConfig") {
-            loadPrinterConfig(mainContent);
+            loadPrinterConfig(mainContent, billPanel);
         }
         else if (contentType === "Receipt") {
-            loadReceiptEditor(mainContent);
+            loadReceiptEditor(mainContent, billPanel);
         }
         else if (contentType === "DateAndTime") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
             mainContent.innerHTML = `
                 <div class='section-title'>
                     <h2>Date And Time</h2>
@@ -236,6 +270,9 @@ async function updateMainContent(contentType) {
             `;
         }
         else if (contentType === "Currency") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
             mainContent.innerHTML = `
                 <div class='section-title'>
                     <h2>Currency</h2>
@@ -244,6 +281,9 @@ async function updateMainContent(contentType) {
             `;
         }
         else if (contentType === "Security") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
             mainContent.innerHTML = `
                 <div class='section-title'>
                     <h2>Security</h2>

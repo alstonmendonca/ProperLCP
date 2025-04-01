@@ -1,7 +1,10 @@
 const { ipcRenderer } = require('electron');
 
 // Function to load receipt editor
-function loadReceiptEditor(mainContent) {
+function loadReceiptEditor(mainContent, billPanel) {
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none';
     mainContent.innerHTML = `
         <div class="receipt-editor-container">
             <h2>Receipt Format Editor</h2>

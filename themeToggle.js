@@ -1,5 +1,8 @@
 // Function to load the Theme Toggle
 function loadThemeToggle(mainContent, billPanel) {
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    
     mainContent.innerHTML = `
         <div class='section-title'>
             <h2>Theme Toggle</h2>

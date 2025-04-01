@@ -1,7 +1,10 @@
 const usb = require('usb'); // Make sure to install the usb package
 
 // Function to load the Printer Configuration content
-async function loadPrinterConfig(mainContent) {
+async function loadPrinterConfig(mainContent, billPanel) {
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none';
     // Get the list of USB devices
     const devices = usb.getDeviceList();
 
