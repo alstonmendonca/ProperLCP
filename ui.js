@@ -11,6 +11,10 @@ async function updateMainContent(contentType) {
         'deletedOrders', 'discountedOrders', 'dayWise', 'monthWise', 
         'yearWise', 'filterHistory', 'customer', 'makeATable', 'yourTables'
     ];
+    const analyticsButtons = [
+        'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
+        'TopSellingCategory', 'CategoryWiseSales'
+    ];
     
     // Highlight top panel button for any top-level section
     if (topPanelButtons.includes(contentType)) {
@@ -41,6 +45,24 @@ async function updateMainContent(contentType) {
     // Store the last clicked History button if we're in History section
     if (historyButtons.includes(contentType)) {
         sessionStorage.setItem('lastHistoryButton', contentType);
+    }
+
+    // Special case: When clicking the Analytics top panel button
+    if (contentType === "Analytics") {
+        // Get the last viewed Analytics sub-section or default to todaysOrders
+        const lastAnalyticsButton = sessionStorage.getItem('lastAnalyticsButton') || 'DayEndSummary';
+        
+        // First update the left panel to show History buttons
+        updateLeftPanel("Analytics");
+        
+        // Then update the content with the last viewed sub-section
+        updateMainContent(lastAnalyticsButton);
+        return; // Exit early since we're handling the content update in the recursive call
+    }
+    
+    // Store the last clicked History button if we're in History section
+    if (analyticsButtons.includes(contentType)) {
+        sessionStorage.setItem('lastAnalyticsButton', contentType);
     }
 
     // Handle highlighting for category panel buttons

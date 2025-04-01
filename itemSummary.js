@@ -7,6 +7,10 @@ function loadItemSummary(mainContent, billPanel) {
     const savedStartDate = sessionStorage.getItem("itemSummaryStartDate") || getToday();
     const savedEndDate = sessionStorage.getItem("itemSummaryEndDate") || getToday();
 
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none'; // Hide bill panel for History
+
     mainContent.innerHTML = `
         <div class="item-summary-header">
             <h2>Item Summary</h2>
@@ -23,7 +27,7 @@ function loadItemSummary(mainContent, billPanel) {
         </div>
         <div id="itemSummaryDiv" class="item-summary-container"></div>
     `;
-    billPanel.style.display = 'none';
+
 
     // Fetch and display item summary data
     fetchItemSummary(savedStartDate, savedEndDate); // Automatically fetch summary for saved dates
