@@ -1,9 +1,56 @@
 const { ipcRenderer } = require("electron");
 const { attachContextMenu } = require("./contextMenu");
 const { deleteOrder } = require("./deleteOrder");
+const { exportTableToExcel } = require("./export");
 
 let currentSortBy = null;
 let currentSortOrder = 'asc'; // Default sort order
+
+// New function to load the Order History UI
+function loadOrderHistory(mainContent, billPanel) {
+    // Apply margins and hide bill panel
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none';
+
+    const today = new Date().toISOString().split("T")[0];
+
+    mainContent.innerHTML = `
+        <div class="order-history-header">
+            <h1>Order History</h1>
+            <div class="date-filters">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" value="${today}">
+                
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" value="${today}">
+                
+                <button class="showHistoryButton">Show History</button>
+                <button id="exportExcelButton">Export to Excel</button>
+            </div>
+        </div>
+        <div id="orderHistoryDiv"></div>
+    `;
+
+    // Load saved dates from sessionStorage
+    const savedStartDate = sessionStorage.getItem("orderHistoryStartDate");
+    const savedEndDate = sessionStorage.getItem("orderHistoryEndDate");
+
+    if (savedStartDate) document.getElementById("startDate").value = savedStartDate;
+    if (savedEndDate) document.getElementById("endDate").value = savedEndDate;
+
+    // Set up event listeners
+    document.querySelector(".showHistoryButton").addEventListener("click", () => {
+        fetchOrderHistory();
+    });
+
+    // Initial fetch
+    if (savedStartDate && savedEndDate) {
+        fetchOrderHistory(savedStartDate, savedEndDate);
+    } else {
+        fetchOrderHistory(today, today);
+    }
+}
 
 function fetchOrderHistory(startDate = null, endDate = null) {
     // Use function parameters if available; otherwise, get from input fields
@@ -206,4 +253,4 @@ function formatDate(dateString) {
     return `${day}-${month}-${year}`;
 }
 
-module.exports = { fetchOrderHistory, sortOrderHistoryTable };
+module.exports = { fetchOrderHistory, sortOrderHistoryTable, loadOrderHistory };

@@ -1,9 +1,95 @@
 const { ipcRenderer } = require("electron");
 const { attachContextMenu } = require("./contextMenu");
 const { deleteOrder } = require("./deleteOrder");
+const { exportTableToExcel } = require("./export");
 
 let currentSortByCategoryWise = null;
 let currentSortOrderCategoryWise = "asc";
+
+// Modified fetchCategories function to handle both dropdown population and initial fetch
+function fetchCategories() {
+    return new Promise((resolve) => {
+        ipcRenderer.send("get-categories-event");
+        ipcRenderer.once("categories-response", (event, data) => {
+            const categoryDropdown = document.getElementById("categoryDropdown");
+            
+            // Clear and populate dropdown
+            categoryDropdown.innerHTML = `<option value="">Select Category</option>`;
+            
+            if (data.categories.length > 0) {
+                data.categories.forEach(category => {
+                    let option = document.createElement("option");
+                    option.value = category.catid;
+                    option.textContent = category.catname;
+                    categoryDropdown.appendChild(option);
+                });
+
+                // Resolve with the categories data
+                resolve(data.categories);
+            } else {
+                resolve([]);
+            }
+        });
+    });
+}
+
+// Updated loadCategoryHistory function
+async function loadCategoryHistory(mainContent, billPanel) {
+    // Apply margins and hide bill panel
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none';
+
+    const today = new Date().toISOString().split("T")[0];
+
+    mainContent.innerHTML = `
+        <div class="category-history-header">
+            <h1>Category Wise Sales</h1>
+            <div class="date-filters">
+                <label for="categoryStartDate">Start Date:</label>
+                <input type="date" id="categoryStartDate" value="${today}">
+                
+                <label for="categoryEndDate">End Date:</label>
+                <input type="date" id="categoryEndDate" value="${today}">
+                
+                <select id="categoryDropdown"></select>
+                <button class="showHistoryButton">Show History</button>
+                <button id="exportExcelButton">Export to Excel</button>
+            </div>
+        </div>
+        <div id="categoryWiseDiv"></div>
+    `;
+
+    // Load saved filters from sessionStorage
+    const savedStartDate = sessionStorage.getItem("categoryWiseStartDate");
+    const savedEndDate = sessionStorage.getItem("categoryWiseEndDate");
+    const savedCategory = sessionStorage.getItem("categoryWiseCategory");
+
+    if (savedStartDate) document.getElementById("categoryStartDate").value = savedStartDate;
+    if (savedEndDate) document.getElementById("categoryEndDate").value = savedEndDate;
+
+    // Set up event listeners
+    document.querySelector(".showHistoryButton").addEventListener("click", () => {
+        fetchCategoryWise();
+    });
+
+    // Fetch categories and handle initial data load
+    try {
+        const categories = await fetchCategories();
+        
+        if (savedCategory) {
+            document.getElementById("categoryDropdown").value = savedCategory;
+            fetchCategoryWise(savedStartDate || today, savedEndDate || today, savedCategory);
+        } else if (categories.length > 0) {
+            // Use first category as default if none saved
+            const defaultCategory = categories[0].catid;
+            document.getElementById("categoryDropdown").value = defaultCategory;
+            fetchCategoryWise(today, today, defaultCategory);
+        }
+    } catch (error) {
+        console.error("Error loading categories:", error);
+    }
+}
 
 function fetchCategoryWise(startDate = null, endDate = null, category = null) {
     // Use function parameters if available; otherwise, get values from inputs
@@ -169,4 +255,4 @@ function formatDate(dateString) {
 }
 
 // Export functions
-module.exports = { fetchCategoryWise, displayCategoryWiseSales, sortCategoryWiseTable };
+module.exports = { fetchCategoryWise, displayCategoryWiseSales, sortCategoryWiseTable, loadCategoryHistory };
