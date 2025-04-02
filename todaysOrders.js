@@ -2,6 +2,26 @@ const { ipcRenderer } = require("electron");
 const { attachTodaysOrdersContextMenu } = require("./todaysOrdersContextMenu");
 const { exportTableToExcel } = require("./export");
 
+// New function to load the Today's Orders UI
+function loadTodaysOrders(mainContent, billPanel) {
+    // Apply margins and hide bill panel
+    mainContent.style.marginLeft = "200px";
+    mainContent.style.marginRight = "0px";
+    billPanel.style.display = 'none';
+    
+    // Set up the HTML structure
+    mainContent.innerHTML = `
+        <div class="todays-orders-header">
+            <h1>Today's Orders</h1>
+        </div>
+        <button style="margin-left: 20px;" id="exportExcelButton">Export to Excel</button>
+        <div id="todaysOrdersDiv"></div>
+    `;
+    
+    // Fetch and display orders
+    fetchTodaysOrders();
+}
+
 function fetchTodaysOrders() {
     ipcRenderer.send("get-todays-orders");
 }
@@ -41,6 +61,7 @@ function closeOrderDetails(event) {
 }
 // Receive today's orders from the main process and update the UI
 ipcRenderer.on("todays-orders-response", (event, data) => {
+
     const orders = data.orders;
     const todaysOrdersDiv = document.getElementById("todaysOrdersDiv");
     todaysOrdersDiv.innerHTML = ""; // Clear previous content
@@ -207,4 +228,4 @@ ipcRenderer.on("order-deleted", (event, { source }) => {
 });
 
 // Export function so it can be used in `renderer.js`
-module.exports = { fetchTodaysOrders, openTodayEditOrder, showOrderDetails, closeOrderDetails };
+module.exports = { fetchTodaysOrders, openTodayEditOrder, showOrderDetails, closeOrderDetails, loadTodaysOrders };

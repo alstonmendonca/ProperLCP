@@ -312,18 +312,7 @@ async function updateMainContent(contentType) {
         
         //----------------------------------------------- HISTORY TAB------------------------------------------------
         else if (contentType === "History" || contentType === "todaysOrders") {
-            // Apply margins for all history views
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; // Hide bill panel for History
-            mainContent.innerHTML = `
-                <div class="todays-orders-header">
-                    <h1>Today's Orders</h1>
-                </div>
-                <button style="margin-left: 20px;" id="exportExcelButton">Export to Excel</button>
-                <div id="todaysOrdersDiv"></div>
-            `;
-            fetchTodaysOrders();
+            loadTodaysOrders(mainContent, billPanel);
         }
 
         else if (contentType === 'orderHistory') {
