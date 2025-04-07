@@ -1812,7 +1812,7 @@ ipcMain.handle("update-food-item", async (event, { fid, fname, category, cost, s
 ipcMain.handle("get-all-food-items", async () => {
     return new Promise((resolve, reject) => {
         const query = `
-            SELECT f.fid, f.fname, f.cost, f.veg 
+            SELECT f.fid, f.fname, f.cost, f.veg, f.category 
             FROM FoodItem f 
             JOIN Category c ON f.category = c.catid
             WHERE f.active = 1 
@@ -1834,7 +1834,7 @@ ipcMain.handle("get-all-food-items", async () => {
 ipcMain.handle("get-food-items", async (event, categoryName) => {
     return new Promise((resolve, reject) => {
         const query = `
-            SELECT f.fid,f.fname, f.cost, f.veg 
+            SELECT f.fid,f.fname, f.cost, f.veg, f.category 
             FROM FoodItem f 
             JOIN Category c ON f.category = c.catid 
             WHERE c.catname = ? AND f.active = 1 AND f.is_on = 1

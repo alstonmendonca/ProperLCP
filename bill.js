@@ -1,8 +1,20 @@
 // Add an item to the bill
-function addToBill(itemId, itemName, price, quantity) {
+function addToBill(itemId, itemName, price, quantity, category) {
     if (quantity > 0) {
         const totalPrice = price * quantity;
         const billItemsList = document.getElementById("bill-items-list");
+
+        // Check if category section exists, if not create it (without visible header)
+        let categorySection = document.getElementById(`bill-category-${category.replace(/\s+/g, '-')}`);
+        if (!categorySection) {
+            categorySection = document.createElement("div");
+            categorySection.classList.add("bill-category");
+            categorySection.id = `bill-category-${category.replace(/\s+/g, '-')}`;
+            
+            // Do NOT create or append categoryHeader here
+
+            billItemsList.appendChild(categorySection);
+        }
 
         let existingItem = document.getElementById(`bill-item-${itemId}`);
         if (existingItem) {
@@ -55,15 +67,16 @@ function addToBill(itemId, itemName, price, quantity) {
             // Append everything in the correct order
             billItemRow.append(itemNameSpan, quantityInput, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
 
-            // Add to bill
-            billItemsList.appendChild(billItemRow);
+            // Add to bill under the appropriate category
+            categorySection.appendChild(billItemRow);
         }
 
         updateBillTotal();
     } else {
-        createTextPopup("Please select a quantity greater than 0 to add to the bill.")
+        createTextPopup("Please select a quantity greater than 0 to add to the bill.");
     }
 }
+
 
 function updateQuantityInput(itemId, price) {
     let itemRow = document.getElementById(`bill-item-${itemId}`);
