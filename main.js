@@ -755,7 +755,8 @@ ipcMain.on('get-held-order-details', (event, heldId) => {
                     'foodid', FoodItem.fid,
                     'fname', FoodItem.fname,
                     'price', FoodItem.cost,
-                    'quantity', HeldOrderDetails.quantity
+                    'quantity', HeldOrderDetails.quantity,
+                    'category', FoodItem.category
                 )
             ) AS food_details
         FROM HeldOrderDetails

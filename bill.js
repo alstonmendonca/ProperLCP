@@ -1,21 +1,23 @@
 // Add an item to the bill
-function addToBill(itemId, itemName, price, quantity, category) {
+function addToBill(itemId, itemName, price, quantity, category = null) {
     if (quantity > 0) {
         const totalPrice = price * quantity;
         const billItemsList = document.getElementById("bill-items-list");
 
-        // Check if category section exists, if not create it (without visible header)
-        let categorySection = document.getElementById(`bill-category-${category.replace(/\s+/g, '-')}`);
-        if (!categorySection) {
-            categorySection = document.createElement("div");
-            categorySection.classList.add("bill-category");
-            categorySection.id = `bill-category-${category.replace(/\s+/g, '-')}`;
-            
-            // Do NOT create or append categoryHeader here
-
-            billItemsList.appendChild(categorySection);
+        // Handle category section if category is provided
+        let categorySection = billItemsList;
+        if (category) {
+            const categoryId = `bill-category-${category.replace(/\s+/g, '-')}`;
+            categorySection = document.getElementById(categoryId);
+            if (!categorySection) {
+                categorySection = document.createElement("div");
+                categorySection.classList.add("bill-category");
+                categorySection.id = categoryId;
+                billItemsList.appendChild(categorySection);
+            }
         }
 
+        // Check if item already exists
         let existingItem = document.getElementById(`bill-item-${itemId}`);
         if (existingItem) {
             const quantityInput = existingItem.querySelector(".bill-quantity");
@@ -24,17 +26,15 @@ function addToBill(itemId, itemName, price, quantity, category) {
             quantityInput.value = newQuantity;
             totalPriceCell.textContent = (price * newQuantity).toFixed(2);
         } else {
-            // Create row for bill item
+            // Create new bill item
             const billItemRow = document.createElement("div");
             billItemRow.classList.add("bill-item");
             billItemRow.id = `bill-item-${itemId}`;
 
-            // Item Name
             const itemNameSpan = document.createElement("span");
             itemNameSpan.classList.add("bill-item-name");
             itemNameSpan.textContent = itemName;
 
-            // Quantity Controls (input field)
             const quantityInput = document.createElement("input");
             quantityInput.type = "number";
             quantityInput.classList.add("bill-quantity");
@@ -42,7 +42,6 @@ function addToBill(itemId, itemName, price, quantity, category) {
             quantityInput.min = 1;
             quantityInput.addEventListener("input", () => updateQuantityInput(itemId, price));
 
-            // Price (with "x" before it)
             const timesSpan = document.createElement("span");
             timesSpan.textContent = " x ";
 
@@ -50,24 +49,20 @@ function addToBill(itemId, itemName, price, quantity, category) {
             priceSpan.classList.add("bill-price");
             priceSpan.textContent = price.toFixed(2);
 
-            // Equals Sign
             const equalsSpan = document.createElement("span");
             equalsSpan.textContent = " = ";
 
-            // Total Price
             const totalSpan = document.createElement("span");
             totalSpan.classList.add("bill-total");
             totalSpan.textContent = totalPrice.toFixed(2);
 
-            // Remove Button
             const removeBtn = document.createElement("button");
             removeBtn.textContent = "Remove";
             removeBtn.onclick = () => removeFromBill(itemId);
 
-            // Append everything in the correct order
             billItemRow.append(itemNameSpan, quantityInput, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
 
-            // Add to bill under the appropriate category
+            // Append to category or general list
             categorySection.appendChild(billItemRow);
         }
 
@@ -76,6 +71,7 @@ function addToBill(itemId, itemName, price, quantity, category) {
         createTextPopup("Please select a quantity greater than 0 to add to the bill.");
     }
 }
+
 
 
 function updateQuantityInput(itemId, price) {
