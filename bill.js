@@ -1,3 +1,4 @@
+const  {createTextPopup} = require("./textPopup");
 // Add an item to the bill
 function addToBill(itemId, itemName, price, quantity, category = null) {
     if (quantity > 0) {
@@ -666,37 +667,8 @@ function closeHeldPopup() {
 }
 
 
-function createTextPopup(message) {
-    // Remove existing popup if it exists
-    let existingPopup = document.getElementById("custom-popup");
-    if (existingPopup) {
-        existingPopup.remove();
-    }
 
-    // Create popup container
-    const popup = document.createElement("div");
-    popup.id = "custom-popup";
-    popup.classList.add("edit-popup");
 
-    popup.innerHTML = `
-        <div class="popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
-            <p>${message}</p>
-
-            <br>
-
-            <div class="popup-buttons">
-                <button id="closePopup" style="width: 90px; height: 40px;">OK</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(popup);
-
-    // Add event listener for closing popup
-    document.getElementById("closePopup").addEventListener("click", () => {
-        popup.remove();
-    });
-}
 
 // ------------ SAVE TO ORDER FUNCTIONALITY IS HERE ------------------
 // Function to display today's orders in a popup

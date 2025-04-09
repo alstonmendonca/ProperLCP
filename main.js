@@ -609,7 +609,7 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
         const escpos = require('escpos');
         escpos.USB = require('escpos-usb');
         
-        const device = new escpos.USB(0x0525, 0xA700); // TVS RP 3220 STAR
+        const device = new escpos.USB(0x0525, 0xA700); // TVS RP 3220 STAR | Vendor ID: 1317 and Product ID: 42752 are written in decimal
         const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
 
         device.open((error) => {
