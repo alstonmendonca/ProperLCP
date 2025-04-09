@@ -688,6 +688,7 @@ ${'-'.repeat(32)}
 
     return customerReceipt + kotReceipt;
 }
+
 //-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS
 ipcMain.on('get-held-orders', (event) => {

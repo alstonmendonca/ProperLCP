@@ -1,4 +1,3 @@
-
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
@@ -219,14 +218,7 @@ async function updateMainContent(contentType) {
             loadUserProfile(mainContent, billPanel);
         }
         else if (contentType === "BusinessInfo") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; 
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Business Information</h2>
-                </div>
-            `
+            loadBusinessInfo(mainContent, billPanel);
         }
         else if (contentType === "ThemeToggle") {
             loadThemeToggle(mainContent, billPanel); 

@@ -56,7 +56,7 @@ const { loadCategories } = require("./categoriesList");
 const { loadTodaysOrders } = require("./todaysOrders");
 const { loadOrderHistory } = require("./history");
 const {loadCategoryHistory} = require("./categoryWiseTable");
-
+const { loadBusinessInfo } = require('./businessInfo');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
