@@ -603,113 +603,89 @@ ipcMain.on("refresh-categories", (event) => {
     
 });
 //----------------------------------------------------BILLING----------------------------------------------------------
-// Handle print-bill event
-ipcMain.on("print-bill", async (event, escPosCommands) => {
+
+ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
     try {
         const escpos = require('escpos');
         escpos.USB = require('escpos-usb');
         
-        // Try to find the printer automatically
-        const device = new escpos.USB();
-        // OR if you need to specify VID/PID
-        // const device = new escpos.USB(1317, 42752);
-        
-        const printer = new escpos.Printer(device);
+        const device = new escpos.USB(0x0525, 0xA700); // TVS RP 3220 STAR
+        const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
 
         device.open((error) => {
             if (error) {
-                console.error("Printer connection error:", error);
-                dialog.showMessageBox({
-                    type: "error",
-                    title: "Printer Error",
-                    message: `Failed to connect to printer: ${error.message}`,
-                    buttons: ["OK"],
-                });
+                event.sender.send('print-error', `Printer connection failed: ${error.message}`);
                 return;
             }
 
+            // Generate hardcoded receipt
+            const commands = generateHardcodedReceipt(billItems, totalAmount, kot, orderId);
+            
             printer
-                .raw(Buffer.from(escPosCommands, "utf8"))
+                .raw(Buffer.from(commands, 'utf8'))
                 .cut()
                 .close((err) => {
                     if (err) {
-                        console.error("Print error:", err);
+                        event.sender.send('print-error', `Print failed: ${err.message}`);
                     } else {
-                        console.log("Printing completed successfully.");
+                        event.sender.send('print-success');
                     }
                 });
         });
     } catch (error) {
-        console.error("Printing failed:", error);
-        dialog.showMessageBox({
-            type: "error",
-            title: "Print Error",
-            message: `Printing failed: ${error.message}`,
-            buttons: ["OK"],
-        });
+        event.sender.send('print-error', `System error: ${error.message}`);
     }
 });
 
-// Load receipt format
-ipcMain.handle('get-receipt-format', async () => {
-    try {
-        if (fs.existsSync(RECEIPT_FORMAT_PATH)) {
-            return JSON.parse(fs.readFileSync(RECEIPT_FORMAT_PATH, 'utf8'));
-        }
-        return {};
-    } catch (error) {
-        console.error('Error loading receipt format:', error);
-        return {};
-    }
-});
-
-// Save receipt format
-ipcMain.handle('save-receipt-format', (event, format) => {
-    try {
-        fs.writeFileSync(RECEIPT_FORMAT_PATH, JSON.stringify(format, null, 2));
-        return true;
-    } catch (error) {
-        console.error('Error saving receipt format:', error);
-        return false;
-    }
-});
-
-// Test print
-ipcMain.on('test-print-receipt', (event, format) => {
-    // Simulate bill items for test print
-    const testItems = [
-        { name: 'Test Item 1', quantity: 1, price: 100.00 },
-        { name: 'Test Item 2', quantity: 2, price: 50.00 }
-    ];
-    
-    // Generate ESC/POS commands using the custom format
-    const commands = generateCustomEscPos(format, testItems, 200.00, 'TEST123', 'TEST456');
-    event.sender.send('print-bill', commands);
-});
-
-function generateCustomEscPos(format, items, totalAmount, kot, orderId) {
+function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     // Format items for receipt
     const formattedItems = items.map(item => 
         `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
     ).join('\n');
     
-    // Replace variables in the format
-    let customerReceipt = format.customerReceipt
-        .replace(/{{shopName}}/g, "THE LASSI CORNER")
-        .replace(/{{shopAddress}}/g, "SJEC, VAMANJOOR")
-        .replace(/{{kotNumber}}/g, kot)
-        .replace(/{{orderId}}/g, orderId)
-        .replace(/{{dateTime}}/g, new Date().toLocaleString())
-        .replace(/{{items}}/g, formattedItems)
-        .replace(/{{totalAmount}}/g, totalAmount.toFixed(2));
+    // Format items for KOT (without prices)
+    const kotItems = items.map(item => 
+        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
+    ).join('\n');
     
-    let kotReceipt = format.kotReceipt
-        .replace(/{{kotNumber}}/g, kot)
-        .replace(/{{dateTime}}/g, new Date().toLocaleTimeString())
-        .replace(/{{items}}/g, items.map(item => 
-            `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
-        ).join('\n'));
-    
+    // Hardcoded customer receipt
+    const customerReceipt = `
+\x1B\x40\x1B\x61\x01\x1D\x21\x11
+THE LASSI CORNER
+\x1D\x21\x00
+SJEC, VAMANJOOR
+\x1B\x45\x01
+Token No: ${kot}
+\x1B\x45\x00\x1B\x61\x00
+Date: ${new Date().toLocaleString()}
+BILL NUMBER: ${orderId}
+${'-'.repeat(32)}
+\x1B\x45\x01
+ITEM          QTY  PRICE
+\x1B\x45\x00
+${formattedItems}
+${'-'.repeat(32)}
+\x1B\x45\x01
+TOTAL: Rs. ${totalAmount.toFixed(2)}
+\x1B\x45\x00\x1B\x61\x01
+Thank you for visiting!
+\x1D\x56\x41\x10`;
+
+    // Hardcoded KOT receipt
+    const kotReceipt = `
+\x1B\x61\x01\x1D\x21\x11
+KITCHEN ORDER
+\x1D\x21\x00
+KOT #: ${kot}
+Time: ${new Date().toLocaleTimeString()}
+${'-'.repeat(32)}
+\x1B\x61\x00\x1B\x45\x01
+ITEM          QTY
+\x1B\x45\x00
+${kotItems}
+${'-'.repeat(32)}
+\x1D\x56\x41\x10`;
+
     return customerReceipt + kotReceipt;
 }
 //-----------------HELD ORDERS-----------------
@@ -755,7 +731,8 @@ ipcMain.on('get-held-order-details', (event, heldId) => {
                     'foodid', FoodItem.fid,
                     'fname', FoodItem.fname,
                     'price', FoodItem.cost,
-                    'quantity', HeldOrderDetails.quantity
+                    'quantity', HeldOrderDetails.quantity,
+                    'category', FoodItem.category
                 )
             ) AS food_details
         FROM HeldOrderDetails
@@ -1812,7 +1789,7 @@ ipcMain.handle("update-food-item", async (event, { fid, fname, category, cost, s
 ipcMain.handle("get-all-food-items", async () => {
     return new Promise((resolve, reject) => {
         const query = `
-            SELECT f.fid, f.fname, f.cost, f.veg 
+            SELECT f.fid, f.fname, f.cost, f.veg, f.category 
             FROM FoodItem f 
             JOIN Category c ON f.category = c.catid
             WHERE f.active = 1 
@@ -1834,7 +1811,7 @@ ipcMain.handle("get-all-food-items", async () => {
 ipcMain.handle("get-food-items", async (event, categoryName) => {
     return new Promise((resolve, reject) => {
         const query = `
-            SELECT f.fid,f.fname, f.cost, f.veg 
+            SELECT f.fid,f.fname, f.cost, f.veg, f.category 
             FROM FoodItem f 
             JOIN Category c ON f.category = c.catid 
             WHERE c.catname = ? AND f.active = 1 AND f.is_on = 1

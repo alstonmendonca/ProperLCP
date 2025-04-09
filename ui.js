@@ -133,7 +133,7 @@ async function updateMainContent(contentType) {
                             style="font-size: 12px; padding: 2px 6px; width: 25px; height: 25px; border-radius: 4px; color: white;">+</button>
                     </div>
 
-                    <button class="add-to-bill" data-fid="${item.fid}" data-fname="${item.fname}" data-price="${item.cost}"
+                    <button class="add-to-bill" data-fid="${item.fid}" data-fname="${item.fname}" data-price="${item.cost}" data-category="${item.category}"
                         style="font-size: 17px; padding: 5px 10px; width: 100%; height: 30px; border-radius: 20px;
                         color: white; margin-top: auto;">
                         ADD
@@ -154,7 +154,8 @@ async function updateMainContent(contentType) {
                     const itemName = event.target.getAttribute("data-fname");
                     const price = parseFloat(event.target.getAttribute("data-price"));
                     const quantity = parseInt(document.getElementById(`quantity-${itemId}`).textContent);
-                    addToBill(itemId, itemName, price, quantity);  // Pass quantity now
+                    const category = event.target.getAttribute("data-category");
+                    addToBill(itemId, itemName, price, quantity, category);  // Pass quantity now
                 });
             });
         
@@ -546,7 +547,6 @@ async function updateMainContent(contentType) {
                 <h1>Year-Wise Order History</h1>
                 <div id="customersDiv"></div>
             `;
-            
         }
         else if(contentType === "makeATable"){
             mainContent.style.marginLeft = "200px";

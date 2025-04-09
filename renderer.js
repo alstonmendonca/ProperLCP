@@ -53,7 +53,6 @@ const {loadThemeToggle} = require('./themeToggle');
 const {loadHome} = require('./home');
 const { updateLeftPanel } = require("./leftPanel"); // Add this import
 const { loadCategories } = require("./categoriesList");
-const { loadReceiptEditor } = require("./receiptEditor");
 const { loadTodaysOrders } = require("./todaysOrders");
 const { loadOrderHistory } = require("./history");
 const {loadCategoryHistory} = require("./categoryWiseTable");

@@ -1,9 +1,23 @@
 // Add an item to the bill
-function addToBill(itemId, itemName, price, quantity) {
+function addToBill(itemId, itemName, price, quantity, category = null) {
     if (quantity > 0) {
         const totalPrice = price * quantity;
         const billItemsList = document.getElementById("bill-items-list");
 
+        // Handle category section if category is provided
+        let categorySection = billItemsList;
+        if (category) {
+            const categoryId = `bill-category-${category.replace(/\s+/g, '-')}`;
+            categorySection = document.getElementById(categoryId);
+            if (!categorySection) {
+                categorySection = document.createElement("div");
+                categorySection.classList.add("bill-category");
+                categorySection.id = categoryId;
+                billItemsList.appendChild(categorySection);
+            }
+        }
+
+        // Check if item already exists
         let existingItem = document.getElementById(`bill-item-${itemId}`);
         if (existingItem) {
             const quantityInput = existingItem.querySelector(".bill-quantity");
@@ -12,17 +26,15 @@ function addToBill(itemId, itemName, price, quantity) {
             quantityInput.value = newQuantity;
             totalPriceCell.textContent = (price * newQuantity).toFixed(2);
         } else {
-            // Create row for bill item
+            // Create new bill item
             const billItemRow = document.createElement("div");
             billItemRow.classList.add("bill-item");
             billItemRow.id = `bill-item-${itemId}`;
 
-            // Item Name
             const itemNameSpan = document.createElement("span");
             itemNameSpan.classList.add("bill-item-name");
             itemNameSpan.textContent = itemName;
 
-            // Quantity Controls (input field)
             const quantityInput = document.createElement("input");
             quantityInput.type = "number";
             quantityInput.classList.add("bill-quantity");
@@ -30,7 +42,6 @@ function addToBill(itemId, itemName, price, quantity) {
             quantityInput.min = 1;
             quantityInput.addEventListener("input", () => updateQuantityInput(itemId, price));
 
-            // Price (with "x" before it)
             const timesSpan = document.createElement("span");
             timesSpan.textContent = " x ";
 
@@ -38,32 +49,30 @@ function addToBill(itemId, itemName, price, quantity) {
             priceSpan.classList.add("bill-price");
             priceSpan.textContent = price.toFixed(2);
 
-            // Equals Sign
             const equalsSpan = document.createElement("span");
             equalsSpan.textContent = " = ";
 
-            // Total Price
             const totalSpan = document.createElement("span");
             totalSpan.classList.add("bill-total");
             totalSpan.textContent = totalPrice.toFixed(2);
 
-            // Remove Button
             const removeBtn = document.createElement("button");
             removeBtn.textContent = "Remove";
             removeBtn.onclick = () => removeFromBill(itemId);
 
-            // Append everything in the correct order
             billItemRow.append(itemNameSpan, quantityInput, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
 
-            // Add to bill
-            billItemsList.appendChild(billItemRow);
+            // Append to category or general list
+            categorySection.appendChild(billItemRow);
         }
 
         updateBillTotal();
     } else {
-        createTextPopup("Please select a quantity greater than 0 to add to the bill.")
+        createTextPopup("Please select a quantity greater than 0 to add to the bill.");
     }
 }
+
+
 
 function updateQuantityInput(itemId, price) {
     let itemRow = document.getElementById(`bill-item-${itemId}`);
@@ -262,7 +271,6 @@ function saveBill() {
     NewOrder();
 }
 
-// Function to save and print the bill
 function saveAndPrintBill() {
     const cashier = 1; // Replace with actual cashier ID
     const date = new Date().toISOString().split("T")[0];
@@ -286,79 +294,61 @@ function saveAndPrintBill() {
         return;
     }
 
-    // Check if a discounted total exists, otherwise use the original totalAmount
+    // Check if a discounted total exists
     let discountField = document.getElementById("discounted-total");
-    let discountedTotal = discountField && discountField.value ? parseFloat(discountField.value) : totalAmount;
+    let discountedTotal = discountField?.value ? parseFloat(discountField.value) : totalAmount;
 
-    // Send order data to main process with discount applied (or not)
+    // Send order data to main process
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
 
-    // Listen for the saved bill response to get the KOT number
+    // Handle bill save response
     ipcRenderer.once("bill-saved", (event, { kot, orderId }) => {
-        console.log(`Bill saved successfully with KOT: ${kot}`);
-
-        // Generate and print the bill
-        const escPosCommands = generateEscPosCommands(billItems, discountedTotal, kot, orderId);
-        ipcRenderer.send("print-bill", escPosCommands);
-
-        // Add the glow effect to the bill panel
+        console.log(`Bill saved with KOT: ${kot}`);
         const billPanel = document.getElementById("bill-panel");
+        
+        // Convert items to simple format and send for printing
+        generateEscPosCommands(billItems, discountedTotal, kot, orderId);
+        
+        // Visual feedback
         billPanel.classList.add("glow");
-
-        // Remove the glow effect after 2 seconds
-        setTimeout(() => {
+        
+        // Print result handlers
+        ipcRenderer.once('print-success', () => {
+            setTimeout(() => {
+                billPanel.classList.remove("glow");
+                NewOrder();
+            }, 800);
+        });
+        
+        ipcRenderer.once('print-error', (event, error) => {
+            createTextPopup(`Print Failed: ${error}`);
             billPanel.classList.remove("glow");
-        }, 800);
-
-        NewOrder();
+        });
     });
 
-    // Handle any errors during bill saving
+    // Handle save errors
     ipcRenderer.once("bill-error", (event, { error }) => {
-        console.error("Error saving bill:", error);
-        createTextPopup(`Error saving bill: ${error}`);
+        createTextPopup(`Save Error: ${error}`);
     });
 }
 
-// Modify the generateEscPosCommands function in bill.js
 function generateEscPosCommands(billItems, totalAmount, kot, orderId) {
-    // Get the custom format
-    const format = ipcRenderer.sendSync('get-receipt-format');
+    // Prepare items for printing
+    const items = Array.from(billItems).map(item => ({
+        name: item.querySelector(".bill-item-name").textContent,
+        quantity: item.querySelector(".bill-quantity").value,
+        price: parseFloat(item.querySelector(".bill-total").textContent)
+    }));
     
-    // Format items for receipt
-    const formattedItems = Array.from(billItems).map(item => {
-        const name = item.querySelector(".bill-item-name").textContent;
-        const qty = item.querySelector(".bill-quantity").value.padStart(3);
-        const price = item.querySelector(".bill-total").textContent.padStart(8);
-        return `${name.substring(0, 14).padEnd(14)}${qty}${price}`;
-    }).join('\n');
-    
-    // Generate commands using custom format or default if not set
-    let customerReceipt = format.customerReceipt || getDefaultCustomerFormat();
-    let kotReceipt = format.kotReceipt || getDefaultKOTFormat();
-    
-    // Replace variables
-    customerReceipt = customerReceipt
-        .replace(/{{shopName}}/g, "THE LASSI CORNER")
-        .replace(/{{shopAddress}}/g, "SJEC, VAMANJOOR")
-        .replace(/{{kotNumber}}/g, kot)
-        .replace(/{{orderId}}/g, orderId)
-        .replace(/{{dateTime}}/g, new Date().toLocaleString())
-        .replace(/{{items}}/g, formattedItems)
-        .replace(/{{totalAmount}}/g, totalAmount.toFixed(2));
-    
-    kotReceipt = kotReceipt
-        .replace(/{{kotNumber}}/g, kot)
-        .replace(/{{dateTime}}/g, new Date().toLocaleTimeString())
-        .replace(/{{items}}/g, Array.from(billItems).map(item => {
-            const name = item.querySelector(".bill-item-name").textContent;
-            const qty = item.querySelector(".bill-quantity").value.padStart(3);
-            return `${name.substring(0, 14).padEnd(14)}${qty}`;
-        }).join('\n'));
-    
-    return customerReceipt + kotReceipt;
+    // Send structured data to main process
+    ipcRenderer.send("print-bill", {
+        billItems: items,
+        totalAmount,
+        kot,
+        orderId,
+        dateTime: new Date().toLocaleString()
+    });
 }
-
 
 // Edit-Mode Bill Panel Starts Here------------------------------------------------------------------------------
 function displayEditMode() {
