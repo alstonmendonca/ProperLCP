@@ -137,21 +137,10 @@ function applyDiscount() {
     let discountAmount = parseFloat(document.getElementById("discount-amount").value) || 0;
     let totalAmount = 0;
 
-    const billItems = document.querySelectorAll(".bill-item");
-
-    // Calculate total before applying discount
-    billItems.forEach(item => {
+    document.querySelectorAll(".bill-item").forEach(item => {
         let amount = parseFloat(item.querySelector(".bill-total").textContent);
-        if (!isNaN(amount)) {
-            totalAmount += amount;
-        }
+        if (!isNaN(amount)) totalAmount += amount;
     });
-
-    // Ensure previous discount is cleared before applying a new one
-    let discountField = document.getElementById("discounted-total");
-    if (discountField) {
-        discountField.value = totalAmount; // Reset before applying a new discount
-    }
 
     if (discountPercentage < 0 || discountAmount < 0) {
         createTextPopup("Discount cannot be negative.");
@@ -168,7 +157,6 @@ function applyDiscount() {
         return;
     }
 
-    // Apply discount
     let discountedTotal = totalAmount;
     if (discountPercentage > 0) {
         discountedTotal -= totalAmount * (discountPercentage / 100);
@@ -176,9 +164,9 @@ function applyDiscount() {
         discountedTotal -= discountAmount;
     }
 
-    discountedTotal = Math.max(0, discountedTotal); // Prevent negative total
+    discountedTotal = Math.max(0, Math.round(discountedTotal * 100) / 100);
 
-    // Store discounted total properly
+    let discountField = document.getElementById("discounted-total");
     if (!discountField) {
         discountField = document.createElement("input");
         discountField.type = "hidden";
@@ -187,23 +175,11 @@ function applyDiscount() {
     }
     discountField.value = discountedTotal;
 
-    // Update displayed total
-    const formattedTotal = new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR'
-    }).format(discountedTotal);
-    
-    document.getElementById("total-amount").textContent = `Total: ${formattedTotal}`;
-    
-    let discountValue = totalAmount - discountedTotal; // Calculate applied discount
-    const formattedDiscount = new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR'
-    }).format(discountValue);
-    
-    document.getElementById("discount-applied-display").textContent = `Discount: ${formattedDiscount}`;
-    
+    const formatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
+    document.getElementById("total-amount").textContent = `Total: ${formatter.format(discountedTotal)}`;
+    document.getElementById("discount-applied-display").textContent = `Discount: ${formatter.format(totalAmount - discountedTotal)}`;
 }
+
 
 // Function to update the total amount of the bill
 function updateBillTotal() {
@@ -552,6 +528,18 @@ function toggleDiscountPopup() {
     `;
 
     document.body.appendChild(popup);
+    const percentField = document.getElementById("discount-percentage");
+    const amountField = document.getElementById("discount-amount");
+
+    percentField.addEventListener("input", () => {
+        amountField.disabled = percentField.value.trim() !== "";
+        if (amountField.disabled) amountField.value = "";
+    });
+
+    amountField.addEventListener("input", () => {
+        percentField.disabled = amountField.value.trim() !== "";
+        if (percentField.disabled) percentField.value = "";
+    });
 
     // Add event listener for closing popup
     document.getElementById("closePopup").addEventListener("click", () => {

@@ -41,7 +41,7 @@ function createTextPopup(message) {
                 color: #333;
             ">${message}</p>
 
-            <button id="closePopup" style="
+            <button id="textPopup_closePopup" style="
                 background-color: #1DB954;
                 color: white;
                 border: none;
@@ -57,7 +57,7 @@ function createTextPopup(message) {
     document.body.appendChild(popup);
 
     // Add event listener for closing popup
-    document.getElementById("closePopup").addEventListener("click", () => {
+    document.getElementById("textPopup_closePopup").addEventListener("click", () => {
         popup.remove();
     });
 }
