@@ -58,6 +58,7 @@ const { loadOrderHistory } = require("./history");
 const {loadCategoryHistory} = require("./categoryWiseTable");
 const { loadBusinessInfo } = require('./businessInfo');
 const {loadEmployeeAnalysis} = require('./employeeAnalysis');
+const {sortEmployeeTable} = require('./employeeAnalysis');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
