@@ -17,7 +17,8 @@ async function updateLeftPanel(contentType) {
             const categories = await ipcRenderer.invoke("get-categories");
 
             if (categories.length > 0) {
-                categoryPanel.innerHTML = categories
+                categoryPanel.innerHTML = `<button class="category" onclick="updateMainContent('Home')">All</button>`
+                categoryPanel.innerHTML += categories
                     .map(
                         (category) =>
                             `<button class="category" id="${category.catname}" onclick="updateMainContent('${category.catname}')">${category.catname}</button>`
