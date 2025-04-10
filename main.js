@@ -1669,6 +1669,39 @@ ipcMain.on('get-month-wise-data', (event, { year }) => {
         }
     });
 });
+
+// Year-Wise Data Handler
+ipcMain.on('get-year-wise-data', (event) => {
+    const query = `
+        SELECT 
+            strftime('%Y', date) as year,
+            COUNT(DISTINCT billno) as order_count,
+            COALESCE(SUM(
+                (SELECT SUM(quantity) 
+                 FROM OrderDetails 
+                 WHERE orderid = Orders.billno)
+            ), 0) as total_units,
+            COALESCE(SUM(price), 0) as total_revenue
+        FROM Orders
+        GROUP BY year
+        ORDER BY year DESC
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Error fetching year-wise data:', err);
+            event.reply('year-wise-data-response', { 
+                success: false, 
+                error: err.message 
+            });
+        } else {
+            event.reply('year-wise-data-response', {
+                success: true,
+                years: rows
+            });
+        }
+    });
+});
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

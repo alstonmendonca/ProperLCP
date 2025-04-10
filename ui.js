@@ -1,3 +1,5 @@
+const { loadYearWiseAnalysis } = require('./yearWise');
+
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
@@ -521,13 +523,7 @@ async function updateMainContent(contentType) {
             loadMonthWiseAnalysis(mainContent, billPanel);
         }
         else if(contentType === "yearWise"){
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; 
-            mainContent.innerHTML = `
-                <h1>Year-Wise Order History</h1>
-                <div id="customersDiv"></div>
-            `;
+            loadYearWiseAnalysis(mainContent, billPanel);
         }
         else if(contentType === "makeATable"){
             mainContent.style.marginLeft = "200px";
