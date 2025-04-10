@@ -6,8 +6,8 @@ function loadEmployeeAnalysis(mainContent, billPanel) {
     billPanel.style.display = 'none';
 
     mainContent.innerHTML = `
-        <div class="employee-analysis-header">
-            <h2>Employee Performance</h2>
+        <div class="section-title">
+            <h2>Employee Analysis</h2>
             <div class="date-filters">
                 <label for="empStartDate">Start Date:</label>
                 <input type="date" id="empStartDate">

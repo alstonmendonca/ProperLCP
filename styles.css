@@ -2201,11 +2201,11 @@ color: #fff;
     overflow-y: auto;
 }
 
-.top-selling-table th{
+.top-selling-table th, .employee-table th{
     padding: 10px; 
     cursor: pointer;
 }
-.top-selling-table th:hover{
+.top-selling-table th:hover, .employee-table th:hover{
     background-color: #11487b;
 }
 
