@@ -1635,6 +1635,40 @@ ipcMain.on('get-day-wise-data', (event, { startDate, endDate }) => {
         }
     });
 });
+
+// Month-Wise Data Handler
+ipcMain.on('get-month-wise-data', (event, { year }) => {
+    const query = `
+        SELECT 
+            CAST(strftime('%m', date) AS INTEGER) as month,
+            COUNT(DISTINCT billno) as order_count,
+            COALESCE(SUM(
+                (SELECT SUM(quantity) 
+                 FROM OrderDetails 
+                 WHERE orderid = Orders.billno)
+            ), 0) as total_units,
+            COALESCE(SUM(price), 0) as total_revenue
+        FROM Orders
+        WHERE strftime('%Y', date) = ?
+        GROUP BY month
+        ORDER BY month ASC
+    `;
+
+    db.all(query, [year.toString()], (err, rows) => {
+        if (err) {
+            console.error('Error fetching month-wise data:', err);
+            event.reply('month-wise-data-response', { 
+                success: false, 
+                error: err.message 
+            });
+        } else {
+            event.reply('month-wise-data-response', {
+                success: true,
+                months: rows
+            });
+        }
+    });
+});
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

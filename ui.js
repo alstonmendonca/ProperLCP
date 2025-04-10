@@ -518,14 +518,7 @@ async function updateMainContent(contentType) {
             loadDayWiseAnalysis(mainContent, billPanel);
         }
         else if(contentType === "monthWise"){
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; 
-            mainContent.innerHTML = `
-                <h1>Month-Wise Order History</h1>
-                <div id="customersDiv"></div>
-            `;
-            
+            loadMonthWiseAnalysis(mainContent, billPanel);
         }
         else if(contentType === "yearWise"){
             mainContent.style.marginLeft = "200px";

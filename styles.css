@@ -2201,14 +2201,14 @@ color: #fff;
     overflow-y: auto;
 }
 
-.top-selling-table th, .employee-table th, .day-wise-table th {
+.top-selling-table th, .employee-table th, .day-wise-table th, .month-wise-table th {
     padding: 10px; 
     cursor: pointer;
 }
-.top-selling-table th:hover, .employee-table th:hover, .day-wise-table th:hover{
+.top-selling-table th:hover, .employee-table th:hover, .day-wise-table th:hover, .month-wise-table th:hover {
     background-color: #11487b;
 }
-.top-selling-table tr:hover, .employee-table tr:hover, .day-wise-table tr:hover {
+.top-selling-table tr:hover, .employee-table tr:hover, .day-wise-table tr:hover, .month-wise-table tr:hover {
     background-color: #e9ecef;
 }
 /* Receipt Editor Styles */

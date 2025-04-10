@@ -60,6 +60,7 @@ const { loadBusinessInfo } = require('./businessInfo');
 const {loadEmployeeAnalysis} = require('./employeeAnalysis');
 const {sortEmployeeTable} = require('./employeeAnalysis');
 const { loadDayWiseAnalysis } = require('./dayWise');
+const { loadMonthWiseAnalysis } = require('./monthWise');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
