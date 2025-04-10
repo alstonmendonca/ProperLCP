@@ -1602,6 +1602,39 @@ ipcMain.on("update-order", (event, { billno, orderItems }) => {
     });
 });
 
+// Day-Wise Data Handler
+ipcMain.on('get-day-wise-data', (event, { startDate, endDate }) => {
+    const query = `
+        SELECT 
+            date,
+            COUNT(DISTINCT billno) as order_count,
+            COALESCE(SUM(
+                (SELECT SUM(quantity) 
+                 FROM OrderDetails 
+                 WHERE orderid = Orders.billno)
+            ), 0) as total_units,
+            COALESCE(SUM(price), 0) as total_revenue
+        FROM Orders
+        WHERE date BETWEEN ? AND ?
+        GROUP BY date
+        ORDER BY date DESC
+    `;
+
+    db.all(query, [startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error('Error fetching day-wise data:', err);
+            event.reply('day-wise-data-response', { 
+                success: false, 
+                error: err.message 
+            });
+        } else {
+            event.reply('day-wise-data-response', {
+                success: true,
+                days: rows
+            });
+        }
+    });
+});
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 

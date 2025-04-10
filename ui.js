@@ -515,14 +515,7 @@ async function updateMainContent(contentType) {
         }
         
         else if(contentType === "dayWise"){
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; 
-            mainContent.innerHTML = `
-                <h1>Day-Wise Order History</h1>
-                <div id="customersDiv"></div>
-            `;
-            
+            loadDayWiseAnalysis(mainContent, billPanel);
         }
         else if(contentType === "monthWise"){
             mainContent.style.marginLeft = "200px";
