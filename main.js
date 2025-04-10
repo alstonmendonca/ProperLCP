@@ -527,6 +527,41 @@ ipcMain.on("get-top-selling-categories", async (event, { startDate, endDate }) =
         event.reply("top-selling-categories-response", { success: true, categories: categoriesArray });
     });
 });
+
+ipcMain.on('get-employee-analysis', (event, { startDate, endDate }) => {
+
+    const query = `
+        SELECT 
+            u.userid,
+            u.uname as name,
+            COUNT(DISTINCT o.billno) as order_count,
+            COALESCE(SUM(od.quantity), 0) as total_units,
+            COALESCE(SUM(od.quantity * fi.cost), 0) as total_revenue
+        FROM 
+            User u
+        LEFT JOIN Orders o ON u.userid = o.cashier 
+            AND date(o.date) BETWEEN date(?) AND date(?)
+        LEFT JOIN OrderDetails od ON o.billno = od.orderid
+        LEFT JOIN FoodItem fi ON od.foodid = fi.fid
+        GROUP BY u.userid
+        ORDER BY total_revenue DESC
+    `;
+
+    db.all(query, [startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error('Query error:', err);
+            event.reply('employee-analysis-response', {
+                success: false,
+                error: err.message
+            });
+        } else {
+            event.reply('employee-analysis-response', {
+                success: true,
+                employees: rows || []
+            });
+        }
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
