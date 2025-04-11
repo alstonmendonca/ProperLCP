@@ -15,7 +15,7 @@ async function updateMainContent(contentType) {
     ];
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
-        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis'
+        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes'
     ];
     const settingsButtons = [
         'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 
@@ -227,6 +227,9 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "ThemeToggle") {
             loadThemeToggle(mainContent, billPanel); 
+        }
+        else if (contentType === "Notes"){
+            loadUserNotes(mainContent, billPanel);
         }
         else if (contentType === "DisplaySettings") {
             mainContent.style.marginLeft = "200px";
