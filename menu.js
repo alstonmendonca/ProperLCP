@@ -313,18 +313,39 @@ ipcRenderer.on("refresh-menu", async () => {
     await displayMenu();
 });
 function toggleAddItemPopup() {
-    let existingPopup = document.getElementById("add-item-popup");
+    let existingPopup = document.getElementById("add-item-popup-overlay");
     if (existingPopup) {
         existingPopup.remove();
         return;
     }
+    // Function to load categories dynamically
+    async function loadCategories() {
+        try {
+            const categories = await ipcRenderer.invoke("get-categories-for-additem");
+            const categorySelect = document.getElementById("category");
+            categorySelect.innerHTML = '<option value="">Select a category</option>'; // Clear old
+            categories.forEach(cat => {
+                let option = document.createElement("option");
+                option.value = cat.catid;
+                option.textContent = cat.catname;
+                categorySelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Failed to load categories:", error);
+        }
+    }
+    // Create overlay container
+    const popupOverlay = document.createElement("div");
+    popupOverlay.id = "add-item-popup-overlay";
+    popupOverlay.classList.add("menu-edit-popup-overlay");
 
+    // Create popup content
     const popup = document.createElement("div");
     popup.id = "add-item-popup";
     popup.classList.add("menu-edit-popup");
 
     popup.innerHTML = `
-        <div class="menu-popup-content" style="align-items: center; justify-content: center; width: 400px; pointer-events: auto;">
+        <div class="menu-popup-content" style="align-items: center; justify-content: center; pointer-events: auto;">
             <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px; color: #333;">Add New Food Item</h3>
             <form id="addItemForm" style="display: flex; flex-direction: column; gap: 15px;">
                 <div class="form-group">
@@ -383,14 +404,36 @@ function toggleAddItemPopup() {
 
                 <div class="menu-popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                     <button type="submit" id="addItemBtn" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Add</button>
-                    <button id="closePopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Cancel</button>
+                    <button type="button" id="closeAddItemPopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Cancel</button>
                 </div>
             </form>
         </div>
     `;
 
-    document.body.appendChild(popup);
-
+    
+    // Append to overlay
+    popupOverlay.appendChild(popup);
+    document.body.appendChild(popupOverlay);
+    // Focus on the food name input
+    document.getElementById("fname").focus();
+    // Close popup on cancel
+    document.getElementById("closeAddItemPopup").addEventListener("click", () => {
+        const overlay = document.getElementById("add-item-popup-overlay");
+        if (overlay) {
+            overlay.remove();
+        } else {
+            // Fallback: Remove any existing popups
+            const existing = document.querySelector(".menu-edit-popup-overlay");
+            if (existing) existing.remove();
+        }
+    });
+    // Add click handler for overlay
+    popupOverlay.addEventListener("click", (e) => {
+        if (e.target === popupOverlay) {
+            const overlay = document.getElementById("add-item-popup-overlay");
+            if (overlay) overlay.remove();
+        }
+    });
     // Load categories dynamically
     loadCategories();
 
@@ -415,17 +458,14 @@ function toggleAddItemPopup() {
             await ipcRenderer.invoke("add-food-item", newItem);
             createTextPopup("Item added successfully!");
             ipcRenderer.send("refresh-menu");
-            popup.remove();
+            popupOverlay.remove();
         } catch (error) {
             console.error("Error adding item:", error);
             createTextPopup("Failed to add item");
         }
     });
 
-    // Close popup on cancel
-    document.getElementById("closePopup").addEventListener("click", () => {
-        popup.remove();
-    });
+    
 }
 
 // Function to load categories dynamically
@@ -433,6 +473,7 @@ async function loadCategories() {
     try {
         const categories = await ipcRenderer.invoke("get-categories-for-additem");
         const categorySelect = document.getElementById("category");
+        categorySelect.innerHTML = '<option value="">Select a category</option>'; // Clear old
         categories.forEach(cat => {
             let option = document.createElement("option");
             option.value = cat.catid;
@@ -443,6 +484,7 @@ async function loadCategories() {
         console.error("Failed to load categories:", error);
     }
 }
+
 function createTextPopup(message) {
     // Remove existing popup if it exists
     let existingPopup = document.getElementById("custom-popup");
