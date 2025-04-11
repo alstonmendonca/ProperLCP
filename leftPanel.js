@@ -46,7 +46,6 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="MenuAnalysis" onclick="updateMainContent('MenuAnalysis')">Menu Analysis</button>
                 <button class="category" id="EmployeeAnalysis" onclick="updateMainContent('EmployeeAnalysis')">Employee Analysis</button>
                 <button class="category" id="Charts" onclick="updateMainContent('Charts')">Charts</button>
-                <button class="category" id="PersonalCalculator" onclick="updateMainContent('PersonalCalculator')">Personal Calculator</button>
                 <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
                 <button class="category" id="SpecialStatistics" onclick="updateMainContent('SpecialStatistics')">Special Statistics</button>
             `;
@@ -64,8 +63,8 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="dayWise" onclick="updateMainContent('dayWise')">Day-wise</button>
                 <button class="category" id="monthWise" onclick="updateMainContent('monthWise')">Month-wise</button>
                 <button class="category" id="yearWise" onclick="updateMainContent('yearWise')">Year-wise</button>
-                <button class="category" id="filterHistory" onclick="updateMainContent('filterHistory')">Filter History</button>
                 <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
+                <button class="category" id="filterHistory" onclick="updateMainContent('filterHistory')">Filter History</button>
                 <button class="category" id="makeATable" onclick="updateMainContent('makeATable')">Make A Table</button>
                 <button class="category" id="yourTables" onclick="updateMainContent('yourTables')">Your Tables</button>
             `;
