@@ -1,18 +1,106 @@
+//REEVANS JOB - MOVE THIS CONFIRM POPUP INTO ANOTHER FILE. ELSE IT WONT DELETE BUTTON
+function createConfirmPopup(message) {
+    return new Promise((resolve) => {
+        let existingPopup = document.getElementById("custom-confirm-popup");
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+
+        // Create overlay
+        const overlay = document.createElement("div");
+        overlay.id = "custom-confirm-popup";
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100vw";
+        overlay.style.height = "100vh";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        overlay.style.display = "flex";
+        overlay.style.alignItems = "center";
+        overlay.style.justifyContent = "center";
+        overlay.style.zIndex = "9999";
+
+        overlay.innerHTML = `
+                <div class="menu-popup-content" style="background: white; padding: 20px; border-radius: 10px; width: 300px; pointer-events: auto;">
+                    <p>${message}</p>
+                    <br>
+                    <div class="menu-popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
+                        <button id="confirmYes" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Yes</button>
+                        <button id="confirmNo" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">No</button>
+                    </div>
+                </div>
+            `;
+
+        // Close on outside click
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                resolve(false);
+            }
+        });
+
+        document.body.appendChild(overlay);
+
+        document.getElementById("confirmYes").addEventListener("click", () => {
+            overlay.remove();
+            resolve(true);
+        });
+
+        document.getElementById("confirmNo").addEventListener("click", () => {
+            overlay.remove();
+            resolve(false);
+        });
+    });
+}
+
+
 async function displayMenu() {
+
+
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
 
     // Store scroll position before updating content
     const currentScrollPosition = mainContent.scrollTop;
 
-    // Show loading message
+    // Show loading message with spinner immediately
     mainContent.innerHTML = `
-        <div class="loading-message" id="loading-message">
-            <p>Loading menu...</p>
-        </div>
+    <div class="loading-message" id="loading-message" style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-size: 18px;
+        color: #555;
+    ">
+        <div class="spinner" style="
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.4s linear infinite;
+            margin-bottom: 15px;
+        "></div>
+        <p>Loading menu...</p>
+    </div>
     `;
-    billPanel.style.display = "none";
 
+    billPanel.style.display = "none";
+    try {
+        // Optional delay for 1 second to show the spinner clearly
+        await new Promise(res => setTimeout(res, 400));
+
+        const foodItems = await ipcRenderer.invoke("get-menu-items");
+
+        // Remove loading message
+        mainContent.innerHTML = "";
+
+        // Continue with displaying foodItems here...
+    } catch (error) {
+        console.error("Error loading menu:", error);
+    }
     try {
         const foodItems = await ipcRenderer.invoke("get-menu-items");
 
@@ -220,27 +308,27 @@ async function displayMenu() {
                         try {
                             const categories = await ipcRenderer.invoke("get-categories-for-additem");
                             const categorySelect = document.getElementById("category");
-                    
+
                             // Clear existing options except the first one
                             categorySelect.innerHTML = '';
-                    
+
                             categories.forEach(cat => {
                                 let option = document.createElement("option");
                                 option.value = cat.catid;
                                 option.textContent = cat.catname;
-                                
+
                                 // Preselect the existing category
                                 if (cat.catid === item.category) {
                                     option.selected = true;
                                 }
-                    
+
                                 categorySelect.appendChild(option);
                             });
                         } catch (error) {
                             console.error("Failed to load categories:", error);
                         }
                     }
-                    
+
                     loadCategories();
 
                     // Close popup when clicking "Cancel"
@@ -251,20 +339,20 @@ async function displayMenu() {
                     // Save changes
                     document.getElementById("saveChanges").addEventListener("click", async () => {
                         const currentScrollPosition = mainContent.scrollTop;
-                    
+
                         const updatedFname = document.getElementById("editFname").value.trim();
                         const updatedCost = parseFloat(document.getElementById("editCost").value);
                         const updatedCategory = parseFloat(document.getElementById("category").value);
                         const updatedsgst = parseFloat(document.getElementById("editsgst").value);
                         const updatedcgst = parseFloat(document.getElementById("editcgst").value);
                         const updatedveg = document.getElementById("editveg").checked ? 1 : 0;
-                    
+
                         // Validate inputs
                         if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
                             createTextPopup("Please enter valid details");
                             return;
                         }
-                    
+
                         // Send IPC message to update the database
                         const response = await ipcRenderer.invoke("update-food-item", {
                             fid,
@@ -275,19 +363,13 @@ async function displayMenu() {
                             cgst: updatedcgst,
                             veg: updatedveg
                         });
-                    
+
                         if (response.success) {
                             // Remove the popup
                             document.body.removeChild(popupOverlay);
-                    
-                            // Update UI dynamically
-                            const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
-                            if (foodItemElement) {
-                                foodItemElement.querySelector("h3").innerHTML = `${updatedFname} <br> ${updatedveg == 1 ? "🌱" : "🍖"}`;
-                                foodItemElement.querySelector("p:nth-child(2)").textContent = `Category: ${updatedCategory}`;
-                                foodItemElement.querySelector("p:nth-child(3)").textContent = `Price: ₹${updatedCost}`;
-                            }
-                    
+
+                            displayMenu();
+
                             // Restore the scroll position
                             mainContent.scrollTop = currentScrollPosition;
                         } else {
@@ -410,7 +492,7 @@ function toggleAddItemPopup() {
         </div>
     `;
 
-    
+
     // Append to overlay
     popupOverlay.appendChild(popup);
     document.body.appendChild(popupOverlay);
@@ -452,20 +534,21 @@ function toggleAddItemPopup() {
             is_on: document.getElementById("is_on").checked ? 1 : 0,
             veg: document.getElementById("veg").checked ? 1 : 0
         };
-        
+
 
         try {
             await ipcRenderer.invoke("add-food-item", newItem);
             createTextPopup("Item added successfully!");
             ipcRenderer.send("refresh-menu");
             popupOverlay.remove();
+            displayMenu();
         } catch (error) {
             console.error("Error adding item:", error);
             createTextPopup("Failed to add item");
         }
     });
 
-    
+
 }
 
 // Function to load categories dynamically
@@ -517,42 +600,3 @@ function createTextPopup(message) {
     });
 }
 
-// CREATE CONFIRM POPUP
-function createConfirmPopup(message) {
-    return new Promise((resolve) => {
-        // Remove existing popup if it exists
-        let existingPopup = document.getElementById("custom-confirm-popup");
-        if (existingPopup) {
-            existingPopup.remove();
-        }
-
-        // Create popup container
-        const popup = document.createElement("div");
-        popup.id = "custom-confirm-popup";
-        popup.classList.add("menu-edit-popup");
-
-        popup.innerHTML = `
-            <div class="menu-popup-content" style="align-items: center; justify-content: center; width: 300px; pointer-events: auto;">
-                <p>${message}</p>
-                <br>
-                <div class="menu-popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
-                    <button id="confirmYes" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Yes</button>
-                    <button id="confirmNo" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">No</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(popup);
-
-        // Add event listeners for buttons
-        document.getElementById("confirmYes").addEventListener("click", () => {
-            popup.remove();
-            resolve(true);
-        });
-
-        document.getElementById("confirmNo").addEventListener("click", () => {
-            popup.remove();
-            resolve(false);
-        });
-    });
-}
