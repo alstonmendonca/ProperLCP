@@ -17,13 +17,22 @@ async function updateLeftPanel(contentType) {
             const categories = await ipcRenderer.invoke("get-categories");
 
             if (categories.length > 0) {
-                categoryPanel.innerHTML = `<button class="category" onclick="updateMainContent('Home')">All</button>`
+                categoryPanel.innerHTML = `<button class="category" id="All" onclick="updateMainContent('Home')">All</button>`
                 categoryPanel.innerHTML += categories
                     .map(
                         (category) =>
                             `<button class="category" id="${category.catname}" onclick="updateMainContent('${category.catname}')">${category.catname}</button>`
                     )
                     .join("");
+
+                // Highlight the active category button
+                const lastCategoryButton = sessionStorage.getItem('lastCategoryButton');
+                if (lastCategoryButton && document.getElementById(lastCategoryButton)) {
+                    document.getElementById(lastCategoryButton).classList.add('active');
+                } else {
+                    document.getElementById('All').classList.add('active');
+                }
+
             } else {
                 categoryPanel.innerHTML = "<p>No categories found.</p>";
             }
@@ -105,13 +114,15 @@ async function updateLeftPanel(contentType) {
             break;
     }
 
-    // Highlight the active category button
-    const categoryButtons = document.querySelectorAll("#category-panel .category");
-    categoryButtons.forEach(button => button.classList.remove("active"));
+    // Highlight the active category button for non-Home sections
+    if (contentType !== "Home") {
+        const categoryButtons = document.querySelectorAll("#category-panel .category");
+        categoryButtons.forEach(button => button.classList.remove("active"));
 
-    const activeCategoryButton = document.getElementById(contentType);
-    if (activeCategoryButton) {
-        activeCategoryButton.classList.add("active");
+        const activeCategoryButton = document.getElementById(contentType);
+        if (activeCategoryButton) {
+            activeCategoryButton.classList.add("active");
+        }
     }
 }
 
