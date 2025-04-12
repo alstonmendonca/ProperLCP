@@ -63,14 +63,44 @@ async function displayMenu() {
     // Store scroll position before updating content
     const currentScrollPosition = mainContent.scrollTop;
 
-    // Show loading message
+    // Show loading message with spinner immediately
     mainContent.innerHTML = `
-        <div class="loading-message" id="loading-message">
-            <p>Loading menu...</p>
-        </div>
+    <div class="loading-message" id="loading-message" style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font-size: 18px;
+        color: #555;
+    ">
+        <div class="spinner" style="
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.4s linear infinite;
+            margin-bottom: 15px;
+        "></div>
+        <p>Loading menu...</p>
+    </div>
     `;
-    billPanel.style.display = "none";
 
+    billPanel.style.display = "none";
+    try {
+        // Optional delay for 1 second to show the spinner clearly
+        await new Promise(res => setTimeout(res, 400));
+
+        const foodItems = await ipcRenderer.invoke("get-menu-items");
+
+        // Remove loading message
+        mainContent.innerHTML = "";
+
+        // Continue with displaying foodItems here...
+    } catch (error) {
+        console.error("Error loading menu:", error);
+    }
     try {
         const foodItems = await ipcRenderer.invoke("get-menu-items");
 
@@ -338,13 +368,7 @@ async function displayMenu() {
                             // Remove the popup
                             document.body.removeChild(popupOverlay);
 
-                            // Update UI dynamically
-                            const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
-                            if (foodItemElement) {
-                                foodItemElement.querySelector("h3").innerHTML = `${updatedFname} <br> ${updatedveg == 1 ? "🌱" : "🍖"}`;
-                                foodItemElement.querySelector("p:nth-child(2)").textContent = `Category: ${updatedCategory}`;
-                                foodItemElement.querySelector("p:nth-child(3)").textContent = `Price: ₹${updatedCost}`;
-                            }
+                            displayMenu();
 
                             // Restore the scroll position
                             mainContent.scrollTop = currentScrollPosition;
@@ -517,6 +541,7 @@ function toggleAddItemPopup() {
             createTextPopup("Item added successfully!");
             ipcRenderer.send("refresh-menu");
             popupOverlay.remove();
+            displayMenu();
         } catch (error) {
             console.error("Error adding item:", error);
             createTextPopup("Failed to add item");
