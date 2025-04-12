@@ -51,9 +51,9 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="CategoryWiseSales" onclick="updateMainContent('CategoryWiseSales')">Category Wise Sales</button>
                 <button class="category" id="TopSellingItems" onclick="updateMainContent('TopSellingItems')">Top Selling Items</button>
                 <button class="category" id="TopSellingCategory" onclick="updateMainContent('TopSellingCategory')">Top Selling Category</button>
+                <button class="category" id="EmployeeAnalysis" onclick="updateMainContent('EmployeeAnalysis')">Employee Analysis</button>
                 <button class="category" id="RateOfSale" onclick="updateMainContent('RateOfSale')">Rate Of Sale</button>
                 <button class="category" id="MenuAnalysis" onclick="updateMainContent('MenuAnalysis')">Menu Analysis</button>
-                <button class="category" id="EmployeeAnalysis" onclick="updateMainContent('EmployeeAnalysis')">Employee Analysis</button>
                 <button class="category" id="Charts" onclick="updateMainContent('Charts')">Charts</button>
                 <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
                 <button class="category" id="SpecialStatistics" onclick="updateMainContent('SpecialStatistics')">Special Statistics</button>
@@ -108,7 +108,6 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="Currency" onclick="updateMainContent('Currency')">Currency</button>
                 <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
-                <button class="category" id="SystemUpdates" onclick="updateMainContent('SystemUpdates')">System Updates</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>
             `;
             break;
