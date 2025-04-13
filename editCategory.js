@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 let catid;
 let isActive = 1;
@@ -27,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const updatedName = document.getElementById("editCategoryName").value.trim();
 
         if (!updatedName) {
-            alert("Please enter a category name.");
+            createTextPopup("Please enter a category name.");
             return;
         }
 

@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 let currentSortBy = null;
 let currentSortOrder = 'asc';
@@ -193,7 +194,7 @@ ipcRenderer.on("customer-added-response", (event, data) => {
     if (data.success) {
         fetchCustomers();
     } else {
-        alert("Failed to add customer.");
+        createTextPopup("Failed to add customer.");
     }
 });
 
@@ -201,7 +202,7 @@ ipcRenderer.on("customer-delete-response", (event, data) => {
     if (data.success) {
         fetchCustomers();
     } else {
-        alert("Failed to delete customer: " + data.error);
+        createTextPopup("Failed to delete customer: " + data.error);
     }
 });
 
@@ -209,7 +210,7 @@ ipcRenderer.on("update-customer-response", (event, data) => {
     if (data.success) {
         fetchCustomers();
     } else {
-        alert("Failed to update customer: " + data.error);
+        createTextPopup("Failed to update customer: " + data.error);
     }
 });
 

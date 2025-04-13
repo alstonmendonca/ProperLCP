@@ -1,9 +1,10 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 function exportTableToExcel(tableId, filename = "export.xlsx") {
     const table = document.querySelector(tableId);
     if (!table) {
-        alert("Table not found!");
+        createTextPopup("Table not found!");
         return;
     }
 

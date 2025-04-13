@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+const  {createTextPopup} = require("./textPopup");
 
 function loadDayWiseAnalysis(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -48,7 +49,7 @@ function loadDayWiseAnalysis(mainContent, billPanel) {
 
 function fetchDayWiseData(startDate, endDate) {
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 

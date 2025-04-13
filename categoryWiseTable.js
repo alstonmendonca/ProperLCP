@@ -2,6 +2,7 @@ const { ipcRenderer } = require("electron");
 const { attachContextMenu } = require("./contextMenu");
 const { deleteOrder } = require("./deleteOrder");
 const { exportTableToExcel } = require("./export");
+const  {createTextPopup} = require("./textPopup");
 
 let currentSortByCategoryWise = null;
 let currentSortOrderCategoryWise = "asc";
@@ -98,12 +99,12 @@ function fetchCategoryWise(startDate = null, endDate = null, category = null) {
     if (!category) category = document.getElementById("categoryDropdown").value;
 
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 
     if (!category) {
-        alert("Please select a category.");
+        createTextPopup("Please select a category.");
         return;
     }
 

@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 function showEditCustomerPopup(customer) {
     // Prevent duplicate popups
@@ -43,7 +44,7 @@ function showEditCustomerPopup(customer) {
                     ipcRenderer.send("get-customers");
                 }, 100); // Small delay ensures proper UI update
             } else {
-                alert("Failed to update customer: " + response.error);
+                createTextPopup("Failed to update customer: " + response.error);
             }
         });
     }
@@ -64,7 +65,7 @@ function showEditCustomerPopup(customer) {
 // Remove duplicate event listener
 ipcRenderer.on("edit-customer-data", (event, customer) => {
     if (!customer) {
-        alert("Customer not found.");
+        createTextPopup("Customer not found.");
         return;
     }
     showEditCustomerPopup(customer);

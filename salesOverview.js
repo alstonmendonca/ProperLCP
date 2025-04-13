@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 // Function to load the Sales Overview content
 function loadSalesOverview(mainContent, billPanel) {
@@ -138,7 +139,7 @@ function loadSalesOverview(mainContent, billPanel) {
 // Function to display sales data in the table
 async function displaySalesOverview(startDate, endDate) {
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 
@@ -169,7 +170,7 @@ async function displaySalesOverview(startDate, endDate) {
         });
     } catch (error) {
         console.error("Error fetching sales overview data:", error);
-        alert("An error occurred while fetching sales data.");
+        createTextPopup("An error occurred while fetching sales data.");
     }
 }
 

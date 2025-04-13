@@ -1,11 +1,12 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 function fetchDeletedOrders() {
     const startDate = document.getElementById("startDate").value;
     const endDate = document.getElementById("endDate").value;
 
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 

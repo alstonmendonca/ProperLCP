@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 // Function to load the User Profile UI
 function loadUserProfile(mainContent, billPanel) {
@@ -252,7 +253,7 @@ function openRemoveUserPopup() {
             .map(userItem => userItem.getAttribute("data-id"));
 
         if (selectedUsers.length === 0) {
-            alert("Please select at least one user to remove.");
+            createTextPopup("Please select at least one user to remove.");
             return;
         }
 
@@ -289,7 +290,7 @@ ipcRenderer.on("user-added", () => {
 
 // Listen for user addition failure
 ipcRenderer.on("user-add-failed", (event, data) => {
-    alert(`Error: ${data.error}`);
+    createTextPopup(`Error: ${data.error}`);
 });
 
 module.exports = { loadUserProfile };

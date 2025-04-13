@@ -20,7 +20,8 @@
 
     <script>
         const { ipcRenderer } = require("electron");
-    
+        const  {createTextPopup} = require("./textPopup");
+        
         let billNo = "";
     
         ipcRenderer.on("populate-delete-window", (event, data) => {
@@ -31,7 +32,7 @@
         document.getElementById("confirmDelete").addEventListener("click", () => {
             const reason = document.getElementById("deleteReason").value.trim();
             if (!reason) {
-                alert("Please enter a reason for deletion.");
+                createTextPopup("Please enter a reason for deletion.");
                 return;
             }
             ipcRenderer.send("confirm-delete-order", { billNo, reason });

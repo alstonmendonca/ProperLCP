@@ -35,7 +35,7 @@ function showAddCustomerPopup() {
         const address = document.getElementById("customerAddress").value.trim();
 
         if (!cname || !phone) {
-            alert("Name and phone number are required!");
+            createTextPopup("Name and phone number are required!");
             return;
         }
 
@@ -50,7 +50,7 @@ function showAddCustomerPopup() {
                     ipcRenderer.send("get-customers"); // Refresh customer list
                 }, 100);
             } else {
-                alert("Failed to add customer: " + response.error);
+                createTextPopup("Failed to add customer: " + response.error);
             }
         });
     }

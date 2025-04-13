@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 // Main function to load categories content
 function loadCategories(mainContent, billPanel) {
@@ -141,7 +142,7 @@ function openEditCategoryPopup(catid, catname, active) {
         const updatedName = document.getElementById("editCategoryName").value.trim();
 
         if (!updatedName) {
-            alert("Please enter a category name.");
+            createTextPopup("Please enter a category name.");
             return;
         }
 

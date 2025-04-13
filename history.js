@@ -2,6 +2,7 @@ const { ipcRenderer } = require("electron");
 const { attachContextMenu } = require("./contextMenu");
 const { deleteOrder } = require("./deleteOrder");
 const { exportTableToExcel } = require("./export");
+const  {createTextPopup} = require("./textPopup");
 
 let currentSortBy = null;
 let currentSortOrder = 'asc'; // Default sort order
@@ -58,7 +59,7 @@ function fetchOrderHistory(startDate = null, endDate = null) {
     if (!endDate) endDate = document.getElementById("endDate").value;
 
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 

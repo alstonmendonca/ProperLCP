@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 function attachTodaysOrdersContextMenu(selector) {
     const orderBoxes = document.querySelectorAll(selector);
@@ -65,7 +66,7 @@ function openDeleteOrderPopup(billNo, sourceSection) {
             ipcRenderer.send("confirm-delete-order", { billNo, reason, source: sourceSection });
             document.body.removeChild(popup);
         } else {
-            alert("Please enter a reason for deletion.");
+            createTextPopup("Please enter a reason for deletion.");
         }
     });
 

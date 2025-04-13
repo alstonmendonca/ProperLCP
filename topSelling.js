@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 // Function to load the Top Selling Items content
 function loadTopSellingItems(mainContent, billPanel) {
@@ -56,7 +57,7 @@ function loadTopSellingItems(mainContent, billPanel) {
 // Rest of the file remains the same...
 async function fetchTopSellingItems(startDate, endDate) {
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 

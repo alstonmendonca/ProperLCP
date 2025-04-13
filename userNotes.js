@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+const  {createTextPopup} = require("./textPopup");
 
 // Function to load the Notes UI
 function loadUserNotes(mainContent, billPanel) {
@@ -134,7 +135,7 @@ function loadUserNotes(mainContent, billPanel) {
     // Add new note button click handler
     addNoteBtn.addEventListener('click', () => {
         if (notes.length >= 10) {
-            alert('Maximum limit of 10 notes reached!');
+            createTextPopup('Maximum limit of 10 notes reached!');
             return;
         }
         

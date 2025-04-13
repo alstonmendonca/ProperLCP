@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 // Function to fetch discounted orders
 function fetchDiscountedOrders(startDate, endDate) {
@@ -176,9 +177,9 @@ async function clearDiscountedOrders() {
 
         ipcRenderer.once("clear-discounted-orders-response", (event, response) => {
             if (response.success) {
-                alert("All discounted orders have been cleared.");
+                createTextPopup("All discounted orders have been cleared.");
             } else {
-                alert("Failed to clear discounted orders.");
+                createTextPopup("Failed to clear discounted orders.");
             }
             resolve();
         });

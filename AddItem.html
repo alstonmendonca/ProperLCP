@@ -95,7 +95,7 @@
     <script src="menu.js"></script>
     <script>
         const { ipcRenderer } = require("electron");
-
+        const  {createTextPopup} = require("./textPopup");
         // Fetch categories from database
         async function loadCategories() {
             try {
@@ -130,7 +130,7 @@
             try {
                 // Add the item to the database
                 await ipcRenderer.invoke("add-food-item", newItem);
-                alert("Item added successfully!");
+                createTextPopup("Item added successfully!");
 
                 // After item is added, notify the main window to refresh the menu
                 ipcRenderer.send("refresh-menu");
@@ -139,7 +139,7 @@
                 window.close();
             } catch (error) {
                 console.error("Error adding item:", error);
-                alert("Failed to add item.");
+                createTextPopup("Failed to add item.");
             }
         });
 

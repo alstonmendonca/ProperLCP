@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 // Function to load the Category Wise Sales content
 function loadCategoryWiseSales(mainContent, billPanel) {
@@ -97,7 +98,7 @@ ipcRenderer.on("category-wise-sales-categories-response", (event, data) => {
 // Function to display category sales based on selected dates
 async function displayCategoryWiseSales(startDate, endDate) {
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 
@@ -127,7 +128,7 @@ async function displayCategoryWiseSales(startDate, endDate) {
         });
     } catch (error) {
         console.error("Error fetching category-wise sales data:", error);
-        alert("An error occurred while fetching sales data.");
+        createTextPopup("An error occurred while fetching sales data.");
     }
 }
 

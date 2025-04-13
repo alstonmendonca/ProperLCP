@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron");
+const  {createTextPopup} = require("./textPopup");
 
 function loadEmployeeAnalysis(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -51,7 +52,7 @@ function loadEmployeeAnalysis(mainContent, billPanel) {
 
 function fetchEmployeeAnalysis(startDate, endDate) {
     if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
-        alert("Please select both start and end dates.");
+        createTextPopup("Please select both start and end dates.");
         return;
     }
 

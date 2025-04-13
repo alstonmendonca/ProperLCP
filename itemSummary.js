@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 const XLSX = require('xlsx'); // Import the xlsx library
+const  {createTextPopup} = require("./textPopup");
 
 // Function to load the Item Summary content
 // Function to load the Item Summary content
@@ -180,7 +181,7 @@ function exportToExcel() {
     const table = document.querySelector(".item-summary-table");
 
     if (!table) {
-        alert("No data to export.");
+        createTextPopup("No data to export.");
         return;
     }
 
@@ -194,7 +195,7 @@ function exportToExcel() {
     // Write the workbook to a file
     XLSX.writeFile(workbook, "ItemSummary.xlsx");
 
-    alert("Exported to ItemSummary.xlsx");
+    createTextPopup("Exported to ItemSummary.xlsx");
 }
 
 // Utility function to get today's date in YYYY-MM-DD format
