@@ -62,7 +62,7 @@ async function displayMenu() {
 
     // Store scroll position before updating content
     const currentScrollPosition = mainContent.scrollTop;
-
+    document.getElementById('top-panel').classList.add('disabled');
     // Show loading message with spinner immediately
     mainContent.innerHTML = `
     <div class="loading-message" id="loading-message" style="
@@ -167,6 +167,7 @@ async function displayMenu() {
                         </button>
                     </div>
                 `;
+
             });
 
             menuContent += `</div>`;
@@ -378,7 +379,7 @@ async function displayMenu() {
                     });
                 });
             });
-
+            document.getElementById('top-panel').classList.remove('disabled');
 
 
         } else {

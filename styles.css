@@ -610,6 +610,18 @@ h1 {
 
 /* MENU TOGGLE BUTTONS */
 
+#top-panel.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+    filter: grayscale(10%);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+#top-panel button.top {
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+
 /*Spinner for loading*/
 @keyframes spin {
     0% { transform: rotate(0deg); }
