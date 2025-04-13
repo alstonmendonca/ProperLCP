@@ -1,30 +1,14 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
-const escpos = require("escpos"); // Install escpos library: npm install escpos
+const escpos = require("escpos");
 const fs = require('fs');
-escpos.USB = require("escpos-usb"); // USB printer support
+escpos.USB = require("escpos-usb");
 const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
 
 let mainWindow;
 let userRole = null;
-let store; // Variable to hold electron-store instance
-// Function to initialize electron-store dynamically
-async function initStore() {
-    const { default: Store } = await import("electron-store");
-    store = new Store();
-}
-// Handle login logic and return user role
-ipcMain.handle('login', (event, password) => {
-    if (password === '1212') {
-        userRole = 'admin'; // Set role for admin
-    } else if (password === '1000') {
-        userRole = 'staff'; // Set role for staff
-    } else {
-        userRole = null; // Invalid password
-    }
-    return userRole; // Return the role (or null if invalid)
-});
+let store; // Will be initialized after dynamic import
 
 // Connect to the SQLite database
 const db = new sqlite3.Database('LC.db', (err) => {
@@ -32,103 +16,140 @@ const db = new sqlite3.Database('LC.db', (err) => {
         console.error("Failed to connect to the database:", err.message);
     } else {
         console.log("Connected to the SQLite database.");
-        checkAndResetFoodItems();
     }
 });
-// Function to check and reset `is_on`
-async function checkAndResetFoodItems() {
-    await initStore(); // Ensure electron-store is initialized
 
-    const lastOpenedDate = store.get("lastOpenedDate", null);
-    const currentDate = new Date().toISOString().split("T")[0]; // Get current date (YYYY-MM-DD)
+async function initStore() {
+    const Store = (await import('electron-store')).default;
+    store = new Store({
+        defaults: {
+            printerConfig: {
+                vendorId: '0x0525',
+                productId: '0xA700'
+            },
+            lastOpenedDate: null
+        }
+    });
+    return store;
+}
+
+async function checkAndResetFoodItems() {
+    await initStore(); // Ensure store is initialized
+    const lastOpenedDate = store.get("lastOpenedDate");
+    const currentDate = new Date().toISOString().split("T")[0];
 
     if (lastOpenedDate !== currentDate) {
         console.log("New day detected, resetting is_on column...");
-
         db.run("UPDATE FoodItem SET is_on = 1", (err) => {
             if (err) {
                 console.error("Failed to reset is_on:", err.message);
             } else {
                 console.log("Successfully reset is_on for new day.");
-                store.set("lastOpenedDate", currentDate); // Update last opened date
-            }
-        });
-    } else {
-        console.log("Same day detected, no reset needed.");
-    }
-}
-//Close database connection
-// Function to close the database connection gracefully
-function closeDatabase() {
-    if (db) {
-        db.close((err) => {
-            if (err) {
-                console.error("Error closing database", err);
-            } else {
-                console.log("Database connection closed");
+                store.set("lastOpenedDate", currentDate);
             }
         });
     }
 }
 
+app.whenReady().then(async () => {
+    // Initialize store first
+    await initStore();
+    
+    // Then check and reset food items
+    await checkAndResetFoodItems();
 
-app.on("ready", () => {
+    // Create main window
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
-        show: false, // Initially hidden until ready-to-show
+        show: false,
         fullscreen: false,
         webPreferences: {
-            nodeIntegration: true, // Allow Node.js in the renderer process
-            contextIsolation: false, // Optional: enable or disable context isolation
+            nodeIntegration: true,
+            contextIsolation: false,
         },
     });
 
-    // Maximize the window after creation
     mainWindow.maximize();
-
-    // Show window once it's ready
-    mainWindow.once("ready-to-show", () => {
-        mainWindow.show();
-    });
-
+    mainWindow.once("ready-to-show", () => mainWindow.show());
     Menu.setApplicationMenu(null);
+    mainWindow.loadFile('index.html').catch(console.error);
 
-    // Skip the login process and directly load index.html for testing
-    mainWindow.loadFile('index.html').catch(err => {
-        console.error("Failed to load index.html:", err);
-    });
-
-    // Send the user role after loading index.html
-    mainWindow.webContents.once('did-finish-load', () => {
-        mainWindow.webContents.send('set-user-role', userRole);
-    });
-
-    // Handle the user role request
-    ipcMain.handle('get-user-role', async () => {
+    // IPC handlers
+    ipcMain.handle('login', (event, password) => {
+        if (password === '1212') userRole = 'admin';
+        else if (password === '1000') userRole = 'staff';
+        else userRole = null;
         return userRole;
     });
 
-    // Handle database queries
+    ipcMain.handle('get-user-role', () => userRole);
+
+    // Printer configuration handlers
+    ipcMain.handle('get-printer-config', () => {
+        const config = store.get('printerConfig', {
+            vendorId: '0x0525',
+            productId: '0xA700'
+        });
+        
+        // Convert hex to decimal for the UI
+        return {
+            vendorId: config.vendorId,
+            productId: config.productId,
+            vendorIdDec: parseInt(config.vendorId, 16),
+            productIdDec: parseInt(config.productId, 16)
+        };
+    });
+
+    ipcMain.handle('save-printer-config', (event, config) => {
+        try {
+            // Validate the input (now expecting hex strings)
+            if (!config || !config.vendorId || !config.productId) {
+                throw new Error('Both Vendor ID and Product ID are required');
+            }
+    
+            // Validate hex format
+            const hexRegex = /^0x[0-9a-fA-F]{4}$/;
+            if (!hexRegex.test(config.vendorId) || !hexRegex.test(config.productId)) {
+                throw new Error('Invalid hexadecimal format');
+            }
+    
+            // Validate numeric conversion
+            const vendorId = parseInt(config.vendorId, 16);
+            const productId = parseInt(config.productId, 16);
+            if (isNaN(vendorId) || isNaN(productId)) {
+                throw new Error('Invalid hexadecimal values');
+            }
+    
+            store.set('printerConfig', config);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    });
 });
 
 app.on("activate", () => {
-    if (mainWindow === null) {
-        mainWindow = new BrowserWindow({
-            width: 1200,
-            height: 800,
-            webPreferences: {
-                preload: path.join(__dirname, 'renderer.js'),
-                contextIsolation: true,
-            }
-        });
-
-        // Skip login and load index.html directly
-        mainWindow.loadFile('index.html').catch(err => {
-            console.error("Failed to load index.html:", err);
-        });
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
     }
 });
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        closeDatabase();
+        app.quit();
+    }
+});
+
+function closeDatabase() {
+    if (db) {
+        db.close((err) => {
+            if (err) console.error("Error closing database", err);
+            else console.log("Database connection closed");
+        });
+    }
+}
 
 //----------------------------------------------ANALYTICS STARTS HERE--------------------------------------------------------------
 // Fetch Today's Items for Item Summary
@@ -641,10 +662,22 @@ ipcMain.on("refresh-categories", (event) => {
 
 ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
     try {
-        const escpos = require('escpos');
-        escpos.USB = require('escpos-usb');
-        
-        const device = new escpos.USB(0x0525, 0xA700); // TVS RP 3220 STAR | Vendor ID: 1317 and Product ID: 42752 are written in decimal
+        // Get config with fallback to defaults
+        const config = store.get('printerConfig', {
+            vendorId: '0x0525',
+            productId: '0xA700'
+        });
+
+        // Convert hex strings to numbers
+        const vendorId = parseInt(config.vendorId, 16);
+        const productId = parseInt(config.productId, 16);
+
+        // Validate IDs
+        if (isNaN(vendorId) || isNaN(productId)) {
+            throw new Error('Invalid printer configuration - please check Vendor/Product IDs');
+        }
+
+        const device = new escpos.USB(vendorId, productId);
         const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
 
         device.open((error) => {
@@ -653,7 +686,6 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
                 return;
             }
 
-            // Generate hardcoded receipt
             const commands = generateHardcodedReceipt(billItems, totalAmount, kot, orderId);
             
             printer
@@ -671,6 +703,7 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
         event.sender.send('print-error', `System error: ${error.message}`);
     }
 });
+
 
 function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     // Format items for receipt

@@ -10,7 +10,7 @@
         "electron-rebuild": "^3.2.9"
     },
     "dependencies": {
-        "electron-store": "^10.0.1",
+        "electron-store": "^8.0.2",
         "escpos": "3.0.0-alpha.6",
         "escpos-usb": "3.0.0-alpha.4",
         "sqlite3": "^5.1.7",
