@@ -20,7 +20,7 @@ async function updateMainContent(contentType) {
     const settingsButtons = [
         'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 
         'TaxAndDiscount', 'PrinterConfig', 'Receipt',
-        'DateAndTime', 'Currency', 'Security', 'Help', 'SystemUpdates'
+        'DateAndTime', 'ConnectedDevices', 'Security', 'Help', 'SystemUpdates'
     ];
     
     // Highlight top panel button for any top-level section
@@ -270,16 +270,8 @@ async function updateMainContent(contentType) {
                 <p>Settings for display</p>
             `;
         }
-        else if (contentType === "Currency") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none';
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Currency</h2>
-                </div>
-                <p>Settings for display</p>
-            `;
+        else if (contentType === "ConnectedDevices") {
+            loadConnectedDevices(mainContent, billPanel);
         }
         else if (contentType === "Security") {
             mainContent.style.marginLeft = "200px";

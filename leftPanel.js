@@ -105,7 +105,7 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="PrinterConfig" onclick="updateMainContent('PrinterConfig')">Printer Configuration</button>
                 <button class="category" id="Receipt" onclick="updateMainContent('Receipt')">Receipt</button>
                 <button class="category" id="DateAndTime" onclick="updateMainContent('DateAndTime')">Date And Time</button>
-                <button class="category" id="Currency" onclick="updateMainContent('Currency')">Currency</button>
+                <button class="category" id="ConnectedDevices" onclick="updateMainContent('ConnectedDevices')">Connected Devices</button>
                 <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>

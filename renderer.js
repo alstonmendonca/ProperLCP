@@ -62,7 +62,7 @@ const {sortEmployeeTable} = require('./employeeAnalysis');
 const { loadDayWiseAnalysis } = require('./dayWise');
 const { loadMonthWiseAnalysis } = require('./monthWise');
 const { loadUserNotes } = require('./userNotes');
-
+const { loadConnectedDevices } = require('./connectedDevices');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
