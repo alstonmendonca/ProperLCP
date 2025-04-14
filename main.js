@@ -614,6 +614,56 @@ ipcMain.on('get-food-pairings', (event) => {
         }
     });
 });
+
+ipcMain.on('get-menu-profitability', (event, { startDate, endDate }) => {
+    const query = `
+        WITH OrderTotals AS (
+            SELECT 
+                o.billno,
+                SUM(od.quantity) as total_quantity,
+                o.price as order_total
+            FROM Orders o
+            JOIN OrderDetails od ON o.billno = od.orderid
+            WHERE o.date BETWEEN ? AND ?
+            GROUP BY o.billno
+        )
+        SELECT 
+            f.fname,
+            c.catname,
+            SUM(od.quantity) as total_units_sold,
+            SUM(od.quantity * f.cost) as total_cost,
+            SUM(od.quantity * (ot.order_total / ot.total_quantity)) as total_revenue,
+            SUM(od.quantity * ((ot.order_total / ot.total_quantity) - f.cost)) as total_profit,
+            ROUND(
+                SUM(od.quantity * ((ot.order_total / ot.total_quantity) - f.cost)) * 100.0 / 
+                SUM(od.quantity * (ot.order_total / ot.total_quantity)), 
+                2
+            ) as profit_margin
+        FROM Orders o
+        JOIN OrderDetails od ON o.billno = od.orderid
+        JOIN FoodItem f ON od.foodid = f.fid
+        JOIN Category c ON f.category = c.catid
+        JOIN OrderTotals ot ON o.billno = ot.billno
+        WHERE o.date BETWEEN ? AND ?
+        GROUP BY od.foodid
+        ORDER BY total_profit DESC
+    `;
+
+    db.all(query, [startDate, endDate, startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error('Error fetching menu profitability data:', err);
+            event.reply('menu-profitability-response', { 
+                success: false, 
+                error: err.message 
+            });
+        } else {
+            event.reply('menu-profitability-response', {
+                success: true,
+                items: rows
+            });
+        }
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------

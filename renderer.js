@@ -64,6 +64,7 @@ const { loadMonthWiseAnalysis } = require('./monthWise');
 const { loadUserNotes } = require('./userNotes');
 const { loadConnectedDevices } = require('./connectedDevices');
 const { loadSpecialStatistics } = require('./specialStatistics');
+const { loadMenuProfitability } = require('./menuProfitability');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;
