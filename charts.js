@@ -9,7 +9,7 @@ function loadCharts(mainContent, billPanel) {
 
     mainContent.innerHTML = `
         <div class="section-title">
-            <h2>7-Day Sales Trend</h2>
+            <h2>7-Day Sales Performance</h2>
             <div class="chart-controls">
                 <button id="refreshChart" class="refresh-btn">
                     <i class="fas fa-sync-alt"></i> Refresh Chart
@@ -48,26 +48,78 @@ function loadCharts(mainContent, billPanel) {
         type: 'line',
         data: {
             labels: [],
-            datasets: [{
-                label: 'Number of Sales',
-                data: [],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 2,
-                tension: 0.1,
-                fill: true
-            }]
+            datasets: [
+                {
+                    label: 'Number of Sales',
+                    data: [],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Total Revenue (₹)',
+                    data: [],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Units Sold',
+                    data: [],
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    yAxisID: 'y2'
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
             scales: {
                 y: {
-                    beginAtZero: true,
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
                     title: {
                         display: true,
                         text: 'Number of Sales'
                     }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Total Revenue (₹)'
+                    }
+                },
+                y2: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Units Sold'
+                    },
+                    // Adjust this if units sold scale is very different
+                    suggestedMin: 0
                 },
                 x: {
                     title: {
@@ -103,6 +155,8 @@ ipcRenderer.on('seven-day-sales-response', (event, data) => {
     // Update chart data
     chart.data.labels = data.dates;
     chart.data.datasets[0].data = data.salesCounts;
+    chart.data.datasets[1].data = data.totalRevenues;
+    chart.data.datasets[2].data = data.unitsSold;
     chart.update();
 });
 

@@ -15,7 +15,8 @@ async function updateMainContent(contentType) {
     ];
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
-        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes', 'SpecialStatistics', 'MenuProfitability'
+        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes', 'SpecialStatistics', 'MenuProfitability',
+        'Charts', 'RateOfSale'
     ];
     const settingsButtons = [
         'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 

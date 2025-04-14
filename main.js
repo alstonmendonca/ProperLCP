@@ -665,7 +665,6 @@ ipcMain.on('get-menu-profitability', (event, { startDate, endDate }) => {
     });
 });
 
-// In your main.js file, add this to the IPC handlers section:
 ipcMain.on('get-seven-day-sales', (event) => {
     // Calculate date range (past 7 days including today)
     const endDate = new Date();
@@ -699,41 +698,77 @@ ipcMain.on('get-seven-day-sales', (event) => {
             return;
         }
         
-        // Now get sales counts for each date
+        // Now get sales counts and revenue for each date
         const salesQuery = `
             SELECT 
                 date,
-                COUNT(billno) as salesCount
+                COUNT(billno) as salesCount,
+                COALESCE(SUM(price), 0) as totalRevenue
             FROM Orders
             WHERE date BETWEEN ? AND ?
             GROUP BY date
             ORDER BY date;
         `;
         
-        db.all(salesQuery, [startDateStr, endDateStr], (err, salesRows) => {
-            if (err) {
-                console.error('Error getting sales data:', err);
-                event.reply('seven-day-sales-response', { 
-                    success: false, 
-                    error: err.message 
+        // Get units sold separately since it requires joining with OrderDetails
+        const unitsQuery = `
+            SELECT 
+                o.date,
+                COALESCE(SUM(od.quantity), 0) as unitsSold
+            FROM Orders o
+            LEFT JOIN OrderDetails od ON o.billno = od.orderid
+            WHERE o.date BETWEEN ? AND ?
+            GROUP BY o.date
+            ORDER BY o.date;
+        `;
+        
+        // Execute both queries in parallel
+        Promise.all([
+            new Promise((resolve, reject) => {
+                db.all(salesQuery, [startDateStr, endDateStr], (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
                 });
-                return;
-            }
-            
-            // Create a map of date to sales count
+            }),
+            new Promise((resolve, reject) => {
+                db.all(unitsQuery, [startDateStr, endDateStr], (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                });
+            })
+        ]).then(([salesRows, unitsRows]) => {
+            // Create maps for each metric
             const salesMap = {};
+            const revenueMap = {};
+            const unitsMap = {};
+            
+            // Process sales and revenue data
             salesRows.forEach(row => {
                 salesMap[row.date] = row.salesCount;
+                revenueMap[row.date] = row.totalRevenue;
+            });
+            
+            // Process units sold data
+            unitsRows.forEach(row => {
+                unitsMap[row.date] = row.unitsSold;
             });
             
             // Prepare response with all dates in order
             const response = {
                 success: true,
                 dates: dateRows.map(row => row.date),
-                salesCounts: dateRows.map(row => salesMap[row.date] || 0)
+                salesCounts: dateRows.map(row => salesMap[row.date] || 0),
+                totalRevenues: dateRows.map(row => revenueMap[row.date] || 0),
+                unitsSold: dateRows.map(row => unitsMap[row.date] || 0)
             };
             
             event.reply('seven-day-sales-response', response);
+        }).catch(err => {
+            console.error('Error getting sales data:', err);
+            event.reply('seven-day-sales-response', { 
+                success: false, 
+                error: err.message 
+            });
         });
     });
 });
