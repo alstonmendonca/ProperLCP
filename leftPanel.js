@@ -55,8 +55,8 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="MenuProfitability" onclick="updateMainContent('MenuProfitability')">Menu Profitability</button>
                 <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
                 <button class="category" id="SpecialStatistics" onclick="updateMainContent('SpecialStatistics')">Special Statistics</button>
-                <button class="category" id="RateOfSale" onclick="updateMainContent('RateOfSale')">Rate Of Sale</button>
                 <button class="category" id="Charts" onclick="updateMainContent('Charts')">Charts</button>
+                <button class="category" id="BestInCategory" onclick="updateMainContent('BestInCategory')">Best In Category</button>
             `;
             break;
 
@@ -67,11 +67,11 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
                 <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
                 <button class="category" id="itemHistory" onclick="updateMainContent('itemHistory')">Item History</button>
-                <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
-                <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
                 <button class="category" id="dayWise" onclick="updateMainContent('dayWise')">Day-wise</button>
                 <button class="category" id="monthWise" onclick="updateMainContent('monthWise')">Month-wise</button>
                 <button class="category" id="yearWise" onclick="updateMainContent('yearWise')">Year-wise</button>
+                <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
+                <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
                 <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
                 <button class="category" id="filterHistory" onclick="updateMainContent('filterHistory')">Filter History</button>
                 <button class="category" id="makeATable" onclick="updateMainContent('makeATable')">Make A Table</button>

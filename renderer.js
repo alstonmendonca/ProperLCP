@@ -66,6 +66,7 @@ const { loadConnectedDevices } = require('./connectedDevices');
 const { loadSpecialStatistics } = require('./specialStatistics');
 const { loadCharts } = require('./charts');
 const { loadMenuProfitability } = require('./menuProfitability');
+const { loadBestInCategory } = require('./bestInCategory');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

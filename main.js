@@ -772,6 +772,55 @@ ipcMain.on('get-seven-day-sales', (event) => {
         });
     });
 });
+
+// In your main.js file, add this to the IPC handlers section:
+// In your main.js file, add/update this IPC handler:
+ipcMain.on('get-best-in-category', (event, { startDate, endDate }) => {
+    const query = `
+        WITH RankedItems AS (
+            SELECT 
+                c.catid,
+                c.catname,
+                f.fname,
+                SUM(od.quantity) AS total_quantity,
+                RANK() OVER (PARTITION BY c.catid ORDER BY SUM(od.quantity) DESC) AS rank
+            FROM Orders o
+            JOIN OrderDetails od ON o.billno = od.orderid
+            JOIN FoodItem f ON od.foodid = f.fid
+            JOIN Category c ON f.category = c.catid
+            WHERE o.date BETWEEN ? AND ?
+            GROUP BY c.catid, f.fid
+        )
+        SELECT 
+            catid,
+            catname,
+            GROUP_CONCAT(fname, ', ') AS top_items
+        FROM RankedItems
+        WHERE rank = 1
+        GROUP BY catid
+        ORDER BY catname;
+    `;
+
+    db.all(query, [startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error('Error fetching best in category data:', err);
+            event.reply('best-in-category-response', { 
+                success: false, 
+                error: err.message 
+            });
+        } else {
+            const processedRows = rows.map(row => ({
+                ...row,
+                top_items: row.top_items ? row.top_items.split(', ') : []
+            }));
+            
+            event.reply('best-in-category-response', {
+                success: true,
+                categories: processedRows
+            });
+        }
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------

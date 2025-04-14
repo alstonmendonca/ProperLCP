@@ -16,7 +16,7 @@ async function updateMainContent(contentType) {
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
         'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes', 'SpecialStatistics', 'MenuProfitability',
-        'Charts', 'RateOfSale'
+        'Charts', 'RateOfSale', 'BestInCategory'
     ];
     const settingsButtons = [
         'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 
@@ -215,8 +215,8 @@ async function updateMainContent(contentType) {
         else if (contentType === "MenuProfitability") {
             loadMenuProfitability(mainContent, billPanel);
         }
-        else if (contentType === "RateOfSale") {
-            
+        else if (contentType === "BestInCategory") {
+            loadBestInCategory(mainContent, billPanel);
         }
         else if (contentType === "Charts") {
             loadCharts(mainContent, billPanel);
