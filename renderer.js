@@ -63,6 +63,7 @@ const { loadDayWiseAnalysis } = require('./dayWise');
 const { loadMonthWiseAnalysis } = require('./monthWise');
 const { loadUserNotes } = require('./userNotes');
 const { loadConnectedDevices } = require('./connectedDevices');
+const { loadSpecialStatistics } = require('./specialStatistics');
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

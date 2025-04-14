@@ -583,6 +583,37 @@ ipcMain.on('get-employee-analysis', (event, { startDate, endDate }) => {
         }
     });
 });
+
+ipcMain.on('get-food-pairings', (event) => {
+    const query = `
+        SELECT 
+            a.fname as item1, 
+            b.fname as item2,
+            COUNT(*) as times_ordered_together
+        FROM OrderDetails od1
+        JOIN OrderDetails od2 ON od1.orderid = od2.orderid AND od1.foodid < od2.foodid
+        JOIN FoodItem a ON od1.foodid = a.fid
+        JOIN FoodItem b ON od2.foodid = b.fid
+        GROUP BY od1.foodid, od2.foodid
+        ORDER BY times_ordered_together DESC
+        LIMIT 50
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Error fetching food pairings:', err);
+            event.reply('food-pairings-response', { 
+                success: false, 
+                error: err.message 
+            });
+        } else {
+            event.reply('food-pairings-response', {
+                success: true,
+                pairings: rows
+            });
+        }
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------

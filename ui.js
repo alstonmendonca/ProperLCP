@@ -15,7 +15,7 @@ async function updateMainContent(contentType) {
     ];
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
-        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes'
+        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes', 'SpecialStatistics'
     ];
     const settingsButtons = [
         'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 
@@ -207,6 +207,9 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "EmployeeAnalysis") {
             loadEmployeeAnalysis(mainContent, billPanel); // Call the top selling categories function
+        }
+        else if (contentType === "SpecialStatistics") {
+            loadSpecialStatistics(mainContent, billPanel);
         }
         
         //-----------------------------------------------ANALYTICS ENDS HERE---------------------------------------------------
