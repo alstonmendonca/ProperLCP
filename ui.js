@@ -214,6 +214,12 @@ async function updateMainContent(contentType) {
         else if (contentType === "MenuProfitability") {
             loadMenuProfitability(mainContent, billPanel);
         }
+        else if (contentType === "RateOfSale") {
+            
+        }
+        else if (contentType === "Charts") {
+            loadCharts(mainContent, billPanel);
+        }
         
         //-----------------------------------------------ANALYTICS ENDS HERE---------------------------------------------------
         //--------------------------CATEGORIES---------------------------------------------------------------

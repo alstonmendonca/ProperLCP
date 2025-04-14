@@ -664,6 +664,79 @@ ipcMain.on('get-menu-profitability', (event, { startDate, endDate }) => {
         }
     });
 });
+
+// In your main.js file, add this to the IPC handlers section:
+ipcMain.on('get-seven-day-sales', (event) => {
+    // Calculate date range (past 7 days including today)
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 6); // 7 days total
+    
+    // Format dates as YYYY-MM-DD
+    const formatDate = (date) => date.toISOString().split('T')[0];
+    const startDateStr = formatDate(startDate);
+    const endDateStr = formatDate(endDate);
+    
+    // First get all dates in the range to ensure we have entries for all days
+    const dateQuery = `
+        WITH RECURSIVE dates(date) AS (
+            VALUES(?)
+            UNION ALL
+            SELECT date(date, '+1 day')
+            FROM dates
+            WHERE date < ?
+        )
+        SELECT date FROM dates;
+    `;
+    
+    db.all(dateQuery, [startDateStr, endDateStr], (err, dateRows) => {
+        if (err) {
+            console.error('Error getting date range:', err);
+            event.reply('seven-day-sales-response', { 
+                success: false, 
+                error: err.message 
+            });
+            return;
+        }
+        
+        // Now get sales counts for each date
+        const salesQuery = `
+            SELECT 
+                date,
+                COUNT(billno) as salesCount
+            FROM Orders
+            WHERE date BETWEEN ? AND ?
+            GROUP BY date
+            ORDER BY date;
+        `;
+        
+        db.all(salesQuery, [startDateStr, endDateStr], (err, salesRows) => {
+            if (err) {
+                console.error('Error getting sales data:', err);
+                event.reply('seven-day-sales-response', { 
+                    success: false, 
+                    error: err.message 
+                });
+                return;
+            }
+            
+            // Create a map of date to sales count
+            const salesMap = {};
+            salesRows.forEach(row => {
+                salesMap[row.date] = row.salesCount;
+            });
+            
+            // Prepare response with all dates in order
+            const response = {
+                success: true,
+                dates: dateRows.map(row => row.date),
+                salesCounts: dateRows.map(row => salesMap[row.date] || 0)
+            };
+            
+            event.reply('seven-day-sales-response', response);
+        });
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------

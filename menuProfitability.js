@@ -24,7 +24,7 @@ function loadMenuProfitability(mainContent, billPanel) {
             <div class="profitability-header">
                 <span class="rank">#</span>
                 <span class="item-name">Menu Item</span>
-                <span class="category">Category</span>
+                <span class="menu-profitability-category">Category</span>
                 <span class="units">Units Sold</span>
                 <span class="revenue">Revenue</span>
                 <span class="cost">Cost</span>
@@ -166,7 +166,7 @@ ipcRenderer.on('menu-profitability-response', (event, data) => {
             <div class="profitability-item">
                 <span class="rank">${index + 1}</span>
                 <span class="item-name">${item.fname}</span>
-                <span class="category">${item.catname}</span>
+                <span class="menu-profitability-category">${item.catname}</span>
                 <span class="units">${item.total_units_sold}</span>
                 <span class="revenue">₹${item.total_revenue.toFixed(2)}</span>
                 <span class="cost">₹${item.total_cost.toFixed(2)}</span>
