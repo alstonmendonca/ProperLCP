@@ -1842,114 +1842,264 @@ input:checked + .slider:before {
     background-color: #c0392b; /* Darker red on hover */
 }
 
-/*User Profile Section Starts here */ 
+/*===============================User Profile Section Starts here============================= */ 
+
+/* Base Styles */
+.display-settings-header h2 {
+    color: #0D3B66;
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #0D3B66;
+    text-align: center;
+}
+
+/* Button Container */
+.user-profile-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* Button Styles */
+.add-user-btn {
+    background-color: #0D3B66;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin: 0 10px 20px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-width: 120px;
+}
+
+.add-user-btn:hover {
+    background-color: #11487b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
 /* Admin Section */
 .admin-bar {
-    background-color: #f0f0f0;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    margin-top: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 25px 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #dee2e6;
+}
+
+.admin-bar h2 {
+    color: #0D3B66;
+    font-size: 22px;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
 .admin-container {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
 }
 
 .admin-box {
-    background-color: #0D3B66;
-    color: rgb(225, 221, 221);
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(145deg, #0D3B66 0%, #1a5a94 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     text-align: center;
+    transition: all 0.3s ease;
+}
+
+.admin-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.admin-box p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.admin-box p strong {
+    font-size: 16px;
 }
 
 /* Staff Section */
-.staff-grid {
-    margin-top: 20px;
+.staff-grid h2 {
+    color: #0D3B66;
+    font-size: 22px;
+    margin: 30px 0 20px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #0D3B66;
 }
 
 .staff-container {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
 }
 
 .staff-box {
-    background-color: #0D3B66;
-    color: rgb(225, 221, 221);
+    background: linear-gradient(145deg, #0D3B66 0%, #1a5a94 100%);
+    color: white;
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     text-align: center;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .staff-box:hover {
-    transform: scale(1.05);
-    background-color: #11487b;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.staff-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+
+.staff-box:hover::before {
+    left: 100%;
+}
+
+.staff-box p {
+    margin: 5px 0;
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+.staff-box p strong {
+    font-size: 16px;
 }
 
 /* Popup Styling */
-.edit-user-popup, .add-user-popup, .remove-user-popup {
+.edit-user-popup, 
+.add-user-popup, 
+.remove-user-popup {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(5px);
 }
 
 .user-popup-content {
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 450px;
     max-width: 90%;
-    overflow-x: hidden; /* Prevent horizontal overflow */
+    animation: popupFadeIn 0.3s ease-out;
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .user-popup-content h3 {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    color: #0D3B66;
+    font-size: 22px;
+    text-align: center;
+}
+
+.user-popup-content label {
+    display: block;
+    margin-bottom: 5px;
+    color: #495057;
+    font-weight: 500;
 }
 
 .user-popup-content input {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
     margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-top: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.user-popup-content input:focus {
+    border-color: #0D3B66;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
 }
 
 .user-popup-buttons {
     display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
 }
 
 .user-popup-buttons button {
-    padding: 8px 15px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
-#saveChanges, #confirmAddUser, #removeUsers {
-    background-color: green;
+#saveChanges, 
+#confirmAddUser, 
+#removeUsers {
+    background: linear-gradient(145deg, #28a745 0%, #218838 100%);
     color: white;
 }
 
+#saveChanges:hover, 
+#confirmAddUser:hover, 
+#removeUsers:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#closePopup {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+#closePopup:hover {
+    background-color: #e9ecef;
+}
 
 /* Remove User Popup Styling */
 .user-list {
@@ -1959,58 +2109,68 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 100%; /* Ensure it doesn't overflow horizontally */
+    padding-right: 5px;
+}
+
+.user-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.user-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.user-list::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 4px;
+}
+
+.user-list::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
 }
 
 .user-item {
-    background-color: #f9f9f9;
+    background-color: white;
     padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
     text-align: center;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    width: 100%; /* Ensure it doesn't overflow horizontally */
-    box-sizing: border-box; /* Include padding and border in the width */
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .user-item:hover {
-    background-color: #f1f1f1;
-    transform: scale(1.02);
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .user-item.selected {
-    background-color: #ffcccc;
-    border-color: #ff9999;
+    background: linear-gradient(145deg, #ff6b6b 0%, #f03e3e 100%);
+    color: white;
+    border-color: #f03e3e;
 }
 
-.user-item input {
-    margin-right: 10px;
-}
-
-.user-item label {
-    cursor: pointer;
-}
-
-.add-user-btn{
-    margin-right: 5px;
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-/*Toggle Switch for the user section*/
-/* User Toggle Switch Styling */
+/* Toggle Switch Styling */
 .user-toggle-switch-container {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.user-toggle-switch-container label:first-child {
+    margin-right: 10px;
+    color: #495057;
+    font-weight: 500;
 }
 
 .user-toggle-switch {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 24px;
+    width: 60px;
+    height: 30px;
     margin: 0 10px;
 }
 
@@ -2029,34 +2189,46 @@ input:checked + .slider:before {
     bottom: 0;
     background-color: #ccc;
     transition: 0.4s;
-    border-radius: 24px;
+    border-radius: 34px;
 }
 
 .user-slider:before {
     position: absolute;
     content: "";
-    height: 20px;
-    width: 20px;
-    left: 2px;
-    bottom: 2px;
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
     background-color: white;
     transition: 0.4s;
     border-radius: 50%;
 }
 
 input:checked + .user-slider {
-    background-color: #0D3B66;
+    background: linear-gradient(145deg, #0D3B66 0%, #1a5a94 100%);
 }
 
 input:checked + .user-slider:before {
-    transform: translateX(26px);
+    transform: translateX(30px);
 }
 
 #user-roleLabel {
-    font-weight: bold;
+    font-weight: 600;
     color: #0D3B66;
+    min-width: 50px;
 }
 
+/* Empty State Styles */
+.admin-bar > p, 
+.staff-grid > p {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+}
 /* User Profile Section ENDS HERE */
 /* Delete Order popup in todaysOrders STARTS HERE*/
 /* Delete Order Popup Styling */
