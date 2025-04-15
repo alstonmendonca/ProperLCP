@@ -15,7 +15,7 @@ async function updateMainContent(contentType) {
     ];
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
-        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes', 'SpecialStatistics', 'MenuProfitability',
+        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes', 'SpecialStatistics', 'TaxOnItems',
         'Charts', 'RateOfSale', 'BestInCategory'
     ];
     const settingsButtons = [
@@ -212,8 +212,8 @@ async function updateMainContent(contentType) {
         else if (contentType === "SpecialStatistics") {
             loadSpecialStatistics(mainContent, billPanel);
         }
-        else if (contentType === "MenuProfitability") {
-            loadMenuProfitability(mainContent, billPanel);
+        else if (contentType === "TaxOnItems") {
+            loadTaxOnItems(mainContent, billPanel);
         }
         else if (contentType === "BestInCategory") {
             loadBestInCategory(mainContent, billPanel);

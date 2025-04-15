@@ -821,6 +821,38 @@ ipcMain.on('get-best-in-category', (event, { startDate, endDate }) => {
         }
     });
 });
+
+ipcMain.on('get-tax-on-items', (event, { startDate, endDate }) => {
+    const query = `
+        SELECT 
+            f.fname,
+            SUM(od.quantity) as total_quantity,
+            SUM(od.quantity) * f.sgst as total_sgst,
+            SUM(od.quantity) * f.cgst as total_cgst,
+            SUM(od.quantity) * f.tax as total_tax
+        FROM Orders o
+        JOIN OrderDetails od ON o.billno = od.orderid
+        JOIN FoodItem f ON od.foodid = f.fid
+        WHERE o.date BETWEEN ? AND ?
+        GROUP BY f.fid
+        ORDER BY f.fname;
+    `;
+
+    db.all(query, [startDate, endDate], (err, rows) => {
+        if (err) {
+            console.error('Error fetching tax data:', err);
+            event.reply('tax-on-items-response', { 
+                success: false, 
+                error: err.message 
+            });
+        } else {
+            event.reply('tax-on-items-response', {
+                success: true,
+                items: rows
+            });
+        }
+    });
+});
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
 //------------------------------ CATEGORIES TAB --------------------------------
