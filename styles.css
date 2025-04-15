@@ -1674,6 +1674,16 @@ input:checked + .slider:before {
     }
 }
 
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+
 /* Transition for the order box */
 .todays-order-box {
     transition: transform 0.3s ease; /* Smooth transition for scaling */
