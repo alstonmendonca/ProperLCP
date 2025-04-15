@@ -442,6 +442,48 @@ function styleButton(button) {
         button.style.backgroundColor = "#0C345A"; // Restore original color
     });
 }
+
+// Add this function to bill.js
+function printBill(billno) {
+    // Get the order details from the database
+    ipcRenderer.send("get-order-for-printing", billno);
+    
+    // Handle the response
+    ipcRenderer.once("order-for-printing-response", (event, { order, items }) => {
+        if (!order || !items) {
+            createTextPopup("Failed to load order details for printing");
+            return;
+        }
+        
+        // Prepare the data for printing
+        const printData = {
+            billItems: items.map(item => ({
+                name: item.fname,
+                quantity: item.quantity,
+                price: item.price * item.quantity
+            })),
+            totalAmount: order.price,
+            kot: order.kot,
+            orderId: order.billno,
+            dateTime: order.date
+        };
+        
+        // Send to main process for printing
+        ipcRenderer.send("print-bill", printData);
+        
+        // Handle print result
+        ipcRenderer.once('print-success', () => {
+            createTextPopup("Bill printed successfully");
+        });
+        
+        ipcRenderer.once('print-error', (event, error) => {
+            createTextPopup(`Print Failed: ${error}`);
+        });
+    });
+}
+
+// Make it available globally
+window.printBill = printBill;
 // Edit-mode Bill panel ends here-------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -653,10 +695,6 @@ function closeHeldPopup() {
         popup.remove();
     }
 }
-
-
-
-
 
 // ------------ SAVE TO ORDER FUNCTIONALITY IS HERE ------------------
 // Function to display today's orders in a popup

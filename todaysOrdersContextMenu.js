@@ -17,13 +17,19 @@ function attachTodaysOrdersContextMenu(selector) {
             const billNo = box.getAttribute("data-billno");
             menu.innerHTML = `
                 <div class="context-option" id="deleteOrder">🗑️ Delete Order (Bill No: ${billNo})</div>
-                <div class="context-option">🔄 Print Bill (Bill No: ${billNo})</div>
+                <div class="context-option" id="printBill">🖨️ Print Bill (Bill No: ${billNo})</div>
                 <div class="context-option">📄 View Details</div>
             `;
 
             // Handle delete order
             menu.querySelector("#deleteOrder").addEventListener("click", () => {
                 openDeleteOrderPopup(billNo, "todaysOrders");
+                menu.remove();
+            });
+
+            // Handle print bill
+            menu.querySelector("#printBill").addEventListener("click", () => {
+                printBill(billNo);
                 menu.remove();
             });
 

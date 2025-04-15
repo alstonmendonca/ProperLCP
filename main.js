@@ -995,6 +995,56 @@ ${'-'.repeat(32)}
     return customerReceipt + kotReceipt;
 }
 
+ipcMain.on('get-order-for-printing', (event, billno) => {
+    // First get the order header
+    const orderQuery = `
+        SELECT * FROM Orders WHERE billno = ?;
+    `;
+    
+    // Updated query to calculate item price based on order total and quantities
+    const itemsQuery = `
+        SELECT 
+            f.fname,
+            od.quantity,
+            (o.price / (SELECT SUM(quantity) FROM OrderDetails WHERE orderid = o.billno)) as item_price
+        FROM OrderDetails od
+        JOIN FoodItem f ON od.foodid = f.fid
+        JOIN Orders o ON od.orderid = o.billno
+        WHERE od.orderid = ?;
+    `;
+    
+    db.get(orderQuery, [billno], (err, order) => {
+        if (err) {
+            console.error('Error fetching order:', err);
+            event.reply('order-for-printing-response', { error: err.message });
+            return;
+        }
+        
+        if (!order) {
+            event.reply('order-for-printing-response', { error: 'Order not found' });
+            return;
+        }
+        
+        db.all(itemsQuery, [billno], (err, items) => {
+            if (err) {
+                console.error('Error fetching order items:', err);
+                event.reply('order-for-printing-response', { error: err.message });
+                return;
+            }
+            
+            // Calculate total price for each item (quantity * item_price)
+            const processedItems = items.map(item => ({
+                ...item,
+                price: item.quantity * item.item_price
+            }));
+            
+            event.reply('order-for-printing-response', { 
+                order, 
+                items: processedItems 
+            });
+        });
+    });
+});
 //-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS
 ipcMain.on('get-held-orders', (event) => {
