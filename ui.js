@@ -451,10 +451,11 @@ async function updateMainContent(contentType) {
             mainContent.style.marginRight = "0px";
             billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
-                <h1>Filter History</h1>
-                <div id="customersDiv"></div>
+                <div class='section-title'>
+                    <h2>Filter History</h2>
+                </div>
+                <p>Coming Soon...</p>
             `;
-            
         }
         else if (contentType === 'itemHistory') {
             mainContent.style.marginLeft = "200px";
@@ -538,8 +539,10 @@ async function updateMainContent(contentType) {
             mainContent.style.marginRight = "0px";
             billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
-                <h1>Make Your Own Table</h1>
-                <div id="makeATableDiv"></div>
+                <div class='section-title'>
+                    <h2>Make A Table</h2>
+                </div>
+                <p>Coming Soon...</p>
             `;
         }
         else if(contentType === "yourTables"){
@@ -547,8 +550,10 @@ async function updateMainContent(contentType) {
             mainContent.style.marginRight = "0px";
             billPanel.style.display = 'none'; 
             mainContent.innerHTML = `
-                <h1>Your Tables</h1>
-                <div id="yourTablesDiv"></div>
+                <div class='section-title'>
+                    <h2>Your Tables</h2>
+                </div>
+                <p>Coming Soon...</p>
             `;
         }
 

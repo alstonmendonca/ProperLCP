@@ -52,11 +52,11 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="TopSellingItems" onclick="updateMainContent('TopSellingItems')">Top Selling Items</button>
                 <button class="category" id="TopSellingCategory" onclick="updateMainContent('TopSellingCategory')">Top Selling Category</button>
                 <button class="category" id="EmployeeAnalysis" onclick="updateMainContent('EmployeeAnalysis')">Employee Analysis</button>
-                <button class="category" id="MenuProfitability" onclick="updateMainContent('MenuProfitability')">Menu Profitability</button>
-                <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
                 <button class="category" id="SpecialStatistics" onclick="updateMainContent('SpecialStatistics')">Special Statistics</button>
                 <button class="category" id="Charts" onclick="updateMainContent('Charts')">Charts</button>
                 <button class="category" id="BestInCategory" onclick="updateMainContent('BestInCategory')">Best In Category</button>
+                <button class="category" id="MenuProfitability" onclick="updateMainContent('MenuProfitability')">Menu Profitability</button>
+                <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
             `;
             break;
 
