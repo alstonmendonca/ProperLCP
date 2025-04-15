@@ -2314,4 +2314,31 @@ ipcMain.on("exit-app", (event) => {
     }
 });
 
+// --------------------------------- BUSINESS INFO SECTION -----------------------------
+const savePath = path.join(__dirname, 'businessInfo.json');
+
+ipcMain.on('save-business-info', (event, businessData) => {
+    fs.writeFile(savePath, JSON.stringify(businessData, null, 4), 'utf-8', (err) => {
+        if (err) {
+            console.error('Error saving business info:', err);
+            event.reply('save-business-info-response', { success: false, message: err.message });
+        } else {
+            console.log('Business info saved to:', savePath);
+            event.reply('save-business-info-response', { success: true });
+        }
+    });
+});
+
+const dataPath = path.join(__dirname, 'businessInfo.json');
+
+ipcMain.handle('load-business-info', async () => {
+    try {
+        const fileData = await fs.promises.readFile(dataPath, 'utf-8');
+        return JSON.parse(fileData);
+    } catch (err) {
+        console.error('Failed to load business info:', err);
+        return null; // or return default data if file is missing
+    }
+});
+// ------------------------------- BUSINESS INFO SECTION ENDS HERE ------------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');
