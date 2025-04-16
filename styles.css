@@ -65,6 +65,7 @@ body {
     height: calc(100vh - 50px); /* Full height minus top panel */
     overflow-y: auto; /* Enable vertical scrolling */
     scrollbar-gutter: stable; /* Isn't this line pointless?? It doesn't store the scroll positions */
+    background-color: #555;
 }
 
 /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
@@ -1347,7 +1348,7 @@ input:checked + .slider:before {
 
 /* Category Box Styles */
 .category-box {
-    background-color: #18456fe8; /* Green background for category boxes */
+    background-color: #18456fe8; 
     color: white; /* White text color */
     font-size: 20px;
     padding: 20px; /* Padding inside the box */
@@ -1363,7 +1364,6 @@ input:checked + .slider:before {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
 }
 
-/* Category Actions Styles
 /* Category Actions Styles */
 .category-actions {
     display: flex; /* Use flexbox for layout */

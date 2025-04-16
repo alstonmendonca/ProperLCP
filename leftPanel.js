@@ -99,14 +99,11 @@ async function updateLeftPanel(contentType) {
             categoryPanel.innerHTML = `
                 <button class="category" id="UserProfile" onclick="updateMainContent('UserProfile')">User Profile</button>
                 <button class="category" id="BusinessInfo" onclick="updateMainContent('BusinessInfo')">Business Information</button>
-                <button class="category" id="ThemeToggle" onclick="updateMainContent('ThemeToggle')">Light/Dark Mode</button>
                 <button class="category" id="DisplaySettings" onclick="updateMainContent('DisplaySettings')">Display Settings</button>
                 <button class="category" id="TaxAndDiscount" onclick="updateMainContent('TaxAndDiscount')">Tax and Discounts</button>
                 <button class="category" id="PrinterConfig" onclick="updateMainContent('PrinterConfig')">Printer Configuration</button>
                 <button class="category" id="Receipt" onclick="updateMainContent('Receipt')">Receipt</button>
-                <button class="category" id="DateAndTime" onclick="updateMainContent('DateAndTime')">Date And Time</button>
                 <button class="category" id="ConnectedDevices" onclick="updateMainContent('ConnectedDevices')">Connected Devices</button>
-                <button class="category" id="Security" onclick="updateMainContent('Security')">Security</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>
             `;

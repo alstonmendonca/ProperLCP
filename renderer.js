@@ -49,7 +49,6 @@ const {sortDeletedOrdersTable} = require('./deletedOrdersTable');
 const {loadPrinterConfig} = require('./printerConfig');
 const {showOrderDetails} = require('./todaysOrders');
 const {closeOrderDetails} = require('./todaysOrders');
-const {loadThemeToggle} = require('./themeToggle');
 const {loadHome} = require('./home');
 const { updateLeftPanel } = require("./leftPanel"); // Add this import
 const { loadCategories } = require("./categoriesList");
