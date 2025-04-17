@@ -68,7 +68,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
 
     if (orders.length === 0) {
         todaysOrdersDiv.innerHTML = `
-            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin: 0;">
+            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 78vh; margin-top: 20px;">
                 <div>
                     <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
                         No Orders For Today
