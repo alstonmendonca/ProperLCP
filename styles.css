@@ -1371,32 +1371,47 @@ input:checked + .slider:before {
 }
 
 .category-box h3 {
-    margin: 0 0 10px;
+    margin: 0 0 15px; /* Increase bottom margin */
+    padding-bottom: 10px; /* Add padding for the underline */
+    border-bottom: 2px solid white; /* Subtle underline */
     font-size: 1.2rem;
     color: #ffffff;
     font-weight: 600;
 }
 
+/* Replace the existing .category-meta styles with these */
 .category-meta {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* Stack vertically */
+    gap: 8px; /* Space between rows */
     margin-bottom: 15px;
-    font-size: 0.85rem;
+    width: 100%; /* Take full width */
 }
 
 .category-id {
-    color: #ffffff;
+    font-size: 0.95rem; /* Larger font size */
+    color: #ffffff; /* Example color - change as needed */
+    text-align: center; /* Align to center */
+    padding: 4px 0;
+    width: 100%;
 }
 
 .status-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.95rem; /* Larger font size */
     font-weight: 500;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Adjust the status badge SVG size */
+.status-badge svg {
+    width: 14px;
+    height: 14px;
 }
 
 .status-badge.active {

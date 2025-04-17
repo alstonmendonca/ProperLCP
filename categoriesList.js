@@ -60,9 +60,9 @@ ipcRenderer.on("categories-list-response", (event, data) => {
             <div class="category-box">
                 <h3>${category.catname}</h3>
                 <div class="category-meta">
-                    <span class="category-id">ID: ${category.catid}</span>
+                    <div class="category-id">ID: ${category.catid}</div>
                     <span class="status-badge ${category.active === 1 ? 'active' : 'inactive'}">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             ${category.active === 1 ? 
                                 '<circle cx="12" cy="12" r="10"></circle>' : 
                                 '<path d="M10 10l4 4m0-4l-4 4"></path>'
