@@ -1040,9 +1040,6 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
             <div class="sto-empty-submessage">
                 Come back after placing an order!
             </div>
-            <button id='sto-goHomeButton' class="sto-empty-button">
-                Place an Order
-            </button>
         </div>
         `;
     } else {
