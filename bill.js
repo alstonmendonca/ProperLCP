@@ -828,7 +828,7 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
         padding: 1rem;
         display: grid;
         gap: 0.5rem;
-        max-height: 150px;
+        height: 150px;
         overflow-y: auto;
     }
 
@@ -1006,66 +1006,89 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
         return;
     }
 
-    let popup = document.createElement("div");
-    popup.id = "todaysOrdersPopup";
-    popup.classList.add("edit-popup");
+    // Create popup container
+    const popup = document.createElement("div");
+    popup.id = "sto-popup";
+    popup.classList.add("sto-popup", "popup-entrance");
+
+    // Create overlay
+    const overlay = document.createElement("div");
+    overlay.classList.add("sto-popup-overlay");
+    document.body.appendChild(overlay);
 
     let popupContent = `
-        <div class="popup-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 850px;">
-            <div style="width: 100%; display: flex; justify-content: flex-end;">
-                <span class="close-btn" onclick="closeTodaysOrdersPopup()" style="cursor: pointer; font-size: 20px; font-weight: bold;">&times;</span>
-            </div>
+    <div class="sto-popup-container">
+        <div class="sto-popup-header">
+            <div class="sto-spacer"></div>
+            <h2 class="sto-popup-title">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                    <path d="M9 12l2 2l4 -4"/>
+                </svg>
+                Today's Orders
+            </h2>
+            <button class="sto-close-btn" onclick="closeTodaysOrdersPopup()">×</button>
+        </div>
     `;
 
     if (data.orders.length === 0) {
         popupContent += `
-            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 50vh; width: 100%;">
-                <div style="font-size: 36px; font-weight: bold; margin-bottom: 20px;">
-                    No Orders For Today
-                </div>
-                <div style="font-size: 18px; margin-bottom: 30px;">
-                    Come back after placing an order!
-                </div>
-                <button id='goHomeButton' style="font-size: 18px; color: #fff; background-color: #1DB954; padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer;">
-                    Place an Order
-                </button>
+        <div class="sto-empty-state">
+            <div class="sto-empty-message">
+                No Orders For Today
             </div>
+            <div class="sto-empty-submessage">
+                Come back after placing an order!
+            </div>
+        </div>
         `;
     } else {
         popupContent += `
-            <h3>Today's Orders</h3>
-            <div class="custom-scrollbar" style="max-height: 550px; overflow-y: auto; width: 100%; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+        <div class="sto-orders-grid">
         `;
 
         data.orders.forEach(order => {
             let itemsArray = order.food_items ? order.food_items.split(", ") : ["No items"];
-            let itemsGrid = "";
-
-            itemsArray.forEach(item => {
-                itemsGrid += `<div style="padding: 3px; border: 1px solid #ddd; font-size: 12px; text-align: center; flex-grow: 1; flex-basis: 48%; height: 40px; display: flex; justify-content: center; align-items: center; background: #f1f1f1;">${item}</div>`;
-            });
-
+            
             popupContent += `
-                <div style="border: 2px solid #333; width: 350px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); height: 250px; display: flex; flex-direction: column;">
-                    <div style="border-bottom: 2px solid #333; padding-bottom: 5px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
-                        <span>BILL NO: ${order.billno}</span>
-                        <span>KOT: ${order.kot || "N/A"}</span>
+            <div class="sto-order-card" data-billno="${order.billno}">
+                <div class="sto-card-header">
+                    <span class="sto-order-id">#${order.billno}</span>
+                    <span class="sto-cashier-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M4 21v-2a4 4 0 0 1 3-3.87"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        ${order.cashier_name}
+                    </span>
+                    <span class="sto-kot-badge">KOT: ${order.kot || "N/A"}</span>
+                </div>
+
+                <div class="sto-order-items">
+                    ${itemsArray.map(item => `
+                    <div class="sto-order-item">
+                        <span class="sto-item-name">${item}</span>
+                    </div>`).join('')}
+                </div>
+
+                <div class="sto-card-footer">
+                    <div class="sto-order-total">
+                        <span class="sto-total-label">Total:</span>
+                        <span class="sto-total-amount">₹${order.price.toFixed(2)}</span>
                     </div>
-                    <div style="padding: 5px; flex-grow: 1; display: flex; flex-direction: column;">
-                        <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Cashier: ${order.cashier_name}</div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; flex-grow: 1; max-height: 120px; overflow-y: auto;">
-                            ${itemsGrid}
-                        </div>
-                        <div style="text-align: right; font-size: 16px; font-weight: bold; margin-top: auto;">
-                            Total: ₹${order.price.toFixed(2)}
-                        </div>
-                    </div>
-                    <div style="border-top: 2px solid #333; padding-top: 5px; text-align: right;">
-                        <button onclick="addToExistingOrder(${order.billno})" style="background-color: #1db954; color: white; padding: 5px 10px; border: none; border-radius: 5px; width:100%; height:30px">
+
+                    <div class="sto-action-buttons">
+                        <button class="sto-btn-add" onclick="addToExistingOrder(${order.billno})">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
                             Add to Order
                         </button>
                     </div>
                 </div>
+            </div>
             `;
         });
 
@@ -1076,13 +1099,247 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
     popup.innerHTML = popupContent;
     document.body.appendChild(popup);
 
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+    .sto-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        z-index: 999;
+    }
+
+    .sto-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.06);
+        width: 90%;
+        max-width: 1000px;
+        max-height: 90vh;
+        overflow: hidden;
+        animation: popupEntrance 0.3s ease-out;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        z-index: 1000;
+    }
+
+    .sto-popup-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .sto-popup-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(135deg, #0D3B66, #0D3B66);
+        color: white;
+        padding: 0.5rem 1rem;
+    }
+
+    .sto-popup-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        justify-content: center;
+        pointer-events: none;
+        margin: 0;
+    }
+
+    .sto-spacer {
+        width: 40px;
+    }
+
+    .sto-close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        padding: 0.25rem 0.75rem;
+        line-height: 1;
+        border-radius: 8px;
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    .sto-close-btn:hover {
+        transform: scale(1.1);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .sto-orders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 1.5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .sto-empty-state {
+        text-align: center;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 50vh;
+        width: 100%;
+    }
+
+    .sto-empty-message {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+
+    .sto-empty-submessage {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #7f8c8d;
+    }
+
+    .sto-empty-button {
+        font-size: 1.2rem;
+        color: #fff;
+        background-color: #28a745;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .sto-empty-button:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+    }
+
+    .sto-order-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+        animation: fadeInUp 0.3s ease both;
+    }
+
+    .sto-order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .sto-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #e0eafc, #cfdef3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .sto-order-id {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .sto-cashier-badge, .sto-kot-badge {
+        background: #e9ecef;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .sto-order-items {
+        padding: 1rem;
+        display: grid;
+        gap: 0.5rem;
+        height: 150px;
+        overflow-y: auto;
+    }
+
+    .sto-order-item {
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .sto-card-footer {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .sto-order-total {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .sto-action-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .sto-btn-add {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        font-weight: 500;
+        background: #28a745;
+        color: white;
+        width: 100%;
+    }
+
+    .sto-btn-add:hover {
+        filter: brightness(0.95);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    `;
+    document.head.appendChild(style);
+
+    // Add event listeners
+    overlay.addEventListener('click', closeTodaysOrdersPopup);
+    
     if (data.orders.length === 0) {
-        document.getElementById('goHomeButton').addEventListener('click', function () {
+        document.getElementById('sto-goHomeButton').addEventListener('click', function() {
             document.getElementById('Home').click();
         });
     }
 });
 
+// Function to add current bill items to an existing order
 // Function to add current bill items to an existing order
 function addToExistingOrder(orderId) {
     // Get all bill items
@@ -1104,8 +1361,12 @@ function addToExistingOrder(orderId) {
     // Send order data to main process
     ipcRenderer.send("add-to-existing-order", { orderId, orderItems });
 
-    // Close the popup after adding
-    document.getElementById("todaysOrdersPopup").remove();
+    // Close the popup and overlay after adding
+    const popup = document.getElementById("sto-popup");
+    const overlay = document.querySelector(".sto-popup-overlay");
+    if (popup) popup.remove();
+    if (overlay) overlay.remove();
+    
     resetBill();
     // Add the glow effect to the bill panel
     const billPanel = document.getElementById("bill-panel");
@@ -1114,15 +1375,17 @@ function addToExistingOrder(orderId) {
     // Remove the glow effect after 2 seconds
     setTimeout(() => {
         billPanel.classList.remove("glow");
-    },800);
+    }, 800);
     
     NewOrder();
 }
 
 // Close popup function
 function closeTodaysOrdersPopup() {
-    let popup = document.getElementById("todaysOrdersPopup");
+    const popup = document.getElementById("sto-popup");
+    const overlay = document.querySelector(".sto-popup-overlay");
     if (popup) popup.remove();
+    if (overlay) overlay.remove();
 }
 // ------------ SAVE TO ORDER FUNCTIONALITY ENDS HERE ------------------
 function NewOrder() {
