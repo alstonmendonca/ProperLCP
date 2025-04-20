@@ -2379,22 +2379,12 @@ ipcMain.on('refresh-menu', (event) => {
 });
 //EXIT THE APP
 // Event listener to handle exit request
+// Event listener to handle exit request
 ipcMain.on("exit-app", (event) => {
-    // Show a confirmation dialog
-    const choice = dialog.showMessageBoxSync({
-        type: "question",
-        buttons: ["Cancel", "Exit"],
-        defaultId: 1,
-        title: "Confirm Exit",
-        message: "Are you sure you want to exit?",
-    });
-
-    if (choice === 1) {
-        // Close the database connection before quitting
-        closeDatabase();
-        app.quit(); // Close the app
-    }
-});
+    // Close the database connection before quitting
+      closeDatabase();
+       app.quit(); // Close the app
+  });
 
 // --------------------------------- BUSINESS INFO SECTION -----------------------------
 const savePath = path.join(__dirname, 'businessInfo.json');

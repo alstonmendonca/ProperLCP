@@ -312,7 +312,12 @@ async function updateMainContent(contentType) {
             `;
         }
         else if (contentType === "Exit") {
-            ipcRenderer.send("exit-app");
+            const  {createConfirmPopup} = require("./textPopup");
+            createConfirmPopup("Are you sure you want to exit?", (confirmed) => {
+                if (confirmed) {
+                    ipcRenderer.send('exit-app');
+                }
+            });
         }
     // --------------------------------SETTINGS END HERE----------------------------------------------------- 
         
@@ -426,9 +431,9 @@ async function updateMainContent(contentType) {
             document.getElementById("fetchDiscountedOrdersBtn").addEventListener("click", () => {
                 const startDate = document.getElementById("startDate").value;
                 const endDate = document.getElementById("endDate").value;
-        
+                const  {createTextPopup} = require("./textPopup");
                 if (startDate > endDate) {
-                    alert("Start date cannot be later than end date.");
+                    createTextPopup("Start date cannot be later than end date.");
                     return;
                 }
         
@@ -585,12 +590,13 @@ function clearDeletedOrders() {
 }
 
 ipcRenderer.on("clear-deleted-orders-response", (event, data) => {
+    const  {createTextPopup} = require("./textPopup");
     if (data.success) {
-        alert("Deleted orders cleared successfully.");
+        createTextPopup("Deleted orders cleared successfully.");
         // Optionally, refresh the displayed deleted orders
         fetchDeletedOrders();
     } else {
-        alert("Failed to clear deleted orders.");
+        createTextPopup("Failed to clear deleted orders.");
     }
 });
 

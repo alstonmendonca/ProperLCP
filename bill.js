@@ -933,10 +933,16 @@ ipcRenderer.on('held-order-details-data', (event, foodDetails, heldId) => {
 });
 
 
+// Function to delete a held order
 function deleteHeldOrder(heldId) {
-    if (confirm("Are you sure you want to delete this held order?")) {
-        ipcRenderer.send('delete-held-order', heldId);
-    }
+    const  {createConfirmPopup} = require("./textPopup");
+    // Show the custom confirmation popup and handle the user's response
+    createConfirmPopup("Are you sure you want to delete this held order?", (confirmed) => {
+        if (confirmed) {
+            // User clicked OK, send the delete request
+            ipcRenderer.send('delete-held-order', heldId);
+        } 
+    });
 }
 
 // Handle held order deletion
