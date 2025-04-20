@@ -13,11 +13,32 @@ function loadCategories(mainContent, billPanel) {
                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
             </svg> Categories</h2>
         </div>
+        <div class="search-container">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="categorySearch" placeholder="Search categories...">
+        </div>
         <div id="categoriesTabDiv"></div>
     `;
-    
+    document.getElementById("categorySearch").addEventListener("input", filterCategories);
     billPanel.style.display = 'none';
     fetchCategoriesList();
+}
+
+function filterCategories() {
+    const searchTerm = document.getElementById("categorySearch").value.toLowerCase();
+    const categoryBoxes = document.querySelectorAll(".category-box:not(#addCategoryBox)");
+    
+    categoryBoxes.forEach(box => {
+        const categoryName = box.querySelector("h3").textContent.toLowerCase();
+        if (categoryName.includes(searchTerm)) {
+            box.style.display = "flex";
+        } else {
+            box.style.display = "none";
+        }
+    });
 }
 
 function fetchCategoriesList() {
