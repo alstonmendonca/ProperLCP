@@ -8,10 +8,7 @@ function loadCategories(mainContent, billPanel) {
     
     mainContent.innerHTML = `
         <div class='section-title'>
-            <h2><svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg> Categories</h2>
+            <h2>Categories</h2>
         </div>
         <div class="search-container">
             <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

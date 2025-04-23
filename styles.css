@@ -1659,16 +1659,29 @@ input:checked + .slider:before {
     font-size: 1.1rem;
     margin: 0;
 }
+ /* Section Title Styles */
+.section-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-/* Section Title Styles */
 .section-title h2 {
     display: flex;
+    justify-content: center; /* Center content inside h2 */
     align-items: center;
     gap: 10px;
+
+    font-size: 2.5rem;
+    font-weight: bold;
     color: #2c3e50;
-    font-size: 1.5rem;
-    margin-bottom: 0;
+    margin-bottom: 20px;
+
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #0D3B66;
 }
+
 
 .section-title .icon {
     stroke-width: 1.5;
@@ -1949,14 +1962,14 @@ input:checked + .slider:before {
 /* Center the header and make it visually appealing */
 .todays-orders-header, .order-history-header, .category-history-header, .deleted-orders-header, .discounted-orders-header, .item-history-header,
 .item-summary-header, .category-wise-sales-header, .top-selling-items-header, .top-selling-categories-header, .day-end-summary-header, .categories-title,
-.customer-header, .business-info-header, .theme-toggle-header, .display-settings-header, .section-title {
+.customer-header, .business-info-header, .theme-toggle-header, .display-settings-header {
     text-align: center; /* Center the content */
     margin-bottom: 20px; /* Add some spacing below the header */
 }
 
 .todays-orders-header h1, .order-history-header h1, .category-history-header h1, .deleted-orders-header h1, .discounted-orders-header h1, .item-history-header h1,
 .item-summary-header h2, .category-wise-sales-header h2, .top-selling-items-header h2, .top-selling-categories-header h2, .day-end-summary-header h2,
-.categories-title h2, .customer-header h2, .business-info-header h1, .theme-toggle-header h2, .display-settings-header h2, .section-title h2{
+.categories-title h2, .customer-header h2, .business-info-header h1, .theme-toggle-header h2, .display-settings-header h2{
     font-size: 2.5rem; /* Increase font size */
     font-weight: bold; /* Make it bold */
     color: #2c3e50; /* Use a dark, professional color */

@@ -143,7 +143,4 @@ function createConfirmPopup(message, callback) {
 }
 
 
-
-
-module.exports = { createTextPopup};
-module.exports = { createConfirmPopup};
+module.exports = { createTextPopup, createConfirmPopup};

@@ -1,6 +1,8 @@
 const  {createTextPopup} = require("./textPopup");
 // Add an item to the bill
 function addToBill(itemId, itemName, price, quantity, category = null) {
+    const  {createTextPopup} = require("./textPopup");
+
     if (quantity > 0) {
         const totalPrice = price * quantity;
         const billItemsList = document.getElementById("bill-items-list");
