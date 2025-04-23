@@ -1653,6 +1653,19 @@ ipcMain.on("show-excel-export-message", (event, options) => {
     });
 });
 
+ipcMain.handle("show-save-dialog", async (event, defaultFilename) => {
+    const result = await dialog.showSaveDialog({
+        title: "Save Excel File",
+        defaultPath: defaultFilename,
+        filters: [
+            { name: "Excel Files", extensions: ["xlsx"] },
+            { name: "All Files", extensions: ["*"] },
+        ],
+    });
+
+    // result.filePath is null if the user cancels the dialog
+    return result.canceled ? null : result.filePath;
+});
 // Fetch Customers
 ipcMain.on("get-customers", (event) => {
     const query = `

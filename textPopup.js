@@ -1,5 +1,5 @@
 //textPopup.js
-
+// for a popup with only ok button
 function createTextPopup(message) {
     // Remove existing popup if it exists
     let existingPopup = document.getElementById("custom-popup");
@@ -61,7 +61,7 @@ function createTextPopup(message) {
         popup.remove();
     });
 }
-
+// for ok and cancel buttons
 function createConfirmPopup(message, callback) {
     // Remove existing popup if it exists
     let existingPopup = document.getElementById("custom-confirm-popup");
