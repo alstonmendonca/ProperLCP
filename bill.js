@@ -207,6 +207,36 @@ function updateBillTotal() {
     }
 }
 
+async function DeductInventory() {
+    try {
+        // Find all food items currently in the bill
+        const billItems = document.querySelectorAll(".bill-item");
+
+        // Track inventory usage per item
+        for (const item of billItems) {
+            const foodId = parseInt(item.id.replace("bill-item-", ""));
+            const quantity = parseInt(item.querySelector(".bill-quantity").value);
+
+            // Request inventory dependencies for this food item from the main process
+            const inventoryItems = await ipcRenderer.invoke("get-inventory-for-food", foodId);
+
+            // Use a for...of loop instead of forEach for async handling
+            for (const invItem of inventoryItems) {
+                // Send deduction request to main process
+                await ipcRenderer.invoke("deduct-inventory-stock", {
+                    foodId: foodId, // Pass foodId as well if needed
+                    invId: invItem.inv_no,  // Correct reference to inventory ID
+                    quantity: quantity
+                });
+            }
+        }
+    } catch (err) {
+        console.error("Error deducting inventory:", err);
+        createTextPopup("Failed to deduct inventory.");
+    }
+}
+
+
 // Function to only save the bill
 function saveBill() {
     const cashier = 1; // Replace with actual cashier ID
@@ -237,7 +267,7 @@ function saveBill() {
 
     // Send order data to main process with discount applied (or not)
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
-
+    DeductInventory();
     // Add the glow effect to the bill panel
     const billPanel = document.getElementById("bill-panel");
     billPanel.classList.add("glow");
