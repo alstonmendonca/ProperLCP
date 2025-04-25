@@ -94,6 +94,10 @@ async function updateLeftPanel(contentType) {
             categoryPanel.style.display = "none";
             break;
 
+        case "Inventory":
+            categoryPanel.style.display = "none";
+            break;
+
         case "Settings":
             categoryPanel.style.display = "block";
             categoryPanel.innerHTML = `

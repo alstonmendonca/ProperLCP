@@ -1,3 +1,4 @@
+const { loadInventory } = require('./inventoryList');
 const { loadYearWiseAnalysis } = require('./yearWise');
 
 // Function to handle category button clicks
@@ -7,7 +8,7 @@ async function updateMainContent(contentType) {
 
 //--------------------------------------- CATEGORY PANEL AND TOP PANEL SESSION STORAGE STARTS HERE ----------------------------------------
     // List of top-panel button IDs
-    const topPanelButtons = ["Home", "Menu", "History", "Categories", "Analytics", "Settings"];
+    const topPanelButtons = ["Home", "Menu", "History", "Categories", "Analytics","Inventory", "Settings"];
     const historyButtons = [
         'todaysOrders', 'orderHistory', 'categoryHistory', 'itemHistory', 
         'deletedOrders', 'discountedOrders', 'dayWise', 'monthWise', 
@@ -228,6 +229,11 @@ async function updateMainContent(contentType) {
             loadCategories(mainContent, billPanel);
         }        
         //--------------------------------CATEGORIES END HERE-----------------------------------------------------
+        //--------------------------------INVENTORY STARTS HERE-----------------------------------------------------
+        else if (contentType === "Inventory") {
+            loadInventory(mainContent, billPanel); 
+        }
+        //--------------------------------INVENTORY ENDS HERE-----------------------------------------------------
         // --------------------------------SETTINGS START HERE-----------------------------------------------------
         // SETTINGS TAB
         else if (contentType === "UserProfile" || contentType === "Settings") {

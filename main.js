@@ -855,7 +855,7 @@ ipcMain.on('get-tax-on-items', (event, { startDate, endDate }) => {
 });
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
-//------------------------------ CATEGORIES TAB --------------------------------
+//------------------------------ CATEGORIES STARTS HERE --------------------------------
 // Listen for request to get categories
 ipcMain.on("get-categories-list", (event) => {
     const query = "SELECT catid, catname, active FROM Category";
@@ -2069,6 +2069,109 @@ ipcMain.on('get-year-wise-data', (event) => {
     });
 });
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
+
+//--------------------------------------- INVENTORY TAB STARTS HERE--------------------------------------------
+// Inventory database operations
+// Get Inventory List
+ipcMain.on("get-inventory-list", (event) => {
+    const query = "SELECT inv_no, inv_item, current_stock FROM Inventory ORDER BY inv_item COLLATE NOCASE";
+    
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching inventory:", err.message);
+            event.reply("inventory-list-response", { success: false, inventory: [] });
+            return;
+        }
+
+        event.reply("inventory-list-response", { success: true, inventory: rows });
+    });
+});
+
+// Delete Inventory Item
+ipcMain.on("delete-inventory-item", (event, inv_no) => {
+    const query = "DELETE FROM Inventory WHERE inv_no = ?";
+    
+    db.run(query, [inv_no], function (err) {
+        if (err) {
+            console.error("Error deleting inventory item:", err.message);
+            return;
+        }
+
+        console.log(`Inventory Item ID ${inv_no} deleted successfully.`);
+        event.reply("inventory-item-deleted"); // Notify renderer to refresh UI
+    });
+});
+
+// Add New Inventory Item
+ipcMain.on("add-inventory-item", (event, itemData) => {
+    const { inv_item, current_stock } = itemData;
+
+    const sql = "INSERT INTO Inventory (inv_item, current_stock) VALUES (?, ?)";
+    db.run(sql, [inv_item, current_stock], function (err) {
+        if (err) {
+            console.error("Error adding inventory item:", err.message);
+            return;
+        }
+
+        event.sender.send("inventory-item-added");
+
+        if (mainWindow) {
+            mainWindow.webContents.send("inventory-item-updated");
+        }
+    });
+});
+
+// Update Inventory Item
+ipcMain.on("update-inventory-item", (event, updatedData) => {
+    const query = "UPDATE Inventory SET inv_item = ?, current_stock = ? WHERE inv_no = ?";
+
+    db.run(query, [updatedData.inv_item, updatedData.current_stock, updatedData.inv_no], function (err) {
+        if (err) {
+            console.error("Error updating inventory item:", err.message);
+            return;
+        }
+
+        console.log(`Inventory Item ID ${updatedData.inv_no} updated successfully.`);
+        event.sender.send("inventory-item-updated");
+    });
+});
+
+// Restock Inventory Item
+ipcMain.on("restock-inventory-item", (event, restockData) => {
+    const { inv_no, quantity } = restockData;
+    
+    // First get current stock
+    db.get("SELECT current_stock FROM Inventory WHERE inv_no = ?", [inv_no], (err, row) => {
+        if (err) {
+            console.error("Error fetching current stock:", err.message);
+            return;
+        }
+
+        if (row) {
+            const newStock = row.current_stock + quantity;
+            db.run("UPDATE Inventory SET current_stock = ? WHERE inv_no = ?", 
+                [newStock, inv_no], 
+                function(err) {
+                    if (err) {
+                        console.error("Error updating inventory stock:", err.message);
+                        return;
+                    }
+
+                    console.log(`Inventory Item ID ${inv_no} restocked (added ${quantity}). New stock: ${newStock}`);
+                    event.sender.send("inventory-item-restocked");
+                }
+            );
+        }
+    });
+});
+
+// Refresh Inventory List
+ipcMain.on("refresh-inventory", (event) => {
+    if (mainWindow) {
+        mainWindow.webContents.send("inventory-item-updated");
+    }
+});
+//---------------------------------------- INVENTORY TAB ENDS HERE --------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 
 ipcMain.on("get-users", (event) => {
