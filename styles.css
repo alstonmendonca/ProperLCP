@@ -810,6 +810,45 @@ input:checked + .slider:before {
     cursor: pointer;
 }
 
+/* Container for Inventory Dependencies (Checkboxes) */
+#inventory-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+    font-size: 14px;
+}
+
+/* Individual checkbox item style */
+#inventory-checklist div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #fff;
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Hover effect for individual items */
+#inventory-checklist div:hover {
+    background-color: #f0f0f0;
+}
+
+/* Style for the checkboxes */
+#inventory-checklist input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: #4caf50;  /* Custom checkbox color */
+    cursor: pointer;
+}
 
 /* Removed all scrollbar-related CSS */
 /* The Order Histoy Context Menu */
