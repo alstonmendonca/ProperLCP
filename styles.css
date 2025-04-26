@@ -1924,6 +1924,7 @@ input:checked + .slider:before {
     justify-content: space-between;
     margin-top: auto;
     gap: 10px;
+    min-width: 0; /* Allows children to shrink below content size */
 }
 
 .inventory-actions-inv button {
@@ -1939,6 +1940,11 @@ input:checked + .slider:before {
     font-size: 0.85rem;
     font-weight: 500;
     transition: all 0.2s ease;
+    min-width: 0; /* Allows text truncation */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 8px 6px; /* Reduced side padding */
 }
 
 .inventory-actions-inv .restock-btn-inv {
