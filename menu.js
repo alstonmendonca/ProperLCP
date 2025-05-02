@@ -131,7 +131,7 @@ async function displayMenu() {
                         <p>Category: ${item.category_name}</p>
                         <p>Food ID: ${item.fid}</p>
                         <p>Price: ₹${item.cost}</p>
-                        <p><strong>Depends On:</strong> ${item.depend_inv_names || 'None'}</p>
+                        <!-- <p><strong>Depends On:</strong> ${item.depend_inv_names || 'None'}</p> -->
 
                         <!-- Toggle Switches Container -->
                         <div class="toggle-container" style="display: flex; justify-content: center; gap: 18px; align-items: center;">
