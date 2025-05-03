@@ -29,6 +29,7 @@ async function createAuthWindow(authUrl) {
     },
   });
   authWin.loadURL(authUrl);
+  
 }
 
 async function getAccessTokenViaElectron() {
@@ -56,7 +57,13 @@ async function getAccessTokenViaElectron() {
         },
       });
       authWin.loadURL(authUrl);
-  
+      // ✅ Detect manual window closure
+      authWin.on('closed', () => {
+        if (authInProgress) {
+          authInProgress = false;
+          reject(new Error('Authorization window closed by user.'));
+        }
+      });
       const server = appServer.listen(3000, () => {
         // At this point, the auth window should be open and ready
       });
