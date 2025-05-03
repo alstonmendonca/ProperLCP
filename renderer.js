@@ -66,6 +66,7 @@ const { loadSpecialStatistics } = require('./specialStatistics');
 const { loadCharts } = require('./charts');
 const { loadBestInCategory } = require('./bestInCategory');
 const { loadTaxOnItems } = require('./taxOnItems');
+const { loadReceiptEditor } = require("./receiptEditor");
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

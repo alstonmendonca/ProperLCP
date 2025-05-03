@@ -1077,6 +1077,7 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
         });
     });
 });
+//------------------------------------------------Bill Printing Ends Here--------------------------------------------------
 //-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS
 ipcMain.on('get-held-orders', (event) => {

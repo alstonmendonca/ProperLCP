@@ -306,15 +306,15 @@ async function updateMainContent(contentType) {
         else if (contentType === "Help") {
             loadHelpSection();
         }
-        else if (contentType === "SystemUpdates") {
+        else if (contentType === "QRMenu") {
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
             billPanel.style.display = 'none';
             mainContent.innerHTML = `
                 <div class='section-title'>
-                    <h2>System Updates</h2>
+                    <h2>QR Menu</h2>
                 </div>
-                <p>Check for Updates at this link: {link will be provided later}</p>
+                <p>Qr Menu</p>
             `;
         }
         else if (contentType === "Exit") {
