@@ -3,6 +3,7 @@ const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const escpos = require("escpos");
 const fs = require('fs');
+const { backupLCdb } = require("./backup");
 escpos.USB = require("escpos-usb");
 const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
 
@@ -52,12 +53,13 @@ async function checkAndResetFoodItems() {
 }
 
 app.whenReady().then(async () => {
+
     // Initialize store first
     await initStore();
     
     // Then check and reset food items
     await checkAndResetFoodItems();
-
+    
     // Create main window
     mainWindow = new BrowserWindow({
         width: 1200,
@@ -2704,5 +2706,37 @@ ipcMain.handle('load-business-info', async () => {
         return null; // or return default data if file is missing
     }
 });
+
 // ------------------------------- BUSINESS INFO SECTION ENDS HERE ------------------------
+//----------------------------------- BACKUP AND RESTORE SECTION STARTS HERE -------------------
+// main.js
+ipcMain.on('backup-database', async (event) => {
+    const { backupLCdb } = require('./backup');
+    
+    try {
+        const success = await backupLCdb(); // Wait for the backup operation to finish
+        event.reply('backup-completed', success); // Reply with the success value
+    } catch (error) {
+        event.reply('backup-completed', false); // If an error occurs, send failure
+    }
+});
+
+
+// main.js
+ipcMain.on('restore-database', async (event) => {
+    const { restoreLCdb } = require('./restore'); // Assuming restoreLCdb is the restore function
+
+    try {
+        const success = await restoreLCdb(); // Wait for the restore operation to finish
+        // Reply to renderer process with the success status
+        event.reply('restore-completed', success);
+    } catch (error) {
+        console.error('Restore failed:', error);
+        // If an error occurs, send failure status to renderer
+        event.reply('restore-completed', false);
+    }
+});
+
+
+// ---------------------------------- BACKUP AND RESTORE SECTION ENDS HERE -------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');

@@ -109,6 +109,8 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="Receipt" onclick="updateMainContent('Receipt')">Receipt</button>
                 <button class="category" id="ConnectedDevices" onclick="updateMainContent('ConnectedDevices')">Connected Devices</button>
                 <button class="category" id="QRMenu" onclick="updateMainContent('QRMenu')">QR Menu</button>
+                <button class="category" id="Backup Database" onclick="updateMainContent('BackupDatabase')">Backup Database</button>
+                <button class="category" id="Restore Database" onclick="updateMainContent('RestoreDatabase')">Restore Database</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>
             `;

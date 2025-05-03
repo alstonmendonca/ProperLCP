@@ -317,6 +317,75 @@ async function updateMainContent(contentType) {
                 <p>Qr Menu</p>
             `;
         }
+        // ui.js
+        else if (contentType === "BackupDatabase") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
+
+            mainContent.innerHTML = `
+                <div class='section-title'>
+                    <h2>BACK UP DATABASE</h2>
+                </div>
+                <button id="backupButton">Back Up Database</button>
+                <p id="backupMessage">Click the button to back up your database.</p>
+            `;
+
+            const backupButton = document.getElementById('backupButton');
+
+            // Backup button click handler
+            backupButton.addEventListener('click', () => {
+                const message = document.getElementById('backupMessage');
+                message.innerText = 'Backing up... Please wait.';
+
+                // Trigger backup process from main process
+                ipcRenderer.send('backup-database');
+            });
+
+            // Listen for the completion response from the main process
+            ipcRenderer.once('backup-completed', (event, success) => {
+                const message = document.getElementById('backupMessage');
+                message.innerText = success
+                    ? '✅ Backup completed successfully!'
+                    : '❌ Backup failed. Please try again.';
+            });
+        }
+
+        
+        
+        else if (contentType === "RestoreDatabase") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            billPanel.style.display = 'none';
+        
+            mainContent.innerHTML = `
+                <div class='section-title'>
+                    <h2>RESTORE DATABASE</h2>
+                </div>
+                <button id="restoreButton">Restore Database</button>
+                <p id="restoreMessage">Click the button to restore your database.</p>
+            `;
+        
+            const restoreButton = document.getElementById('restoreButton');
+        
+            // Restore button click handler
+            restoreButton.addEventListener('click', () => {
+                const message = document.getElementById('restoreMessage');
+                message.innerText = 'Restoring... Please wait.';
+        
+                // Trigger restore process from main process
+                ipcRenderer.send('restore-database');
+            });
+        
+            // Listen for the completion response from the main process
+            ipcRenderer.once('restore-completed', (event, success) => {
+                const message = document.getElementById('restoreMessage');
+                message.innerText = success
+                    ? '✅ Restore completed successfully!'
+                    : '❌ Restore failed. Please try again.';
+            });
+        }
+        
         else if (contentType === "Exit") {
             const  {createConfirmPopup} = require("./textPopup");
             createConfirmPopup("Are you sure you want to exit?", (confirmed) => {
