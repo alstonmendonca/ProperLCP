@@ -25,73 +25,75 @@ function loadReceiptEditor(mainContent, billPanel) {
         </div>
         
         <div class="receipt-container">
-            <div class="receipt-paper">
-                <div class="receipt-content">
-                    <div class="receipt-header">
-                        <h3 class="receipt-title">THE LASSI CORNER</h3>
-                        <p class="receipt-subtitle">SJEC, VAMANJOOR</p>
-                    </div>
-                    
-                    <div class="receipt-details">
-                        <p><strong>Token No:</strong> ${sampleBill.kot}</p>
-                        <p><strong>Date:</strong> ${sampleBill.dateTime}</p>
-                        <p><strong>BILL NUMBER:</strong> ${sampleBill.orderId}</p>
-                    </div>
-                    
-                    <div class="receipt-divider">${'-'.repeat(32)}</div>
-                    
-                    <div class="receipt-items-header">
-                        <span class="item-name">ITEM</span>
-                        <span class="item-qty">QTY</span>
-                        <span class="item-price">PRICE</span>
-                    </div>
-                    
-                    <div class="receipt-items">
-                        ${sampleBill.items.map(item => `
-                            <div class="receipt-item">
-                                <span class="item-name">${item.name.substring(0, 14).padEnd(14)}</span>
-                                <span class="item-qty">${item.quantity.toString().padStart(3)}</span>
-                                <span class="item-price">${item.price.toFixed(2).padStart(8)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    
-                    <div class="receipt-divider">${'-'.repeat(32)}</div>
-                    
-                    <div class="receipt-total">
-                        <strong>TOTAL: Rs. ${sampleBill.totalAmount.toFixed(2)}</strong>
-                    </div>
-                    
-                    <div class="receipt-footer">
-                        <p>Thank you for visiting!</p>
-                    </div>
-                    
-                    <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
-                    
-                    <div class="kot-section">
-                        <h4 class="kot-title">KITCHEN ORDER</h4>
-                        <p><strong>KOT #:</strong> ${sampleBill.kot}</p>
-                        <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
-                        <div class="receipt-divider">${'-'.repeat(32)}</div>
-                        
-                        <div class="kot-items-header">
-                            <span class="item-name">ITEM</span>
-                            <span class="item-qty">QTY</span>
+            <div class="receipt-scaler">
+                <div class="receipt-paper">
+                    <div class="receipt-content">
+                        <div class="receipt-header">
+                            <h3 class="receipt-title">THE LASSI CORNER</h3>
+                            <p class="receipt-subtitle">SJEC, VAMANJOOR</p>
                         </div>
                         
-                        <div class="kot-items">
+                        <div class="receipt-details">
+                            <p><strong>Token No:</strong> ${sampleBill.kot}</p>
+                            <p><strong>Date:</strong> ${sampleBill.dateTime}</p>
+                            <p><strong>BILL NUMBER:</strong> ${sampleBill.orderId}</p>
+                        </div>
+                        
+                        <div class="receipt-divider">${'-'.repeat(32)}</div>
+                        
+                        <div class="receipt-items-header">
+                            <span class="item-name">ITEM</span>
+                            <span class="item-qty">QTY</span>
+                            <span class="item-price">PRICE</span>
+                        </div>
+                        
+                        <div class="receipt-items">
                             ${sampleBill.items.map(item => `
-                                <div class="kot-item">
+                                <div class="receipt-item">
                                     <span class="item-name">${item.name.substring(0, 14).padEnd(14)}</span>
                                     <span class="item-qty">${item.quantity.toString().padStart(3)}</span>
+                                    <span class="item-price">${item.price.toFixed(2).padStart(8)}</span>
                                 </div>
                             `).join('')}
                         </div>
                         
                         <div class="receipt-divider">${'-'.repeat(32)}</div>
+                        
+                        <div class="receipt-total">
+                            <strong>TOTAL: Rs. ${sampleBill.totalAmount.toFixed(2)}</strong>
+                        </div>
+                        
+                        <div class="receipt-footer">
+                            <p>Thank you for visiting!</p>
+                        </div>
+                        
+                        <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
+                        
+                        <div class="kot-section">
+                            <h4 class="kot-title">KITCHEN ORDER</h4>
+                            <p><strong>KOT #:</strong> ${sampleBill.kot}</p>
+                            <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                            <div class="receipt-divider">${'-'.repeat(32)}</div>
+                            
+                            <div class="kot-items-header">
+                                <span class="item-name">ITEM</span>
+                                <span class="item-qty">QTY</span>
+                            </div>
+                            
+                            <div class="kot-items">
+                                ${sampleBill.items.map(item => `
+                                    <div class="kot-item">
+                                        <span class="item-name">${item.name.substring(0, 14).padEnd(14)}</span>
+                                        <span class="item-qty">${item.quantity.toString().padStart(3)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="receipt-divider">${'-'.repeat(32)}</div>
+                        </div>
+                        
+                        <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
                     </div>
-                    
-                    <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
                 </div>
             </div>
         </div>
@@ -101,6 +103,13 @@ function loadReceiptEditor(mainContent, billPanel) {
                 display: flex;
                 justify-content: center;
                 padding: 20px;
+                overflow: visible; /* Ensure scaled content isn't clipped */
+            }
+
+            .receipt-scaler {
+                transform: scale(1.5); /* Adjust this value as needed (1.5 = 150%) */
+                transform-origin: top center;
+                width: 384px; /* Original width */
             }
             
             .receipt-paper {
