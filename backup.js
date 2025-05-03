@@ -3,9 +3,10 @@ const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-
-const CLIENT_ID = '285343040820-foqk7u85g9qicdcfn1s41upd978k38vh.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
+const dotenv = require('dotenv');
+dotenv.config();
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:3000/oauth2callback';
 
 const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
