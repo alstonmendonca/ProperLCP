@@ -855,7 +855,7 @@ ipcMain.on('get-tax-on-items', (event, { startDate, endDate }) => {
 });
 //----------------------------------------------ANALYTICS ENDS HERE--------------------------------------------------------------
 
-//------------------------------ CATEGORIES TAB --------------------------------
+//------------------------------ CATEGORIES STARTS HERE --------------------------------
 // Listen for request to get categories
 ipcMain.on("get-categories-list", (event) => {
     const query = "SELECT catid, catname, active FROM Category";
@@ -1653,6 +1653,19 @@ ipcMain.on("show-excel-export-message", (event, options) => {
     });
 });
 
+ipcMain.handle("show-save-dialog", async (event, defaultFilename) => {
+    const result = await dialog.showSaveDialog({
+        title: "Save Excel File",
+        defaultPath: defaultFilename,
+        filters: [
+            { name: "Excel Files", extensions: ["xlsx"] },
+            { name: "All Files", extensions: ["*"] },
+        ],
+    });
+
+    // result.filePath is null if the user cancels the dialog
+    return result.canceled ? null : result.filePath;
+});
 // Fetch Customers
 ipcMain.on("get-customers", (event) => {
     const query = `
@@ -2056,6 +2069,109 @@ ipcMain.on('get-year-wise-data', (event) => {
     });
 });
 //---------------------------------------HISTORY TAB ENDS HERE--------------------------------------------
+
+//--------------------------------------- INVENTORY TAB STARTS HERE--------------------------------------------
+// Inventory database operations
+// Get Inventory List
+ipcMain.on("get-inventory-list", (event) => {
+    const query = "SELECT inv_no, inv_item, current_stock FROM Inventory ORDER BY inv_item COLLATE NOCASE";
+    
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching inventory:", err.message);
+            event.reply("inventory-list-response", { success: false, inventory: [] });
+            return;
+        }
+
+        event.reply("inventory-list-response", { success: true, inventory: rows });
+    });
+});
+
+// Delete Inventory Item
+ipcMain.on("delete-inventory-item", (event, inv_no) => {
+    const query = "DELETE FROM Inventory WHERE inv_no = ?";
+    
+    db.run(query, [inv_no], function (err) {
+        if (err) {
+            console.error("Error deleting inventory item:", err.message);
+            return;
+        }
+
+        console.log(`Inventory Item ID ${inv_no} deleted successfully.`);
+        event.reply("inventory-item-deleted"); // Notify renderer to refresh UI
+    });
+});
+
+// Add New Inventory Item
+ipcMain.on("add-inventory-item", (event, itemData) => {
+    const { inv_item, current_stock } = itemData;
+
+    const sql = "INSERT INTO Inventory (inv_item, current_stock) VALUES (?, ?)";
+    db.run(sql, [inv_item, current_stock], function (err) {
+        if (err) {
+            console.error("Error adding inventory item:", err.message);
+            return;
+        }
+
+        event.sender.send("inventory-item-added");
+
+        if (mainWindow) {
+            mainWindow.webContents.send("inventory-item-updated");
+        }
+    });
+});
+
+// Update Inventory Item
+ipcMain.on("update-inventory-item", (event, updatedData) => {
+    const query = "UPDATE Inventory SET inv_item = ?, current_stock = ? WHERE inv_no = ?";
+
+    db.run(query, [updatedData.inv_item, updatedData.current_stock, updatedData.inv_no], function (err) {
+        if (err) {
+            console.error("Error updating inventory item:", err.message);
+            return;
+        }
+
+        console.log(`Inventory Item ID ${updatedData.inv_no} updated successfully.`);
+        event.sender.send("inventory-item-updated");
+    });
+});
+
+// Restock Inventory Item
+ipcMain.on("restock-inventory-item", (event, restockData) => {
+    const { inv_no, quantity } = restockData;
+    
+    // First get current stock
+    db.get("SELECT current_stock FROM Inventory WHERE inv_no = ?", [inv_no], (err, row) => {
+        if (err) {
+            console.error("Error fetching current stock:", err.message);
+            return;
+        }
+
+        if (row) {
+            const newStock = row.current_stock + quantity;
+            db.run("UPDATE Inventory SET current_stock = ? WHERE inv_no = ?", 
+                [newStock, inv_no], 
+                function(err) {
+                    if (err) {
+                        console.error("Error updating inventory stock:", err.message);
+                        return;
+                    }
+
+                    console.log(`Inventory Item ID ${inv_no} restocked (added ${quantity}). New stock: ${newStock}`);
+                    event.sender.send("inventory-item-restocked");
+                }
+            );
+        }
+    });
+});
+
+// Refresh Inventory List
+ipcMain.on("refresh-inventory", (event) => {
+    if (mainWindow) {
+        mainWindow.webContents.send("inventory-item-updated");
+    }
+});
+//---------------------------------------- INVENTORY TAB ENDS HERE --------------------------------------------
 //---------------------------------------SETTINGS TAB STARTS HERE--------------------------------------------
 
 ipcMain.on("get-users", (event) => {
@@ -2140,33 +2256,74 @@ ipcMain.handle("get-categories", async () => {
 //----------------------------------------------MENU TAB--------------------------------------------
 // Fetch Food Items when requested from the renderer process
 ipcMain.handle("get-menu-items", async () => {
-    const query = `
+    const foodQuery = `
         SELECT 
             FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, 
             FoodItem.sgst, FoodItem.cgst, FoodItem.veg, FoodItem.is_on, FoodItem.active,
+            FoodItem.depend_inv,
             Category.catname AS category_name
         FROM FoodItem
         JOIN Category ON FoodItem.category = Category.catid;
     `;
 
+    const inventoryQuery = `
+        SELECT inv_no, inv_item FROM Inventory;
+    `;
+
     try {
-        const rows = await new Promise((resolve, reject) => {
-            db.all(query, (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
+        const foodItems = await new Promise((resolve, reject) => {
+            db.all(foodQuery, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
             });
         });
 
-        return rows;
+        const inventoryItems = await new Promise((resolve, reject) => {
+            db.all(inventoryQuery, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+
+        // Create a map from inv_no to inv_item
+        const invMap = {};
+        inventoryItems.forEach(item => {
+            invMap[item.inv_no] = item.inv_item;
+        });
+
+        // Add `depend_inv_names` to each food item
+        const enrichedFoodItems = foodItems.map(item => {
+            const dependInvIds = (item.depend_inv || "").split(",").map(i => i.trim()).filter(i => i);
+            const dependNames = dependInvIds.map(id => invMap[id]).filter(Boolean); // filter out nulls
+            return {
+                ...item,
+                depend_inv_names: dependNames.join(", ")
+            };
+        });
+
+        return enrichedFoodItems;
     } catch (err) {
-        console.error("Error fetching food items:", err);
+        console.error("Error fetching food or inventory items:", err);
         return [];
     }
 });
 
+ipcMain.handle('get-all-inventory-items', async () => {
+    try {
+        const query = `SELECT inv_no, inv_item FROM Inventory ORDER BY inv_item ASC`;
+        const items = await new Promise((resolve, reject) => {
+            db.all(query, (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+
+        return items;
+    } catch (error) {
+        console.error("Error fetching inventory items:", error);
+        return []; // return empty array on error
+    }
+});
 // Toggle menu items - DAILY TOGGLE ON/OFF:
 ipcMain.handle("toggle-menu-item", async (event, fid) => {
     try {
@@ -2262,16 +2419,21 @@ ipcMain.handle("delete-menu-item", async (event, fid) => {
     }
 });
 //Edit Menu ITems
-ipcMain.handle("update-food-item", async (event, { fid, fname, category, cost, sgst, cgst, veg }) => {
+ipcMain.handle("update-food-item", async (event, { fid, fname, category, cost, sgst, cgst, veg, depend_inv }) => {
     try {
-        const query = `UPDATE FoodItem SET fname = ?, cost = ?, category = ?, sgst = ?, cgst = ?, veg = ? WHERE fid = ?`;
-        await db.run(query, [fname, cost, category, sgst, cgst, veg, fid]);
+        const query = `
+            UPDATE FoodItem 
+            SET fname = ?, cost = ?, category = ?, sgst = ?, cgst = ?, veg = ?, depend_inv = ?
+            WHERE fid = ?
+        `;
+        await db.run(query, [fname, cost, category, sgst, cgst, veg, depend_inv, fid]);
         return { success: true };
     } catch (error) {
         console.error("Error updating food item:", error);
         return { success: false, error: error.message };
     }
 });
+
 
 //-------------------
 //-----------HOME TAB----------------
@@ -2295,6 +2457,123 @@ ipcMain.handle("get-all-food-items", async () => {
         });
     });
 });
+
+// Fetch inventory items for a given food item
+ipcMain.handle("get-inventory-for-food", async (event, foodId) => {
+    const query = `
+        SELECT depend_inv
+        FROM FoodItem
+        WHERE fid = ?;
+    `;
+
+    try {
+        // Get the depend_inv value (comma-separated inventory IDs)
+        const rows = await new Promise((resolve, reject) => {
+            db.all(query, [foodId], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+
+        if (rows.length === 0 || !rows[0].depend_inv) {
+            return []; // No inventory dependencies for this food item
+        }
+
+        // Parse the depend_inv field to get inventory IDs
+        const inventoryIds = rows[0].depend_inv.split(',').map(id => id.trim());
+
+        // Now fetch the inventory details for each inventory ID
+        const inventoryQuery = `
+            SELECT inv_no, inv_item, current_stock
+            FROM Inventory
+            WHERE inv_no IN (${inventoryIds.map(() => '?').join(', ')});
+        `;
+        
+        const inventoryItems = await new Promise((resolve, reject) => {
+            db.all(inventoryQuery, inventoryIds, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+
+        return inventoryItems; // Return the inventory details
+    } catch (err) {
+        console.error("Error fetching inventory for food item:", err);
+        return [];
+    }
+});
+
+
+// Deduct stock for an inventory item (stock will not go below zero)
+ipcMain.handle("deduct-inventory-stock", async (event, { foodId, quantity }) => {
+    const getDependInvQuery = `
+        SELECT depend_inv FROM FoodItem WHERE fid = ?;
+    `;
+
+    try {
+        // Step 1: Fetch the depend_inv (comma-separated list of inventory IDs) for the given food item
+        const dependInvResult = await new Promise((resolve, reject) => {
+            db.get(getDependInvQuery, [foodId], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
+
+        // If depend_inv is null or empty, no dependencies to process
+        if (!dependInvResult || !dependInvResult.depend_inv) {
+            return { success: true };
+        }
+
+        // Step 2: Split the depend_inv string into an array of inventory IDs
+        const dependInvIds = dependInvResult.depend_inv.split(',').map(id => id.trim());
+
+        // Step 3: Loop through each inventory item in depend_inv and update their stock
+        for (let invIdStr of dependInvIds) {
+            const invIdInt = parseInt(invIdStr); // Ensure we have a valid integer inventory ID
+
+            if (isNaN(invIdInt)) continue; // Skip invalid inventory IDs
+
+            const query = `
+                UPDATE Inventory
+                SET current_stock = CASE
+                    WHEN current_stock - ? < 0 THEN 0
+                    ELSE current_stock - ?
+                END
+                WHERE inv_no = ?;
+            `;
+
+            // Deduct stock for each item in the depend_inv list
+            await new Promise((resolve, reject) => {
+                db.run(query, [quantity, quantity, invIdInt], function(err) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({ success: true });
+                    }
+                });
+            });
+        }
+
+        return { success: true };
+
+    } catch (err) {
+        console.error("Error deducting inventory:", err);
+        return { success: false, message: "An error occurred while deducting stock." };
+    }
+});
+
+
+
+
 //-0-----------HOME TAB ENDS HERE-----------
 
 ipcMain.handle("get-food-items", async (event, categoryName) => {
@@ -2354,9 +2633,20 @@ ipcMain.handle("get-categories-for-additem", async () => {
 ipcMain.handle("add-food-item", async (event, item) => {
     return new Promise((resolve, reject) => {
         db.run(
-            `INSERT INTO FoodItem (fname, category, cost, sgst, cgst, tax, active, is_on, veg)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [item.fname, item.category, item.cost, item.sgst, item.cgst, item.tax, item.active, item.is_on, item.veg],
+            `INSERT INTO FoodItem (fname, category, cost, sgst, cgst, tax, active, is_on, veg, depend_inv)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                item.fname,
+                item.category,
+                item.cost,
+                item.sgst,
+                item.cgst,
+                item.tax,
+                item.active,
+                item.is_on,
+                item.veg,
+                item.depend_inv || "" // Fallback to empty string if undefined
+            ],
             function (err) {
                 if (err) {
                     reject(err);
@@ -2367,6 +2657,7 @@ ipcMain.handle("add-food-item", async (event, item) => {
         );
     });
 });
+
 
 //refresh menu
 // In main.js
@@ -2379,22 +2670,12 @@ ipcMain.on('refresh-menu', (event) => {
 });
 //EXIT THE APP
 // Event listener to handle exit request
+// Event listener to handle exit request
 ipcMain.on("exit-app", (event) => {
-    // Show a confirmation dialog
-    const choice = dialog.showMessageBoxSync({
-        type: "question",
-        buttons: ["Cancel", "Exit"],
-        defaultId: 1,
-        title: "Confirm Exit",
-        message: "Are you sure you want to exit?",
-    });
-
-    if (choice === 1) {
-        // Close the database connection before quitting
-        closeDatabase();
-        app.quit(); // Close the app
-    }
-});
+    // Close the database connection before quitting
+      closeDatabase();
+       app.quit(); // Close the app
+  });
 
 // --------------------------------- BUSINESS INFO SECTION -----------------------------
 const savePath = path.join(__dirname, 'businessInfo.json');

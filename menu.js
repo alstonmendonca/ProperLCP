@@ -131,7 +131,8 @@ async function displayMenu() {
                         <p>Category: ${item.category_name}</p>
                         <p>Food ID: ${item.fid}</p>
                         <p>Price: ₹${item.cost}</p>
-                        
+                        <p><strong>Depends On:</strong> ${item.depend_inv_names || 'None'}</p>
+
                         <!-- Toggle Switches Container -->
                         <div class="toggle-container" style="display: flex; justify-content: center; gap: 18px; align-items: center;">
 
@@ -287,6 +288,10 @@ async function displayMenu() {
                                 <span class="slider round"></span>
                             </label>
                             <br>
+                            <label>Dependant Items:</label>
+                            <div id="dependant-items-container" class="checkbox-container">
+                                Loading...
+                            </div>
                             <div class="menu-popup-buttons">
                                 <button id="saveChanges">Save</button>
                                 <button id="closePopup">Cancel</button>
@@ -329,9 +334,48 @@ async function displayMenu() {
                             console.error("Failed to load categories:", error);
                         }
                     }
+                    async function loadInventoryItems() {
+                        try {
+                            const inventoryItems = await ipcRenderer.invoke("get-all-inventory-items");
+                            const container = document.getElementById("dependant-items-container");
+                    
+                            container.innerHTML = ''; // clear previous content
+                    
+                            inventoryItems.forEach(inv => {
+                                const checkbox = document.createElement("input");
+                                checkbox.type = "checkbox";
+                                checkbox.value = inv.inv_no;
+                                checkbox.id = `inv_${inv.inv_no}`;
+                                checkbox.name = "dependant_inv";
+                    
+                                // Pre-check if this item is in depend_inv
+                                const dependArray = (item.depend_inv || "").split(",").map(i => i.trim()).filter(i => i);
+                                if (dependArray.includes(inv.inv_no.toString())) {
+                                    checkbox.checked = true;
+                                }
+                    
+                                const label = document.createElement("label");
+                                label.htmlFor = `inv_${inv.inv_no}`;
+                                label.textContent = inv.inv_item;
+                                label.style.marginRight = "10px";
+                    
+                                const wrapper = document.createElement("div");
+                                wrapper.appendChild(checkbox);
+                                wrapper.appendChild(label);
+                    
+                                container.appendChild(wrapper);
+                            });
+                    
+                        } catch (error) {
+                            console.error("Failed to load inventory items:", error);
+                            const container = document.getElementById("dependant-items-container");
+                            container.textContent = "Failed to load inventory items.";
+                        }
+                    }
+                    
 
                     loadCategories();
-
+                    loadInventoryItems();
                     // Close popup when clicking "Cancel"
                     document.getElementById("closePopup").addEventListener("click", () => {
                         document.body.removeChild(popupOverlay);
@@ -347,6 +391,9 @@ async function displayMenu() {
                         const updatedsgst = parseFloat(document.getElementById("editsgst").value);
                         const updatedcgst = parseFloat(document.getElementById("editcgst").value);
                         const updatedveg = document.getElementById("editveg").checked ? 1 : 0;
+                        const selectedInvCheckboxes = document.querySelectorAll("input[name='dependant_inv']:checked");
+                        const depend_inv = Array.from(selectedInvCheckboxes).map(cb => cb.value).join(",") || null;
+
 
                         // Validate inputs
                         if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
@@ -362,8 +409,10 @@ async function displayMenu() {
                             category: updatedCategory,
                             sgst: updatedsgst,
                             cgst: updatedcgst,
-                            veg: updatedveg
+                            veg: updatedveg,
+                            depend_inv
                         });
+                        
 
                         if (response.success) {
                             // Remove the popup
@@ -417,6 +466,25 @@ function toggleAddItemPopup() {
             console.error("Failed to load categories:", error);
         }
     }
+        // Function to load inventory items dynamically
+    async function loadInventoryItems() {
+        try {
+            const inventory = await ipcRenderer.invoke("get-all-inventory-items");
+            const container = document.getElementById("inventory-checklist");
+            inventory.forEach(inv => {
+                const checkbox = document.createElement("label");
+                checkbox.classList.add("inv-checkbox");
+                checkbox.innerHTML = `
+                    <input type="checkbox" value="${inv.inv_no}">
+                    ${inv.inv_item}
+                `;
+                container.appendChild(checkbox);
+            });
+        } catch (err) {
+            console.error("Failed to load inventory items:", err);
+        }
+    }
+
     // Create overlay container
     const popupOverlay = document.createElement("div");
     popupOverlay.id = "add-item-popup-overlay";
@@ -484,7 +552,12 @@ function toggleAddItemPopup() {
                         <span class="slider round"></span>
                     </label>
                 </div>
-
+                <div class="form-group">
+                    <label style="font-size: 14px; color: #555; margin-bottom: 5px;">Inventory Dependencies:</label>
+                    <div id="inventory-checklist" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; max-height: 120px; overflow-y: auto;">
+                        <!-- checkboxes go here -->
+                    </div>
+                </div>
                 <div class="menu-popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                     <button type="submit" id="addItemBtn" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Add</button>
                     <button type="button" id="closeAddItemPopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Cancel</button>
@@ -519,6 +592,7 @@ function toggleAddItemPopup() {
     });
     // Load categories dynamically
     loadCategories();
+    loadInventoryItems(); // Load inventory checkboxes
 
     // Handle form submission
     document.getElementById("addItemForm").addEventListener("submit", async (event) => {
@@ -533,7 +607,10 @@ function toggleAddItemPopup() {
             tax: parseFloat(document.getElementById("sgst").value) + parseFloat(document.getElementById("cgst").value),
             active: document.getElementById("active").checked ? 1 : 0,
             is_on: document.getElementById("is_on").checked ? 1 : 0,
-            veg: document.getElementById("veg").checked ? 1 : 0
+            veg: document.getElementById("veg").checked ? 1 : 0,
+            depend_inv: Array.from(document.querySelectorAll('#inventory-checklist input[type="checkbox"]:checked'))
+                  .map(cb => cb.value)
+                  .join(",")
         };
 
 

@@ -774,6 +774,82 @@ input:checked + .slider:before {
 }
 
 
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+    font-size: 14px;
+}
+
+.checkbox-container div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #fff;
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-container div:hover {
+    background-color: #f0f0f0;
+}
+
+.checkbox-container input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: #4caf50;
+    cursor: pointer;
+}
+
+/* Container for Inventory Dependencies (Checkboxes) */
+#inventory-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+    font-size: 14px;
+}
+
+/* Individual checkbox item style */
+#inventory-checklist div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #fff;
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Hover effect for individual items */
+#inventory-checklist div:hover {
+    background-color: #f0f0f0;
+}
+
+/* Style for the checkboxes */
+#inventory-checklist input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: #4caf50;  /* Custom checkbox color */
+    cursor: pointer;
+}
+
 /* Removed all scrollbar-related CSS */
 /* The Order Histoy Context Menu */
 
@@ -1659,16 +1735,29 @@ input:checked + .slider:before {
     font-size: 1.1rem;
     margin: 0;
 }
+ /* Section Title Styles */
+.section-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-/* Section Title Styles */
 .section-title h2 {
     display: flex;
+    justify-content: center; /* Center content inside h2 */
     align-items: center;
     gap: 10px;
+
+    font-size: 2.5rem;
+    font-weight: bold;
     color: #2c3e50;
-    font-size: 1.5rem;
-    margin-bottom: 0;
+    margin-bottom: 20px;
+
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #0D3B66;
 }
+
 
 .section-title .icon {
     stroke-width: 1.5;
@@ -1684,7 +1773,344 @@ input:checked + .slider:before {
     text-align: center;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
+.search-container {
+    position: relative;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.search-container .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+#categorySearch {
+    width: 100%;
+    padding: 12px 20px 12px 40px;
+    border: 3px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#categorySearch:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
 /* -------------------------------------------- CATEGORIES ENDS HERE -------------------------------------------------------------------- */
+
+/* -------------------------------------------- INVENTORY STARTS HERE -------------------------------------------------------------------- */
+/* Inventory Grid Styles */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Inventory Item Box Styles */
+.inventory-item-box {
+    background-color: #0D3B66; /* Light blue background */
+    color: #333;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #cce0ff; /* Light blue border to match */
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+}
+
+.inventory-item-box:hover {
+    background-color: #3c649c; /* Slightly darker blue on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    border-color: #d0d0d0;
+}
+
+.inventory-item-box h3 {
+    margin: 0 0 15px; /* Increase bottom margin */
+    padding-bottom: 10px; /* Add padding for the underline */
+    border-bottom: 2px solid white; /* Subtle underline */
+    font-size: 1.2rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Low stock items */
+.inventory-item-box.low-stock {
+    background-color: #5c1a1a; /* Dark red background */
+    border-color: #ff6b6b;
+}
+
+.inventory-item-box.low-stock:hover {
+    background-color: #7a2323; /* Slightly lighter red on hover */
+}
+
+/* Inventory Meta Styles */
+.inventory-meta-inv {
+    display: flex;
+    flex-direction: column; /* Stack vertically */
+    gap: 8px; /* Space between rows */
+    margin-bottom: 15px;
+    width: 100%; /* Take full width */
+}
+
+.inventory-id-inv {
+    font-size: 0.95rem; /* Larger font size */
+    color: #ffffff; /* Example color - change as needed */
+    text-align: center; /* Align to center */
+    padding: 4px 0;
+    width: 100%;
+}
+
+.stock-count-inv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.95rem; /* Larger font size */
+    font-weight: 500;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.stock-count-inv.out-of-stock {
+    background-color: rgba(255, 0, 0, 0.2);
+    color: #ff6b6b;
+}
+
+/* Add Inventory Item Box Styles */
+#addInventoryItemBoxInv {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 2px dashed #adb5bd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+#addInventoryItemBoxInv:hover {
+    background-color: #f1f3f5;
+    border-color: #868e96;
+    color: #212529;
+}
+
+#addInventoryItemBoxInv .add-icon {
+    stroke: #495057;
+    margin-bottom: 10px;
+}
+
+#addInventoryItemBoxInv:hover .add-icon {
+    stroke: #212529;
+}
+
+/* Inventory Actions Styles */
+.inventory-actions-inv {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    gap: 10px;
+    min-width: 0; /* Allows children to shrink below content size */
+}
+
+.inventory-actions-inv button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 0; /* Allows text truncation */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 8px 6px; /* Reduced side padding */
+}
+
+.inventory-actions-inv .restock-btn-inv {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.inventory-actions-inv .restock-btn-inv:hover {
+    background-color: #c8e6c9;
+}
+
+.inventory-actions-inv .edit-btn-inv {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.inventory-actions-inv .edit-btn-inv:hover {
+    background-color: #bbdefb;
+}
+
+/* Inventory Popup Styles */
+.inventory-edit-popup-inv {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 380px;
+    max-width: 90%;
+    text-align: center;
+}
+
+.inventory-popup-content-inv h2 {
+    margin-top: 15px;
+    color: #2c3e50;
+    font-size: 1.4rem;
+}
+
+.popup-buttons-inv {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.popup-buttons-inv button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.primary-btn-inv {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+}
+
+.primary-btn-inv:hover {
+    background-color: #1565c0;
+}
+
+.secondary-btn-inv {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.secondary-btn-inv:hover {
+    background-color: #e9ecef;
+}
+
+/* Inventory Form Group Styles */
+.inventory-form-group-inv {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.inventory-form-group-inv label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+.inventory-popup-content-inv input {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+}
+
+.inventory-popup-content-inv input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+.inventory-popup-content-inv input[type="number"] {
+    text-align: center;
+}
+
+/* Low Stock Banner */
+.low-stock-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background-color: #ffebee;
+    color: #c62828;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.low-stock-banner svg {
+    stroke-width: 2;
+}
+
+/* Inventory Search Styles */
+#inventorySearchInv {
+    width: 100%;
+    padding: 12px 20px 12px 40px;
+    border: 3px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#inventorySearchInv:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Empty State Styles (shared with categories) */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: #7f8c8d;
+}
+
+.empty-state svg {
+    margin-bottom: 15px;
+    stroke-width: 1.5;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+/* -------------------------------------------- INVENTORY ENDS HERE -------------------------------------------------------------------- */
 /* Styles for the Todays Orders grid */
 .todays-orders-grid {
     display: grid;
@@ -1921,14 +2347,14 @@ input:checked + .slider:before {
 /* Center the header and make it visually appealing */
 .todays-orders-header, .order-history-header, .category-history-header, .deleted-orders-header, .discounted-orders-header, .item-history-header,
 .item-summary-header, .category-wise-sales-header, .top-selling-items-header, .top-selling-categories-header, .day-end-summary-header, .categories-title,
-.customer-header, .business-info-header, .theme-toggle-header, .display-settings-header, .section-title {
+.customer-header, .business-info-header, .theme-toggle-header, .display-settings-header {
     text-align: center; /* Center the content */
     margin-bottom: 20px; /* Add some spacing below the header */
 }
 
 .todays-orders-header h1, .order-history-header h1, .category-history-header h1, .deleted-orders-header h1, .discounted-orders-header h1, .item-history-header h1,
 .item-summary-header h2, .category-wise-sales-header h2, .top-selling-items-header h2, .top-selling-categories-header h2, .day-end-summary-header h2,
-.categories-title h2, .customer-header h2, .business-info-header h1, .theme-toggle-header h2, .display-settings-header h2, .section-title h2{
+.categories-title h2, .customer-header h2, .business-info-header h1, .theme-toggle-header h2, .display-settings-header h2{
     font-size: 2.5rem; /* Increase font size */
     font-weight: bold; /* Make it bold */
     color: #2c3e50; /* Use a dark, professional color */

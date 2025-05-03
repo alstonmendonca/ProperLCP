@@ -1,6 +1,8 @@
 const  {createTextPopup} = require("./textPopup");
 // Add an item to the bill
 function addToBill(itemId, itemName, price, quantity, category = null) {
+    const  {createTextPopup} = require("./textPopup");
+
     if (quantity > 0) {
         const totalPrice = price * quantity;
         const billItemsList = document.getElementById("bill-items-list");
@@ -205,6 +207,36 @@ function updateBillTotal() {
     }
 }
 
+async function DeductInventory() {
+    try {
+        // Find all food items currently in the bill
+        const billItems = document.querySelectorAll(".bill-item");
+
+        // Track inventory usage per item
+        for (const item of billItems) {
+            const foodId = parseInt(item.id.replace("bill-item-", ""));
+            const quantity = parseInt(item.querySelector(".bill-quantity").value);
+
+            // Request inventory dependencies for this food item from the main process
+            const inventoryItems = await ipcRenderer.invoke("get-inventory-for-food", foodId);
+
+            // Use a for...of loop instead of forEach for async handling
+            for (const invItem of inventoryItems) {
+                // Send deduction request to main process
+                await ipcRenderer.invoke("deduct-inventory-stock", {
+                    foodId: foodId, // Pass foodId as well if needed
+                    invId: invItem.inv_no,  // Correct reference to inventory ID
+                    quantity: quantity
+                });
+            }
+        }
+    } catch (err) {
+        console.error("Error deducting inventory:", err);
+        createTextPopup("Failed to deduct inventory.");
+    }
+}
+
+
 // Function to only save the bill
 function saveBill() {
     const cashier = 1; // Replace with actual cashier ID
@@ -235,7 +267,7 @@ function saveBill() {
 
     // Send order data to main process with discount applied (or not)
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
-
+    DeductInventory();
     // Add the glow effect to the bill panel
     const billPanel = document.getElementById("bill-panel");
     billPanel.classList.add("glow");
@@ -553,22 +585,98 @@ function toggleDiscountPopup() {
     popup.classList.add("edit-popup");
 
     popup.innerHTML = `
-        <div class="popup-content" style="display: flex; flex-direction: column; max-width: 100%; width: 300px; pointer-events: auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-            <h3 style="font-size: 1.5em; margin-bottom: 16px; color: #333; text-align: center;">Apply Discount</h3>
-            
-            <label for="discount-percentage" style="margin-bottom: 8px; font-weight: bold; color: #555;">Discount Percentage:</label>
-            <input type="number" id="discount-percentage" placeholder="Enter discount %" min="0" max="100" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
+    <div class="popup-content" style="
+        display: flex; 
+        flex-direction: column; 
+        max-width: 100%; 
+        width: 320px; 
+        pointer-events: auto; 
+        padding: 24px; 
+        background-color: #ffffff; 
+        border-radius: 12px; 
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); 
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        font-family: 'Segoe UI', Roboto, sans-serif;
+    ">
+        <h3 style="
+            font-size: 1.5em; 
+            margin: 0 0 20px 0; 
+            color: #2c3e50; 
+            text-align: center; 
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        ">Apply Discount</h3>
         
-            <label for="discount-amount" style="margin-bottom: 8px; font-weight: bold; color: #555;">Fixed Discount (Rs.):</label>
-            <input type="number" id="discount-amount" placeholder="Enter discount amount" min="0" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
-        
-            <div class="popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
-                <button id="apply-discount-btn" type="button" style="width: 90px; height: 40px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Apply</button>
-                <button id="closePopup" type="button" style="width: 90px; height: 40px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Cancel</button>
-            </div>
+        <label for="discount-percentage" style="
+            margin-bottom: 6px; 
+            font-weight: 500; 
+            color: #4a5568; 
+            font-size: 14px;
+        ">Discount Percentage:</label>
+        <input type="number" id="discount-percentage" placeholder="0-100%" min="0" max="100" step="0.01" style="
+            width: 100%; 
+            padding: 10px 12px; 
+            margin-bottom: 16px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            transition: all 0.2s;
+            background-color: #f8fafc;
+        " required
+        onfocus="this.style.borderColor='#4299e1'; this.style.boxShadow='0 0 0 3px rgba(66, 153, 225, 0.2)'; this.style.backgroundColor='#ffffff'"
+        onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'; this.style.backgroundColor='#f8fafc'">
+    
+        <label for="discount-amount" style="
+            margin-bottom: 6px; 
+            font-weight: 500; 
+            color: #4a5568; 
+            font-size: 14px;
+        ">Fixed Discount (Rs.):</label>
+        <input type="number" id="discount-amount" placeholder="Enter amount" min="0" step="0.01" style="
+            width: 100%; 
+            padding: 10px 12px; 
+            margin-bottom: 24px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 6px; 
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: #f8fafc;
+        " required
+        onfocus="this.style.borderColor='#4299e1'; this.style.boxShadow='0 0 0 3px rgba(66, 153, 225, 0.2)'; this.style.backgroundColor='#ffffff'"
+        onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'; this.style.backgroundColor='#f8fafc'">
+    
+        <div class="popup-buttons" style="
+            display: flex; 
+            justify-content: center; 
+            gap: 12px;
+        ">
+            <button id="apply-discount-btn" type="button" style="
+                width: 100px; 
+                height: 40px; 
+                background-color: #4299e1; 
+                color: white; 
+                border: none; 
+                border-radius: 6px; 
+                cursor: pointer; 
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.2s;
+            " onmouseover="this.style.backgroundColor='#3182ce'" onmouseout="this.style.backgroundColor='#4299e1'">Apply</button>
+            <button id="closePopup" type="button" style="
+                width: 100px; 
+                height: 40px; 
+                background-color: #ffffff; 
+                color: #4a5568; 
+                border: 1px solid #e2e8f0; 
+                border-radius: 6px; 
+                cursor: pointer; 
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.2s;
+            " onmouseover="this.style.backgroundColor='#f7fafc'; this.style.borderColor='#cbd5e0'" onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#e2e8f0'">Cancel</button>
         </div>
-    `;
-
+    </div>
+`;
     document.body.appendChild(popup);
     const percentField = document.getElementById("discount-percentage");
     const amountField = document.getElementById("discount-amount");
@@ -933,10 +1041,16 @@ ipcRenderer.on('held-order-details-data', (event, foodDetails, heldId) => {
 });
 
 
+// Function to delete a held order
 function deleteHeldOrder(heldId) {
-    if (confirm("Are you sure you want to delete this held order?")) {
-        ipcRenderer.send('delete-held-order', heldId);
-    }
+    const  {createConfirmPopup} = require("./textPopup");
+    // Show the custom confirmation popup and handle the user's response
+    createConfirmPopup("Are you sure you want to delete this held order?", (confirmed) => {
+        if (confirmed) {
+            // User clicked OK, send the delete request
+            ipcRenderer.send('delete-held-order', heldId);
+        } 
+    });
 }
 
 // Handle held order deletion

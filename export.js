@@ -1,24 +1,31 @@
 const { ipcRenderer } = require("electron");
 const  {createTextPopup} = require("./textPopup");
 
-function exportTableToExcel(tableId, filename = "export.xlsx") {
+function exportTableToExcel(tableId, defaultFilename = "export.xlsx") {
     const table = document.querySelector(tableId);
     if (!table) {
         createTextPopup("Table not found!");
         return;
     }
 
-    const XLSX = require("xlsx");
-    let wb = XLSX.utils.book_new();
-    let ws = XLSX.utils.table_to_sheet(table);
+    ipcRenderer.invoke("show-save-dialog", defaultFilename).then(filePath => {
+        if (!filePath) {
+            createTextPopup("Export canceled.");
+            return;
+        }
 
-    XLSX.utils.book_append_sheet(wb, ws, "Order History");
-    XLSX.writeFile(wb, filename);
+        const XLSX = require("xlsx");
+        let wb = XLSX.utils.book_new();
+        let ws = XLSX.utils.table_to_sheet(table);
 
-    ipcRenderer.send("show-excel-export-message", {
-        type: "info",
-        title: "Export Successful",
-        message: `Order history has been successfully exported to ${filename}.`,
+        XLSX.utils.book_append_sheet(wb, ws, "Order History");
+        XLSX.writeFile(wb, filePath);
+
+        ipcRenderer.send("show-excel-export-message", {
+            type: "info",
+            title: "Export Successful",
+            message: `Order history has been successfully exported to:\n${filePath}`,
+        });
     });
 }
 
