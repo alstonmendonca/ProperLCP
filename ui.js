@@ -317,6 +317,20 @@ async function updateMainContent(contentType) {
                 <p>Qr Menu</p>
             `;
         }
+        // ui.js
+        else if (contentType === "BackupDatabase") {
+            const { loadBackupUI } = require("./loadBackupUI");
+            loadBackupUI(mainContent, billPanel); // Call the backup UI function
+        }
+
+        
+        
+        else if (contentType === "RestoreDatabase") {
+            const { loadRestoreUI } = require("./loadRestoreUI");
+            loadRestoreUI(mainContent, billPanel); // Call the restore UI function
+
+        }
+        
         else if (contentType === "Exit") {
             const  {createConfirmPopup} = require("./textPopup");
             createConfirmPopup("Are you sure you want to exit?", (confirmed) => {
