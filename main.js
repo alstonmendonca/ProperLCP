@@ -931,8 +931,14 @@ ipcMain.on("refresh-categories", (event) => {
     
 });
 //----------------------------------------------------BILLING----------------------------------------------------------
-
+let isPrinting = false;
 ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
+    if (isPrinting) {
+        event.sender.send('print-error', 'Printer is busy');
+        return;
+    }
+    isPrinting = true;
+
     try {
         // Get config with fallback to defaults
         const config = store.get('printerConfig', {
@@ -973,11 +979,38 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
         });
     } catch (error) {
         event.sender.send('print-error', `System error: ${error.message}`);
+    } finally {
+        isPrinting = false;
     }
 });
 
+ipcMain.on('update-receipt-template', (event, { title, subtitle, footer }) => {
+    try {
+        // Save to persistent storage
+        store.set('receiptTemplate', {
+            title,
+            subtitle,
+            footer,
+            lastUpdated: new Date().toISOString()
+        });
+        
+        event.reply('receipt-template-updated', { success: true });
+    } catch (error) {
+        event.reply('receipt-template-updated', { 
+            success: false,
+            error: error.message 
+        });
+    }
+});
 
 function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
+    // Get template from store or use defaults
+    const template = store.get('receiptTemplate', {
+        title: 'THE LASSI CORNER',
+        subtitle: 'SJEC, VAMANJOOR',
+        footer: 'Thank you for visiting!'
+    });
+
     // Format items for receipt
     const formattedItems = items.map(item => 
         `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
@@ -991,9 +1024,9 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     // Hardcoded customer receipt
     const customerReceipt = `
 \x1B\x40\x1B\x61\x01\x1D\x21\x11
-THE LASSI CORNER
+${template.title}
 \x1D\x21\x00
-SJEC, VAMANJOOR
+${template.subtitle}
 \x1B\x45\x01
 Token No: ${kot}
 \x1B\x45\x00\x1B\x61\x00
@@ -1008,7 +1041,7 @@ ${'-'.repeat(32)}
 \x1B\x45\x01
 TOTAL: Rs. ${totalAmount.toFixed(2)}
 \x1B\x45\x00\x1B\x61\x01
-Thank you for visiting!
+${template.footer}
 \x1D\x56\x41\x10`;
 
     // Hardcoded KOT receipt
@@ -1028,6 +1061,11 @@ ${'-'.repeat(32)}
 
     return customerReceipt + kotReceipt;
 }
+
+ipcMain.on('get-receipt-template', (event, defaults) => {
+    const template = store.get('receiptTemplate', defaults);
+    event.returnValue = template;
+});
 
 ipcMain.on('get-order-for-printing', (event, billno) => {
     // First get the order header
@@ -1079,6 +1117,8 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
         });
     });
 });
+
+
 //------------------------------------------------Bill Printing Ends Here--------------------------------------------------
 //-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS

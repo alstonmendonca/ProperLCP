@@ -6,6 +6,15 @@ function loadReceiptEditor(mainContent, billPanel) {
     mainContent.style.marginRight = "0px";
     billPanel.style.display = 'none';
 
+    let isEditMode = false;
+
+    // Get saved template or use defaults
+    const template = ipcRenderer.sendSync('get-receipt-template', {
+        title: 'THE LASSI CORNER',
+        subtitle: 'SJEC, VAMANJOOR',
+        footer: 'Thank you for visiting!'
+    });
+
     // Create a sample bill data structure
     const sampleBill = {
         kot: 1234,
@@ -31,8 +40,8 @@ function loadReceiptEditor(mainContent, billPanel) {
                 <div class="receipt-paper">
                     <div class="receipt-content">
                         <div class="receipt-header">
-                            <h3 class="receipt-title">THE LASSI CORNER</h3>
-                            <p class="receipt-subtitle">SJEC, VAMANJOOR</p>
+                            <h3 class="receipt-title">${template.title}</h3>
+                            <p class="receipt-subtitle">${template.subtitle}</p>
                         </div>
                         
                         <div class="receipt-details">
@@ -66,7 +75,7 @@ function loadReceiptEditor(mainContent, billPanel) {
                         </div>
                         
                         <div class="receipt-footer">
-                            <p>Thank you for visiting!</p>
+                            <p>${template.footer}</p>
                         </div>
                         
                         <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
@@ -216,6 +225,8 @@ function loadReceiptEditor(mainContent, billPanel) {
             }
 
             .edit-receipt-btn {
+                display: block;
+                margin: 0 auto 20px auto; /* Center button with margin below */
                 padding: 10px 20px;
                 background-color: #1DB954;
                 color: white;
@@ -223,7 +234,6 @@ function loadReceiptEditor(mainContent, billPanel) {
                 border-radius: 4px;
                 font-size: 16px;
                 cursor: pointer;
-                margin-left: 20px;
             }
 
             .edit-receipt-btn:hover {
@@ -232,6 +242,78 @@ function loadReceiptEditor(mainContent, billPanel) {
 
         </style>
     `;
+
+    // Modify your button click handler:
+document.getElementById('editReceiptBtn').addEventListener('click', () => {
+    isEditMode = !isEditMode; // Toggle edit mode
+    
+    if (isEditMode) {
+        // Enter edit mode
+        document.getElementById('editReceiptBtn').textContent = 'Save Changes';
+        enableReceiptEditing();
+    } else {
+        // Exit edit mode
+        document.getElementById('editReceiptBtn').textContent = 'Edit Receipt';
+        saveReceiptChanges();
+    }
+});
+}
+
+
+
+function enableReceiptEditing() {
+    // Make editable fields
+    const title = document.querySelector('.receipt-title');
+    const subtitle = document.querySelector('.receipt-subtitle');
+    const footer = document.querySelector('.receipt-footer p');
+    
+    title.contentEditable = true;
+    subtitle.contentEditable = true;
+    footer.contentEditable = true;
+    
+    // Add visual feedback for editable fields
+    title.style.backgroundColor = '#f0f8ff';
+    subtitle.style.backgroundColor = '#f0f8ff';
+    footer.style.backgroundColor = '#f0f8ff';
+    
+    title.focus();
+
+    // Add outline to editable fields
+    title.style.outline = '2px dashed #1DB954';
+    subtitle.style.outline = '2px dashed #1DB954';
+    footer.style.outline = '2px dashed #1DB954';
+}
+
+function saveReceiptChanges() {
+    
+    // Disable editing
+    const editableElements = document.querySelectorAll('[contenteditable="true"]');
+    editableElements.forEach(el => {
+        el.contentEditable = false;
+        el.style.backgroundColor = 'transparent';
+    });
+    
+    // Get the updated values
+    const newTitle = document.querySelector('.receipt-title').textContent;
+    const newSubtitle = document.querySelector('.receipt-subtitle').textContent;
+    const newFooter = document.querySelector('.receipt-footer p').textContent;
+
+    if (!newTitle) {
+        createTextPopup("Title cannot be empty");
+        return;
+    }
+    
+    // Save to main process (we'll implement this next)
+    ipcRenderer.send('update-receipt-template', {
+        title: newTitle,
+        subtitle: newSubtitle,
+        footer: newFooter
+    });
+
+    // Remove outlines
+    editableElements.forEach(el => {
+        el.style.outline = 'none';
+    });
 }
 
 module.exports = { loadReceiptEditor };
