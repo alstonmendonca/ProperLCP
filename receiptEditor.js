@@ -23,6 +23,8 @@ function loadReceiptEditor(mainContent, billPanel) {
         <div class="section-title">
             <h2>Receipt Preview</h2>
         </div>
+
+        <button id="editReceiptBtn" class="edit-receipt-btn">Edit Receipt</button>
         
         <div class="receipt-container">
             <div class="receipt-scaler">
@@ -212,6 +214,22 @@ function loadReceiptEditor(mainContent, billPanel) {
                 margin: 5px 0;
                 font-size: 16px;
             }
+
+            .edit-receipt-btn {
+                padding: 10px 20px;
+                background-color: #1DB954;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 16px;
+                cursor: pointer;
+                margin-left: 20px;
+            }
+
+            .edit-receipt-btn:hover {
+                background-color: #169c46;
+            }
+
         </style>
     `;
 }
