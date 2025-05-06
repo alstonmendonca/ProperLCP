@@ -13,11 +13,13 @@ function loadReceiptEditor(mainContent, billPanel) {
         title: 'THE LASSI CORNER',
         subtitle: 'SJEC, VAMANJOOR',
         footer: 'Thank you for visiting!',
-        kotTitle: 'KITCHEN ORDER',  // New field
-        itemHeader: 'ITEM',         // New field
-        qtyHeader: 'QTY',           // New field
-        priceHeader: 'PRICE',       // New field
-        totalText: 'TOTAL: Rs.'     // New field
+        kotTitle: 'KITCHEN ORDER',  
+        itemHeader: 'ITEM',         
+        qtyHeader: 'QTY',           
+        priceHeader: 'PRICE',       
+        totalText: 'TOTAL: Rs.',
+        kotItemHeader: 'ITEM',
+        kotQtyHeader: 'QTY'
     });
 
     // Create a sample bill data structure
@@ -92,8 +94,8 @@ function loadReceiptEditor(mainContent, billPanel) {
                             <div class="receipt-divider">${'-'.repeat(32)}</div>
                             
                             <div class="kot-items-header">
-                                <span class="item-name">ITEM</span>
-                                <span class="item-qty">QTY</span>
+                                <span class="kot-item-header">${template.kotItemHeader}</span>
+                                <span class="kot-qty-header">${template.kotQtyHeader}</span>
                             </div>
                             
                             <div class="kot-items">
@@ -278,9 +280,11 @@ function enableReceiptEditing() {
     const qtyHeader = document.querySelector('.qty-header');
     const priceHeader = document.querySelector('.price-header');
     const totalText = document.querySelector('.total-text');
+    const kotItemHeader = document.querySelector('.kot-item-header');
+    const kotQtyHeader = document.querySelector('.kot-qty-header');
     
     // Make editable
-    [title, subtitle, footer, kotTitle, itemHeader, qtyHeader, priceHeader, totalText].forEach(el => {
+    [title, subtitle, footer, kotTitle, itemHeader, qtyHeader, priceHeader, totalText, kotItemHeader, kotQtyHeader].forEach(el => {
         el.contentEditable = true;
         el.style.backgroundColor = '#f0f8ff';
         el.style.outline = '2px dashed #1DB954';
@@ -309,7 +313,9 @@ function saveReceiptChanges() {
         itemHeader: document.querySelector('.item-header').textContent,
         qtyHeader: document.querySelector('.qty-header').textContent,
         priceHeader: document.querySelector('.price-header').textContent,
-        totalText: document.querySelector('.total-text').textContent.replace(/[\d.]+$/, '').trim()
+        totalText: document.querySelector('.total-text').textContent.replace(/[\d.]+$/, '').trim(),
+        kotItemHeader: document.querySelector('.kot-item-header').textContent,
+        kotQtyHeader: document.querySelector('.kot-qty-header').textContent,
     };
     
     // Validate required fields

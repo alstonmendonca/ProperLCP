@@ -1008,7 +1008,9 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         itemHeader: 'ITEM',
         qtyHeader: 'QTY',
         priceHeader: 'PRICE',
-        totalText: 'TOTAL: Rs.'
+        totalText: 'TOTAL: Rs.',
+        kotItemHeader: 'ITEM',
+        kotQtyHeader: 'QTY'
     });
 
     // Format items using template headers
@@ -1051,7 +1053,7 @@ KOT #: ${kot}
 Time: ${new Date().toLocaleTimeString()}
 ${'-'.repeat(32)}
 \x1B\x61\x00\x1B\x45\x01
-${template.itemHeader.padEnd(14)}${template.qtyHeader.padStart(3)}
+${template.KotItemHeader.padEnd(14)}${template.kotQtyHeader.padStart(3)}
 \x1B\x45\x00
 ${kotItems}
 ${'-'.repeat(32)}
