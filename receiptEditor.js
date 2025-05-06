@@ -120,6 +120,7 @@ function loadReceiptEditor(mainContent, billPanel) {
                 font-family: 'Courier New', monospace; /* More printer-like font */
                 font-size: 12px; /* Base font size */
                 line-height: 1.2;
+                margin-bottom: 30px;
             }
 
             .receipt-header {
