@@ -6,6 +6,22 @@ function loadReceiptEditor(mainContent, billPanel) {
     mainContent.style.marginRight = "0px";
     billPanel.style.display = 'none';
 
+    let isEditMode = false;
+
+    // Get saved template or use defaults
+    const template = ipcRenderer.sendSync('get-receipt-template', {
+        title: 'THE LASSI CORNER',
+        subtitle: 'SJEC, VAMANJOOR',
+        footer: 'Thank you for visiting!',
+        kotTitle: 'KITCHEN ORDER',  
+        itemHeader: 'ITEM',         
+        qtyHeader: 'QTY',           
+        priceHeader: 'PRICE',       
+        totalText: 'TOTAL: Rs.',
+        kotItemHeader: 'ITEM',
+        kotQtyHeader: 'QTY'
+    });
+
     // Create a sample bill data structure
     const sampleBill = {
         kot: 1234,
@@ -23,14 +39,16 @@ function loadReceiptEditor(mainContent, billPanel) {
         <div class="section-title">
             <h2>Receipt Preview</h2>
         </div>
+
+        <button id="editReceiptBtn" class="edit-receipt-btn">Edit Receipt</button>
         
         <div class="receipt-container">
             <div class="receipt-scaler">
                 <div class="receipt-paper">
                     <div class="receipt-content">
                         <div class="receipt-header">
-                            <h3 class="receipt-title">THE LASSI CORNER</h3>
-                            <p class="receipt-subtitle">SJEC, VAMANJOOR</p>
+                            <h3 class="receipt-title">${template.title}</h3>
+                            <p class="receipt-subtitle">${template.subtitle}</p>
                         </div>
                         
                         <div class="receipt-details">
@@ -42,9 +60,9 @@ function loadReceiptEditor(mainContent, billPanel) {
                         <div class="receipt-divider">${'-'.repeat(32)}</div>
                         
                         <div class="receipt-items-header">
-                            <span class="item-name">ITEM</span>
-                            <span class="item-qty">QTY</span>
-                            <span class="item-price">PRICE</span>
+                            <span class="item-header">${template.itemHeader}</span>
+                            <span class="qty-header">${template.qtyHeader}</span>
+                            <span class="price-header">${template.priceHeader}</span>
                         </div>
                         
                         <div class="receipt-items">
@@ -60,24 +78,24 @@ function loadReceiptEditor(mainContent, billPanel) {
                         <div class="receipt-divider">${'-'.repeat(32)}</div>
                         
                         <div class="receipt-total">
-                            <strong>TOTAL: Rs. ${sampleBill.totalAmount.toFixed(2)}</strong>
+                            <strong class="total-text">${template.totalText} ${sampleBill.totalAmount.toFixed(2)}</strong>
                         </div>
                         
                         <div class="receipt-footer">
-                            <p>Thank you for visiting!</p>
+                            <p>${template.footer}</p>
                         </div>
                         
                         <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
                         
                         <div class="kot-section">
-                            <h4 class="kot-title">KITCHEN ORDER</h4>
+                            <h4 class="kot-title">${template.kotTitle}</h4>
                             <p><strong>KOT #:</strong> ${sampleBill.kot}</p>
                             <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
                             <div class="receipt-divider">${'-'.repeat(32)}</div>
                             
                             <div class="kot-items-header">
-                                <span class="item-name">ITEM</span>
-                                <span class="item-qty">QTY</span>
+                                <span class="kot-item-header">${template.kotItemHeader}</span>
+                                <span class="kot-qty-header">${template.kotQtyHeader}</span>
                             </div>
                             
                             <div class="kot-items">
@@ -212,8 +230,102 @@ function loadReceiptEditor(mainContent, billPanel) {
                 margin: 5px 0;
                 font-size: 16px;
             }
+
+            .edit-receipt-btn {
+                display: block;
+                margin: 0 auto 20px auto; /* Center button with margin below */
+                padding: 10px 20px;
+                background-color: #1DB954;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+
+            .edit-receipt-btn:hover {
+                background-color: #169c46;
+            }
+
         </style>
     `;
+
+    // Modify your button click handler:
+document.getElementById('editReceiptBtn').addEventListener('click', () => {
+    isEditMode = !isEditMode; // Toggle edit mode
+    
+    if (isEditMode) {
+        // Enter edit mode
+        document.getElementById('editReceiptBtn').textContent = 'Save Changes';
+        enableReceiptEditing();
+    } else {
+        // Exit edit mode
+        document.getElementById('editReceiptBtn').textContent = 'Edit Receipt';
+        saveReceiptChanges();
+    }
+});
+}
+
+
+
+function enableReceiptEditing() {
+    // Existing fields
+    const title = document.querySelector('.receipt-title');
+    const subtitle = document.querySelector('.receipt-subtitle');
+    const footer = document.querySelector('.receipt-footer p');
+    
+    // New fields
+    const kotTitle = document.querySelector('.kot-title');
+    const itemHeader = document.querySelector('.item-header');
+    const qtyHeader = document.querySelector('.qty-header');
+    const priceHeader = document.querySelector('.price-header');
+    const totalText = document.querySelector('.total-text');
+    const kotItemHeader = document.querySelector('.kot-item-header');
+    const kotQtyHeader = document.querySelector('.kot-qty-header');
+    
+    // Make editable
+    [title, subtitle, footer, kotTitle, itemHeader, qtyHeader, priceHeader, totalText, kotItemHeader, kotQtyHeader].forEach(el => {
+        el.contentEditable = true;
+        el.style.backgroundColor = '#f0f8ff';
+        el.style.outline = '2px dashed #1DB954';
+    });
+    
+    title.focus();
+}
+
+function saveReceiptChanges() {
+    // Get all editable elements
+    const editableElements = document.querySelectorAll('[contenteditable="true"]');
+    
+    // Disable editing and remove styling
+    editableElements.forEach(el => {
+        el.contentEditable = false;
+        el.style.backgroundColor = 'transparent';
+        el.style.outline = 'none';
+    });
+    
+    // Get updated values
+    const updates = {
+        title: document.querySelector('.receipt-title').textContent,
+        subtitle: document.querySelector('.receipt-subtitle').textContent,
+        footer: document.querySelector('.receipt-footer p').textContent,
+        kotTitle: document.querySelector('.kot-title').textContent,
+        itemHeader: document.querySelector('.item-header').textContent,
+        qtyHeader: document.querySelector('.qty-header').textContent,
+        priceHeader: document.querySelector('.price-header').textContent,
+        totalText: document.querySelector('.total-text').textContent.replace(/[\d.]+$/, '').trim(),
+        kotItemHeader: document.querySelector('.kot-item-header').textContent,
+        kotQtyHeader: document.querySelector('.kot-qty-header').textContent,
+    };
+    
+    // Validate required fields
+    if (!updates.title || !updates.itemHeader || !updates.qtyHeader || !updates.priceHeader) {
+        createTextPopup("Required fields cannot be empty");
+        return;
+    }
+    
+    // Save to main process
+    ipcRenderer.send('update-receipt-template', updates);
 }
 
 module.exports = { loadReceiptEditor };

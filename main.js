@@ -931,8 +931,14 @@ ipcMain.on("refresh-categories", (event) => {
     
 });
 //----------------------------------------------------BILLING----------------------------------------------------------
-
+let isPrinting = false;
 ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
+    if (isPrinting) {
+        event.sender.send('print-error', 'Printer is busy');
+        return;
+    }
+    isPrinting = true;
+
     try {
         // Get config with fallback to defaults
         const config = store.get('printerConfig', {
@@ -973,27 +979,55 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
         });
     } catch (error) {
         event.sender.send('print-error', `System error: ${error.message}`);
+    } finally {
+        isPrinting = false;
     }
 });
 
+ipcMain.on('update-receipt-template', (event, updates) => {
+    try {
+        store.set('receiptTemplate', {
+            ...updates,
+            lastUpdated: new Date().toISOString()
+        });
+        event.reply('receipt-template-updated', { success: true });
+    } catch (error) {
+        event.reply('receipt-template-updated', { 
+            success: false,
+            error: error.message 
+        });
+    }
+});
 
 function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
-    // Format items for receipt
+    const template = store.get('receiptTemplate', {
+        title: 'THE LASSI CORNER',
+        subtitle: 'SJEC, VAMANJOOR',
+        footer: 'Thank you for visiting!',
+        kotTitle: 'KITCHEN ORDER',
+        itemHeader: 'ITEM',
+        qtyHeader: 'QTY',
+        priceHeader: 'PRICE',
+        totalText: 'TOTAL: Rs.',
+        kotItemHeader: 'ITEM',
+        kotQtyHeader: 'QTY'
+    });
+
+    // Format items using template headers
     const formattedItems = items.map(item => 
         `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
     ).join('\n');
     
-    // Format items for KOT (without prices)
     const kotItems = items.map(item => 
         `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
     ).join('\n');
     
-    // Hardcoded customer receipt
+    // Updated receipt with template fields
     const customerReceipt = `
 \x1B\x40\x1B\x61\x01\x1D\x21\x11
-THE LASSI CORNER
+${template.title}
 \x1D\x21\x00
-SJEC, VAMANJOOR
+${template.subtitle}
 \x1B\x45\x01
 Token No: ${kot}
 \x1B\x45\x00\x1B\x61\x00
@@ -1001,26 +1035,25 @@ Date: ${new Date().toLocaleString()}
 BILL NUMBER: ${orderId}
 ${'-'.repeat(32)}
 \x1B\x45\x01
-ITEM          QTY  PRICE
+${template.itemHeader.padEnd(14)}${template.qtyHeader.padStart(3)}${template.priceHeader.padStart(8)}
 \x1B\x45\x00
 ${formattedItems}
 ${'-'.repeat(32)}
 \x1B\x45\x01
-TOTAL: Rs. ${totalAmount.toFixed(2)}
+${template.totalText} ${totalAmount.toFixed(2)}
 \x1B\x45\x00\x1B\x61\x01
-Thank you for visiting!
+${template.footer}
 \x1D\x56\x41\x10`;
 
-    // Hardcoded KOT receipt
     const kotReceipt = `
 \x1B\x61\x01\x1D\x21\x11
-KITCHEN ORDER
+${template.kotTitle}
 \x1D\x21\x00
 KOT #: ${kot}
 Time: ${new Date().toLocaleTimeString()}
 ${'-'.repeat(32)}
 \x1B\x61\x00\x1B\x45\x01
-ITEM          QTY
+${template.KotItemHeader.padEnd(14)}${template.kotQtyHeader.padStart(3)}
 \x1B\x45\x00
 ${kotItems}
 ${'-'.repeat(32)}
@@ -1028,6 +1061,11 @@ ${'-'.repeat(32)}
 
     return customerReceipt + kotReceipt;
 }
+
+ipcMain.on('get-receipt-template', (event, defaults) => {
+    const template = store.get('receiptTemplate', defaults);
+    event.returnValue = template;
+});
 
 ipcMain.on('get-order-for-printing', (event, billno) => {
     // First get the order header
@@ -1079,6 +1117,8 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
         });
     });
 });
+
+
 //------------------------------------------------Bill Printing Ends Here--------------------------------------------------
 //-----------------HELD ORDERS-----------------
 //DISPLAY HELD ORDERS
