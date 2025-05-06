@@ -12,7 +12,12 @@ function loadReceiptEditor(mainContent, billPanel) {
     const template = ipcRenderer.sendSync('get-receipt-template', {
         title: 'THE LASSI CORNER',
         subtitle: 'SJEC, VAMANJOOR',
-        footer: 'Thank you for visiting!'
+        footer: 'Thank you for visiting!',
+        kotTitle: 'KITCHEN ORDER',  // New field
+        itemHeader: 'ITEM',         // New field
+        qtyHeader: 'QTY',           // New field
+        priceHeader: 'PRICE',       // New field
+        totalText: 'TOTAL: Rs.'     // New field
     });
 
     // Create a sample bill data structure
@@ -53,9 +58,9 @@ function loadReceiptEditor(mainContent, billPanel) {
                         <div class="receipt-divider">${'-'.repeat(32)}</div>
                         
                         <div class="receipt-items-header">
-                            <span class="item-name">ITEM</span>
-                            <span class="item-qty">QTY</span>
-                            <span class="item-price">PRICE</span>
+                            <span class="item-header">${template.itemHeader}</span>
+                            <span class="qty-header">${template.qtyHeader}</span>
+                            <span class="price-header">${template.priceHeader}</span>
                         </div>
                         
                         <div class="receipt-items">
@@ -71,7 +76,7 @@ function loadReceiptEditor(mainContent, billPanel) {
                         <div class="receipt-divider">${'-'.repeat(32)}</div>
                         
                         <div class="receipt-total">
-                            <strong>TOTAL: Rs. ${sampleBill.totalAmount.toFixed(2)}</strong>
+                            <strong class="total-text">${template.totalText} ${sampleBill.totalAmount.toFixed(2)}</strong>
                         </div>
                         
                         <div class="receipt-footer">
@@ -81,7 +86,7 @@ function loadReceiptEditor(mainContent, billPanel) {
                         <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
                         
                         <div class="kot-section">
-                            <h4 class="kot-title">KITCHEN ORDER</h4>
+                            <h4 class="kot-title">${template.kotTitle}</h4>
                             <p><strong>KOT #:</strong> ${sampleBill.kot}</p>
                             <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
                             <div class="receipt-divider">${'-'.repeat(32)}</div>
@@ -262,58 +267,59 @@ document.getElementById('editReceiptBtn').addEventListener('click', () => {
 
 
 function enableReceiptEditing() {
-    // Make editable fields
+    // Existing fields
     const title = document.querySelector('.receipt-title');
     const subtitle = document.querySelector('.receipt-subtitle');
     const footer = document.querySelector('.receipt-footer p');
     
-    title.contentEditable = true;
-    subtitle.contentEditable = true;
-    footer.contentEditable = true;
+    // New fields
+    const kotTitle = document.querySelector('.kot-title');
+    const itemHeader = document.querySelector('.item-header');
+    const qtyHeader = document.querySelector('.qty-header');
+    const priceHeader = document.querySelector('.price-header');
+    const totalText = document.querySelector('.total-text');
     
-    // Add visual feedback for editable fields
-    title.style.backgroundColor = '#f0f8ff';
-    subtitle.style.backgroundColor = '#f0f8ff';
-    footer.style.backgroundColor = '#f0f8ff';
+    // Make editable
+    [title, subtitle, footer, kotTitle, itemHeader, qtyHeader, priceHeader, totalText].forEach(el => {
+        el.contentEditable = true;
+        el.style.backgroundColor = '#f0f8ff';
+        el.style.outline = '2px dashed #1DB954';
+    });
     
     title.focus();
-
-    // Add outline to editable fields
-    title.style.outline = '2px dashed #1DB954';
-    subtitle.style.outline = '2px dashed #1DB954';
-    footer.style.outline = '2px dashed #1DB954';
 }
 
 function saveReceiptChanges() {
-    
-    // Disable editing
+    // Get all editable elements
     const editableElements = document.querySelectorAll('[contenteditable="true"]');
+    
+    // Disable editing and remove styling
     editableElements.forEach(el => {
         el.contentEditable = false;
         el.style.backgroundColor = 'transparent';
+        el.style.outline = 'none';
     });
     
-    // Get the updated values
-    const newTitle = document.querySelector('.receipt-title').textContent;
-    const newSubtitle = document.querySelector('.receipt-subtitle').textContent;
-    const newFooter = document.querySelector('.receipt-footer p').textContent;
-
-    if (!newTitle) {
-        createTextPopup("Title cannot be empty");
+    // Get updated values
+    const updates = {
+        title: document.querySelector('.receipt-title').textContent,
+        subtitle: document.querySelector('.receipt-subtitle').textContent,
+        footer: document.querySelector('.receipt-footer p').textContent,
+        kotTitle: document.querySelector('.kot-title').textContent,
+        itemHeader: document.querySelector('.item-header').textContent,
+        qtyHeader: document.querySelector('.qty-header').textContent,
+        priceHeader: document.querySelector('.price-header').textContent,
+        totalText: document.querySelector('.total-text').textContent.replace(/[\d.]+$/, '').trim()
+    };
+    
+    // Validate required fields
+    if (!updates.title || !updates.itemHeader || !updates.qtyHeader || !updates.priceHeader) {
+        createTextPopup("Required fields cannot be empty");
         return;
     }
     
-    // Save to main process (we'll implement this next)
-    ipcRenderer.send('update-receipt-template', {
-        title: newTitle,
-        subtitle: newSubtitle,
-        footer: newFooter
-    });
-
-    // Remove outlines
-    editableElements.forEach(el => {
-        el.style.outline = 'none';
-    });
+    // Save to main process
+    ipcRenderer.send('update-receipt-template', updates);
 }
 
 module.exports = { loadReceiptEditor };

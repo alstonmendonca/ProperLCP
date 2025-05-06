@@ -984,16 +984,12 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
     }
 });
 
-ipcMain.on('update-receipt-template', (event, { title, subtitle, footer }) => {
+ipcMain.on('update-receipt-template', (event, updates) => {
     try {
-        // Save to persistent storage
         store.set('receiptTemplate', {
-            title,
-            subtitle,
-            footer,
+            ...updates,
             lastUpdated: new Date().toISOString()
         });
-        
         event.reply('receipt-template-updated', { success: true });
     } catch (error) {
         event.reply('receipt-template-updated', { 
@@ -1004,24 +1000,27 @@ ipcMain.on('update-receipt-template', (event, { title, subtitle, footer }) => {
 });
 
 function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
-    // Get template from store or use defaults
     const template = store.get('receiptTemplate', {
         title: 'THE LASSI CORNER',
         subtitle: 'SJEC, VAMANJOOR',
-        footer: 'Thank you for visiting!'
+        footer: 'Thank you for visiting!',
+        kotTitle: 'KITCHEN ORDER',
+        itemHeader: 'ITEM',
+        qtyHeader: 'QTY',
+        priceHeader: 'PRICE',
+        totalText: 'TOTAL: Rs.'
     });
 
-    // Format items for receipt
+    // Format items using template headers
     const formattedItems = items.map(item => 
         `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
     ).join('\n');
     
-    // Format items for KOT (without prices)
     const kotItems = items.map(item => 
         `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
     ).join('\n');
     
-    // Hardcoded customer receipt
+    // Updated receipt with template fields
     const customerReceipt = `
 \x1B\x40\x1B\x61\x01\x1D\x21\x11
 ${template.title}
@@ -1034,26 +1033,25 @@ Date: ${new Date().toLocaleString()}
 BILL NUMBER: ${orderId}
 ${'-'.repeat(32)}
 \x1B\x45\x01
-ITEM          QTY  PRICE
+${template.itemHeader.padEnd(14)}${template.qtyHeader.padStart(3)}${template.priceHeader.padStart(8)}
 \x1B\x45\x00
 ${formattedItems}
 ${'-'.repeat(32)}
 \x1B\x45\x01
-TOTAL: Rs. ${totalAmount.toFixed(2)}
+${template.totalText} ${totalAmount.toFixed(2)}
 \x1B\x45\x00\x1B\x61\x01
 ${template.footer}
 \x1D\x56\x41\x10`;
 
-    // Hardcoded KOT receipt
     const kotReceipt = `
 \x1B\x61\x01\x1D\x21\x11
-KITCHEN ORDER
+${template.kotTitle}
 \x1D\x21\x00
 KOT #: ${kot}
 Time: ${new Date().toLocaleTimeString()}
 ${'-'.repeat(32)}
 \x1B\x61\x00\x1B\x45\x01
-ITEM          QTY
+${template.itemHeader.padEnd(14)}${template.qtyHeader.padStart(3)}
 \x1B\x45\x00
 ${kotItems}
 ${'-'.repeat(32)}
