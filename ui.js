@@ -20,8 +20,8 @@ async function updateMainContent(contentType) {
         'Charts', 'RateOfSale', 'BestInCategory'
     ];
     const settingsButtons = [
-        'UserProfile', 'BusinessInfo', 'ThemeToggle', 'DisplaySettings', 
-        'TaxAndDiscount', 'PrinterConfig', 'Receipt',
+        'UserProfile', 'BusinessInfo', 'ThemeToggle', 
+        'PrinterConfig', 'Receipt',
         'DateAndTime', 'ConnectedDevices', 'Security', 'Help', 'SystemUpdates'
     ];
     
@@ -249,28 +249,6 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "Notes"){
             loadUserNotes(mainContent, billPanel);
-        }
-        else if (contentType === "DisplaySettings") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none';
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Display Settings</h2>
-                </div>
-                <p>Settings for display</p>
-            `;
-        }
-        else if (contentType === "TaxAndDiscount") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none';
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Tax and Discount</h2>
-                </div>
-                <p>Settings for display</p>
-            `;
         }
         else if (contentType === "PrinterConfig") {
             loadPrinterConfig(mainContent, billPanel);
