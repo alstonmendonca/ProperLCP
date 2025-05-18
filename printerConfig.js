@@ -20,7 +20,7 @@ function loadPrinterConfig(mainContent, billPanel) {
             <div style="margin-top: 20px;">
                 <form id="printerConfigForm">
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: bold; text-align: center;">
                             Vendor ID (Decimal):
                         </label>
                         <input type="number" id="vendorId" value="${defaultVendorId}" 
@@ -30,7 +30,7 @@ function loadPrinterConfig(mainContent, billPanel) {
                         <small style="color: #666;">Common values: 1317 (0x0525), 1155 (0x0483)</small>
                     </div>
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: bold; text-align: center;">
                             Product ID (Decimal):
                         </label>
                         <input type="number" id="productId" value="${defaultProductId}" 

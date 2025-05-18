@@ -8,12 +8,22 @@ function loadUserProfile(mainContent, billPanel) {
             <h2>User Profile</h2>
         </div>
         <div class="user-profile-actions">
+
+            <button id="switchUserButton" class="switch-user-btn">Switch User</button>
+
             <!-- Add User Buttons -->
             <button id="addUserButton" class="add-user-btn">Add User</button>
 
             <!-- Remove User Buttons -->
             <button id="removeUserButton" class="add-user-btn">Remove User</button>
         </div>
+
+        <div style="margin-top: 10px;">
+            <h3 class="current-user-display">
+                Current User: Ajay Francis Anchan
+            </h3>
+        </div>
+
         <!-- Admin Users Bar -->
         <div id="adminBar" class="admin-bar"></div>
 
