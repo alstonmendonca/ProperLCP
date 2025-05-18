@@ -309,10 +309,10 @@ function openSwitchUserPopup() {
     popup.classList.add("switch-user-popup");
     popup.innerHTML = `
         <div class="user-popup-content">
-            <h3>Select Users to Remove</h3>
+            <h3>Select User to Switch to</h3>
             <div class="user-list" id="userList"></div>
             <div class="user-popup-buttons">
-                <button id="removeUsers">Remove Selected Users</button>
+                <button id="removeUsers">Switch</button>
                 <button id="closePopup">Cancel</button>
             </div>
         </div>

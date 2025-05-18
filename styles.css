@@ -2626,7 +2626,8 @@ input:checked + .slider:before {
 /* Popup Styling */
 .edit-user-popup, 
 .add-user-popup, 
-.remove-user-popup {
+.remove-user-popup,
+.switch-user-popup {
     position: fixed;
     top: 0;
     left: 0;
