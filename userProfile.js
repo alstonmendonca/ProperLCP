@@ -8,12 +8,22 @@ function loadUserProfile(mainContent, billPanel) {
             <h2>User Profile</h2>
         </div>
         <div class="user-profile-actions">
+
+            <button id="switchUserButton" class="switch-user-btn">Switch User</button>
+
             <!-- Add User Buttons -->
             <button id="addUserButton" class="add-user-btn">Add User</button>
 
             <!-- Remove User Buttons -->
             <button id="removeUserButton" class="add-user-btn">Remove User</button>
         </div>
+
+        <div style="margin-top: 10px;">
+            <h3 class="current-user-display">
+                Current User: Ajay Francis Anchan
+            </h3>
+        </div>
+
         <!-- Admin Users Bar -->
         <div id="adminBar" class="admin-bar"></div>
 
@@ -29,6 +39,7 @@ function loadUserProfile(mainContent, billPanel) {
     // Add event listener to "Add User" button
     document.getElementById("addUserButton").addEventListener("click", openAddUserPopup);
     document.getElementById("removeUserButton").addEventListener("click", openRemoveUserPopup);
+    document.getElementById("switchUserButton").addEventListener("click", openSwitchUserPopup);
 }
 
 // Handle response from main process
@@ -292,5 +303,72 @@ ipcRenderer.on("user-added", () => {
 ipcRenderer.on("user-add-failed", (event, data) => {
     createTextPopup(`Error: ${data.error}`);
 });
+
+function openSwitchUserPopup() {
+    const popup = document.createElement("div");
+    popup.classList.add("switch-user-popup");
+    popup.innerHTML = `
+        <div class="user-popup-content">
+            <h3>Select User to Switch to</h3>
+            <div class="user-list" id="userList"></div>
+            <div class="user-popup-buttons">
+                <button id="removeUsers">Switch</button>
+                <button id="closePopup">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Fetch users from the main process
+    ipcRenderer.send("get-users");
+
+    ipcRenderer.on("users-response", (event, users) => {
+        const userList = popup.querySelector("#userList");
+        userList.innerHTML = ""; // Clear previous content
+
+        users.forEach(user => {
+            const userItem = document.createElement("div");
+            userItem.classList.add("user-item");
+            userItem.setAttribute("data-id", user.userid); // Store user ID for selection
+            userItem.innerHTML = `
+                <span>${user.uname} (${user.isadmin ? "Admin" : "Staff"})</span>
+            `;
+
+            // Toggle selection on click
+            userItem.addEventListener("click", () => {
+                userItem.classList.toggle("selected");
+            });
+
+            userList.appendChild(userItem);
+        });
+    });
+
+    // Handle remove users
+    popup.querySelector("#removeUsers").addEventListener("click", () => {
+        const selectedUsers = Array.from(popup.querySelectorAll(".user-item.selected"))
+            .map(userItem => userItem.getAttribute("data-id"));
+
+        if (selectedUsers.length === 0) {
+            createTextPopup("Please select at least one user to remove.");
+            return;
+        }
+
+        ipcRenderer.send("remove-users", selectedUsers);
+    });
+
+    // Close popup
+    popup.querySelector("#closePopup").addEventListener("click", () => {
+        document.body.removeChild(popup);
+    });
+
+    // Close popup when clicking outside
+    popup.addEventListener("click", (e) => {
+        if (e.target === popup) {
+            document.body.removeChild(popup);
+        }
+    });
+
+}
 
 module.exports = { loadUserProfile };

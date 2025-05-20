@@ -2456,12 +2456,33 @@ input:checked + .slider:before {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     width: 100%;
 }
 
 /* Button Styles */
 .add-user-btn {
+    background-color: #0D3B66;
+    color: white;
+    border: none;
+    padding: 14px 26px;
+    margin: 0 10px 20px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-width: 120px;
+}
+
+.add-user-btn:hover {
+    background-color: #11487b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.switch-user-btn {
     background-color: #0D3B66;
     color: white;
     border: none;
@@ -2476,7 +2497,7 @@ input:checked + .slider:before {
     min-width: 120px;
 }
 
-.add-user-btn:hover {
+.switch-user-btn:hover {
     background-color: #11487b;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -2515,7 +2536,7 @@ input:checked + .slider:before {
     transition: all 0.3s ease;
 }
 
-.admin-box:hover {
+.admin-box:hover, .current-user-display:hover {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
@@ -2528,6 +2549,19 @@ input:checked + .slider:before {
 .admin-box p strong {
     font-size: 16px;
 }
+
+.current-user-display{
+    background: linear-gradient(145deg, #0D3B66 0%, #1a5a94 100%);
+    color: white;
+    font-size: 20px;
+    margin: 20px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
 
 /* Staff Section */
 .staff-grid h2 {
@@ -2592,7 +2626,8 @@ input:checked + .slider:before {
 /* Popup Styling */
 .edit-user-popup, 
 .add-user-popup, 
-.remove-user-popup {
+.remove-user-popup,
+.switch-user-popup {
     position: fixed;
     top: 0;
     left: 0;
