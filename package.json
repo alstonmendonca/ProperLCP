@@ -11,6 +11,7 @@
     },
     "dependencies": {
         "chart.js": "^4.4.8",
+        "dotenv": "^16.5.0",
         "electron-store": "^8.0.2",
         "escpos": "3.0.0-alpha.6",
         "escpos-usb": "3.0.0-alpha.4",
