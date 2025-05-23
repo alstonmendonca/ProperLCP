@@ -21,7 +21,7 @@ function loadBestInCategory(mainContent, billPanel) {
                     <input type="date" id="startDate" value="${startDate.toISOString().split('T')[0]}">
                     <label for="endDate">To:</label>
                     <input type="date" id="endDate" value="${endDate.toISOString().split('T')[0]}">
-                    <button id="refreshBtn" class="refresh-btn">
+                    <button id="refreshBtn" class="refresh-btn" style="background-color: #104475;">
                         <i class="fas fa-sync-alt"></i> Generate Report
                     </button>
                 </div>

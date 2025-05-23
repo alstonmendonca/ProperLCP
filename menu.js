@@ -115,8 +115,12 @@ async function displayMenu() {
                 </div>
                 <input type="text" id="searchBar" placeholder="Search..." style="padding: 10px; border: 3px solid #ccc; border-radius: 25px; width: 1490px; margin-bottom: 20px;">
                 <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                    <button id="addNewItem" style="border: 1px solid #ccc; padding: 10px; text-align: center; background-color: #4CAF50;">
-                    <p style = "font-size : 100px">+</p>
+                    <button id="addNewItem" style="padding: 10px; text-align: center; background-color:rgb(255, 255, 255); border: 2px dashed #aaa; border-radius: 10px; color:black; font-size: 16px;">
+                    <svg class="add-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
                     <br>
                     Add New Item
                     </button>

@@ -73,7 +73,7 @@ function loadSpecialStatistics(mainContent, billPanel) {
             }
             
             .refresh-btn {
-                background-color: #1DB954;
+                background-color: #104475;
                 color: white;
                 border: none;
                 padding: 8px 15px;
@@ -85,7 +85,7 @@ function loadSpecialStatistics(mainContent, billPanel) {
             }
             
             .refresh-btn:hover {
-                background-color: #169c46;
+                background-color: #092947;
             }
         </style>
     `;
