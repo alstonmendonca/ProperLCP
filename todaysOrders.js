@@ -76,7 +76,7 @@ ipcRenderer.on("todays-orders-response", (event, data) => {
                     <div style="font-size: 24px; margin-bottom: 40px;">
                         Come back after placing an order!
                     </div>
-                    <button id='goHomeButton' style="font-size: 18px; color: #fff; background-color: #1DB954; padding: 10px 20px; border: none; border-radius: 25px; text-decoration: none; cursor: pointer;">
+                    <button id='goHomeButton' style="font-size: 18px; color: #fff; background-color: #104475; padding: 10px 20px; border: none; border-radius: 25px; text-decoration: none; cursor: pointer;">
                         Place an Order
                     </button>
                 </div>

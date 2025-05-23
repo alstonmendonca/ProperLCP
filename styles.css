@@ -132,13 +132,13 @@ body {
 
 /* Active Category Button Style */
 #category-panel .category.active {
-    background-color: #1DB954; /* Highlight color */
+    background-color: #0D3B66; /* Highlight color */
     color: white;
     font-weight: bold;
 }
 
 #category-panel .category.active:hover {
-    background-color: #1DB954; /* Highlight color */
+    background-color: #0D3B66; /* Highlight color */
     color: white;
     font-weight: bold;
 }
@@ -438,22 +438,6 @@ input[type="number"] {
     border-radius: 4px;
     font-size: 14px;
     margin-right: 40px; /* Space between inputs and button */
-}
-
-/* Show History Button */
-.date-filters button {
-    padding: 8px 16px;
-    background-color: var(--second-color); /* Green */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-.date-filters button:hover {
-    background-color: var(--secondary-color); /* Darker green on hover */
 }
 
 /* Order History Table */
@@ -2142,7 +2126,7 @@ input:checked + .slider:before {
     position: absolute; /* Position it at the top right */
     top: 10px;
     right: 10px;
-    background-color: #4CAF50; /* Green background */
+    background-color: #104475; /* Blue background */
     color: white; /* White text */
     border: none; /* No border */
     border-radius: 50%; /* Circular button */
@@ -2155,7 +2139,7 @@ input:checked + .slider:before {
 }
 
 .todays-orders-edit-button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #092947; /* Darker Blue on hover */
 }
 
 /* Additional styles for the order box text */
@@ -2330,7 +2314,7 @@ input:checked + .slider:before {
 }
 
 #exportExcelButton {
-    background-color: #1DB954; /* Green background */
+    background-color: #104475; /* Blue background */
     color: white; /* White text */
     border: none; /* Remove border */
     padding: 10px 20px; /* Add padding */
@@ -2341,7 +2325,7 @@ input:checked + .slider:before {
 }
 
 #exportExcelButton:hover {
-    background-color: #17a84b; /* Darker green on hover */
+    background-color: #092947; /* Darker blue  on hover */
 }
 
 /* Center the header and make it visually appealing */
@@ -2416,7 +2400,7 @@ input:checked + .slider:before {
 }
 
 .date-filters button {
-    background-color: #1DB954; /* Green background */
+    background-color: #104475; /* Default Blue */
     color: white; /* White text */
     border: none; /* Remove border */
     padding: 10px 20px; /* Add padding */
@@ -2427,7 +2411,7 @@ input:checked + .slider:before {
 }
 
 .date-filters button:hover {
-    background-color: #17a84b; /* Darker green on hover */
+    background-color: #092947; /* Darker Blue */
 }
 
 /* Specific style for the "Clear History" button */
