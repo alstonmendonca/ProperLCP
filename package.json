@@ -19,6 +19,7 @@
         "fs": "^0.0.1-security",
         "google-auth-library": "^9.15.1",
         "googleapis": "^148.0.0",
+        "mongoose": "^8.15.0",
         "open": "^10.1.2",
         "sqlite3": "^5.1.7",
         "usb": "2.8.0",
