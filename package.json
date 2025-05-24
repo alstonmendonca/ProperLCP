@@ -10,6 +10,7 @@
         "electron-rebuild": "^3.2.9"
     },
     "dependencies": {
+        "better-sqlite3": "^11.10.0",
         "chart.js": "^4.4.8",
         "dotenv": "^16.5.0",
         "electron-store": "^8.0.2",

@@ -1,6 +1,6 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
-const sqlite3 = require("sqlite3").verbose();
+const sqlite3 = require('sqlite3').verbose();
 const escpos = require("escpos");
 const fs = require('fs');
 const { backupLCdb } = require("./backup");
@@ -19,6 +19,7 @@ const db = new sqlite3.Database('LC.db', (err) => {
         console.log("Connected to the SQLite database.");
     }
 });
+
 
 async function initStore() {
     const Store = (await import('electron-store')).default;
