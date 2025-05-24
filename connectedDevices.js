@@ -27,10 +27,10 @@ function loadConnectedDevices(mainContent, billPanel) {
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
-                            <tr style="background-color: #f5f5f5;">
-                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Device</th>
-                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Vendor ID</th>
-                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Product ID</th>
+                            <tr style="background-color: #0D3B66;">
+                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; color:rgb(255, 255, 255);">Device</th>
+                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; color:rgb(255, 255, 255);">Vendor ID</th>
+                                <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; color:rgb(255, 255, 255);">Product ID</th>
                             </tr>
                         </thead>
                         <tbody>
