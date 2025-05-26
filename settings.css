@@ -334,11 +334,6 @@
     font-family: 'Courier New', monospace; /* Monospace for better number alignment */
 }
 
-/* For number input specifically */
-input[type="number"] {
-    -moz-appearance: textfield; /* Firefox */
-}
-
 /* Remove spinner arrows in Chrome/Safari */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
