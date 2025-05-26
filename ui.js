@@ -21,7 +21,7 @@ async function updateMainContent(contentType) {
     ];
     const settingsButtons = [
         'UserProfile', 'BusinessInfo',  
-        'PrinterConfig', 'Receipt', 'DriverConfiguration', 'QRMenu', 'BackupDatabase', 'RestoreDatabase',
+        'Receipt', 'DriverConfiguration', 'QRMenu', 'BackupDatabase', 'RestoreDatabase',
         'ConnectedDevices', 'Help'
     ];
     
@@ -247,14 +247,12 @@ async function updateMainContent(contentType) {
         else if (contentType === "Notes"){
             loadUserNotes(mainContent, billPanel);
         }
-        else if (contentType === "PrinterConfig") {
-            loadPrinterConfig(mainContent, billPanel);
+        else if (contentType === "DriverConfiguration") {
+            const mode = 'auto';
+            loadPrinterConfiguration(mainContent, billPanel, mode);
         }
         else if (contentType === "Receipt") {
             loadReceiptEditor(mainContent, billPanel);
-        }
-        else if (contentType === "DriverConfiguration") {
-            loadDriverConfiguration(mainContent, billPanel);
         }
         else if (contentType === "ConnectedDevices") {
             loadConnectedDevices(mainContent, billPanel);

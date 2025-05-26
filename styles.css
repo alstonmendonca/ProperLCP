@@ -3265,3 +3265,30 @@ color: #fff;
     font-family: 'Courier New', monospace;
     padding: 10px;
 }
+
+.printer-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    color: black;
+}
+
+.tab-btn.active {
+    border-bottom-color: #1DB954;
+    font-weight: bold;
+    color: #1DB954;
+}
+
+.tab-btn:hover:not(.active) {
+    background-color: #d1cece;
+}
