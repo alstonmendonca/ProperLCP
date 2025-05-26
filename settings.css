@@ -1,0 +1,368 @@
+/* Modern Printer Configuration Styles */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+.printer-config-wrapper {
+    max-width: 900px; /* Increased from 800px */
+    margin: 0 auto;
+    padding: 30px; /* Increased padding */
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.printer-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.printer-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.printer-subtitle {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.printer-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #95a5a6;
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    margin: 0 5px;
+}
+
+.tab-btn .tab-icon {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.tab-btn.active {
+    color: #1DB954;
+    border-bottom-color: #1DB954;
+}
+
+.tab-btn:hover {
+    color: #1DB954;
+}
+
+.config-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.config-section.active {
+    display: block;
+}
+
+.printer-config-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px; /* Increased padding */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-group {
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 18px; /* Increased padding */
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    font-size: 16px; /* Increased font size */
+    transition: border 0.3s;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #1DB954;
+    box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+}
+
+.form-hint {
+    display: block;
+    margin-top: 6px;
+    color: #7f8c8d;
+    font-size: 13px;
+}
+
+.select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.form-select {
+    -webkit-appearance: none; /* Chrome/Safari */
+    -moz-appearance: none; /* Firefox */
+    appearance: none; /* Standard */
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: white;
+    cursor: pointer;
+    box-sizing: border-box;
+    background-image: none; /* Remove any default background images */
+}
+
+.select-wrapper .form-select {
+    padding-right: 40px; /* More space for arrow */
+}
+
+
+
+/* Custom arrow styling */
+.select-arrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #7f8c8d;
+    font-size: 14px;
+    z-index: 1; /* Ensure it's above the select */
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+    margin: 25px 0;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 15px;
+}
+
+.btn i {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.btn-test {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-test:hover {
+    background-color: #2980b9;
+}
+
+.btn-save {
+    background-color: #1DB954;
+    color: white;
+    width: 100%;
+}
+
+.btn-save:hover {
+    background-color: #18a74a;
+}
+
+.status-message {
+    margin-left: 15px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.status-message i {
+    margin-right: 6px;
+}
+
+.status-message.testing {
+    color: #3498db;
+}
+
+.status-message.success {
+    color: #1DB954;
+}
+
+.status-message.error {
+    color: #e74c3c;
+}
+
+.printer-help {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff8e1;
+    border-radius: 8px;
+    border-left: 4px solid #f39c12;
+}
+
+.help-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.help-header i {
+    color: #f39c12;
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.help-header h3 {
+    margin: 0;
+    color: #856404;
+    font-size: 18px;
+}
+
+.driver-links h4 {
+    margin: 20px 0 15px;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+.driver-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.driver-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #2c3e50;
+    transition: all 0.2s;
+    border: 1px solid #ecf0f1;
+}
+
+.driver-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    color: #1DB954;
+}
+
+.driver-card i {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #1DB954;
+}
+
+.error-message {
+    padding: 15px;
+    background: #fdecea;
+    border-radius: 8px;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+}
+
+.error-message i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure the form takes full width */
+#autoPrinterConfigForm, 
+#manualPrinterConfigForm {
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .printer-config-wrapper {
+        padding: 20px;
+    }
+    
+    .printer-config-card {
+        padding: 25px;
+    }
+    
+    .form-input,
+    .form-select {
+        padding: 12px 15px;
+        font-size: 15px;
+    }
+}
+
+/* Add these styles to your existing CSS */
+
+.wide-number-input {
+    width: 100%;
+    min-width: 150px; /* Ensures enough space for 5-digit numbers */
+    padding: 14px 18px;
+    font-size: 16px;
+    font-family: 'Courier New', monospace; /* Monospace for better number alignment */
+}
+
+/* For number input specifically */
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+/* Remove spinner arrows in Chrome/Safari */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Make the form layout more spacious */
+#manualPrinterConfigForm {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Ensure form groups take full width */
+#manualPrinterConfigForm .form-group {
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .wide-number-input {
+        min-width: 120px;
+        padding: 12px 15px;
+        font-size: 15px;
+    }
+}

@@ -7,43 +7,53 @@ function loadPrinterConfiguration(mainContent, billPanel, mode = 'auto') {
     mainContent.style.marginRight = "0px";
     billPanel.style.display = 'none';
 
-    // Create tabbed interface
+    // Create modern tabbed interface
     mainContent.innerHTML = `
-        <div class='section-title'>
-            <h2>Thermal Printer Configuration</h2>
-        </div>
-        
-        <div class="printer-tabs" style="margin-bottom: 20px;">
-            <button class="tab-btn ${mode === 'auto' ? 'active' : ''}" data-mode="auto">Automatic Detection</button>
-            <button class="tab-btn ${mode === 'manual' ? 'active' : ''}" data-mode="manual">Manual Configuration</button>
-        </div>
-        
-        <div id="autoConfigSection" style="display: ${mode === 'auto' ? 'block' : 'none'};">
-            <!-- Auto detection content will be loaded here -->
-        </div>
-        
-        <div id="manualConfigSection" style="display: ${mode === 'manual' ? 'block' : 'none'};">
-            <!-- Manual config content will be loaded here -->
+        <div class="printer-config-wrapper">
+            <div class="printer-header">
+                <h2 class="printer-title">Printer Configuration</h2>
+                <p class="printer-subtitle">Configure your thermal printer settings for receipts and KOTs</p>
+            </div>
+            
+            <div class="printer-tabs">
+                <button class="tab-btn ${mode === 'auto' ? 'active' : ''}" data-mode="auto">
+                    <i class="tab-icon fas fa-search"></i>
+                    <span>Auto Detect</span>
+                </button>
+                <button class="tab-btn ${mode === 'manual' ? 'active' : ''}" data-mode="manual">
+                    <i class="tab-icon fas fa-cog"></i>
+                    <span>Manual Setup</span>
+                </button>
+            </div>
+            
+            <div id="autoConfigSection" class="config-section ${mode === 'auto' ? 'active' : ''}">
+                <!-- Auto detection content will be loaded here -->
+            </div>
+            
+            <div id="manualConfigSection" class="config-section ${mode === 'manual' ? 'active' : ''}">
+                <!-- Manual config content will be loaded here -->
+            </div>
         </div>
     `;
 
-    // Add tab switching functionality
+    // Tab switching functionality
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const mode = btn.dataset.mode;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            document.getElementById('autoConfigSection').style.display = mode === 'auto' ? 'block' : 'none';
-            document.getElementById('manualConfigSection').style.display = mode === 'manual' ? 'block' : 'none';
+            document.querySelectorAll('.config-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${mode}ConfigSection`).classList.add('active');
             
-            // Reload content when switching tabs
             if (mode === 'auto') loadAutoConfig();
             else loadManualConfig();
         });
     });
 
-    // Load initial content based on mode
+    // Load initial content
     if (mode === 'auto') loadAutoConfig();
     else loadManualConfig();
 }
@@ -52,70 +62,69 @@ async function loadAutoConfig() {
     const section = document.getElementById('autoConfigSection');
     
     try {
-        // Get available printers and saved printer config
         const [printers, savedPrinter] = await Promise.all([
             ipcRenderer.invoke('get-available-printers'),
             ipcRenderer.invoke('get-saved-printer')
         ]);
 
-        // Create printer dropdown options
         const printerOptions = printers.map(printer => 
             `<option value="${printer.name}" ${savedPrinter === printer.name ? 'selected' : ''}>
                 ${printer.displayName} (${printer.status})
             </option>`
         ).join('');
 
-        // Create help links for common printers
         const helpSection = printers.length === 0 ? `
-            <div class="printer-help" style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 4px;">
-                <h3 style="color: #856404;">⚠️ No printers found</h3>
+            <div class="printer-help">
+                <div class="help-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>No printers found</h3>
+                </div>
                 <p>Make sure your printer is connected and drivers are installed.</p>
                 
-                <h4>Need help? Download drivers:</h4>
-                <ul style="list-style-type: none; padding-left: 0;">
-                    <li>• TVS RP3220 STAR – <a href="https://www.tvs-e.in/downloads/thermal-printer-drivers" target="_blank">Download</a></li>
-                    <li>• Epson TM-T88IV – <a href="https://epson.com/Support/Printers/Point-of-Sale/TM-series/Epson-TM-T88IV/s/SPT_C31CA85011" target="_blank">Download</a></li>
-                    <li>• POS-X EVO – <a href="https://www.pos-x.com/support/downloads" target="_blank">Download</a></li>
-                </ul>
+                <div class="driver-links">
+                    <h4>Download Drivers</h4>
+                    <div class="driver-grid">
+                        <a href="https://www.tvs-e.in/downloads/thermal-printer-drivers" target="_blank" class="driver-card">
+                            <i class="fas fa-print"></i>
+                            <span>TVS RP3220 STAR</span>
+                        </a>
+                        <a href="https://epson.com/Support/Printers/Point-of-Sale/TM-series/Epson-TM-T88IV/s/SPT_C31CA85011" target="_blank" class="driver-card">
+                            <i class="fas fa-print"></i>
+                            <span>Epson TM-T88IV</span>
+                        </a>
+                        <a href="https://www.pos-x.com/support/downloads" target="_blank" class="driver-card">
+                            <i class="fas fa-print"></i>
+                            <span>POS-X EVO</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         ` : '';
 
         section.innerHTML = `
-            <div class="printer-config-container" style="margin-top: 20px;">
+            <div class="printer-config-card">
                 <form id="autoPrinterConfigForm">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 10px; font-weight: bold;">
-                            Select Thermal Printer:
-                        </label>
-                        <select id="printerSelect" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            ${printerOptions.length ? printerOptions : '<option disabled selected>No printers available</option>'}
-                        </select>
+                    <div class="form-group">
+                        <label class="form-label">Select Printer</label>
+                        <div class="select-wrapper">
+                            <select id="printerSelect" class="form-select">
+                                ${printerOptions.length ? printerOptions : '<option disabled selected>No printers available</option>'}
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
                     </div>
                     
-                    <div style="margin-bottom: 15px;">
-                        <button type="button" id="testPrinterBtn" style="
-                            background-color: #17a2b8;
-                            color: white;
-                            border: none;
-                            padding: 8px 15px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            margin-right: 10px;
-                        ">
+                    <div class="button-group">
+                        <button type="button" id="testPrinterBtn" class="btn btn-test">
+                            <i class="fas fa-paper-plane"></i>
                             Test Printer
                         </button>
-                        <span id="printerStatus" style="font-weight: bold;"></span>
+                        <span id="printerStatus" class="status-message"></span>
                     </div>
                     
-                    <button type="submit" style="
-                        background-color: #1DB954;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                    ">
-                        Save Printer Configuration
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i>
+                        Save Configuration
                     </button>
                 </form>
                 
@@ -132,8 +141,8 @@ async function loadAutoConfig() {
             }
 
             const statusElement = document.getElementById('printerStatus');
-            statusElement.textContent = 'Testing...';
-            statusElement.style.color = '#17a2b8';
+            statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            statusElement.className = 'status-message testing';
 
             try {
                 const success = await ipcRenderer.invoke('test-printer', {
@@ -150,15 +159,15 @@ async function loadAutoConfig() {
                 });
                 
                 if (success) {
-                    statusElement.textContent = '✓ Printer test successful';
-                    statusElement.style.color = '#28a745';
+                    statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Printer test successful';
+                    statusElement.className = 'status-message success';
                 } else {
-                    statusElement.textContent = '✗ Printer test failed';
-                    statusElement.style.color = '#dc3545';
+                    statusElement.innerHTML = '<i class="fas fa-times-circle"></i> Printer test failed';
+                    statusElement.className = 'status-message error';
                 }
             } catch (error) {
-                statusElement.textContent = `Error: ${error.message}`;
-                statusElement.style.color = '#dc3545';
+                statusElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error: ${error.message}`;
+                statusElement.className = 'status-message error';
             }
         });
 
@@ -182,7 +191,8 @@ async function loadAutoConfig() {
 
     } catch (error) {
         section.innerHTML = `
-            <div style="color: #dc3545; margin-top: 20px;">
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
                 Error loading printer configuration: ${error.message}
             </div>
         `;
@@ -192,44 +202,32 @@ async function loadAutoConfig() {
 function loadManualConfig() {
     const section = document.getElementById('manualConfigSection');
 
-    // Get printer config via IPC
     ipcRenderer.invoke('get-printer-config').then(config => {
-        // Convert hex values to decimal for display
         const defaultVendorId = config.vendorId ? parseInt(config.vendorId, 16) : 1317;
         const defaultProductId = config.productId ? parseInt(config.productId, 16) : 42752;
 
         section.innerHTML = `
-            <div style="margin-top: 20px;">
+            <div class="printer-config-card">
                 <form id="manualPrinterConfigForm">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 10px; font-weight: bold; text-align: center;">
-                            Vendor ID (Decimal):
-                        </label>
+                    <div class="form-group">
+                        <label class="form-label">Vendor ID (Decimal)</label>
                         <input type="number" id="vendorId" value="${defaultVendorId}" 
-                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-                            min="0" max="65535" step="1"
+                            class="form-input wide-number-input" min="0" max="65535" step="1"
                             title="Enter decimal value between 0 and 65535">
-                        <small style="color: #666;">Common values: 1317 (0x0525), 1155 (0x0483)</small>
+                        <small class="form-hint">Common values: 1317 (0x0525), 1155 (0x0483)</small>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 10px; font-weight: bold; text-align: center;">
-                            Product ID (Decimal):
-                        </label>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product ID (Decimal)</label>
                         <input type="number" id="productId" value="${defaultProductId}" 
-                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-                            min="0" max="65535" step="1"
+                            class="form-input wide-number-input" min="0" max="65535" step="1"
                             title="Enter decimal value between 0 and 65535">
-                        <small style="color: #666;">Common values: 42752 (0xA700), 22304 (0x5720)</small>
+                        <small class="form-hint">Common values: 42752 (0xA700), 22304 (0x5720)</small>
                     </div>
-                    <button type="submit" style="
-                        background-color: #1DB954;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                    ">
-                        Save Printer Configuration
+                    
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i>
+                        Save Configuration
                     </button>
                 </form>
             </div>
