@@ -3229,3 +3229,39 @@ color: #fff;
 .receipt span[style*="bold"] {
     font-weight: bold !important;
 }
+
+/* Printer Configuration Styles */
+.printer-config-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.printer-help {
+    margin-top: 30px;
+    padding: 15px;
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+}
+
+.printer-help h4 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.printer-help a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.printer-help a:hover {
+    text-decoration: underline;
+}
+
+#printerSelect {
+    font-family: 'Courier New', monospace;
+    padding: 10px;
+}

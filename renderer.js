@@ -67,6 +67,7 @@ const { loadCharts } = require('./charts');
 const { loadBestInCategory } = require('./bestInCategory');
 const { loadTaxOnItems } = require('./taxOnItems');
 const { loadReceiptEditor } = require("./receiptEditor");
+const { loadDriverConfiguration } = require("./driverConfiguration");
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;
 window.fetchDeletedOrders = fetchDeletedOrders;

@@ -20,9 +20,9 @@ async function updateMainContent(contentType) {
         'Charts', 'RateOfSale', 'BestInCategory'
     ];
     const settingsButtons = [
-        'UserProfile', 'BusinessInfo', 'ThemeToggle', 
-        'PrinterConfig', 'Receipt',
-        'DateAndTime', 'ConnectedDevices', 'Security', 'Help', 'SystemUpdates'
+        'UserProfile', 'BusinessInfo',  
+        'PrinterConfig', 'Receipt', 'DriverConfiguration', 'QRMenu', 'BackupDatabase', 'RestoreDatabase',
+        'ConnectedDevices', 'Help'
     ];
     
     // Highlight top panel button for any top-level section
@@ -244,9 +244,6 @@ async function updateMainContent(contentType) {
         else if (contentType === "BusinessInfo") {
             loadBusinessInfo(mainContent, billPanel);
         }
-        else if (contentType === "ThemeToggle") {
-            loadThemeToggle(mainContent, billPanel); 
-        }
         else if (contentType === "Notes"){
             loadUserNotes(mainContent, billPanel);
         }
@@ -256,30 +253,11 @@ async function updateMainContent(contentType) {
         else if (contentType === "Receipt") {
             loadReceiptEditor(mainContent, billPanel);
         }
-        else if (contentType === "DateAndTime") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none';
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Date And Time</h2>
-                </div>
-                <p>Settings for display</p>
-            `;
+        else if (contentType === "DriverConfiguration") {
+            loadDriverConfiguration(mainContent, billPanel);
         }
         else if (contentType === "ConnectedDevices") {
             loadConnectedDevices(mainContent, billPanel);
-        }
-        else if (contentType === "Security") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none';
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Security</h2>
-                </div>
-                <p>Settings for display</p>
-            `;
         }
         else if (contentType === "Help") {
             loadHelpSection();
@@ -295,20 +273,15 @@ async function updateMainContent(contentType) {
                 <p>Qr Menu</p>
             `;
         }
-        // ui.js
         else if (contentType === "BackupDatabase") {
             const { loadBackupUI } = require("./loadBackupUI");
             loadBackupUI(mainContent, billPanel); // Call the backup UI function
         }
-
-        
-        
         else if (contentType === "RestoreDatabase") {
             const { loadRestoreUI } = require("./loadRestoreUI");
             loadRestoreUI(mainContent, billPanel); // Call the restore UI function
 
         }
-        
         else if (contentType === "Exit") {
             const  {createConfirmPopup} = require("./textPopup");
             createConfirmPopup("Are you sure you want to exit?", (confirmed) => {

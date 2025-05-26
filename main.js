@@ -1120,6 +1120,126 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
     });
 });
 
+// Add this to your main.js IPC handlers
+ipcMain.handle('test-printer', async (event, { printerName, testData }) => {
+    if (isPrinting) {
+        throw new Error('Printer is busy with another job');
+    }
+    isPrinting = true;
+
+    try {
+        // Get printer config
+        const config = store.get('printerConfig', {
+            vendorId: '0x0525',
+            productId: '0xA700'
+        });
+
+        // Convert hex strings to numbers
+        const vendorId = parseInt(config.vendorId, 16);
+        const productId = parseInt(config.productId, 16);
+
+        // Validate IDs
+        if (isNaN(vendorId)) throw new Error('Invalid Vendor ID');
+        if (isNaN(productId)) throw new Error('Invalid Product ID');
+
+        const device = new escpos.USB(vendorId, productId);
+        const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
+
+        // Generate test receipt
+        const commands = generateTestReceipt(testData);
+
+        return await new Promise((resolve, reject) => {
+            device.open((error) => {
+                if (error) {
+                    reject(new Error(`Printer connection failed: ${error.message}`));
+                    return;
+                }
+
+                printer
+                    .raw(Buffer.from(commands, 'utf8'))
+                    .cut()
+                    .close((err) => {
+                        if (err) {
+                            reject(new Error(`Print failed: ${err.message}`));
+                        } else {
+                            resolve(true);
+                        }
+                    });
+            });
+        });
+    } catch (error) {
+        event.sender.send('print-error', `System error: ${error.message}`);
+    } finally {
+        isPrinting = false;
+    }
+});
+
+// Add this function to main.js
+function generateTestReceipt(testData) {
+    const template = store.get('receiptTemplate', {
+        title: 'THE LASSI CORNER',
+        subtitle: 'SJEC, VAMANJOOR',
+        footer: 'Thank you for visiting!',
+        kotTitle: 'KITCHEN ORDER',
+        itemHeader: 'ITEM',
+        qtyHeader: 'QTY',
+        priceHeader: 'PRICE',
+        totalText: 'TOTAL: Rs.',
+        kotItemHeader: 'ITEM',
+        kotQtyHeader: 'QTY'
+    });
+
+    // Format test items
+    const formattedItems = testData.items.map(item => 
+        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
+    ).join('\n');
+    
+    const kotItems = testData.items.map(item => 
+        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
+    ).join('\n');
+    
+    // Test customer receipt
+    const customerReceipt = `
+\x1B\x40\x1B\x61\x01\x1D\x21\x11
+TEST PRINT
+\x1D\x21\x00
+${template.title}
+\x1B\x45\x01
+Token No: ${testData.kot}
+\x1B\x45\x00\x1B\x61\x00
+Date: ${new Date().toLocaleString()}
+BILL NUMBER: ${testData.orderId}
+${'-'.repeat(32)}
+\x1B\x45\x01
+${template.itemHeader.padEnd(14)}${template.qtyHeader.padStart(3)}${template.priceHeader.padStart(8)}
+\x1B\x45\x00
+${formattedItems}
+${'-'.repeat(32)}
+\x1B\x45\x01
+${template.totalText} ${testData.totalAmount.toFixed(2)}
+\x1B\x45\x00\x1B\x61\x01
+This is a test print
+${template.footer}
+\x1D\x56\x41\x10`;
+
+    // Test KOT receipt
+    const kotReceipt = `
+\x1B\x61\x01\x1D\x21\x11
+TEST KOT PRINT
+\x1D\x21\x00
+KOT #: ${testData.kot}
+Time: ${new Date().toLocaleTimeString()}
+${'-'.repeat(32)}
+\x1B\x61\x00\x1B\x45\x01
+${template.kotItemHeader.padEnd(14)}${template.kotQtyHeader.padStart(3)}
+\x1B\x45\x00
+${kotItems}
+${'-'.repeat(32)}
+\x1D\x56\x41\x10`;
+
+    return customerReceipt + kotReceipt;
+}
+
 
 //------------------------------------------------Bill Printing Ends Here--------------------------------------------------
 //-----------------HELD ORDERS-----------------
@@ -2283,6 +2403,31 @@ ipcMain.on("remove-users", (event, userIds) => {
         event.reply("users-deleted");
         mainWindow.webContents.send("get-users"); // Refresh user list in main UI
     });
+});
+
+// Printer Configuration
+const Store = require('electron-store');
+const printerStore = new Store({ name: 'printer-config' });
+
+// Get available printers
+ipcMain.handle('get-available-printers', async () => {
+    const printers = await mainWindow.webContents.getPrintersAsync();
+    return printers.map(printer => ({
+        name: printer.name,
+        displayName: printer.displayName,
+        status: printer.status === 0 ? 'Ready' : 'Offline'
+    }));
+});
+
+// Get saved printer
+ipcMain.handle('get-saved-printer', () => {
+    return printerStore.get('selectedPrinter', null);
+});
+
+// Save printer config
+ipcMain.handle('save-printer-configuration', (event, printerName) => {
+    printerStore.set('selectedPrinter', printerName);
+    return true;
 });
 
 //----------------------------------------------SETTINGS TAB ENDS HERE--------------------------------------------
