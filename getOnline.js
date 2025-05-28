@@ -178,6 +178,19 @@ async function startTunnel(restartAttempt = 0) {
 
   return tunnelProcess;
 }
+process.on('SIGTERM', () => {
+  console.log("Received SIGTERM in getOnline.js. Cleaning up...");
+
+  // Close DB connection before exiting
+  if (db) {
+    db.close(() => {
+      console.log("Database connection closed in getOnline.js");
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});
 
 server.listen(PORT, async () => {
   console.log(`Local WebSocket server running on port ${PORT}`);

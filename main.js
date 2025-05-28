@@ -141,12 +141,7 @@ function startGetOnlineServer() {
   });
 }
 
-// Optional cleanup
-app.on('before-quit', () => {
-  if (onlineProcess) {
-    onlineProcess.kill();
-  }
-});
+
 
 
 app.whenReady().then(async () => {
@@ -250,7 +245,13 @@ function closeDatabase() {
         });
     }
 }
-
+// Optional cleanup
+app.on('before-quit', () => {
+  console.log("App is quitting. Cleaning up...");
+  if (onlineProcess) {
+    onlineProcess.kill();
+  }
+});
 //----------------------------------------------ANALYTICS STARTS HERE--------------------------------------------------------------
 // Fetch Today's Items for Item Summary
 // Item Summary
@@ -3024,47 +3025,74 @@ ipcMain.on('restore-database', async (event) => {
 // ---------------------------------- BACKUP AND RESTORE SECTION ENDS HERE -------------------
 
 //---------------------------------- ONLINE ORDERS SECTION STARTS HERE -------------------
-const { ipcMain } = require('electron');
-
+ipcMain.handle("getOnlineOrderCount", async () => {
+  return new Promise((resolve, reject) => {
+    db.get("SELECT COUNT(*) as cnt FROM OnlineOrders", (err, row) => {
+      if (err) reject(err);
+      else resolve(row?.cnt || 0);
+    });
+  });
+});
 // Assuming 'db' is your sqlite3 database instance
-ipcMain.on('get-online-orders', (event) => {
-    const ordersQuery = `SELECT * FROM OnlineOrders`;
-    const itemsQuery = `SELECT * FROM OnlineOrderItems WHERE orderId = ?`;
-
-    db.all(ordersQuery, [], (err, orders) => {
-        if (err) {
-            console.error('Failed to fetch orders:', err.message);
-            return event.reply('get-online-orders-response', { error: err.message });
-        }
-
-        const ordersWithItems = [];
-
-        let remaining = orders.length;
-        if (remaining === 0) {
-            return event.reply('get-online-orders-response', []);
-        }
-
-        orders.forEach(order => {
-            db.all(itemsQuery, [order.orderId], (err, items) => {
-                if (err) {
-                    console.error('Failed to fetch items for order', order.orderId, err.message);
-                    items = [];
-                }
-
-                ordersWithItems.push({
-                    ...order,
-                    cartItems: items
-                });
-
-                remaining--;
-                if (remaining === 0) {
-                    event.reply('get-online-orders-response', ordersWithItems);
-                }
-            });
-        });
+ipcMain.on("get-food-name", (event, fid) => {
+    db.get("SELECT fname FROM FoodItem WHERE fid = ?", [fid], (err, row) => {
+        event.reply(`food-name-${fid}`, row?.fname);
     });
 });
 
 
-//----------------------------------- ONLINE ORDERS SECTION STARTS HERE -------------------
+ipcMain.on('get-online-orders', (event) => {
+    db.all(`SELECT * FROM OnlineOrders`, [], (err, orders) => {
+        if (err) {
+            console.error('Error fetching online orders:', err);
+            event.reply('online-orders-response', { error: true, message: err.message });
+            return;
+        }
+
+        // Now fetch items for each order
+        const orderIds = orders.map(o => o.orderId);
+        const placeholders = orderIds.map(() => '?').join(',');
+
+        db.all(
+            `SELECT * FROM OnlineOrderItems WHERE orderId IN (${placeholders})`,
+            orderIds,
+            (err, items) => {
+                if (err) {
+                    console.error('Error fetching order items:', err);
+                    event.reply('online-orders-response', { error: true, message: err.message });
+                    return;
+                }
+
+                // Group items by orderId
+                const groupedItems = {};
+                items.forEach(item => {
+                    if (!groupedItems[item.orderId]) groupedItems[item.orderId] = [];
+                    groupedItems[item.orderId].push(item);
+                });
+
+                // Attach items to orders
+                const result = orders.map(order => ({
+                    ...order,
+                    items: groupedItems[order.orderId] || []
+                }));
+
+                event.reply('online-orders-response', { error: false, orders: result });
+            }
+        );
+    });
+});
+ipcMain.on("cancel-online-order", (event, orderId) => {
+    db.serialize(() => {
+        db.run("DELETE FROM OnlineOrderItems WHERE orderId = ?", [orderId]);
+        db.run("DELETE FROM OnlineOrders WHERE orderId = ?", [orderId], function (err) {
+            if (err) {
+                console.error("Failed to delete order:", err.message);
+            } else {
+                console.log(`Order ${orderId} cancelled successfully`);
+            }
+        });
+    });
+});
+
+//----------------------------------- ONLINE ORDERS SECTION ENDS HERE -------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');

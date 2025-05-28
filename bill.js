@@ -1,4 +1,32 @@
 const  {createTextPopup} = require("./textPopup");
+
+async function updateOnlineOrderStatus() {
+  try {
+    const count = await ipcRenderer.invoke('getOnlineOrderCount');
+    const statusDiv = document.getElementById('online-order-status');
+    if (!statusDiv) return;
+
+    if (count > 0) {
+      statusDiv.innerText = `YOU HAVE ${count} PENDING ONLINE ORDER${count > 1 ? 'S' : ''}`;
+      statusDiv.style.backgroundColor = 'red';
+      statusDiv.style.color = 'white';
+    } else {
+      statusDiv.innerText = 'You have no pending online orders';
+      statusDiv.style.backgroundColor = 'white';
+      statusDiv.style.color = 'green';
+    }
+  } catch (err) {
+    console.error('Failed to fetch online order count:', err);
+  }
+}
+
+// Call on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateOnlineOrderStatus();
+
+  // Optional: update every 30 seconds
+  setInterval(updateOnlineOrderStatus, 30000);
+});
 // Add an item to the bill
 function addToBill(itemId, itemName, price, quantity, category = null) {
     const  {createTextPopup} = require("./textPopup");
@@ -1501,3 +1529,244 @@ function NewOrder() {
     resetBill();
     updateMainContent('Home');
 }
+// ----------------ONLINE ORDERS FUNCTIONALITY STARTS HERE ------------------
+function getOnlineOrders() {
+    function fetchFoodItemName(fid, callback) {
+        ipcRenderer.once(`food-name-${fid}`, (event, name) => {
+            callback(name || "Unknown Item");
+        });
+        ipcRenderer.send("get-food-name", fid);
+    }
+  function showOnlineOrdersPopup(orders) {
+        let popup = document.createElement("div");
+        popup.id = "onlineOrdersPopup";
+        popup.style = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px);
+            padding: 35px 20px 20px 20px;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+            max-width: 90%;
+            width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        `;
+
+        // Close Button
+        const closeBtn = document.createElement("div");
+        closeBtn.innerHTML = "&times;";
+        closeBtn.style = `
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #ff4757;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            transition: all 0.2s;
+            line-height: 1;
+        `;
+        closeBtn.onmouseover = () => {
+            closeBtn.style.background = '#ff6b81';
+            closeBtn.style.transform = 'rotate(90deg) scale(1.1)';
+        };
+        closeBtn.onmouseout = () => {
+            closeBtn.style.background = '#ff4757';
+            closeBtn.style.transform = 'none';
+        };
+        closeBtn.onclick = () => popup.remove();
+        popup.appendChild(closeBtn);
+
+        // SVG icons
+        const svgPackage = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#e84393" viewBox="0 0 24 24"><path d="M21 16v-8l-9-4-9 4v8l9 4 9-4zm-18-7.5 7.5-3.33v5.83l-7.5 3.34v-5.84zm16.5 6.33-7.5 3.34v-5.84l7.5-3.34v5.84zm-11.25-4.33h4.5v2h-4.5v-2z"/></svg>`;
+        const svgUser = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2d3436" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+        const svgMoney = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2ecc71" viewBox="0 0 24 24"><path d="M12 1c-4.97 0-9 4.03-9 9h2a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 3.86-3.14 7-7 7a6.97 6.97 0 0 1-6.93-6H3c0 4.97 4.03 9 9 9 5.52 0 10-4.48 10-10S17.52 1 12 1z"/></svg>`;
+        const svgFood = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#57606f" viewBox="0 0 24 24"><path d="M8 13v5a1 1 0 1 0 2 0v-5a3 3 0 1 0-2 0zM12 8a1 1 0 0 0 0 2h2v8h2v-8h2a1 1 0 0 0 0-2h-6z"/></svg>`;
+        const svgCheck = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M20.285 6.709l-11.09 11.09-5.486-5.486 1.415-1.415 4.07 4.07 9.675-9.675z"/></svg>`;
+        const svgCancel = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414-1.414L12 9.172 7.05 4.222 5.636 5.636 10.586 10.586 5.636 15.536l1.414 1.414L12 12l4.95 4.95 1.414-1.414L13.414 10.586z"/></svg>`;
+
+        orders.forEach(order => {
+            const orderDiv = document.createElement("div");
+            orderDiv.style = `
+                background: #ffffff;
+                margin: 12px 0;
+                padding: 18px;
+                border-radius: 10px;
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+                transition: transform 0.2s, box-shadow 0.2s;
+                border: 1px solid #f1f2f6;
+            `;
+            orderDiv.onmouseover = () => {
+                orderDiv.style.transform = 'translateY(-3px)';
+                orderDiv.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.08)';
+            };
+            orderDiv.onmouseout = () => {
+                orderDiv.style.transform = 'none';
+                orderDiv.style.boxShadow = '0 3px 12px rgba(0, 0, 0, 0.06)';
+            };
+
+            // Payment status text & color
+            const paidOnline = order.paymentID !== null;
+            const paymentMethod = paidOnline ? "Online" : "Cafe";
+            const paymentColor = paidOnline ? "#2ecc71" : "#ff6b81";
+
+            const header = document.createElement("div");
+            header.style = `
+                font-weight: 600;
+                color: #2d3436;
+                font-size: 1.2rem;
+                margin-bottom: 14px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #f8f9fa;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            `;
+            header.innerHTML = `
+                ${svgPackage} <span style="color: #e84393;">Order ${order.orderId}</span>
+                | ${svgUser} ${order.customerName} (${order.phone})
+                | ${svgMoney} <span style="color: #2ecc71;">₹${order.totalPrice}</span>
+                | <span style="color: ${paymentColor}; font-weight: 600;">
+                    ${paidOnline ? `Paid Online (ID: ${order.paymentID})` : "Pay at Cafe"}
+                </span>
+            `;
+            orderDiv.appendChild(header);
+
+            // Items - asynchronously fetch names and then append
+            order.items.forEach(item => {
+                // Create placeholder paragraph to update later
+                const itemP = document.createElement("p");
+                itemP.style = `
+                    margin: 10px 0;
+                    padding: 10px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    font-size: 0.95rem;
+                    color: #57606f;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                `;
+                itemP.innerHTML = `${svgFood} <span style="font-weight: 500;">Loading item #${item.fid}...</span>`;
+                orderDiv.appendChild(itemP);
+
+                // Fetch food item name and update paragraph
+                fetchFoodItemName(item.fid, (itemName) => {
+                    itemP.innerHTML = `
+                        ${svgFood} <span style="font-weight: 500;">${itemName}</span>
+                        <span style="color: #747d8c;">x${item.quantity}</span>
+                        <span style="margin-left: auto; color: #2ed573;">₹${item.price}</span>
+                    `;
+                });
+            });
+
+            const buttonsDiv = document.createElement("div");
+            buttonsDiv.style = `
+                display: flex;
+                gap: 12px;
+                margin-top: 18px;
+                padding-top: 14px;
+                border-top: 1px solid #f1f2f6;
+            `;
+
+            // Add to Bill Button
+            const addToBillBtn = document.createElement("button");
+            addToBillBtn.style = `
+                background: #2ecc71;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-weight: 500;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            `;
+            addToBillBtn.onmouseover = () => addToBillBtn.style.background = '#27ae60';
+            addToBillBtn.onmouseout = () => addToBillBtn.style.background = '#2ecc71';
+            addToBillBtn.innerHTML = `${svgCheck} Add to Bill`;
+            addToBillBtn.onclick = () => {
+                order.items.forEach(item => {
+                    fetchFoodItemName(item.fid, (itemName) => {
+                        addToBill(item.fid, itemName, item.price, item.quantity);
+                    });
+                });
+                ipcRenderer.send("cancel-online-order", order.orderId);
+                popup.remove();
+            };
+
+            // Cancel Order Button
+            const cancelBtn = document.createElement("button");
+            cancelBtn.style = `
+                background: #ff4757;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-weight: 500;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            `;
+            cancelBtn.onmouseover = () => cancelBtn.style.background = '#ff6b81';
+            cancelBtn.onmouseout = () => cancelBtn.style.background = '#ff4757';
+            cancelBtn.innerHTML = `${svgCancel} Cancel Order`;
+            cancelBtn.onclick = () => {
+                if (confirm(`Are you sure you want to cancel Order ${order.orderId}? This action cannot be undone.`)) {
+                    ipcRenderer.send("cancel-online-order", order.orderId);
+                    popup.remove();
+                }
+            };
+
+            buttonsDiv.appendChild(addToBillBtn);
+            buttonsDiv.appendChild(cancelBtn);
+            orderDiv.appendChild(buttonsDiv);
+            popup.appendChild(orderDiv);
+        });
+
+        document.body.appendChild(popup);
+    }
+
+
+
+    let existingPopup = document.getElementById("onlineOrdersPopup");
+
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
+    }
+
+    ipcRenderer.send("get-online-orders"); // Request online orders from the main process
+    ipcRenderer.once('online-orders-response', (event, response) => {
+        if (response.error) {
+            alert('Failed to fetch online orders: ' + response.message);
+            return;
+        }
+
+        showOnlineOrdersPopup(response.orders);
+    });
+
+}
+
+// --------------- ONLINE ORDERS FUNCTIONALITY ENDS HERE ------------------
