@@ -6,7 +6,7 @@ const fs = require('fs');
 const { backupLCdb } = require("./backup");
 escpos.USB = require("escpos-usb");
 const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
-
+const { fork } = require('child_process');
 let mainWindow;
 let userRole = null;
 let store; // Will be initialized after dynamic import
@@ -52,9 +52,105 @@ async function checkAndResetFoodItems() {
         });
     }
 }
+function saveOrderToDatabase(order) {
+    const {
+        orderId,
+        name,
+        phone,
+        datetime,
+        paymentId,
+        paymentMethod,
+        totalPrice,
+        source,
+        cartItems
+    } = order;
+
+    db.serialize(() => {
+        db.run(
+            `INSERT INTO OnlineOrders (
+                orderId, customerName, phone, datetime, paymentId, 
+                paymentMethod, totalPrice, source
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                orderId,
+                name,
+                phone,
+                datetime,
+                paymentId,
+                paymentMethod,
+                totalPrice,
+                source
+            ],
+            function (err) {
+                if (err) {
+                    return console.error("Failed to insert order:", err.message);
+                }
+
+                console.log(`Inserted order ${orderId} successfully`);
+
+                const insertItemStmt = db.prepare(
+                    `INSERT INTO OnlineOrderItems (
+                        orderId, fid, quantity, price
+                    ) VALUES (?, ?, ?, ?)`
+                );
+
+                cartItems.forEach(item => {
+                    insertItemStmt.run(
+                        orderId,
+                        item.fid,
+                        item.quantity,
+                        item.price
+                    );
+                });
+
+                insertItemStmt.finalize((err) => {
+                    if (err) {
+                        console.error("Failed to insert order items:", err.message);
+                    } else {
+                        console.log(`Inserted ${cartItems.length} items for order ${orderId}`);
+                    }
+                });
+            }
+        );
+    });
+}
+// Spawn getOnline.js as a background process
+function startGetOnlineServer() {
+  const scriptPath = path.join(__dirname, 'getOnline.js');
+
+  onlineProcess = fork(scriptPath, {
+    env: process.env,
+  });
+
+  // Listen for messages from getOnline.js
+  onlineProcess.on('message', (message) => {
+    if (message.type === 'newOrder') {
+      console.log('New order received in main process:', message.data);
+
+      // Save to DB here or forward to renderer with BrowserWindow.webContents.send()
+      saveOrderToDatabase(message.data); // ← Replace with your DB logic
+    }
+  });
+
+  onlineProcess.on('error', (err) => {
+    console.error('Error from getOnline.js:', err);
+  });
+
+  onlineProcess.on('exit', (code, signal) => {
+    console.log(`getOnline.js exited with code ${code}, signal ${signal}`);
+  });
+}
+
+// Optional cleanup
+app.on('before-quit', () => {
+  if (onlineProcess) {
+    onlineProcess.kill();
+  }
+});
+
 
 app.whenReady().then(async () => {
-
+    startGetOnlineServer(); // Start Cloudflare tunnel + WebSocket server
     // Initialize store first
     await initStore();
     
@@ -2926,4 +3022,49 @@ ipcMain.on('restore-database', async (event) => {
 
 
 // ---------------------------------- BACKUP AND RESTORE SECTION ENDS HERE -------------------
+
+//---------------------------------- ONLINE ORDERS SECTION STARTS HERE -------------------
+const { ipcMain } = require('electron');
+
+// Assuming 'db' is your sqlite3 database instance
+ipcMain.on('get-online-orders', (event) => {
+    const ordersQuery = `SELECT * FROM OnlineOrders`;
+    const itemsQuery = `SELECT * FROM OnlineOrderItems WHERE orderId = ?`;
+
+    db.all(ordersQuery, [], (err, orders) => {
+        if (err) {
+            console.error('Failed to fetch orders:', err.message);
+            return event.reply('get-online-orders-response', { error: err.message });
+        }
+
+        const ordersWithItems = [];
+
+        let remaining = orders.length;
+        if (remaining === 0) {
+            return event.reply('get-online-orders-response', []);
+        }
+
+        orders.forEach(order => {
+            db.all(itemsQuery, [order.orderId], (err, items) => {
+                if (err) {
+                    console.error('Failed to fetch items for order', order.orderId, err.message);
+                    items = [];
+                }
+
+                ordersWithItems.push({
+                    ...order,
+                    cartItems: items
+                });
+
+                remaining--;
+                if (remaining === 0) {
+                    event.reply('get-online-orders-response', ordersWithItems);
+                }
+            });
+        });
+    });
+});
+
+
+//----------------------------------- ONLINE ORDERS SECTION STARTS HERE -------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');
