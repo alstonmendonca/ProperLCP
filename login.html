@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lassi Corner Login</title>
+    <style>
+        body {
+            background-color: #2c3e50;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px; /* Max width for better responsiveness */
+        }
+
+        h1 {
+            color: #2980b9;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #2980b9;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+
+        button {
+            background-color: #2980b9;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3498db;
+        }
+
+        button:focus {
+            outline: none; /* Removes default focus outline */
+        }
+
+        /* Style for the incorrect password message */
+        .error-message {
+            color: red;
+            font-size: 14px;
+            display: none; /* Initially hidden */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button type="submit" id="login-btn">Login</button>
+        <div id="error-message" class="error-message">Incorrect password. Please try again.</div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

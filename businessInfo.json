@@ -1,0 +1,18 @@
+{
+    "name": "Lassi Corner",
+    "tagline": "Lorem Ipsum Default Hardcoded Values for Lassi Corner",
+    "description": "This App was created by Alston and Reevan, once upon a time. Please edit this default message.",
+    "address": "Vamanjoor, Mangalore, Karnataka 575028",
+    "phone": "+91 9876543210",
+    "email": "contact@lassicorner.com",
+    "hours": {
+        "weekdays": "9:00 AM - 10:00 PM",
+        "saturday": "10:00 AM - 11:00 PM",
+        "sunday": "Timings not available"
+    },
+    "owner": {
+        "name": "Ajay Anchan",
+        "position": "Founder & CEO",
+        "initials": "AA"
+    }
+}
