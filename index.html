@@ -90,13 +90,36 @@
 
 <!-- Bill Panel (Right Side) -->
 <div id="bill-panel">
-    <!-- Status Label for Online Orders -->
-    <div id="online-order-status" style="margin-bottom: 10px; padding: 5px 10px; border-radius: 5px; font-weight: bold; text-align: center; font-size: 10px;">
-    Checking online order status...
-    </div>
+<div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+    <label id="online-order-status" style="
+        background-color: #e0f2fe;
+        color: #0D3B66;
+        padding: 2px 8px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-family: Arial, sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 9px;
+    ">
+        <span style="
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #0D3B66;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        "></span>
+        Checking for Online Orders
+    </label>
+</div>
 
   <!-- Flexbox for H3 and Reset Button -->
-  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 10px;">
     <h3 style="margin: 0;">Bill</h3>
     <div id='upperbuttons' style="display: flex; gap: 10px;">
         <button onclick="NewOrder()" style="font-size: 14px; padding: 5px 10px; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px;">

@@ -180,7 +180,7 @@ body {
     border: 1px solid #555;
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling */
-    height: calc(100% - 119px); /* Ensures it occupies a set height */
+    height: calc(100% - 140px); /* Ensures it occupies a set height */
     min-height: 200px; /* Prevents it from collapsing when empty */
     display: flex;
     flex-direction: column;
@@ -2634,7 +2634,10 @@ input:checked + .slider:before {
     max-width: 90%;
     animation: popupFadeIn 0.3s ease-out;
 }
-
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
 @keyframes popupFadeIn {
     from {
         opacity: 0;

@@ -145,7 +145,7 @@ function startGetOnlineServer() {
 
 
 app.whenReady().then(async () => {
-    startGetOnlineServer(); // Start Cloudflare tunnel + WebSocket server
+    //startGetOnlineServer(); // Start Cloudflare tunnel + WebSocket server
     // Initialize store first
     await initStore();
     
