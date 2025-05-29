@@ -1039,17 +1039,14 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
     isPrinting = true;
 
     try {
-        // Get config with fallback to defaults
         const config = store.get('printerConfig', {
             vendorId: '0x0525',
             productId: '0xA700'
         });
 
-        // Convert hex strings to numbers
         const vendorId = parseInt(config.vendorId, 16);
         const productId = parseInt(config.productId, 16);
 
-        // Validate IDs
         if (isNaN(vendorId) || isNaN(productId)) {
             throw new Error('Invalid printer configuration - please check Vendor/Product IDs');
         }
@@ -1057,9 +1054,9 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
         const device = new escpos.USB(vendorId, productId);
         const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
 
-        device.open((error) => {
-            if (error) {
-                event.sender.send('print-error', `Printer connection failed: ${error.message}`);
+        device.open((err) => {
+            if (err) {
+                event.sender.send('print-error', `Printer connection failed: ${err.message}`);
                 return;
             }
 
@@ -1067,12 +1064,12 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
             
             printer
                 .raw(Buffer.from(commands, 'utf8'))
-                .cut()
                 .close((err) => {
                     if (err) {
                         event.sender.send('print-error', `Print failed: ${err.message}`);
                     } else {
-                        event.sender.send('print-success');
+                        // Return kot and orderId for saving
+                        event.sender.send('print-success-with-data', { kot, orderId });
                     }
                 });
         });
@@ -1103,7 +1100,6 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         title: 'THE LASSI CORNER',
         subtitle: 'SJEC, VAMANJOOR',
         footer: 'Thank you for visiting!',
-        kotTitle: 'KITCHEN ORDER TICKET',
         itemHeader: 'ITEM',
         qtyHeader: 'QTY',
         priceHeader: 'PRICE',
@@ -1112,86 +1108,60 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         kotQtyHeader: 'QTY'
     });
 
-    // Common ESC/POS commands
-    const reset = '\x1B\x40';
-    const center = '\x1B\x61\x01';
-    const left = '\x1B\x61\x00';
-    const bold = '\x1B\x45\x01';
-    const normal = '\x1B\x45\x00';
-    const largeFont = '\x1D\x21\x22';  // Double size
-    const mediumFont = '\x1D\x21\x11';  // 1.5x size
-    const standardFont = '\x1D\x21\x00';
-    const lineFeed = '\x1B\x64\x02';  // Print and feed 2 lines
-    const solidLine = '\x1C\x2D\x02\x28';  // Solid line
-    const underline = '\x1B\x2D\x01';  // Underline on
-    const underlineOff = '\x1B\x2D\x00';  // Underline off
+    // Adjusted for 80mm paper (~42-48 chars per line)
+    const itemWidth = 35;  // More space for food names
+    const qtyWidth = 5;    // Right-aligned
+    const priceWidth = 5;  // Right-aligned (for decimals)
+    
+    // Format items with better spacing
+    const formattedItems = items.map(item => 
+        `${item.name.substring(0, itemWidth).padEnd(itemWidth)}` +
+        `${item.quantity.toString().padStart(qtyWidth)}` +
+        `${item.price.toFixed(2).padStart(priceWidth)}`
+    ).join('\n');
+    
+    const kotItems = items.map(item => 
+        `${item.name.substring(0, itemWidth).padEnd(itemWidth)}` +
+        `${item.quantity.toString().padStart(qtyWidth)}`
+    ).join('\n');
+    
+    // Customer receipt (optimized for 80mm)
+    const customerReceipt = `
+\x1B\x40\x1B\x61\x01\x1D\x21\x11
+${template.title}
+\x1D\x21\x00\x1B\x61\x01  // Center align subtitle
+${template.subtitle}
+\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
+TOKEN: ${kot}
+\x1D\x21\x00\x1B\x45\x00\x1B\x61\x00
+Date: ${new Date().toLocaleString()}
+Bill #: ${orderId}
+${'-'.repeat(32)}  // Standard width for 80mm paper
+\x1B\x45\x01
+ITEM                              QTY     PRICE 
+\x1B\x45\x00
+${formattedItems}
+${'-'.repeat(32)}
+\x1B\x45\x01
+TOTAL: Rs. ${totalAmount.toFixed(2).padStart(8)}
+\x1B\x45\x00\x1B\x61\x01
+${template.footer}
+\x1D\x56\x41\x00`;  // Partial cut
 
-    // Set horizontal tab positions (columns)
-    const setTabs = '\x1B\x44\x18\x24\x00';  // Tabs at 24 and 36 columns
+// KOT receipt (larger KOT #)
+const kotReceipt = `\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01\x1B\x2D\x00${kot}
+\x1B\x33\x03
+\x1D\x21\x00\x1B\x45\x00\x1B\x2D\x00
+Time: ${new Date().toLocaleTimeString()}
+\x1B\x61\x00\x1B\x45\x01\x1B\x2D\x00
+------------------------------------------
+ITEM                                   QTY
+------------------------------------------
+\x1B\x45\x00\x1B\x2D\x00
+${kotItems}
+\x1D\x56\x41\x00`;  // Partial cut
 
-    // Customer Receipt
-    const customerReceipt = [
-        reset,
-        center + largeFont,
-        template.title + '\n',
-        mediumFont,
-        template.subtitle + '\n',
-        standardFont + left + lineFeed,
-        bold + 'Token No: ' + kot + normal + '\n',
-        'Date: ' + new Date().toLocaleDateString(),
-        'Time: ' + new Date().toLocaleTimeString(),
-        'Order ID: ' + orderId,
-        lineFeed,
-        solidLine + '--------------------------------',
-        center + underline,
-        setTabs,
-        template.itemHeader.padEnd(24) + template.qtyHeader.padEnd(12) + template.priceHeader,
-        underlineOff + left,
-        ...items.map(item => 
-            item.name.substring(0, 22).padEnd(24) + 
-            '\x09' +  // Tab to first position
-            item.quantity.toString().padStart(3) +
-            '\x09' +  // Tab to second position
-            'Rs.' + item.price.toFixed(2).padStart(8)
-        ),
-        lineFeed,
-        solidLine + '--------------------------------',
-        center + bold + template.totalText + totalAmount.toFixed(2) + normal,
-        lineFeed,
-        center + '---  CUSTOMER COPY  ---',
-        lineFeed,
-        center + template.footer,
-        '\x1D\x56\x41\x10'  // Cut paper
-    ].join('\n');
-
-    // Kitchen Order Ticket (KOT)
-    const kotReceipt = [
-        reset,
-        center + largeFont,
-        template.kotTitle + '\n',
-        mediumFont,
-        'Token No: ' + kot + '\n',
-        standardFont + left,
-        'Order Time: ' + new Date().toLocaleTimeString(),
-        lineFeed,
-        solidLine + '--------------------------------',
-        setTabs,
-        underline + template.kotItemHeader.padEnd(24) + template.kotQtyHeader,
-        underlineOff,
-        ...items.map(item => 
-            item.name.substring(0, 22).padEnd(24) + 
-            '\x09' +  // Tab to quantity position
-            item.quantity.toString().padStart(3)
-        ),
-        lineFeed,
-        solidLine + '--------------------------------',
-        center + '---  KITCHEN COPY  ---',
-        lineFeed,
-        center + 'Priority: NORMAL',
-        '\x1D\x56\x41\x10'  // Cut paper
-    ].join('\n');
-
-    return customerReceipt + kotReceipt;
+return kotReceipt;
 }
 
 ipcMain.on('get-receipt-template', (event, defaults) => {
