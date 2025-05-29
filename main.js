@@ -1039,17 +1039,14 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
     isPrinting = true;
 
     try {
-        // Get config with fallback to defaults
         const config = store.get('printerConfig', {
             vendorId: '0x0525',
             productId: '0xA700'
         });
 
-        // Convert hex strings to numbers
         const vendorId = parseInt(config.vendorId, 16);
         const productId = parseInt(config.productId, 16);
 
-        // Validate IDs
         if (isNaN(vendorId) || isNaN(productId)) {
             throw new Error('Invalid printer configuration - please check Vendor/Product IDs');
         }
@@ -1057,9 +1054,9 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
         const device = new escpos.USB(vendorId, productId);
         const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
 
-        device.open((error) => {
-            if (error) {
-                event.sender.send('print-error', `Printer connection failed: ${error.message}`);
+        device.open((err) => {
+            if (err) {
+                event.sender.send('print-error', `Printer connection failed: ${err.message}`);
                 return;
             }
 
@@ -1071,7 +1068,8 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
                     if (err) {
                         event.sender.send('print-error', `Print failed: ${err.message}`);
                     } else {
-                        event.sender.send('print-success');
+                        // Return kot and orderId for saving
+                        event.sender.send('print-success-with-data', { kot, orderId });
                     }
                 });
         });
@@ -1102,7 +1100,6 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         title: 'THE LASSI CORNER',
         subtitle: 'SJEC, VAMANJOOR',
         footer: 'Thank you for visiting!',
-        kotTitle: 'KITCHEN ORDER',
         itemHeader: 'ITEM',
         qtyHeader: 'QTY',
         priceHeader: 'PRICE',
@@ -1111,54 +1108,60 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         kotQtyHeader: 'QTY'
     });
 
-    // Format items using template headers
+    // Adjusted for 80mm paper (~42-48 chars per line)
+    const itemWidth = 20;  // More space for food names
+    const qtyWidth = 5;    // Right-aligned
+    const priceWidth = 10;  // Right-aligned (for decimals)
+    
+    // Format items with better spacing
     const formattedItems = items.map(item => 
-        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
+        `${item.name.substring(0, itemWidth).padEnd(itemWidth)}` +
+        `${item.quantity.toString().padStart(qtyWidth)}` +
+        `${item.price.toFixed(2).padStart(priceWidth)}`
     ).join('\n');
     
     const kotItems = items.map(item => 
-        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
+        `${item.name.substring(0, itemWidth).padEnd(itemWidth)}` +
+        `${item.quantity.toString().padStart(qtyWidth)}`
     ).join('\n');
     
-    // Customer receipt (with partial cut at end)
+    // Customer receipt (optimized for 80mm)
     const customerReceipt = `
 \x1B\x40\x1B\x61\x01\x1D\x21\x11
 ${template.title}
-\x1D\x21\x00
+\x1D\x21\x00\x1B\x61\x00
 ${template.subtitle}
-\x1B\x45\x01
-Token No: ${kot}
-\x1B\x45\x00\x1B\x61\x00
+\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
+TOKEN: ${kot}
+\x1D\x21\x00\x1B\x45\x00\x1B\x61\x00
 Date: ${new Date().toLocaleString()}
-BILL NUMBER: ${orderId}
-${'-'.repeat(32)}
+Bill #: ${orderId}
+${'-'.repeat(42)}  // Adjusted to ~42 chars
 \x1B\x45\x01
-${template.itemHeader.padEnd(14)}${template.qtyHeader.padStart(3)}${template.priceHeader.padStart(8)}
+${template.itemHeader.padEnd(itemWidth)}${template.qtyHeader.padStart(qtyWidth)}${template.priceHeader.padStart(priceWidth)}
 \x1B\x45\x00
 ${formattedItems}
-${'-'.repeat(32)}
+${'-'.repeat(42)}
 \x1B\x45\x01
-${template.totalText} ${totalAmount.toFixed(2)}
+${template.totalText} ${totalAmount.toFixed(2).padStart(priceWidth + qtyWidth + 1)}
 \x1B\x45\x00\x1B\x61\x01
 ${template.footer}
-\x1D\x56\x41\x00`;  // Partial cut after customer receipt
+\x1D\x56\x41\x00`;  // Partial cut
 
-    // KOT receipt (with partial cut at end)
+    // KOT receipt (larger KOT #)
     const kotReceipt = `
-\x1B\x61\x01\x1D\x21\x11
-${template.kotTitle}
-\x1D\x21\x00
+\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
 KOT #: ${kot}
+\x1D\x21\x00\x1B\x45\x00
 Time: ${new Date().toLocaleTimeString()}
-${'-'.repeat(32)}
+${'-'.repeat(42)}
 \x1B\x61\x00\x1B\x45\x01
-${template.kotItemHeader.padEnd(14)}${template.kotQtyHeader.padStart(3)}
+${template.kotItemHeader.padEnd(itemWidth)}${template.kotQtyHeader.padStart(qtyWidth)}
 \x1B\x45\x00
 ${kotItems}
-${'-'.repeat(32)}
-\x1D\x56\x41\x00`;  // Partial cut after KOT receipt
+${'-'.repeat(42)}
+\x1D\x56\x41\x00`;  // Partial cut
 
-    // Combine with a line feed between them
     return customerReceipt + '\n' + kotReceipt;
 }
 
