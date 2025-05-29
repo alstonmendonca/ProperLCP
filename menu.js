@@ -475,17 +475,57 @@ function toggleAddItemPopup() {
         try {
             const inventory = await ipcRenderer.invoke("get-all-inventory-items");
             const container = document.getElementById("inventory-checklist");
+            
+            // Clear existing items while preserving the container
+            container.replaceChildren();
+            
+            // Create document fragment for batch DOM insertion
+            const fragment = new DocumentFragment();
+            
             inventory.forEach(inv => {
-                const checkbox = document.createElement("label");
-                checkbox.classList.add("inv-checkbox");
-                checkbox.innerHTML = `
-                    <input type="checkbox" value="${inv.inv_no}">
-                    ${inv.inv_item}
+                const itemId = `inv_${inv.inv_no}`;
+                
+                // Create checkbox container
+                const itemContainer = document.createElement("div");
+                itemContainer.className = "checkbox-item";
+                itemContainer.innerHTML = `
+                    <input type="checkbox" 
+                        id="${itemId}" 
+                        value="${inv.inv_no}" 
+                        style="accent-color: #4f46e5;">
+                    <label for="${itemId}" 
+                        style="font-size: 13px; color: #475569; cursor: pointer;">
+                        ${inv.inv_item}
+                    </label>
                 `;
-                container.appendChild(checkbox);
+                
+                fragment.appendChild(itemContainer);
             });
+            
+            container.appendChild(fragment);
+            
+            // Add empty state message if needed
+            if (inventory.length === 0) {
+                container.innerHTML = `<div style="
+                    color: #94a3b8;
+                    font-style: italic;
+                    padding: 10px;
+                    text-align: center;
+                    width: 100%;
+                ">No inventory items available</div>`;
+            }
         } catch (err) {
             console.error("Failed to load inventory items:", err);
+            // Show error in UI
+            document.getElementById("inventory-checklist").innerHTML = `
+                <div style="
+                    color: #ef4444;
+                    padding: 10px;
+                    text-align: center;
+                    font-size: 13px;
+                ">
+                    Failed to load inventory items
+                </div>`;
         }
     }
 
@@ -500,74 +540,293 @@ function toggleAddItemPopup() {
     popup.classList.add("menu-edit-popup");
 
     popup.innerHTML = `
-        <div class="menu-popup-content" style="pointer-events: auto; max-width: 500px; width: 100%; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);">
-            <h3 style="text-align: center; margin-bottom: 20px; font-size: 22px; font-weight: 600; color: #333;">Add New Food Item</h3>
-            <form id="addItemForm" style="display: flex; flex-direction: column; gap: 12px;">
+    <div class="menu-popup-content" style="
+        pointer-events: auto;
+        max-width: 500px;
+        width: 100%;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    ">
+        <style>
+            .popup-input:focus, .popup-select:focus {
+                border-color: #6366f1;
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+                outline: none;
+            }
+            .popup-switch {
+                position: relative;
+                display: inline-block;
+                width: 44px;
+                height: 24px;
+            }
+            .popup-switch input { 
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .popup-slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #e2e8f0;
+                transition: .3s;
+                border-radius: 24px;
+            }
+            .popup-slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .3s;
+                border-radius: 50%;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            input:checked + .popup-slider {
+                background-color: #4f46e5;
+            }
+            input:checked + .popup-slider:before {
+                transform: translateX(20px);
+            }
+            .popup-btn {
+                transition: all 0.2s ease;
+                font-weight: 500;
+                border-radius: 8px;
+                padding: 10px 22px;
+                font-size: 14px;
+                cursor: pointer;
+            }
+            .popup-btn:active {
+                transform: translateY(1px);
+            }
+            .checkbox-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+            }
+        </style>
+        
+        <h3 style="
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.02em;
+        ">
+            Add New Food Item
+        </h3>
+        
+        <form id="addItemForm" style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="form-group">
+                <label for="fname" style="
+                    display: block;
+                    font-size: 14px;
+                    color: #475569;
+                    margin-bottom: 6px;
+                    font-weight: 500;
+                ">Food Name</label>
+                <input type="text" id="fname" required class="popup-input" style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    background: #f8fafc;
+                    transition: border 0.2s, box-shadow 0.2s;
+                ">
+            </div>
+
+            <div class="form-group">
+                <label for="category" style="
+                    display: block;
+                    font-size: 14px;
+                    color: #475569;
+                    margin-bottom: 6px;
+                    font-weight: 500;
+                ">Category</label>
+                <select id="category" required class="popup-select" style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    background: #f8fafc;
+                    appearance: none;
+                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
+                    background-repeat: no-repeat;
+                    background-position: right 12px center;
+                    background-size: 14px;
+                    transition: border 0.2s, box-shadow 0.2s;
+                ">
+                    <option value="">Select a category</option>
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
                 <div class="form-group">
-                    <label for="fname" style="font-size: 14px; color: #333; margin-bottom: 4px;">Food Name</label>
-                    <input type="text" id="fname" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+                    <label for="cost" style="
+                        display: block;
+                        font-size: 14px;
+                        color: #475569;
+                        margin-bottom: 6px;
+                        font-weight: 500;
+                    ">Cost (₹)</label>
+                    <input type="number" id="cost" step="0.01" required class="popup-input" style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        background: #f8fafc;
+                        transition: border 0.2s, box-shadow 0.2s;
+                    ">
                 </div>
-
                 <div class="form-group">
-                    <label for="category" style="font-size: 14px; color: #333; margin-bottom: 4px;">Category</label>
-                    <select id="category" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
-                        <option value="">Select a category</option>
-                    </select>
+                    <label for="sgst" style="
+                        display: block;
+                        font-size: 14px;
+                        color: #475569;
+                        margin-bottom: 6px;
+                        font-weight: 500;
+                    ">SGST (%)</label>
+                    <input type="number" id="sgst" step="0.01" value="0" class="popup-input" style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        background: #f8fafc;
+                        transition: border 0.2s, box-shadow 0.2s;
+                    ">
                 </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="form-group">
-                        <label for="cost" style="font-size: 14px; color: #333; margin-bottom: 4px;">Cost (₹)</label>
-                        <input type="number" id="cost" step="0.01" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="sgst" style="font-size: 14px; color: #333; margin-bottom: 4px;">SGST (%)</label>
-                        <input type="number" id="sgst" step="0.01" value="0" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="cgst" style="font-size: 14px; color: #333; margin-bottom: 4px;">CGST (%)</label>
-                        <input type="number" id="cgst" step="0.01" value="0" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
-                    </div>
-                </div>
-
-                <!-- Toggles Row -->
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
-                    <div class="form-group" style="flex: 1; display: flex; align-items: center; justify-content: space-between;">
-                        <label for="veg" style="font-size: 14px; color: #333;">Veg</label>
-                        <label class="switch">
-                            <input type="checkbox" id="veg" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="form-group" style="flex: 1; display: flex; align-items: center; justify-content: space-between;">
-                        <label for="active" style="font-size: 14px; color: #333;">Active</label>
-                        <label class="switch">
-                            <input type="checkbox" id="active" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="form-group" style="flex: 1; display: flex; align-items: center; justify-content: space-between;">
-                        <label for="is_on" style="font-size: 14px; color: #333;">Available</label>
-                        <label class="switch">
-                            <input type="checkbox" id="is_on" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-
                 <div class="form-group">
-                    <label style="font-size: 14px; color: #333; margin-bottom: 4px;">Inventory Dependencies</label>
-                    <div id="inventory-checklist" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; max-height: 100px; overflow-y: auto;">
-                        <!-- checkboxes go here -->
-                    </div>
+                    <label for="cgst" style="
+                        display: block;
+                        font-size: 14px;
+                        color: #475569;
+                        margin-bottom: 6px;
+                        font-weight: 500;
+                    ">CGST (%)</label>
+                    <input type="number" id="cgst" step="0.01" value="0" class="popup-input" style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        background: #f8fafc;
+                        transition: border 0.2s, box-shadow 0.2s;
+                    ">
                 </div>
+            </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-                    <button type="submit" id="addItemBtn" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">Add</button>
-                    <button type="button" id="closeAddItemPopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">Cancel</button>
+            <div style="
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+                background: #f1f5f9;
+                padding: 16px;
+                border-radius: 10px;
+                margin-top: 8px;
+            ">
+                <div class="form-group" style="
+                    flex: 1;
+                    min-width: 120px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                ">
+                    <label for="veg" style="font-size: 14px; color: #334155; font-weight: 500;">Veg</label>
+                    <label class="popup-switch">
+                        <input type="checkbox" id="veg" checked>
+                        <span class="popup-slider"></span>
+                    </label>
                 </div>
-            </form>
-        </div>
+                <div class="form-group" style="
+                    flex: 1;
+                    min-width: 120px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                ">
+                    <label for="active" style="font-size: 14px; color: #334155; font-weight: 500;">Active</label>
+                    <label class="popup-switch">
+                        <input type="checkbox" id="active" checked>
+                        <span class="popup-slider"></span>
+                    </label>
+                </div>
+                <div class="form-group" style="
+                    flex: 1;
+                    min-width: 120px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                ">
+                    <label for="is_on" style="font-size: 14px; color: #334155; font-weight: 500;">Available</label>
+                    <label class="popup-switch">
+                        <input type="checkbox" id="is_on" checked>
+                        <span class="popup-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="
+                    display: block;
+                    font-size: 14px;
+                    color: #475569;
+                    margin-bottom: 6px;
+                    font-weight: 500;
+                ">Inventory Dependencies</label>
+                <div id="inventory-checklist" style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    padding: 16px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 10px;
+                    max-height: 140px;
+                    overflow-y: auto;
+                    background: #ffffff;
+                ">
+                </div>
+            </div>
+
+            <div style="
+                display: flex;
+                justify-content: center;
+                gap: 12px;
+                margin-top: 10px;
+                padding-top: 8px;
+                border-top: 1px solid #f1f5f9;
+            ">
+                <button type="submit" id="addItemBtn" class="popup-btn" style="
+                    background: #4f46e5;
+                    color: white;
+                    border: none;
+                    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+                ">Add Item</button>
+                <button type="button" id="closeAddItemPopup" class="popup-btn" style="
+                    background: #ffffff;
+                    color: #64748b;
+                    border: 1px solid #e2e8f0;
+                ">Cancel</button>
+            </div>
+        </form>
+    </div>
     `;
 
 

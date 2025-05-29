@@ -701,7 +701,7 @@ input:checked + .slider:before {
 }
 
 .menu-popup-content {
-  overflow-y: hidden;
+  overflow-y: auto;
   padding: 20px;
   max-height: 80vh;
 }
@@ -809,7 +809,7 @@ input:checked + .slider:before {
 #inventory-checklist {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 15px;
     margin-bottom: 16px;
     max-height: 150px;
     overflow-y: auto;
