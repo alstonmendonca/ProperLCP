@@ -1109,9 +1109,9 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     });
 
     // Adjusted for 80mm paper (~42-48 chars per line)
-    const itemWidth = 20;  // More space for food names
+    const itemWidth = 35;  // More space for food names
     const qtyWidth = 5;    // Right-aligned
-    const priceWidth = 10;  // Right-aligned (for decimals)
+    const priceWidth = 5;  // Right-aligned (for decimals)
     
     // Format items with better spacing
     const formattedItems = items.map(item => 
@@ -1129,40 +1129,38 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     const customerReceipt = `
 \x1B\x40\x1B\x61\x01\x1D\x21\x11
 ${template.title}
-\x1D\x21\x00\x1B\x61\x00
+\x1D\x21\x00\x1B\x61\x01  // Center align subtitle
 ${template.subtitle}
 \x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
 TOKEN: ${kot}
 \x1D\x21\x00\x1B\x45\x00\x1B\x61\x00
 Date: ${new Date().toLocaleString()}
 Bill #: ${orderId}
-${'-'.repeat(42)}  // Adjusted to ~42 chars
+${'-'.repeat(32)}  // Standard width for 80mm paper
 \x1B\x45\x01
-${template.itemHeader.padEnd(itemWidth)}${template.qtyHeader.padStart(qtyWidth)}${template.priceHeader.padStart(priceWidth)}
+ITEM                              QTY     PRICE 
 \x1B\x45\x00
 ${formattedItems}
-${'-'.repeat(42)}
+${'-'.repeat(32)}
 \x1B\x45\x01
-${template.totalText} ${totalAmount.toFixed(2).padStart(priceWidth + qtyWidth + 1)}
+TOTAL: Rs. ${totalAmount.toFixed(2).padStart(8)}
 \x1B\x45\x00\x1B\x61\x01
 ${template.footer}
 \x1D\x56\x41\x00`;  // Partial cut
 
-    // KOT receipt (larger KOT #)
-    const kotReceipt = `
-\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
-KOT #: ${kot}
-\x1D\x21\x00\x1B\x45\x00
+// KOT receipt (larger KOT #)
+const kotReceipt = `\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01\x1B\x2D\x00${kot}
+\x1D\x21\x00\x1B\x45\x00\x1B\x2D\x00
 Time: ${new Date().toLocaleTimeString()}
-${'-'.repeat(42)}
-\x1B\x61\x00\x1B\x45\x01
-${template.kotItemHeader.padEnd(itemWidth)}${template.kotQtyHeader.padStart(qtyWidth)}
-\x1B\x45\x00
+\x1B\x61\x00\x1B\x45\x01\x1B\x2D\x00
+------------------------------------------
+ITEM                                   QTY
+------------------------------------------
+\x1B\x45\x00\x1B\x2D\x00
 ${kotItems}
-${'-'.repeat(42)}
 \x1D\x56\x41\x00`;  // Partial cut
 
-    return customerReceipt + '\n' + kotReceipt;
+return kotReceipt;
 }
 
 ipcMain.on('get-receipt-template', (event, defaults) => {
