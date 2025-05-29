@@ -1103,7 +1103,7 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         title: 'THE LASSI CORNER',
         subtitle: 'SJEC, VAMANJOOR',
         footer: 'Thank you for visiting!',
-        kotTitle: 'KITCHEN ORDER',
+        kotTitle: 'KITCHEN ORDER TICKET',
         itemHeader: 'ITEM',
         qtyHeader: 'QTY',
         priceHeader: 'PRICE',
@@ -1112,51 +1112,84 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         kotQtyHeader: 'QTY'
     });
 
-    // Format items using template headers
-    const formattedItems = items.map(item => 
-        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}${item.price.toFixed(2).padStart(8)}`
-    ).join('\n');
-    
-    const kotItems = items.map(item => 
-        `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
-    ).join('\n');
-    
-    // Updated receipt with template fields
-    const customerReceipt = `
-\x1B\x40\x1B\x61\x01\x1D\x21\x11
-${template.title}
-\x1D\x21\x00
-${template.subtitle}
-\x1B\x45\x01
-Token No: ${kot}
-\x1B\x45\x00\x1B\x61\x00
-Date: ${new Date().toLocaleString()}
-BILL NUMBER: ${orderId}
-${'-'.repeat(32)}
-\x1B\x45\x01
-${template.itemHeader.padEnd(14)}${template.qtyHeader.padStart(3)}${template.priceHeader.padStart(8)}
-\x1B\x45\x00
-${formattedItems}
-${'-'.repeat(32)}
-\x1B\x45\x01
-${template.totalText} ${totalAmount.toFixed(2)}
-\x1B\x45\x00\x1B\x61\x01
-${template.footer}
-\x1D\x56\x41\x10`;
+    // Common ESC/POS commands
+    const reset = '\x1B\x40';
+    const center = '\x1B\x61\x01';
+    const left = '\x1B\x61\x00';
+    const bold = '\x1B\x45\x01';
+    const normal = '\x1B\x45\x00';
+    const largeFont = '\x1D\x21\x22';  // Double size
+    const mediumFont = '\x1D\x21\x11';  // 1.5x size
+    const standardFont = '\x1D\x21\x00';
+    const lineFeed = '\x1B\x64\x02';  // Print and feed 2 lines
+    const solidLine = '\x1C\x2D\x02\x28';  // Solid line
+    const underline = '\x1B\x2D\x01';  // Underline on
+    const underlineOff = '\x1B\x2D\x00';  // Underline off
 
-    const kotReceipt = `
-\x1B\x61\x01\x1D\x21\x11
-${template.kotTitle}
-\x1D\x21\x00
-KOT #: ${kot}
-Time: ${new Date().toLocaleTimeString()}
-${'-'.repeat(32)}
-\x1B\x61\x00\x1B\x45\x01
-${template.KotItemHeader.padEnd(14)}${template.kotQtyHeader.padStart(3)}
-\x1B\x45\x00
-${kotItems}
-${'-'.repeat(32)}
-\x1D\x56\x41\x10`;
+    // Set horizontal tab positions (columns)
+    const setTabs = '\x1B\x44\x18\x24\x00';  // Tabs at 24 and 36 columns
+
+    // Customer Receipt
+    const customerReceipt = [
+        reset,
+        center + largeFont,
+        template.title + '\n',
+        mediumFont,
+        template.subtitle + '\n',
+        standardFont + left + lineFeed,
+        bold + 'Token No: ' + kot + normal + '\n',
+        'Date: ' + new Date().toLocaleDateString(),
+        'Time: ' + new Date().toLocaleTimeString(),
+        'Order ID: ' + orderId,
+        lineFeed,
+        solidLine + '--------------------------------',
+        center + underline,
+        setTabs,
+        template.itemHeader.padEnd(24) + template.qtyHeader.padEnd(12) + template.priceHeader,
+        underlineOff + left,
+        ...items.map(item => 
+            item.name.substring(0, 22).padEnd(24) + 
+            '\x09' +  // Tab to first position
+            item.quantity.toString().padStart(3) +
+            '\x09' +  // Tab to second position
+            'Rs.' + item.price.toFixed(2).padStart(8)
+        ),
+        lineFeed,
+        solidLine + '--------------------------------',
+        center + bold + template.totalText + totalAmount.toFixed(2) + normal,
+        lineFeed,
+        center + '---  CUSTOMER COPY  ---',
+        lineFeed,
+        center + template.footer,
+        '\x1D\x56\x41\x10'  // Cut paper
+    ].join('\n');
+
+    // Kitchen Order Ticket (KOT)
+    const kotReceipt = [
+        reset,
+        center + largeFont,
+        template.kotTitle + '\n',
+        mediumFont,
+        'Token No: ' + kot + '\n',
+        standardFont + left,
+        'Order Time: ' + new Date().toLocaleTimeString(),
+        lineFeed,
+        solidLine + '--------------------------------',
+        setTabs,
+        underline + template.kotItemHeader.padEnd(24) + template.kotQtyHeader,
+        underlineOff,
+        ...items.map(item => 
+            item.name.substring(0, 22).padEnd(24) + 
+            '\x09' +  // Tab to quantity position
+            item.quantity.toString().padStart(3)
+        ),
+        lineFeed,
+        solidLine + '--------------------------------',
+        center + '---  KITCHEN COPY  ---',
+        lineFeed,
+        center + 'Priority: NORMAL',
+        '\x1D\x56\x41\x10'  // Cut paper
+    ].join('\n');
 
     return customerReceipt + kotReceipt;
 }
