@@ -500,75 +500,76 @@ function toggleAddItemPopup() {
     popup.classList.add("menu-edit-popup");
 
     popup.innerHTML = `
-        <div class="menu-popup-content" style="align-items: center; justify-content: center; pointer-events: auto;">
-            <h3 style="text-align: center; margin-bottom: 20px; font-size: 24px; color: #333;">Add New Food Item</h3>
-            <form id="addItemForm" style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="menu-popup-content" style="pointer-events: auto; max-width: 500px; width: 100%; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);">
+            <h3 style="text-align: center; margin-bottom: 20px; font-size: 22px; font-weight: 600; color: #333;">Add New Food Item</h3>
+            <form id="addItemForm" style="display: flex; flex-direction: column; gap: 12px;">
                 <div class="form-group">
-                    <label for="fname" style="font-size: 14px; color: #555; margin-bottom: 5px;">Food Name:</label>
-                    <input type="text" id="fname" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                    <label for="fname" style="font-size: 14px; color: #333; margin-bottom: 4px;">Food Name</label>
+                    <input type="text" id="fname" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
                 </div>
 
                 <div class="form-group">
-                    <label for="category" style="font-size: 14px; color: #555; margin-bottom: 5px;">Category:</label>
-                    <select id="category" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;">
+                    <label for="category" style="font-size: 14px; color: #333; margin-bottom: 4px;">Category</label>
+                    <select id="category" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
                         <option value="">Select a category</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="cost" style="font-size: 14px; color: #555; margin-bottom: 5px;">Cost (₹):</label>
-                    <input type="number" id="cost" step="0.01" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label for="cost" style="font-size: 14px; color: #333; margin-bottom: 4px;">Cost (₹)</label>
+                        <input type="number" id="cost" step="0.01" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="sgst" style="font-size: 14px; color: #333; margin-bottom: 4px;">SGST (%)</label>
+                        <input type="number" id="sgst" step="0.01" value="0" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="cgst" style="font-size: 14px; color: #333; margin-bottom: 4px;">CGST (%)</label>
+                        <input type="number" id="cgst" step="0.01" value="0" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+                    </div>
+                </div>
+
+                <!-- Toggles Row -->
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                    <div class="form-group" style="flex: 1; display: flex; align-items: center; justify-content: space-between;">
+                        <label for="veg" style="font-size: 14px; color: #333;">Veg</label>
+                        <label class="switch">
+                            <input type="checkbox" id="veg" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="flex: 1; display: flex; align-items: center; justify-content: space-between;">
+                        <label for="active" style="font-size: 14px; color: #333;">Active</label>
+                        <label class="switch">
+                            <input type="checkbox" id="active" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="flex: 1; display: flex; align-items: center; justify-content: space-between;">
+                        <label for="is_on" style="font-size: 14px; color: #333;">Available</label>
+                        <label class="switch">
+                            <input type="checkbox" id="is_on" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="sgst" style="font-size: 14px; color: #555; margin-bottom: 5px;">SGST (%):</label>
-                    <input type="number" id="sgst" step="0.01" value="0" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
-                </div>
-
-                <div class="form-group">
-                    <label for="cgst" style="font-size: 14px; color: #555; margin-bottom: 5px;">CGST (%):</label>
-                    <input type="number" id="cgst" step="0.01" value="0" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
-                </div>
-
-                <!-- Toggle for Veg -->
-                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <label for="veg" style="font-size: 14px; color: #555;">Veg:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="veg" checked>
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-
-                <!-- Toggle for Active -->
-                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <label for="active" style="font-size: 14px; color: #555;">Active:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="active" checked>
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-
-                <!-- Toggle for Available -->
-                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <label for="is_on" style="font-size: 14px; color: #555;">Available:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="is_on" checked>
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label style="font-size: 14px; color: #555; margin-bottom: 5px;">Inventory Dependencies:</label>
-                    <div id="inventory-checklist" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; max-height: 120px; overflow-y: auto;">
+                    <label style="font-size: 14px; color: #333; margin-bottom: 4px;">Inventory Dependencies</label>
+                    <div id="inventory-checklist" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; max-height: 100px; overflow-y: auto;">
                         <!-- checkboxes go here -->
                     </div>
                 </div>
-                <div class="menu-popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="submit" id="addItemBtn" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Add</button>
-                    <button type="button" id="closeAddItemPopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Cancel</button>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                    <button type="submit" id="addItemBtn" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">Add</button>
+                    <button type="button" id="closeAddItemPopup" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">Cancel</button>
                 </div>
             </form>
         </div>
     `;
+
 
 
     // Append to overlay

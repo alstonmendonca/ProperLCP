@@ -92,7 +92,9 @@ function addToBill(itemId, itemName, price, quantity, category = null) {
             removeBtn.onclick = () => removeFromBill(itemId);
 
             billItemRow.append(itemNameSpan, quantityInput, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
-
+            requestAnimationFrame(() => {
+                billItemRow.classList.add("show");
+            });
             // Append to category or general list
             categorySection.appendChild(billItemRow);
         }

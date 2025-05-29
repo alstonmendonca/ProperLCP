@@ -145,7 +145,7 @@ function startGetOnlineServer() {
 
 
 app.whenReady().then(async () => {
-    startGetOnlineServer(); // WebSocket server
+    //startGetOnlineServer(); // WebSocket server
     // Initialize store first
     await initStore();
     

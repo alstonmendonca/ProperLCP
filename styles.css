@@ -230,6 +230,17 @@ body {
     background-color: var(--danger-hover);
 }
 
+.bill-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.bill-item.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 /* Total Amount & Discount Applied display */
 #total-discount-container {
@@ -679,20 +690,20 @@ input:checked + .slider:before {
 
 /* Popup Container - Centered content */
 .menu-edit-popup {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    max-width: 90vw;
-    position: relative;
+  width: 350px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
 }
 
 .menu-popup-content {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    align-items: center;
+  overflow-y: hidden;
+  padding: 20px;
+  max-height: 80vh;
 }
 
 .menu-popup-content h3 {
