@@ -1067,7 +1067,6 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
             
             printer
                 .raw(Buffer.from(commands, 'utf8'))
-                .cut()
                 .close((err) => {
                     if (err) {
                         event.sender.send('print-error', `Print failed: ${err.message}`);
@@ -1121,7 +1120,7 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
         `${item.name.substring(0, 14).padEnd(14)}${item.quantity.toString().padStart(3)}`
     ).join('\n');
     
-    // Updated receipt with template fields
+    // Customer receipt (with partial cut at end)
     const customerReceipt = `
 \x1B\x40\x1B\x61\x01\x1D\x21\x11
 ${template.title}
@@ -1142,8 +1141,9 @@ ${'-'.repeat(32)}
 ${template.totalText} ${totalAmount.toFixed(2)}
 \x1B\x45\x00\x1B\x61\x01
 ${template.footer}
-\x1D\x56\x41\x10`;
+\x1D\x56\x41\x00`;  // Partial cut after customer receipt
 
+    // KOT receipt (with partial cut at end)
     const kotReceipt = `
 \x1B\x61\x01\x1D\x21\x11
 ${template.kotTitle}
@@ -1152,13 +1152,14 @@ KOT #: ${kot}
 Time: ${new Date().toLocaleTimeString()}
 ${'-'.repeat(32)}
 \x1B\x61\x00\x1B\x45\x01
-${template.KotItemHeader.padEnd(14)}${template.kotQtyHeader.padStart(3)}
+${template.kotItemHeader.padEnd(14)}${template.kotQtyHeader.padStart(3)}
 \x1B\x45\x00
 ${kotItems}
 ${'-'.repeat(32)}
-\x1D\x56\x41\x10`;
+\x1D\x56\x41\x00`;  // Partial cut after KOT receipt
 
-    return customerReceipt + kotReceipt;
+    // Combine with a line feed between them
+    return customerReceipt + '\n' + kotReceipt;
 }
 
 ipcMain.on('get-receipt-template', (event, defaults) => {
