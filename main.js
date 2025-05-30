@@ -6,7 +6,7 @@ const fs = require('fs');
 const { backupLCdb } = require("./backup");
 escpos.USB = require("escpos-usb");
 const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
-const { fork } = require('child_process');
+const { fork, spawn } = require('child_process');
 let mainWindow;
 let userRole = null;
 let store; // Will be initialized after dynamic import
@@ -140,12 +140,32 @@ function startGetOnlineServer() {
     console.log(`getOnline.js exited with code ${code}, signal ${signal}`);
   });
 }
+let expressProcess = null;
 
+function startExpressServer() {
+  const scriptPath = path.join(__dirname, 'startMongoExpress.js');
+
+  const child = spawn('node', [scriptPath], {
+    detached: true,
+    stdio: 'ignore', // fully detached, no stdio inherited
+    env: process.env,
+    shell: false, // Use shell to allow environment variables
+  });
+
+  child.unref(); // So Electron can quit independently if needed
+
+  expressProcess = child; // Store reference for kill()
+
+  console.log(`✅ Started detached Express server (PID: ${child.pid})`);
+
+  return child;
+}
 
 
 
 app.whenReady().then(async () => {
-    //startGetOnlineServer(); // WebSocket server
+    await startGetOnlineServer(); // WebSocket server
+    await startExpressServer(); // Express server
     // Initialize store first
     await initStore();
     
@@ -245,13 +265,25 @@ function closeDatabase() {
         });
     }
 }
-// Optional cleanup
-app.on('before-quit', () => {
+
+app.on('will-quit', () => {
   console.log("App is quitting. Cleaning up...");
+
   if (onlineProcess) {
-    onlineProcess.kill();
+    onlineProcess.kill('SIGTERM');
+  }
+
+  if (expressProcess && expressProcess.pid) {
+    try {
+      process.kill(expressProcess.pid, 'SIGTERM');
+      console.log(`🛑 Killed Express server (PID: ${expressProcess.pid})`);
+    } catch (err) {
+      console.error(`❌ Failed to kill Express server:`, err);
+    }
   }
 });
+
+
 //----------------------------------------------ANALYTICS STARTS HERE--------------------------------------------------------------
 // Fetch Today's Items for Item Summary
 // Item Summary
@@ -3028,6 +3060,22 @@ ipcMain.on('restore-database', async (event) => {
 // ---------------------------------- BACKUP AND RESTORE SECTION ENDS HERE -------------------
 
 //---------------------------------- ONLINE ORDERS SECTION STARTS HERE -------------------
+// In Electron renderer or main, using fetch or axios
+const MONGO_PORT = process.env.MONGO_PORT;
+async function updateOrderStatus(orderId, status) {
+  const response = await fetch(`http://localhost:${MONGO_PORT}/order/${orderId}/status`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    console.log('Status updated:', data.message);
+  } else {
+    console.error('Failed to update:', data.message);
+  }
+}
 ipcMain.handle("getOnlineOrderCount", async () => {
   return new Promise((resolve, reject) => {
     db.get("SELECT COUNT(*) as cnt FROM OnlineOrders", (err, row) => {
@@ -3097,5 +3145,14 @@ ipcMain.on("cancel-online-order", (event, orderId) => {
     });
 });
 
+ipcMain.handle('update-online-order', async (event, { orderId, status }) => {
+  try {
+    await updateOrderStatus(orderId, status);
+    return { success: true, message: 'Order status updated' };
+  } catch (err) {
+    console.error('Failed to update order status:', err);
+    return { success: false, message: err.message };
+  }
+});
 //----------------------------------- ONLINE ORDERS SECTION ENDS HERE -------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');
