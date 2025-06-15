@@ -1,0 +1,674 @@
+/* Order History Section */
+#orderHistory {
+    margin-top: 20px;
+}
+
+/* Date Filters Container */
+.date-filters {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    gap: 10px;
+    text-align: center;
+    margin: 20px auto;
+}
+
+/* Labels for Date Inputs */
+.date-filters label {
+    font-weight: bold;
+    margin-right: 5px; /* Space between label and input */
+}
+
+/* Date Input Fields */
+.date-filters input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 40px; /* Space between inputs and button */
+}
+
+/* Order History Table */
+.order-history-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove space between cells */
+    margin-top: 20px; /* Space above the table */
+    font-family: Arial, sans-serif; /* Use a clean font */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+/* Table Header */
+.order-history-table thead th {
+    background-color: var(--all-table-header-color); /* Green header */
+    color: white; /* White text */
+    padding: 12px; /* Padding for header cells */
+    text-align: left; /* Align text to the left */
+    border: 1px solid #ddd; /* Add a border */
+    font-weight: bold; /* Bold text */
+}
+
+/* Date Column Specific Width */
+.order-history-table th.date-column{
+    width: 50px; /* Set a fixed width for the Date column */
+    white-space: nowrap; /* Prevent text wrapping */
+    cursor: pointer; /* Show pointer cursor for clickable headers */
+}
+
+.order-history-table th.date-column:hover{
+    background-color: var(--all-table-header-hover); 
+}
+
+.order-history-table td.date-column {
+    width: 50px; /* Set a fixed width for the Date column */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Only make certain columns sortable */
+.order-history-table thead th.sortable {
+    cursor: pointer; /* Show pointer cursor for clickable headers */
+}
+
+/* Hover effect for sortable columns */
+.order-history-table thead th.sortable:hover{
+    background-color: var(--all-table-header-hover); 
+}
+
+/* Table Rows */
+.order-history-table tbody tr {
+    border-bottom: 1px solid #000000; /* Add a border between rows */
+}
+
+/* Alternate Row Colors */
+.order-history-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Light gray for even rows */
+}
+
+.order-history-table tbody tr:hover {
+    background-color: #f1f1f1; /* Light gray on hover */
+}
+
+/* Table Cells */
+.order-history-table td {
+    padding: 12px; /* Padding for cells */
+    text-align: left; /* Align text to the left */
+}
+
+/* No Orders Message */
+#orderHistory p {
+    text-align: center;
+    color: #888; /* Gray text */
+    font-style: italic; /* Italicize the message */
+    margin-top: 20px; /* Space above the message */
+}
+
+/* Style the category dropdown */
+#categoryDropdown, #foodItemDropdown {
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 220px; /* Adjust width for better readability */
+    margin-right: 40px; /* Adds spacing between dropdown and 'show history' button */
+}
+
+/* Hover effect */
+#categoryDropdown:hover, #foodItemDropdown:hover {
+    border-color: #888;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .date-filters {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    #categoryDropdown, #foodItemDropdown, .date-filters button {
+        width: 100%; /* Full width on smaller screens */
+    }
+}
+
+/*===================================================CUSTOMER SECTION STARTS HERE===============================================*/
+#addCustomerPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1000;
+    width: 300px;
+}
+
+.add-customer-popup-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.add-customer-popup-content h2 {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.add-customer-popup-content label {
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.add-customer-popup-content input {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.add-customer-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-customer-popup-buttons button {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#confirmAddCustomer {
+    background-color: #28a745;
+    color: white;
+}
+
+#cancelAddCustomer {
+    background-color: #dc3545;
+    color: white;
+}
+/*Add customer Popup ends*/
+
+/* Edit customer popup starts */
+#editCustomerPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Popup content */
+.edit-customer-popup-content {
+    background: #fff;
+    padding: 20px;
+    width: 350px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Heading */
+.edit-customer-popup-content h2 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Labels */
+.edit-customer-popup-content label {
+    display: block;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 10px 0 5px;
+    color: #444;
+}
+
+/* Input fields */
+.edit-customer-popup-content input {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border 0.2s;
+}
+
+.edit-customer-popup-content input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Buttons */
+.edit-customer-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.edit-customer-popup-buttons button {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#confirmEditCustomer {
+    background: #007bff;
+    color: white;
+    margin-right: 5px;
+}
+
+#confirmEditCustomer:hover {
+    background: #0056b3;
+}
+
+#cancelEditCustomer {
+    background: #dc3545;
+    color: white;
+    margin-left: 5px;
+}
+
+#cancelEditCustomer:hover {
+    background: #b02a37;
+}
+/* Edit customer popup ends*/
+
+#messagePopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1001;
+    text-align: center;
+}
+
+#messagePopup .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#messagePopup button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#messagePopup button:hover {
+    background: #0056b3;
+}
+
+#confirmPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1001;
+    text-align: center;
+}
+
+#confirmPopup .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#confirmPopup .popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#confirmPopup button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1;
+    margin: 5px;
+}
+
+#confirmYes {
+    background: #28a745;
+    color: white;
+}
+
+#confirmYes:hover {
+    background: #218838;
+}
+
+#confirmNo {
+    background: #dc3545;
+    color: white;
+}
+
+#confirmNo:hover {
+    background: #b02a37;
+}
+
+.no-customers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    color: #555;
+    font-size: 1.2rem;
+    margin: 20px;
+}
+
+.no-customers p {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #777;
+}
+
+.no-customers-img {
+    width: 150px; /* Adjust size */
+    opacity: 0.7;
+}
+
+/*===================================================CUSTOMER SECTION ENDS HERE===============================================*/
+
+/* Delete Order popup in todaysOrders STARTS HERE*/
+/* Delete Order Popup Styling */
+.delete-order-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.delete-order-popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    max-width: 90%;
+}
+
+.delete-order-popup-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.delete-order-popup-content label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.delete-order-popup-content input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.delete-order-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.delete-order-popup-buttons button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#confirmDeleteOrder {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+#cancelDeleteOrder {
+    background-color: #ccc;
+    color: black;
+}
+/* Delete Order Popup for todays orders ENDS HERE*/
+
+/* The Order Histoy Context Menu */
+
+.context-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    padding: 5px;
+    border-radius: 5px;
+    width: 180px;
+}
+
+.context-option {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+}
+
+.context-option:last-child {
+    border-bottom: none;
+}
+
+.context-option:hover {
+    background: #f0f0f0;
+}
+
+/* Order History context menu ends here*/
+
+/* Styles for the Todays Orders grid */
+.todays-orders-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 boxes per row */
+    gap: 20px; /* Space between boxes */
+    padding: 20px; /* Padding around the grid */
+}
+
+/* Styles for each order box */
+.todays-order-box {
+    background-color: #ffffff; /* White background */
+    border: 2px solid transparent; /* Use a transparent border to maintain size */
+    border-radius: 10px; /* Rounded corners */
+    padding: 15px; /* Padding inside the box */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    position: relative; /* Position relative for the edit button */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for border color and shadow */
+}
+
+/* Hover effect for order box */
+.todays-order-box:hover {
+    border-color: #4CAF50; /* Change border color on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Slightly larger shadow on hover */
+}
+
+
+/* Styles for the edit button */
+.todays-orders-edit-button {
+    position: absolute; /* Position it at the top right */
+    top: 10px;
+    right: 10px;
+    background-color: #104475; /* Blue background */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 50%; /* Circular button */
+    width: 30px; /* Width of the button */
+    height: 30px; /* Height of the button */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.todays-orders-edit-button:hover {
+    background-color: #092947; /* Darker Blue on hover */
+}
+
+/* Additional styles for the order box text */
+.todays-order-box h3 {
+    margin: 0; /* Remove default margin */
+    font-size: 1.2em; /* Slightly larger font size */
+}
+
+.todays-order-box p {
+    margin: 5px 0; /* Margin for spacing between paragraphs */
+    font-size: 0.9em; /* Font size for order details */
+}
+
+/* Styles for the order details modal */
+.order-details-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s;
+}
+
+.order-details-content {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    /* HIGHLIGHT: You can adjust these dimensions as needed */
+    width: 80%; /* Default width */
+    max-width: 600px; /* Maximum width */
+    height: 80%; /* Default height */
+    max-height: 700px; /* Maximum height */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    line-height: 1.5;
+    /* Add scrolling to content */
+    display: flex;
+    flex-direction: column;
+}
+
+.order-details-body {
+    overflow-y: auto; /* Enable vertical scrolling */
+    flex-grow: 1; /* Take up remaining space */
+    padding-right: 10px; /* Prevent content from touching scrollbar */
+}
+
+/* Custom scrollbar styling */
+.order-details-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.order-details-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.order-details-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.order-details-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Styles for the food items list */
+.food-items-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.food-items-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Animation for fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0; /* Start transparent */
+    }
+    to {
+        opacity: 1; /* End fully visible */
+    }
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+
+/* Transition for the order box */
+.todays-order-box {
+    transition: transform 0.3s ease; /* Smooth transition for scaling */
+}
+
+.todays-order-box:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+/*======================================================== Todays Orders Section ENDS HERE ===========================================================*/

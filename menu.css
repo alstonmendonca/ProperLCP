@@ -1,0 +1,214 @@
+/* MENU TOGGLE BUTTONS */
+
+#top-panel.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+    filter: grayscale(10%);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+#top-panel button.top {
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+
+/*Spinner for loading*/
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* Toggle switch container */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+/* Hide default checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Slider (the toggle button) */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: gray;
+    transition: .4s;
+    border-radius: 22px;
+}
+
+/* Round slider */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+/* Checked state */
+input:checked + .slider {
+    background-color: green;
+}
+
+/* Move the toggle knob when checked */
+input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+/* Popup Overlay - This creates the semi-transparent background */
+.menu-edit-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Popup Container - Centered content */
+.menu-edit-popup {
+  width: 350px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-popup-content {
+  overflow-y: auto;
+  padding: 20px;
+  max-height: 80vh;
+}
+
+.menu-popup-content h3 {
+    margin-top: 0;
+    color: #333;
+    text-align: center;
+}
+
+.menu-popup-content label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+    align-self: center;
+}
+
+.menu-popup-content input,
+.menu-popup-content select {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+
+}
+
+/* Updated button container to center buttons */
+.menu-popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.menu-popup-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    min-width: 100px;
+}
+
+#saveChanges {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#saveChanges:hover {
+    background-color: #45a049;
+}
+
+#closePopup {
+    background-color: #f44336;
+    color: white;
+}
+
+#closePopup:hover {
+    background-color: #d32f2f;
+}
+
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+    font-size: 14px;
+}
+
+.checkbox-container div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #fff;
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-container div:hover {
+    background-color: #f0f0f0;
+}
+
+.checkbox-container input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: #4caf50;
+    cursor: pointer;
+}
+
+/* ============================================= MENU SECTION TITLE ============================================== */
+.menu-section-title{
+    text-align: center; /* Center the content */
+    margin-bottom: 5px; /* Add some spacing below the header */
+}
+.menu-section-title h2{
+    font-size: 2.5rem; /* Increase font size */
+    font-weight: bold; /* Make it bold */
+    color: #2c3e50; /* Use a dark, professional color */
+    margin-bottom: 10px; /* Add spacing below the heading */
+    text-transform: uppercase; /* Uppercase the text for emphasis */
+    letter-spacing: 2px; /* Add spacing between letters */
+}

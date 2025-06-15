@@ -1,0 +1,194 @@
+/* ANALYTICS STARTS HERE */
+/* CSS for the Item Summary Table */
+
+.item-summary-container {
+    width: 100%; /* Make the container span the full width */
+    overflow-x: auto; /* Add horizontal scroll if needed */
+    margin-top: 20px;
+}
+
+.item-summary-table {
+    width: 100%; /* Make the table span the full width */
+    border-collapse: collapse; /* Remove spacing between cells */
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+.item-summary-table th,
+.item-summary-table td {
+    padding: 12px 15px; /* Add padding to cells */
+    text-align: left; /* Align text to the left */
+    border: 1px solid #ddd; /* Add a border between rows */
+}
+
+.item-summary-table th {
+    background-color: var(--all-table-header-color); /* Light gray background for headers */
+    font-weight: bold;
+    color: white;
+    cursor: pointer; /* Show pointer cursor for clickable headers */
+}
+
+.item-summary-table th:hover {
+    background-color: var(--all-table-header-hover); /* Slightly darker background on hover */
+}
+
+.category-row {
+    background-color: var(--fourth-color); /* Light gray background for category rows */
+    font-weight: bold;
+    border: 1px solid #ddd; /* Add a border between rows */
+}
+
+.item-row{
+    background-color: var(--fifth-color); /* Light gray background on hover */
+    color: black;
+}
+
+.item-row:hover {
+    background-color: #e8e8e8; /* Light gray background on hover */
+}
+
+/* Add a subtle animation for hover effects */
+.item-summary-table tr {
+    transition: background-color 0.2s ease;
+}
+/* ANALYTICS ENDS HERE */
+
+/* Sales Overview Design*/
+.sales-overview-grid {
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    gap: 20px; /* Space between boxes */
+    margin-top: 20px; /* Space above the grid */
+}
+
+/* Sales Box Styles */
+.sales-box {
+    background: linear-gradient(135deg, #F79D84, #F79D84); /* Gradient background */
+    color: white; /* Text color */
+    padding: 20px; /* Padding inside the box */
+    border-radius: 12px; /* Rounded corners */
+    text-align: center; /* Center text horizontally */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth scaling and shadow effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    height: 150px; /* Fixed height for the boxes */
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Arrange children in a column */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+}
+
+.sales-box:hover {
+    transform: translateY(-5px) scale(1.05); /* Lift effect on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+/* Sales Overview Design Ends Here*/
+
+/* Summary Div Styles */
+/* Summary Container Styles */
+.summary-container {
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+    gap: 20px; /* Space between grid items */
+    margin: 0 auto; /* Center the container */
+    max-width: 1200px; /* Maximum width for larger screens */
+    margin-top: 20px; /* Space above the grid */
+}
+
+/* Summary Div Styles */
+.summary-div {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between title and info */
+    align-items: center; /* Center items vertically */
+    background: linear-gradient(135deg, #094872, #094872); /* Gradient background */
+    color: white; /* Text color */
+    padding: 20px; /* Padding inside the box */
+    border-radius: 12px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth scaling and shadow effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    height: 100px; /* Fixed height for the boxes */
+}
+
+/* Title Styles */
+.summary-div h3 {
+    margin: 0; /* Remove default margin */
+    font-size: 20px; /* Font size for the title */
+    flex: 1; /* Allow title to take available space */
+}
+
+/* Info Styles */
+.summary-info {
+    font-size: 22px; /* Larger font size for the info */
+    font-weight: bold; /* Bold text for emphasis */
+    text-align: right; /* Align text to the right */
+    flex: 1; /* Allow info to take available space */
+}
+
+/* Summary Info Container Styles */
+.summary-info-container {
+    background-color: #f8f4e3; /* Light background color for the info section */
+    padding: 20px; /* Padding inside the info container */
+    border-radius: 10px; /* Rounded corners */
+    flex: 0.5; /* Allow it to take available space */
+    text-align: right; /* Align text to the right */
+    color: black;
+}
+
+.summary-div:hover {
+    transform: translateY(-5px) scale(1.05); /* Lift effect on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Expanded State */
+.summary-div.expanded {
+    height: 150px; /* Height when expanded */
+    background: linear-gradient(135deg, #FF5722, #FF7043); /* Change gradient on expand */
+}
+
+/* =========================================== Category Wise Sales STARTS HERE ========================================================= */
+.category-wise-sales-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between boxes */
+    justify-content: center; /* Center the boxes */
+    margin-top: 20px; /* Space above the boxes */
+}
+
+.category-wise-sales-box {
+    background-color: #f9f9f9; /* Light background color */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Padding inside the box */
+    width: calc(25% - 20px); /* 4 boxes per row */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center; /* Center text */
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition for hover effects */
+}
+
+.category-wise-sales-box:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+.category-wise-sales-box h3 {
+    font-size: 1.5em; /* Larger font for category name */
+    margin-bottom: 10px; /* Space below the heading */
+    color: #333; /* Darker text color */
+}
+
+.category-wise-sales-box p {
+    font-size: 1.1em; /* Slightly larger font for sales and revenue */
+    color: #555; /* Medium gray text color */
+}
+
+/* =========================================== Category Wise Sales ENDS HERE ========================================================= */
+/* Specific style for the "Clear History" button */
+#deletedClearHistory, #discountedClearHistory {
+    background-color: #e74c3c; /* Red background for clear history button */
+}
+
+#deletedClearHistory:hover, #discountedClearHistory:hover {
+    background-color: #c0392b; /* Darker red on hover */
+}
