@@ -174,7 +174,8 @@ body {
 #bill-items-list {
     padding-right: 5px;
     margin-top: 10px;
-    border: 1px solid #555;
+    border: 2px solid #0D3B66;
+    border-radius: 8px;
     flex-grow: 1;
     overflow-y: auto; /* Enables scrolling */
     height: calc(100% - 140px); /* Ensures it occupies a set height */
@@ -292,7 +293,6 @@ body {
     border-radius: 5px;
 }
 
-
 /* CSS to improve the display of discount section */
 #discount-section {
     margin-top: 15px;
@@ -324,7 +324,7 @@ body {
 
 #apply-discount-btn {
     padding: 5px 10px;
-    background-color: var(--second-color);
+    background-color: #0D3B66;
     color: white;
     border: none;
     border-radius: 3px;
@@ -339,7 +339,7 @@ body {
 
 button {
     padding: 10px 20px;
-    background-color: var(--second-color);
+    background-color: #0D3B66;
     color: white;
     font-size: 14px;
     border-radius: 5px;
@@ -349,7 +349,7 @@ button {
 }
 
 button:hover {
-    background-color: #2374a6;
+    background-color: #11487b;
 }
 
 button:focus {
@@ -487,16 +487,6 @@ h1 {
 
 /* COLOR SECTION IS HERE ----- ALL UI COLORING IS PRESENT HEERE ------------------------------------- */
 
-#bill-buttons button {
-    background-color: #0C345A;
-}
-#upperbuttons button {
-    background-color: #0C345A;
-}
-
-.food-item button {
-    background-color: #0C345A;
-}
 
 /* Top Horizontal Panel */
 /* Button Styling */
@@ -579,7 +569,7 @@ h1 {
 }
 
 #exportExcelButton {
-    background-color: #1d6f42; /* Blue background */
+    background-color: #1d6f42; /* green background */
     color: white; /* White text */
     border: none; /* Remove border */
     padding: 10px 20px; /* Add padding */
@@ -590,7 +580,7 @@ h1 {
 }
 
 #exportExcelButton:hover {
-    background-color: #1a5735; /* Darker blue  on hover */
+    background-color: #1a5735; /* Darker green on hover */
 }
 
 /* Center the header and make it visually appealing */
@@ -668,6 +658,7 @@ h1 {
 .date-filters button:hover {
     background-color: #092947; /* Darker Blue */
 }
+/* ================================================ DATE FILTERS END HERE ========================================================= */
 
 /*Held orders Display*/
 #heldpopup {

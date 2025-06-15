@@ -231,7 +231,7 @@ function updateBillTotal() {
     }).format(totalAmount);
 
     if (billItems.length === 0) {
-        totalElement.textContent = 'Total: Rs. 0.00 (Your bill is empty)';
+        totalElement.textContent = 'Total: Rs. 0.00';
     } else {
         totalElement.textContent = `Total: ${formattedTotal}`;
     }
