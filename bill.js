@@ -92,7 +92,9 @@ function addToBill(itemId, itemName, price, quantity, category = null) {
             removeBtn.onclick = () => removeFromBill(itemId);
 
             billItemRow.append(itemNameSpan, quantityInput, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
-
+            requestAnimationFrame(() => {
+                billItemRow.classList.add("show");
+            });
             // Append to category or general list
             categorySection.appendChild(billItemRow);
         }
@@ -1545,280 +1547,293 @@ function getOnlineOrders() {
         });
         ipcRenderer.send("get-food-name", fid);
     }
-function showOnlineOrdersPopup(orders) {
-    // Overlay for background blur
-    const overlay = document.createElement("div");
-    overlay.style = `
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(13, 59, 102, 0.18);
-        backdrop-filter: blur(6px);
-        z-index: 999;
-    `;
-    overlay.onclick = () => {
-        popup.remove();
-        overlay.remove();
-    };
-
-    let popup = document.createElement("div");
-    popup.id = "onlineOrdersPopup";
-    popup.style = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #f7fbff;
-        padding: 35px 24px 24px 24px;
-        border-radius: 16px;
-        box-shadow: 0 12px 40px rgba(13,59,102,0.13);
-        max-width: 95%;
-        width: 650px;
-        max-height: 85vh;
-        overflow-y: auto;
-        z-index: 1000;
-        border: 1px solid #dbeafe;
-        font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
-    `;
-
-    // Close Button
-    const closeBtn = document.createElement("div");
-    closeBtn.innerHTML = "&times;";
-    closeBtn.style = `
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        cursor: pointer;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: #2563eb;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        transition: all 0.2s;
-        line-height: 1;
-        box-shadow: 0 2px 8px rgba(37,99,235,0.08);
-    `;
-    closeBtn.onmouseover = () => {
-        closeBtn.style.background = '#1e40af';
-        closeBtn.style.transform = 'rotate(90deg) scale(1.1)';
-    };
-    closeBtn.onmouseout = () => {
-        closeBtn.style.background = '#2563eb';
-        closeBtn.style.transform = 'none';
-    };
-    closeBtn.onclick = () => {
-        popup.remove();
-        overlay.remove();
-    };
-    popup.appendChild(closeBtn);
-
-    // SVG icons (blue/gray theme, no emojis)
-    const svgPackage = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2563eb" viewBox="0 0 24 24"><path d="M21 16v-8l-9-4-9 4v8l9 4 9-4zm-18-7.5 7.5-3.33v5.83l-7.5 3.34v-5.84zm16.5 6.33-7.5 3.34v-5.84l7.5-3.34v5.84zm-11.25-4.33h4.5v2h-4.5v-2z"/></svg>`;
-    const svgUser = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#0c345a" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
-    const svgMoney = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2563eb" viewBox="0 0 24 24"><path d="M12 1c-4.97 0-9 4.03-9 9h2a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 3.86-3.14 7-7 7a6.97 6.97 0 0 1-6.93-6H3c0 4.97 4.03 9 9 9 5.52 0 10-4.48 10-10S17.52 1 12 1z"/></svg>`;
-    const svgFood = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#0c345a" viewBox="0 0 24 24"><path d="M8 13v5a1 1 0 1 0 2 0v-5a3 3 0 1 0-2 0zM12 8a1 1 0 0 0 0 2h2v8h2v-8h2a1 1 0 0 0 0-2h-6z"/></svg>`;
-    const svgCheck = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M20.285 6.709l-11.09 11.09-5.486-5.486 1.415-1.415 4.07 4.07 9.675-9.675z"/></svg>`;
-    const svgCancel = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414-1.414L12 9.172 7.05 4.222 5.636 5.636 10.586 10.586 5.636 15.536l1.414 1.414L12 12l4.95 4.95 1.414-1.414L13.414 10.586z"/></svg>`;
-
-    // Title
-    const title = document.createElement("div");
-    title.style = `
-        font-size: 1.7rem;
-        font-weight: 700;
-        color: #0c345a;
-        margin-bottom: 18px;
-        text-align: center;
-        letter-spacing: -0.5px;
-    `;
-    title.textContent = "Online Orders";
-    popup.appendChild(title);
-
-    if (orders.length === 0) {
-        const emptyMsg = document.createElement("div");
-        emptyMsg.style = `
-            color: #2563eb;
-            background: #e0e7ef;
-            border-radius: 10px;
-            padding: 32px 0;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin: 24px 0;
+    async function showOnlineOrdersPopup(orders) {
+        // Overlay for background blur
+        const overlay = document.createElement("div");
+        overlay.style = `
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(13, 59, 102, 0.18);
+            backdrop-filter: blur(6px);
+            z-index: 999;
         `;
-        emptyMsg.textContent = "No pending online orders.";
-        popup.appendChild(emptyMsg);
-    }
-
-    orders.forEach(order => {
-        const orderDiv = document.createElement("div");
-        orderDiv.style = `
-            background: #fff;
-            margin: 18px 0;
-            padding: 20px 18px 16px 18px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(13,59,102,0.07);
-            border: 1px solid #e0e7ef;
-            transition: transform 0.2s, box-shadow 0.2s;
-        `;
-        orderDiv.onmouseover = () => {
-            orderDiv.style.transform = 'translateY(-2px)';
-            orderDiv.style.boxShadow = '0 6px 18px rgba(13,59,102,0.11)';
-        };
-        orderDiv.onmouseout = () => {
-            orderDiv.style.transform = 'none';
-            orderDiv.style.boxShadow = '0 3px 12px rgba(13,59,102,0.07)';
-        };
-
-        // Payment status text & color
-        const paidOnline = order.paymentId !== null && order.paymentId !== "";
-        const paymentMethod = paidOnline ? "Online" : "Cafe";
-        const paymentColor = paidOnline ? "#2563eb" : "#e11d48";
-        const paymentBg = paidOnline ? "#e0e7ef" : "#fef2f2";
-
-
-        const header = document.createElement("div");
-        header.style = `
-            font-weight: 600;
-            color: #0c345a;
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f1f5fa;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        `;
-        header.innerHTML = `
-            ${svgPackage} <span style="color: #2563eb;">Order ${order.orderId}</span>
-            | ${svgUser} ${order.customerName} (${order.phone})
-            | ${svgMoney} <span style="color: #2563eb;">₹${order.totalPrice}</span>
-            | <span style="color: ${paymentColor}; background: ${paymentBg}; border-radius: 6px; padding: 2px 10px; font-size: 0.98em;">
-               ${paidOnline ? `Paid Online (ID: ${order.paymentId})` : "Pay at Cafe"}
-            </span>
-        `;
-        orderDiv.appendChild(header);
-
-        // Items - asynchronously fetch names and then append
-        order.items.forEach(item => {
-            // Create placeholder paragraph to update later
-            const itemP = document.createElement("p");
-            itemP.style = `
-                margin: 8px 0;
-                padding: 8px 10px;
-                background: #f1f5fa;
-                border-radius: 7px;
-                font-size: 1rem;
-                color: #0c345a;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            `;
-            itemP.innerHTML = `${svgFood} <span style="font-weight: 500;">Loading item #${item.fid}...</span>`;
-            orderDiv.appendChild(itemP);
-
-            // Fetch food item name and update paragraph
-            fetchFoodItemName(item.fid, (itemName) => {
-                itemP.innerHTML = `
-                    ${svgFood} <span style="font-weight: 500;">${itemName}</span>
-                    <span style="color: #2563eb; margin-left: 12px;">x${item.quantity}</span>
-                    <span style="margin-left: auto; color: #0c345a; font-weight: 600;">₹${item.price}</span>
-                `;
-            });
-        });
-
-        const buttonsDiv = document.createElement("div");
-        buttonsDiv.style = `
-            display: flex;
-            gap: 14px;
-            margin-top: 18px;
-            padding-top: 14px;
-            border-top: 1px solid #e0e7ef;
-        `;
-
-        // Add to Bill Button
-        const addToBillBtn = document.createElement("button");
-        addToBillBtn.style = `
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 1rem;
-            box-shadow: 0 2px 8px rgba(37,99,235,0.07);
-        `;
-        addToBillBtn.onmouseover = () => addToBillBtn.style.background = '#1e40af';
-        addToBillBtn.onmouseout = () => addToBillBtn.style.background = '#2563eb';
-        addToBillBtn.innerHTML = `${svgCheck} Add to Bill`;
-        addToBillBtn.onclick = () => {
-            order.items.forEach(item => {
-                fetchFoodItemName(item.fid, (itemName) => {
-                    addToBill(item.fid, itemName, item.price, item.quantity);
-                });
-            });
-            ipcRenderer.send("cancel-online-order", order.orderId);
+        overlay.onclick = () => {
             popup.remove();
             overlay.remove();
         };
 
-        // Cancel Order Button
-        const cancelBtn = document.createElement("button");
-        cancelBtn.style = `
-            background: #e11d48;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+        let popup = document.createElement("div");
+        popup.id = "onlineOrdersPopup";
+        popup.style = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f7fbff;
+            padding: 35px 24px 24px 24px;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(13,59,102,0.13);
+            max-width: 95%;
+            width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid #dbeafe;
+            font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+        `;
+
+        // Close Button
+        const closeBtn = document.createElement("div");
+        closeBtn.innerHTML = "&times;";
+        closeBtn.style = `
+            position: absolute;
+            top: 15px;
+            right: 15px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-            flex: 1;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 1rem;
-            box-shadow: 0 2px 8px rgba(225,29,72,0.07);
+            font-size: 26px;
+            transition: all 0.2s;
+            line-height: 1;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
         `;
-        cancelBtn.onmouseover = () => cancelBtn.style.background = '#be123c';
-        cancelBtn.onmouseout = () => cancelBtn.style.background = '#e11d48';
-        cancelBtn.innerHTML = `${svgCancel} Cancel Order`;
-        cancelBtn.onclick = () => {
-                const  {createConfirmPopup} = require("./textPopup");
-                // Show the custom confirmation popup and handle the user's response
+        closeBtn.onmouseover = () => {
+            closeBtn.style.background = '#1e40af';
+            closeBtn.style.transform = 'rotate(90deg) scale(1.1)';
+        };
+        closeBtn.onmouseout = () => {
+            closeBtn.style.background = '#2563eb';
+            closeBtn.style.transform = 'none';
+        };
+        closeBtn.onclick = () => {
+            popup.remove();
+            overlay.remove();
+        };
+        popup.appendChild(closeBtn);
 
-                createConfirmPopup(`Are you sure you want to cancel Order ${order.orderId}?`, (confirmed) => {
-                if (confirmed) {
-                    // User clicked OK, send the delete request
-                    ipcRenderer.send("cancel-online-order", order.orderId);
-                    popup.remove();
-                    overlay.remove();
-                } 
+        // SVG icons (blue/gray theme, no emojis)
+        const svgPackage = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2563eb" viewBox="0 0 24 24"><path d="M21 16v-8l-9-4-9 4v8l9 4 9-4zm-18-7.5 7.5-3.33v5.83l-7.5 3.34v-5.84zm16.5 6.33-7.5 3.34v-5.84l7.5-3.34v5.84zm-11.25-4.33h4.5v2h-4.5v-2z"/></svg>`;
+        const svgUser = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#0c345a" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+        const svgMoney = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#2563eb" viewBox="0 0 24 24"><path d="M12 1c-4.97 0-9 4.03-9 9h2a7 7 0 0 1 7-7 7 7 0 0 1 7 7c0 3.86-3.14 7-7 7a6.97 6.97 0 0 1-6.93-6H3c0 4.97 4.03 9 9 9 5.52 0 10-4.48 10-10S17.52 1 12 1z"/></svg>`;
+        const svgFood = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#0c345a" viewBox="0 0 24 24"><path d="M8 13v5a1 1 0 1 0 2 0v-5a3 3 0 1 0-2 0zM12 8a1 1 0 0 0 0 2h2v8h2v-8h2a1 1 0 0 0 0-2h-6z"/></svg>`;
+        const svgCheck = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M20.285 6.709l-11.09 11.09-5.486-5.486 1.415-1.415 4.07 4.07 9.675-9.675z"/></svg>`;
+        const svgCancel = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414-1.414L12 9.172 7.05 4.222 5.636 5.636 10.586 10.586 5.636 15.536l1.414 1.414L12 12l4.95 4.95 1.414-1.414L13.414 10.586z"/></svg>`;
+
+        // Title
+        const title = document.createElement("div");
+        title.style = `
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #0c345a;
+            margin-bottom: 18px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        `;
+        title.textContent = "Online Orders";
+        popup.appendChild(title);
+
+        if (orders.length === 0) {
+            const emptyMsg = document.createElement("div");
+            emptyMsg.style = `
+                color: #2563eb;
+                background: #e0e7ef;
+                border-radius: 10px;
+                padding: 32px 0;
+                text-align: center;
+                font-size: 1.2rem;
+                font-weight: 500;
+                margin: 24px 0;
+            `;
+            emptyMsg.textContent = "No pending online orders.";
+            popup.appendChild(emptyMsg);
+        }
+
+        orders.forEach(order => {
+            const orderDiv = document.createElement("div");
+            orderDiv.style = `
+                background: #fff;
+                margin: 18px 0;
+                padding: 20px 18px 16px 18px;
+                border-radius: 12px;
+                box-shadow: 0 3px 12px rgba(13,59,102,0.07);
+                border: 1px solid #e0e7ef;
+                transition: transform 0.2s, box-shadow 0.2s;
+            `;
+            orderDiv.onmouseover = () => {
+                orderDiv.style.transform = 'translateY(-2px)';
+                orderDiv.style.boxShadow = '0 6px 18px rgba(13,59,102,0.11)';
+            };
+            orderDiv.onmouseout = () => {
+                orderDiv.style.transform = 'none';
+                orderDiv.style.boxShadow = '0 3px 12px rgba(13,59,102,0.07)';
+            };
+
+            // Payment status text & color
+            const paidOnline = order.paymentId !== null && order.paymentId !== "";
+            const paymentMethod = paidOnline ? "Online" : "Cafe";
+            const paymentColor = paidOnline ? "#2563eb" : "#e11d48";
+            const paymentBg = paidOnline ? "#e0e7ef" : "#fef2f2";
+
+
+            const header = document.createElement("div");
+            header.style = `
+                font-weight: 600;
+                color: #0c345a;
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid #f1f5fa;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            `;
+            header.innerHTML = `
+                ${svgPackage} <span style="color: #2563eb;">Order ${order.orderId}</span>
+                | ${svgUser} ${order.customerName} (${order.phone})
+                | ${svgMoney} <span style="color: #2563eb;">₹${order.totalPrice}</span>
+                | <span style="color: ${paymentColor}; background: ${paymentBg}; border-radius: 6px; padding: 2px 10px; font-size: 0.98em;">
+                ${paidOnline ? `Paid Online (ID: ${order.paymentId})` : "Pay at Cafe"}
+                </span>
+            `;
+            orderDiv.appendChild(header);
+
+            // Items - asynchronously fetch names and then append
+            order.items.forEach(item => {
+                // Create placeholder paragraph to update later
+                const itemP = document.createElement("p");
+                itemP.style = `
+                    margin: 8px 0;
+                    padding: 8px 10px;
+                    background: #f1f5fa;
+                    border-radius: 7px;
+                    font-size: 1rem;
+                    color: #0c345a;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                itemP.innerHTML = `${svgFood} <span style="font-weight: 500;">Loading item #${item.fid}...</span>`;
+                orderDiv.appendChild(itemP);
+
+                // Fetch food item name and update paragraph
+                fetchFoodItemName(item.fid, (itemName) => {
+                    itemP.innerHTML = `
+                        ${svgFood} <span style="font-weight: 500;">${itemName}</span>
+                        <span style="color: #2563eb; margin-left: 12px;">x${item.quantity}</span>
+                        <span style="margin-left: auto; color: #0c345a; font-weight: 600;">₹${item.price}</span>
+                    `;
+                });
             });
 
+            const buttonsDiv = document.createElement("div");
+            buttonsDiv.style = `
+                display: flex;
+                gap: 14px;
+                margin-top: 18px;
+                padding-top: 14px;
+                border-top: 1px solid #e0e7ef;
+            `;
 
-        };
+            // Add to Bill Button
+            const addToBillBtn = document.createElement("button");
+            addToBillBtn.style = `
+                background: #2563eb;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-weight: 600;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-size: 1rem;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.07);
+            `;
+            addToBillBtn.onmouseover = () => addToBillBtn.style.background = '#1e40af';
+            addToBillBtn.onmouseout = () => addToBillBtn.style.background = '#2563eb';
+            addToBillBtn.innerHTML = `${svgCheck} Add to Bill`;
+            addToBillBtn.onclick = async () => {
+                order.items.forEach(item => {
+                    fetchFoodItemName(item.fid, (itemName) => {
+                        addToBill(item.fid, itemName, item.price, item.quantity);
+                    });
+                });
+                ipcRenderer.send("cancel-online-order", order.orderId);
+                const result = await ipcRenderer.invoke('update-online-order', { orderId: order.orderId, status: 1 });
+                if (result.success) {
+                    console.log('Status updated:', result.message);
+                } else {
+                    console.error('Failed to update:', result.message);
+                }
+                popup.remove();
+                overlay.remove();
+            };
 
-        buttonsDiv.appendChild(addToBillBtn);
-        buttonsDiv.appendChild(cancelBtn);
-        orderDiv.appendChild(buttonsDiv);
-        popup.appendChild(orderDiv);
-    });
+            // Cancel Order Button
+            const cancelBtn = document.createElement("button");
+            cancelBtn.style = `
+                background: #e11d48;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-weight: 600;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-size: 1rem;
+                box-shadow: 0 2px 8px rgba(225,29,72,0.07);
+            `;
+            cancelBtn.onmouseover = () => cancelBtn.style.background = '#be123c';
+            cancelBtn.onmouseout = () => cancelBtn.style.background = '#e11d48';
+            cancelBtn.innerHTML = `${svgCancel} Cancel Order`;
+            cancelBtn.onclick = () => {
+                    const  {createConfirmPopup} = require("./textPopup");
+                    // Show the custom confirmation popup and handle the user's response
 
-    document.body.appendChild(overlay);
-    document.body.appendChild(popup);
-}
+                    createConfirmPopup(`Are you sure you want to cancel Order ${order.orderId}?`, async (confirmed) => {
+                    if (confirmed) {
+                        // User clicked OK, send the delete request
+                        ipcRenderer.send("cancel-online-order", order.orderId);
+                        const result = await ipcRenderer.invoke('update-online-order', { orderId: order.orderId, status: 0 });
+                        if (result.success) {
+                            console.log('Status updated:', result.message);
+                        } else {
+                            console.error('Failed to update:', result.message);
+                        }
+
+                        popup.remove();
+                        overlay.remove();
+                    } 
+                });
+
+
+            };
+
+            buttonsDiv.appendChild(addToBillBtn);
+            buttonsDiv.appendChild(cancelBtn);
+            orderDiv.appendChild(buttonsDiv);
+            popup.appendChild(orderDiv);
+        });
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(popup);
+    }
 
 
 
