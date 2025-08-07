@@ -10,7 +10,7 @@ const { fork, spawn } = require('child_process');
 let mainWindow;
 let userRole = null;
 let store; // Will be initialized after dynamic import
-
+const axios = require('axios');
 // Connect to the SQLite database
 const db = new sqlite3.Database('LC.db', (err) => {
     if (err) {
@@ -161,17 +161,60 @@ function startExpressServer() {
   return child;
 }
 
+// 1. Read all items from SQLite:
+function fetchAllFoodItems() {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database('LC.db');
+    db.all(`SELECT fid, fname, category, cost, sgst, cgst, tax, active, is_on, veg, depend_inv FROM FoodItem`, [], (err, rows) => {
+      db.close();
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+}
 
+// 2. POST them to your Express route:
+async function syncFoodItemsToMongo() {
+  try {
+    const items = await fetchAllFoodItems();
+    const resp = await axios.post(`http://localhost:${process.env.MONGO_PORT}/sync/fooditems`, items);
+    console.log(resp.data.message);
+  } catch (err) {
+    console.error('Sync failed:', err);
+  }
+}
 
+async function waitForServerReady(retries = 20, delay = 500) {
+  const url = `http://localhost:${process.env.MONGO_PORT}/ping`;
+
+  for (let i = 0; i < retries; i++) {
+    console.log(`⏳ Waiting for Express server... (${i + 1}/${retries})`);
+    try {
+      const res = await axios.get(url);
+      if (res.status === 200) {
+        console.log('✅ Express server is ready');
+        return;
+      }
+    } catch (err) {
+      // Wait before next attempt
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  throw new Error('❌ Express server did not become ready in time.');
+}
 app.whenReady().then(async () => {
-    await startGetOnlineServer(); // WebSocket server
-    await startExpressServer(); // Express server
-    // Initialize store first
-    await initStore();
-    
-    // Then check and reset food items
-    await checkAndResetFoodItems();
-    
+  await startGetOnlineServer(); // WebSocket server
+  await startExpressServer();   // Spawn Express server
+
+  // 🕒 Wait for Express to actually start
+  await waitForServerReady();
+
+  await initStore();
+  await checkAndResetFoodItems();
+
+  // ✅ Now safe to sync
+  await syncFoodItemsToMongo();
     // Create main window
     mainWindow = new BrowserWindow({
         width: 1200,
