@@ -31,7 +31,7 @@
             font-size: 24px;
         }
 
-        input[type="password"] {
+        input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -73,10 +73,39 @@
 <body>
     <div class="login-container">
         <h1>Login</h1>
+        <input type="text" id="username" placeholder="Enter your username" required>
         <input type="password" id="password" placeholder="Enter your password" required>
         <button type="submit" id="login-btn">Login</button>
-        <div id="error-message" class="error-message">Incorrect password. Please try again.</div>
+        <div id="error-message" class="error-message">Incorrect credentials. Please try again.</div>
     </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('error-message');
+
+            try {
+                const result = await ipcRenderer.invoke('login', { username, password });
+
+                if (!result || !result.role) {
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+
+                localStorage.setItem('userRole', result.role);
+                localStorage.setItem('userName', result.name);
+
+                window.location.href = 'index.html';
+            } catch (err) {
+                console.error('Login error:', err);
+                errorMessage.textContent = 'Login failed due to an error.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
 
     <script src="renderer.js"></script>
 </body>

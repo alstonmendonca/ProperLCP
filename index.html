@@ -89,7 +89,7 @@
 
     <!-- Main Content Area -->
     <div id="main-content">
-      <h2>Welcome to LASSI CORNER!</h2>
+      <h2 id="welcome-user">Welcome to LASSI CORNER!</h2>
       <p>Time to make some sales!</p>
     </div>
 
@@ -215,7 +215,24 @@
   </button>
 </div>
 </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const role = localStorage.getItem('userRole');
+        const userName = localStorage.getItem('userName');
 
+        console.log(`Logged in as ${userName} with role ${role}`);
+
+        if (role === 'staff') {
+            document.getElementById('Analytics').style.display = 'none';
+            document.getElementById('History').style.display = 'none';
+        }
+                // Optional: show greeting
+        const welcome = document.getElementById('welcome-user');
+        if (welcome && userName) {
+            welcome.textContent = `Welcome, ${userName}`;
+        }
+    });
+    </script>
   <script src="renderer.js"></script>
   <script src="table.js"></script>
   <script src="bill.js"></script>

@@ -2,7 +2,7 @@
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 require('dotenv').config();
-
+const bcrypt = require('bcrypt');
 const app = express();
 app.use(express.json());
 
@@ -20,6 +20,45 @@ async function connectToMongo() {
 
 app.get('/ping', (req, res) => {
   res.status(200).send('pong');
+});
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: 'Username and password are required' });
+    }
+
+    const user = await db.collection('LCPUsers').findOne({ username });
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    const hash = user.password_hash;
+
+    // Skip hash check if hash is missing or empty (for development/test only)
+    if (!hash || (Array.isArray(hash) && hash.length === 0)) {
+      return res.status(401).json({ success: false, message: 'No password hash set for user' });
+    }
+
+    const match = await bcrypt.compare(password, hash);
+
+    if (!match) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        name: user.uname,
+        role: user.isadmin === 1 ? 'admin' : 'staff'
+      }
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 });
 // API to update order status
 app.post('/order/:orderId/status', async (req, res) => {

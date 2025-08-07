@@ -231,14 +231,36 @@ app.whenReady().then(async () => {
     mainWindow.maximize();
     mainWindow.once("ready-to-show", () => mainWindow.show());
     Menu.setApplicationMenu(null);
-    mainWindow.loadFile('index.html').catch(console.error);
+    mainWindow.loadFile('login.html').catch(console.error);
 
-    // IPC handlers
-    ipcMain.handle('login', (event, password) => {
-        if (password === '1212') userRole = 'admin';
-        else if (password === '1000') userRole = 'staff';
-        else userRole = null;
-        return userRole;
+        // IPC handlers
+    ipcMain.handle('login', async (event, { username, password }) => {
+    try {
+        const response = await axios.post(`http://localhost:${MONGO_PORT}/login`, {
+        username,
+        password
+        });
+
+        if (response.data.success) {
+        const user = response.data.user;
+        console.log("Login successful:", user);
+        // Save user to local session (electron-store)
+        store.set('sessionUser', user);
+        return user; // return to renderer
+        } else {
+        return null;
+        }
+    } catch (err) {
+        console.error("Login API error:", err.message);
+        return null;
+    }
+    });
+    ipcMain.handle('get-session-user', () => {
+        return store.get('sessionUser') || null;
+    });
+    ipcMain.handle('logout', () => {
+        store.delete('sessionUser');
+        return true;
     });
 
     ipcMain.handle('get-user-role', () => userRole);
