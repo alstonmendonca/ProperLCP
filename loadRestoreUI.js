@@ -24,7 +24,7 @@ function loadRestoreUI(mainContent, billPanel) {
             #restoreButton {
                 padding: 12px 24px;
                 font-size: 16px;
-                background-color: #007bff;
+                background-color: #0D3B66;
                 color: white;
                 border: none;
                 border-radius: 6px;
@@ -33,7 +33,7 @@ function loadRestoreUI(mainContent, billPanel) {
             }
 
             #restoreButton:hover {
-                background-color: #0056b3;
+                background-color: #032a53ff;
             }
 
             #restoreMessage {

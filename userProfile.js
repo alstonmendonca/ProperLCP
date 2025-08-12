@@ -1,374 +1,352 @@
 const { ipcRenderer } = require("electron");
-const  {createTextPopup} = require("./textPopup");
 
-// Function to load the User Profile UI
-function loadUserProfile(mainContent, billPanel) {
+async function loadUserProfile(mainContent, billPanel) {
+  billPanel.style.display = "none";
+
+  const user = await ipcRenderer.invoke("get-session-user");
+
+  if (!user) {
     mainContent.innerHTML = `
-        <div class="display-settings-header">
-            <h2>User Profile</h2>
+      <div class="profile-empty-state">
+        <div class="empty-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
-        <div class="user-profile-actions">
-
-            <button id="switchUserButton" class="switch-user-btn">Switch User</button>
-
-            <!-- Add User Buttons -->
-            <button id="addUserButton" class="add-user-btn">Add User</button>
-
-            <!-- Remove User Buttons -->
-            <button id="removeUserButton" class="add-user-btn">Remove User</button>
-        </div>
-
-        <div style="margin-top: 10px;">
-            <h3 class="current-user-display">
-                Current User: Ajay Francis Anchan
-            </h3>
-        </div>
-
-        <!-- Admin Users Bar -->
-        <div id="adminBar" class="admin-bar"></div>
-
-        <!-- Staff Members Grid -->
-        <div id="staffGrid" class="staff-grid"></div>
+        <h2>No Active Session</h2>
+        <p>Please log in to view your profile</p>
+        <button id="loginRedirectBtn" class="action-btn primary">
+          Go to Login
+        </button>
+      </div>
     `;
+    
+    document.getElementById("loginRedirectBtn").addEventListener("click", () => {
+      window.location.href = "login.html";
+    });
+    return;
+  }
 
-    billPanel.style.display = 'none';
+  // Generate initials for avatar
+  const initials = user.name 
+    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+    : '??';
 
-    // Fetch users from the database
-    ipcRenderer.send("get-users");
+  // Format role name
+  const roleName = user.role ? 
+    user.role.charAt(0).toUpperCase() + user.role.slice(1) : 
+    'Unknown';
 
-    // Add event listener to "Add User" button
-    document.getElementById("addUserButton").addEventListener("click", openAddUserPopup);
-    document.getElementById("removeUserButton").addEventListener("click", openRemoveUserPopup);
-    document.getElementById("switchUserButton").addEventListener("click", openSwitchUserPopup);
-}
-
-// Handle response from main process
-ipcRenderer.on("users-response", (event, users) => {
-    const adminBar = document.getElementById("adminBar");
-    const staffGrid = document.getElementById("staffGrid");
-
-    // Clear existing content
-    adminBar.innerHTML = "";
-    staffGrid.innerHTML = "";
-
-    // Separate admins and staff
-    const admins = users.filter(user => user.isadmin === 1);
-    const staff = users.filter(user => user.isadmin === 0);
-
-    // Display admins inside the rectangular bar
-    if (admins.length > 0) {
-        adminBar.innerHTML = `
-            <h2 style="margin-bottom: 15px; text-align: center;">ADMINS</h2>
-            <div class="admin-container">
-                ${admins.map(admin => `
-                    <div class="admin-box">
-                        <p><strong>${admin.uname}</strong></p>
-                        <p>Password: ${admin.password}</p>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    } else {
-        adminBar.innerHTML = "<p>No Admins Found</p>";
+  mainContent.innerHTML = `
+  <style>
+  :root {
+    --primary: #0D3B66;
+    --primary-light: #0D3B66;
+    --secondary: #0D3B66;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --gray: #64748b;
+    --border: #e2e8f0;
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 5px 10px -5px rgba(0, 0, 0, 0.02);
+    --transition: all 0.3s ease;
+  }
+  
+  .profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  
+  .profile-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  
+  .avatar-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+  }
+  
+  .user-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-size: 2.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: var(--card-shadow);
+  }
+  
+  .role-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .admin-badge { background: var(--danger); color: white; }
+  .staff-badge { background: var(--success); color: white; }
+  .manager-badge { background: var(--warning); color: white; }
+  .default-badge { background: var(--gray); color: white; }
+  
+  .profile-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+  }
+  
+  .profile-header p {
+    color: var(--gray);
+    font-size: 1.1rem;
+  }
+  
+  .profile-details {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+  }
+  
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .detail-item {
+    display: flex;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    margin-right: 1rem;
+    color: var(--primary);
+  }
+  
+  .detail-content {
+    flex: 1;
+  }
+  
+  .detail-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray);
+    margin-bottom: 0.25rem;
+  }
+  
+  .detail-value {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--dark);
+  }
+  
+  .profile-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .action-btn {
+    padding: 0.85rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    border: none;
+  }
+  
+  .primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+  }
+  
+  .primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(67, 97, 238, 0.25);
+  }
+  
+  .secondary {
+    background: var(--light);
+    color: var(--gray);
+    border: 1px solid var(--border);
+  }
+  
+  .secondary:hover {
+    background: white;
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  
+  .profile-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .empty-icon svg {
+    width: 40px;
+    height: 40px;
+    color: var(--primary);
+  }
+  
+  .profile-empty-state h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+  }
+  
+  .profile-empty-state p {
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+  
+  @media (max-width: 600px) {
+    .profile-details {
+      padding: 1.5rem;
     }
-
-    // Display staff inside a grid
-    if (staff.length > 0) {
-        staffGrid.innerHTML = `
-            <h2 style="margin-top: 30px; margin-bottom: 15px; text-align: center;">STAFF MEMBERS</h2>
-            <div class="staff-container">
-                ${staff.map(staffMember => `
-                    <div class="staff-box" data-id="${staffMember.userid}" data-uname="${staffMember.uname}" data-password="${staffMember.password}">
-                        <p><strong>${staffMember.uname}</strong></p>
-                        <p>Password: ${staffMember.password}</p>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-
-        // Add click event listeners to staff boxes
-        document.querySelectorAll(".staff-box").forEach(box => {
-            box.addEventListener("click", function () {
-                const userid = this.getAttribute("data-id");
-                const uname = this.getAttribute("data-uname");
-                const password = this.getAttribute("data-password");
-
-                openEditPopup(userid, uname, password);
-            });
-        });
-    } else {
-        staffGrid.innerHTML = "<p>No Staff Members Found</p>";
+    
+    .profile-actions {
+      flex-direction: column;
     }
-});
+    
+    .action-btn {
+      width: 100%;
+    }
+  }
+</style>
 
-// Function to open popup for editing staff details
-function openEditPopup(userid, uname, password) {
-    const popup = document.createElement("div");
-    popup.classList.add("edit-user-popup");
-    popup.innerHTML = `
-        <div class="user-popup-content">
-            <h3>Edit Staff</h3>
-            <label>Username:</label>
-            <input type="text" id="editUname" value="${uname}">
-            <label>Password:</label>
-            <input type="text" id="editPassword" value="${password}">
-            <div class="user-popup-buttons">
-                <button id="saveChanges">Save</button>
-                <button id="closePopup">Cancel</button>
-            </div>
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="avatar-container">
+      <div class="user-avatar">${initials}</div>
+      <div class="role-badge ${user.role || 'default'}-badge">${roleName}</div>
+    </div>
+    <h1>Welcome, ${user.name || "User"}</h1>
+    <p>Here's your account information</p>
+  </div>
+
+  <div class="profile-details">
+    <div class="detail-grid">
+      <div class="detail-item">
+        <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+        </svg>
+        <div class="detail-content">
+          <div class="detail-title">User ID</div>
+          <div class="detail-value">${user.userid || "Unknown"}</div>
         </div>
-    `;
-
-    document.body.appendChild(popup);
-
-    // Close popup
-    document.getElementById("closePopup").addEventListener("click", () => {
-        document.body.removeChild(popup);
-    });
-
-    // Save changes
-    document.getElementById("saveChanges").addEventListener("click", () => {
-        const newUname = document.getElementById("editUname").value.trim();
-        const newPassword = document.getElementById("editPassword").value.trim();
-
-        if (newUname && newPassword) {
-            ipcRenderer.send("update-user", { userid, uname: newUname, password: newPassword });
-        }
-    });
-
-    // Close popup when clicking outside
-    popup.addEventListener("click", (e) => {
-        if (e.target === popup) {
-            document.body.removeChild(popup);
-        }
-    });
-}
-
-// Listen for "user-updated" event from main process
-ipcRenderer.on("user-updated", () => {
-    // Close the Edit User Popup
-    document.querySelector(".edit-user-popup")?.remove();
-
-    // Refresh the user list in the mainContent
-    ipcRenderer.send("get-users");
-});
-
-// Function to open the Add User popup
-function openAddUserPopup() {
-    const popup = document.createElement("div");
-    popup.classList.add("add-user-popup");
-    popup.innerHTML = `
-        <div class="user-popup-content">
-            <h3>Add New User</h3>
-            <label>Username:</label>
-            <input type="text" id="newUname" placeholder="Enter username">
-            <label>Password:</label>
-            <input type="password" id="newPassword" placeholder="Enter password">
-            <div class="user-toggle-switch-container">
-                <label>Role:</label>
-                <label class="user-toggle-switch">
-                    <input type="checkbox" id="user-roleToggle">
-                    <span class="user-slider"></span>
-                </label>
-                <span id="user-roleLabel">Staff</span>
-            </div>
-            <div class="user-popup-buttons">
-                <button id="confirmAddUser">Add User</button>
-                <button id="closePopup">Cancel</button>
-            </div>
+      </div>
+      
+      <div class="detail-item">
+        <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <div class="detail-content">
+          <div class="detail-title">Username</div>
+          <div class="detail-value">${user.username || "Unknown"}</div>
         </div>
-    `;
-
-    document.body.appendChild(popup);
-
-    // Toggle role between Admin and Staff
-    const roleToggle = popup.querySelector("#user-roleToggle");
-    const roleLabel = popup.querySelector("#user-roleLabel");
-
-    roleToggle.addEventListener("change", () => {
-        if (roleToggle.checked) {
-            roleLabel.textContent = "Admin";
-        } else {
-            roleLabel.textContent = "Staff";
-        }
-    });
-
-    // Add user event
-    popup.querySelector("#confirmAddUser").addEventListener("click", () => {
-        const uname = popup.querySelector("#newUname").value.trim();
-        const password = popup.querySelector("#newPassword").value.trim();
-        const isadmin = roleToggle.checked ? 1 : 0;
-
-        if (uname && password) {
-            ipcRenderer.send("add-user", { uname, password, isadmin });
-        }
-    });
-
-    // Close popup
-    popup.querySelector("#closePopup").addEventListener("click", () => {
-        document.body.removeChild(popup);
-    });
-
-    // Close popup when clicking outside
-    popup.addEventListener("click", (e) => {
-        if (e.target === popup) {
-            document.body.removeChild(popup);
-        }
-    });
-}
-
-// Function to open the Remove User popup
-function openRemoveUserPopup() {
-    const popup = document.createElement("div");
-    popup.classList.add("remove-user-popup");
-    popup.innerHTML = `
-        <div class="user-popup-content">
-            <h3>Select Users to Remove</h3>
-            <div class="user-list" id="userList"></div>
-            <div class="user-popup-buttons">
-                <button id="removeUsers">Remove Selected Users</button>
-                <button id="closePopup">Cancel</button>
-            </div>
+      </div>
+      
+      <div class="detail-item">
+        <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <div class="detail-content">
+          <div class="detail-title">Email</div>
+          <div class="detail-value">${user.email || "Not provided"}</div>
         </div>
-    `;
-
-    document.body.appendChild(popup);
-
-    // Fetch users from the main process
-    ipcRenderer.send("get-users");
-
-    ipcRenderer.on("users-response", (event, users) => {
-        const userList = popup.querySelector("#userList");
-        userList.innerHTML = ""; // Clear previous content
-
-        users.forEach(user => {
-            const userItem = document.createElement("div");
-            userItem.classList.add("user-item");
-            userItem.setAttribute("data-id", user.userid); // Store user ID for selection
-            userItem.innerHTML = `
-                <span>${user.uname} (${user.isadmin ? "Admin" : "Staff"})</span>
-            `;
-
-            // Toggle selection on click
-            userItem.addEventListener("click", () => {
-                userItem.classList.toggle("selected");
-            });
-
-            userList.appendChild(userItem);
-        });
-    });
-
-    // Handle remove users
-    popup.querySelector("#removeUsers").addEventListener("click", () => {
-        const selectedUsers = Array.from(popup.querySelectorAll(".user-item.selected"))
-            .map(userItem => userItem.getAttribute("data-id"));
-
-        if (selectedUsers.length === 0) {
-            createTextPopup("Please select at least one user to remove.");
-            return;
-        }
-
-        ipcRenderer.send("remove-users", selectedUsers);
-    });
-
-    // Close popup
-    popup.querySelector("#closePopup").addEventListener("click", () => {
-        document.body.removeChild(popup);
-    });
-
-    // Close popup when clicking outside
-    popup.addEventListener("click", (e) => {
-        if (e.target === popup) {
-            document.body.removeChild(popup);
-        }
-    });
-}
-
-// Listen for "users-deleted" event from main process
-ipcRenderer.on("users-deleted", () => {
-    // Close the Remove User Popup
-    document.querySelector(".remove-user-popup")?.remove();
-
-    // Refresh the user list in the mainContent
-    ipcRenderer.send("get-users");
-});
-
-// Listen for user added confirmation from `main.js`
-ipcRenderer.on("user-added", () => {
-    document.querySelector(".add-user-popup")?.remove(); // Close the popup
-    ipcRenderer.send("get-users"); // **Force refresh**
-});
-
-// Listen for user addition failure
-ipcRenderer.on("user-add-failed", (event, data) => {
-    createTextPopup(`Error: ${data.error}`);
-});
-
-function openSwitchUserPopup() {
-    const popup = document.createElement("div");
-    popup.classList.add("switch-user-popup");
-    popup.innerHTML = `
-        <div class="user-popup-content">
-            <h3>Select User to Switch to</h3>
-            <div class="user-list" id="userList"></div>
-            <div class="user-popup-buttons">
-                <button id="removeUsers">Switch</button>
-                <button id="closePopup">Cancel</button>
-            </div>
+      </div>
+      
+      <div class="detail-item">
+        <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="detail-content">
+          <div class="detail-title">Member Since</div>
+          <div class="detail-value">${user.joinDate || "Unknown"}</div>
         </div>
-    `;
+      </div>
+    </div>
+  </div>
 
-    document.body.appendChild(popup);
+  <div class="profile-actions">
+    <button id="editProfileBtn" class="action-btn secondary">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+      Edit Profile
+    </button>
+    <button id="logoutBtn" class="action-btn primary">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+      Log Out
+    </button>
+  </div>
+</div>
+  `;
 
-    // Fetch users from the main process
-    ipcRenderer.send("get-users");
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    const { ipcRenderer } = require("electron");
+    await ipcRenderer.invoke("logout");
+    window.location.href = "login.html";
+  });
 
-    ipcRenderer.on("users-response", (event, users) => {
-        const userList = popup.querySelector("#userList");
-        userList.innerHTML = ""; // Clear previous content
-
-        users.forEach(user => {
-            const userItem = document.createElement("div");
-            userItem.classList.add("user-item");
-            userItem.setAttribute("data-id", user.userid); // Store user ID for selection
-            userItem.innerHTML = `
-                <span>${user.uname} (${user.isadmin ? "Admin" : "Staff"})</span>
-            `;
-
-            // Toggle selection on click
-            userItem.addEventListener("click", () => {
-                userItem.classList.toggle("selected");
-            });
-
-            userList.appendChild(userItem);
-        });
-    });
-
-    // Handle remove users
-    popup.querySelector("#removeUsers").addEventListener("click", () => {
-        const selectedUsers = Array.from(popup.querySelectorAll(".user-item.selected"))
-            .map(userItem => userItem.getAttribute("data-id"));
-
-        if (selectedUsers.length === 0) {
-            createTextPopup("Please select at least one user to remove.");
-            return;
-        }
-
-        ipcRenderer.send("remove-users", selectedUsers);
-    });
-
-    // Close popup
-    popup.querySelector("#closePopup").addEventListener("click", () => {
-        document.body.removeChild(popup);
-    });
-
-    // Close popup when clicking outside
-    popup.addEventListener("click", (e) => {
-        if (e.target === popup) {
-            document.body.removeChild(popup);
-        }
-    });
-
+  document.getElementById("editProfileBtn").addEventListener("click", () => {
+    alert("Edit profile functionality would open here");
+    // Implement actual edit functionality
+  });
 }
 
 module.exports = { loadUserProfile };

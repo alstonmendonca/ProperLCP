@@ -168,9 +168,9 @@ async function loadBusinessInfo(mainContent, billPanel) {
 
         <style>
             :root {
-                --primary: #f59e0b;
-                --primary-dark: #d97706;
-                --secondary: #3b82f6;
+                --primary: #0D3B66;
+                --primary-dark: #0D3B66;
+                --secondary: #0D3B66;
                 --background: #f8fafc;
                 --text: #1e293b;
                 --text-light: #64748b;

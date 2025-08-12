@@ -52,7 +52,9 @@ app.post('/login', async (req, res) => {
       success: true,
       user: {
         name: user.uname,
-        role: user.isadmin === 1 ? 'admin' : 'staff'
+        role: user.isadmin === 1 ? 'admin' : 'staff',
+        username: user.username,
+        userid: user.userid
       }
     });
   } catch (err) {
