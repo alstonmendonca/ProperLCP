@@ -313,8 +313,8 @@ async function loadUserProfile(mainContent, billPanel) {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <div class="detail-content">
-          <div class="detail-title">Member Since</div>
-          <div class="detail-value">${user.joinDate || "Unknown"}</div>
+          <div class="detail-title">Access Type</div>
+          <div class="detail-value">${user.role.toUpperCase() || "Unknown"}</div>
         </div>
       </div>
     </div>

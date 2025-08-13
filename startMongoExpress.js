@@ -54,7 +54,8 @@ app.post('/login', async (req, res) => {
         name: user.uname,
         role: user.isadmin === 1 ? 'admin' : 'staff',
         username: user.username,
-        userid: user.userid
+        userid: user.userid,
+        email: user.email
       }
     });
   } catch (err) {
