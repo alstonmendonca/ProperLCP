@@ -689,10 +689,11 @@ input[type="number"]::-webkit-inner-spin-button {
     background: linear-gradient(145deg, #0D3B66 0%, #1a5a94 100%);
     color: white;
     font-size: 20px;
+    font-weight: bold;
     margin: 20px;
     text-align: center;
-    padding: 20px;
-    border-radius: 20px;
+    padding: 10px;
+    border-radius: 16px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
 }
@@ -774,6 +775,24 @@ input[type="number"]::-webkit-inner-spin-button {
     align-items: center;
     z-index: 1000;
     backdrop-filter: blur(5px);
+}
+
+.switch-user-popup .user-item {
+    padding: 10px;
+    margin: 5px 0;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.switch-user-popup .user-item:hover {
+    background: #e0e0e0;
+}
+
+.switch-user-popup .user-item.selected {
+    background: #2196F3;
+    color: white;
 }
 
 .user-popup-content {

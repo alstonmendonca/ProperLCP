@@ -11,6 +11,9 @@ let mainWindow;
 let userRole = null;
 let store; // Will be initialized after dynamic import
 
+// Store current user in memory
+let currentUser = null;
+
 // Connect to the SQLite database
 const db = new sqlite3.Database('LC.db', (err) => {
     if (err) {
@@ -2496,6 +2499,29 @@ ipcMain.on("update-user", (event, data) => {
         }
         console.log(`User ${userid} updated successfully.`);
         event.reply("user-updated"); // Notify renderer process to refresh the page
+    });
+});
+
+// Get current user
+ipcMain.on('get-current-user', (event) => {
+    event.reply('current-user-response', currentUser);
+});
+
+// Switch user
+ipcMain.on("switch-user", (event, userId) => {
+    const query = `SELECT * FROM User WHERE userid = ?`;
+    db.get(query, [userId], (err, user) => {
+        if (err) {
+            console.error("Database Error:", err);
+            event.reply("user-switch-failed", { error: "Database error" });
+            return;
+        }
+        if (user) {
+            currentUser = user;
+            event.reply("user-switched", user);
+        } else {
+            event.reply("user-switch-failed", { error: "User not found" });
+        }
     });
 });
 

@@ -1,5 +1,7 @@
 const { ipcRenderer } = require("electron");
-const  {createTextPopup} = require("./textPopup");
+const { createTextPopup } = require("./textPopup");
+
+let currentUser = null;
 
 // Function to load the User Profile UI
 function loadUserProfile(mainContent, billPanel) {
@@ -8,19 +10,14 @@ function loadUserProfile(mainContent, billPanel) {
             <h2>User Profile</h2>
         </div>
         <div class="user-profile-actions">
-
             <button id="switchUserButton" class="switch-user-btn">Switch User</button>
-
-            <!-- Add User Buttons -->
             <button id="addUserButton" class="add-user-btn">Add User</button>
-
-            <!-- Remove User Buttons -->
             <button id="removeUserButton" class="add-user-btn">Remove User</button>
         </div>
 
         <div style="margin-top: 10px;">
-            <h3 class="current-user-display">
-                Current User: Ajay Francis Anchan
+            <h3 class="current-user-display" id="currentUserDisplay">
+                Current User: Loading...
             </h3>
         </div>
 
@@ -33,10 +30,84 @@ function loadUserProfile(mainContent, billPanel) {
 
     billPanel.style.display = 'none';
 
-    // Fetch users from the database
+    // Initialize current user display
+    function refreshUserDisplay(user) {
+        currentUser = user;
+        const displayText = user && user.uname ? `Current User: ${user.uname}` : 'Current User: None';
+        document.getElementById('currentUserDisplay').textContent = displayText;
+    }
+
+    // Request current user immediately
+    ipcRenderer.send('get-current-user');
+    ipcRenderer.once('current-user-response', refreshUserDisplay);
+
+    // Set up permanent users-response handler
+    function handleUsersResponse(event, users) {
+        const adminBar = document.getElementById("adminBar");
+        const staffGrid = document.getElementById("staffGrid");
+
+        // Clear existing content
+        adminBar.innerHTML = "";
+        staffGrid.innerHTML = "";
+
+        // Separate admins and staff
+        const admins = users.filter(user => user.isadmin === 1);
+        const staff = users.filter(user => user.isadmin === 0);
+
+        // Display admins
+        if (admins.length > 0) {
+            adminBar.innerHTML = `
+                <h2 style="margin-bottom: 15px; text-align: center;">ADMINS</h2>
+                <div class="admin-container">
+                    ${admins.map(admin => `
+                        <div class="admin-box">
+                            <p><strong>${admin.uname}</strong></p>
+                            <p>Password: ${admin.password}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            adminBar.innerHTML = "<p>No Admins Found</p>";
+        }
+
+        // Display staff
+        if (staff.length > 0) {
+            staffGrid.innerHTML = `
+                <h2 style="margin-top: 30px; margin-bottom: 15px; text-align: center;">STAFF MEMBERS</h2>
+                <div class="staff-container">
+                    ${staff.map(staffMember => `
+                        <div class="staff-box" data-id="${staffMember.userid}" data-uname="${staffMember.uname}" data-password="${staffMember.password}">
+                            <p><strong>${staffMember.uname}</strong></p>
+                            <p>Password: ${staffMember.password}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // Add click event listeners to staff boxes
+            document.querySelectorAll(".staff-box").forEach(box => {
+                box.addEventListener("click", function() {
+                    const userid = this.getAttribute("data-id");
+                    const uname = this.getAttribute("data-uname");
+                    const password = this.getAttribute("data-password");
+                    openEditPopup(userid, uname, password);
+                });
+            });
+        } else {
+            staffGrid.innerHTML = "<p>No Staff Members Found</p>";
+        }
+    }
+
+    // Remove any existing listener to prevent duplicates
+    ipcRenderer.removeAllListeners('users-response');
+    // Add the permanent listener
+    ipcRenderer.on('users-response', handleUsersResponse);
+
+    // Initial fetch
     ipcRenderer.send("get-users");
 
-    // Add event listener to "Add User" button
+    // Add event listeners
     document.getElementById("addUserButton").addEventListener("click", openAddUserPopup);
     document.getElementById("removeUserButton").addEventListener("click", openRemoveUserPopup);
     document.getElementById("switchUserButton").addEventListener("click", openSwitchUserPopup);
@@ -304,15 +375,16 @@ ipcRenderer.on("user-add-failed", (event, data) => {
     createTextPopup(`Error: ${data.error}`);
 });
 
+// Add this new function for switching users
 function openSwitchUserPopup() {
     const popup = document.createElement("div");
     popup.classList.add("switch-user-popup");
     popup.innerHTML = `
         <div class="user-popup-content">
-            <h3>Select User to Switch to</h3>
-            <div class="user-list" id="userList"></div>
+            <h3>Select User to Switch To</h3>
+            <div class="user-list" id="switchUserList"></div>
             <div class="user-popup-buttons">
-                <button id="removeUsers">Switch</button>
+                <button id="confirmSwitch">Switch</button>
                 <button id="closePopup">Cancel</button>
             </div>
         </div>
@@ -320,41 +392,48 @@ function openSwitchUserPopup() {
 
     document.body.appendChild(popup);
 
+    // Clear any existing listeners to prevent duplicates
+    ipcRenderer.removeAllListeners('users-response');
+
     // Fetch users from the main process
     ipcRenderer.send("get-users");
 
-    ipcRenderer.on("users-response", (event, users) => {
-        const userList = popup.querySelector("#userList");
-        userList.innerHTML = ""; // Clear previous content
+    let selectedUserId = null;
+
+    ipcRenderer.once("users-response", (event, users) => {
+        const userList = popup.querySelector("#switchUserList");
+        userList.innerHTML = "";
 
         users.forEach(user => {
             const userItem = document.createElement("div");
             userItem.classList.add("user-item");
-            userItem.setAttribute("data-id", user.userid); // Store user ID for selection
+            userItem.setAttribute("data-id", user.userid);
             userItem.innerHTML = `
                 <span>${user.uname} (${user.isadmin ? "Admin" : "Staff"})</span>
             `;
 
-            // Toggle selection on click
             userItem.addEventListener("click", () => {
-                userItem.classList.toggle("selected");
+                // Deselect all other items
+                document.querySelectorAll("#switchUserList .user-item").forEach(item => {
+                    item.classList.remove("selected");
+                });
+                // Select this item
+                userItem.classList.add("selected");
+                selectedUserId = user.userid;
             });
 
             userList.appendChild(userItem);
         });
     });
 
-    // Handle remove users
-    popup.querySelector("#removeUsers").addEventListener("click", () => {
-        const selectedUsers = Array.from(popup.querySelectorAll(".user-item.selected"))
-            .map(userItem => userItem.getAttribute("data-id"));
-
-        if (selectedUsers.length === 0) {
-            createTextPopup("Please select at least one user to remove.");
+    // Handle switch user
+    popup.querySelector("#confirmSwitch").addEventListener("click", () => {
+        if (!selectedUserId) {
+            createTextPopup("Please select a user to switch to");
             return;
         }
 
-        ipcRenderer.send("remove-users", selectedUsers);
+        ipcRenderer.send("switch-user", selectedUserId);
     });
 
     // Close popup
@@ -368,7 +447,28 @@ function openSwitchUserPopup() {
             document.body.removeChild(popup);
         }
     });
-
 }
+
+// Add these new IPC listeners
+ipcRenderer.on('current-user-response', (event, user) => {
+    currentUser = user;
+    document.getElementById('currentUserDisplay').textContent = `Current User: ${user ? user.uname : 'None'}`;
+});
+
+ipcRenderer.on('user-switched', (event, user) => {
+    currentUser = user;
+    const displayText = user && user.uname ? `Current User: ${user.uname}` : 'Current User: None';
+    document.getElementById('currentUserDisplay').textContent = displayText;
+    document.querySelector('.switch-user-popup')?.remove();
+    createTextPopup(`Switched to user: ${user.uname}`);
+    
+    // Force refresh the users list
+    ipcRenderer.send("get-users");
+});
+
+// Add this new IPC listener
+ipcRenderer.on('user-switch-failed', (event, data) => {
+    createTextPopup(`Failed to switch user: ${data.error}`);
+});
 
 module.exports = { loadUserProfile };
