@@ -34,7 +34,7 @@ function loadBackupUI(mainContent, billPanel) {
             #backupButton {
                 padding: 12px 24px;
                 font-size: 16px;
-                background-color: #28a745;
+                background-color: #0D3B66;
                 color: white;
                 border: none;
                 border-radius: 6px;
@@ -43,7 +43,7 @@ function loadBackupUI(mainContent, billPanel) {
             }
 
             #backupButton:hover {
-                background-color: #1e7e34;
+                background-color: #010a67ff;
             }
 
             #backupMessage {

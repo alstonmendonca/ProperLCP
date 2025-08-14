@@ -8,7 +8,7 @@ function loadHelpSection() {
 
     mainContent.innerHTML = `
         <div style="
-            background: linear-gradient(135deg, #1DB954 0%, #0D3B66 100%);
+            background: linear-gradient(135deg, #0D3B66 0%, #0D3B66 100%);
             color: white;
             padding: 20px;
             border-radius: 8px;
@@ -48,7 +48,7 @@ function loadHelpSection() {
                     background: #f8f9fa;
                     padding: 20px;
                     border-radius: 8px;
-                    border-left: 4px solid #1DB954;
+                    border-left: 4px solid #0D3B66;
                 ">
                     <h3 style="
                         color: #0D3B66;
@@ -59,7 +59,7 @@ function loadHelpSection() {
                         gap: 10px;
                     ">
                         <span style="
-                            background: #1DB954;
+                            background: #0D3B66;
                             color: white;
                             width: 30px;
                             height: 30px;
@@ -74,13 +74,13 @@ function loadHelpSection() {
                     <div style="margin-left: 40px;">
                         <p style="margin: 15px 0;">
                             <strong style="color: #333; min-width: 80px; display: inline-block;">Email:</strong>
-                            <a href="mailto:support@lassicorner.com" style="color: #1DB954; text-decoration: none;">
+                            <a href="mailto:support@lassicorner.com" style="color: #0D3B66; text-decoration: none;">
                                 support@lassicorner.com
                             </a>
                         </p>
                         <p style="margin: 15px 0;">
                             <strong style="color: #333; min-width: 80px; display: inline-block;">Phone:</strong>
-                            <a href="tel:+919876543210" style="color: #1DB954; text-decoration: none;">
+                            <a href="tel:+919876543210" style="color: #0D3B66; text-decoration: none;">
                                 +91 98765 43210
                             </a>
                         </p>
@@ -91,7 +91,7 @@ function loadHelpSection() {
                     background: #f8f9fa;
                     padding: 20px;
                     border-radius: 8px;
-                    border-left: 4px solid #1DB954;
+                    border-left: 4px solid #0D3B66;
                 ">
                     <h3 style="
                         color: #0D3B66;
@@ -102,7 +102,7 @@ function loadHelpSection() {
                         gap: 10px;
                     ">
                         <span style="
-                            background: #1DB954;
+                            background: #0D3B66;
                             color: white;
                             width: 30px;
                             height: 30px;
@@ -130,7 +130,7 @@ function loadHelpSection() {
                 background: #f8f9fa;
                 padding: 20px;
                 border-radius: 8px;
-                border-left: 4px solid #1DB954;
+                border-left: 4px solid #0D3B66;
                 margin-bottom: 30px;
             ">
                 <h3 style="
@@ -142,7 +142,7 @@ function loadHelpSection() {
                     gap: 10px;
                 ">
                     <span style="
-                        background: #1DB954;
+                        background: #0D3B66;
                         color: white;
                         width: 30px;
                         height: 30px;
@@ -157,7 +157,7 @@ function loadHelpSection() {
                 <div style="margin-left: 40px;">
                     <p style="margin: 15px 0; line-height: 1.6;">
                         If you encounter any bugs or issues with the system, please report them to our 
-                        <a href="mailto:support@lassicorner.com" style="color: #1DB954; text-decoration: none;">
+                        <a href="mailto:support@lassicorner.com" style="color: #0D3B66; text-decoration: none;">
                             support email
                         </a> with screenshots and detailed steps to reproduce the issue.
                     </p>
@@ -168,7 +168,7 @@ function loadHelpSection() {
                 background: #f8f9fa;
                 padding: 20px;
                 border-radius: 8px;
-                border-left: 4px solid #1DB954;
+                border-left: 4px solid #0D3B66;
             ">
                 <h3 style="
                     color: #0D3B66;
@@ -179,7 +179,7 @@ function loadHelpSection() {
                     gap: 10px;
                 ">
                     <span style="
-                        background: #1DB954;
+                        background: #0D3B66;
                         color: white;
                         width: 30px;
                         height: 30px;
@@ -194,12 +194,12 @@ function loadHelpSection() {
                 <div style="margin-left: 40px;">
                     <p style="margin: 15px 0; line-height: 1.6;">
                         Your feedback helps us improve! Share your suggestions at 
-                        <a href="mailto:feedback@lassicorner.com" style="color: #1DB954; text-decoration: none;">
+                        <a href="mailto:feedback@lassicorner.com" style="color: #0D3B66; text-decoration: none;">
                             feedback@lassicorner.com
                         </a>
                     </p>
                     <button style="
-                        background: #1DB954;
+                        background: #0D3B66;
                         color: white;
                         border: none;
                         padding: 10px 20px;
@@ -210,7 +210,7 @@ function loadHelpSection() {
                         transition: all 0.2s;
                     " 
                     onmouseover="this.style.backgroundColor='#0D3B66'" 
-                    onmouseout="this.style.backgroundColor='#1DB954'">
+                    onmouseout="this.style.backgroundColor='#0D3B66'">
                         Send Feedback
                     </button>
                 </div>
