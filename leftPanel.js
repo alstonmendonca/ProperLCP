@@ -73,9 +73,7 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
                 <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
                 <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
-                <button class="category" id="filterHistory" onclick="updateMainContent('filterHistory')">Filter History</button>
-                <button class="category" id="makeATable" onclick="updateMainContent('makeATable')">Make A Table</button>
-                <button class="category" id="yourTables" onclick="updateMainContent('yourTables')">Your Tables</button>
+                <button class="category" id="searchOrder" onclick="updateMainContent('searchOrder')">Search Order</button>
             `;
 
             // Highlight the active history button

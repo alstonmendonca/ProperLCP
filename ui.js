@@ -12,7 +12,7 @@ async function updateMainContent(contentType) {
     const historyButtons = [
         'todaysOrders', 'orderHistory', 'categoryHistory', 'itemHistory', 
         'deletedOrders', 'discountedOrders', 'dayWise', 'monthWise', 
-        'yearWise', 'filterHistory', 'customer', 'makeATable', 'yourTables'
+        'yearWise', 'searchOrder', 'customer',
     ];
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
@@ -420,16 +420,8 @@ async function updateMainContent(contentType) {
         else if (contentType === 'customer') {
             loadCustomers(mainContent, billPanel);
         }
-        else if(contentType === "filterHistory"){
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; 
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Filter History</h2>
-                </div>
-                <p>Coming Soon...</p>
-            `;
+        else if(contentType === "searchOrder"){
+            loadSearchOrder(mainContent,billPanel);
         }
         else if (contentType === 'itemHistory') {
             mainContent.style.marginLeft = "200px";

@@ -52,6 +52,7 @@ async function checkAndResetFoodItems() {
         });
     }
 }
+
 function saveOrderToDatabase(order) {
     const {
         orderId,
@@ -3244,3 +3245,99 @@ ipcMain.handle('update-online-order', async (event, { orderId, status }) => {
 });
 //----------------------------------- ONLINE ORDERS SECTION ENDS HERE -------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');
+
+
+
+//-------------------------------- Search Order (in History Section) Starts Here-------------------------------------
+ipcMain.on("search-orders", (event, filters) => {
+    let query = `
+        SELECT 
+            o.billno,
+            o.kot,
+            o.price,
+            o.sgst,
+            o.cgst,
+            o.tax,
+            o.date,
+            u.uname AS cashier_name,
+            GROUP_CONCAT(fi.fname || ' (x' || od.quantity || ')', ', ') AS food_items
+        FROM Orders o
+        JOIN User u ON o.cashier = u.userid
+        JOIN OrderDetails od ON o.billno = od.orderid
+        JOIN FoodItem fi ON od.foodid = fi.fid
+    `;
+
+    const conditions = [];
+    const params = [];
+
+    // Bill No range
+    if (filters.billNoFrom) {
+        conditions.push("o.billno >= ?");
+        params.push(parseInt(filters.billNoFrom));
+    }
+    if (filters.billNoTo) {
+        conditions.push("o.billno <= ?");
+        params.push(parseInt(filters.billNoTo));
+    }
+
+    // KOT range
+    if (filters.kotFrom) {
+        conditions.push("o.kot >= ?");
+        params.push(parseInt(filters.kotFrom));
+    }
+    if (filters.kotTo) {
+        conditions.push("o.kot <= ?");
+        params.push(parseInt(filters.kotTo));
+    }
+
+    // Date range
+    if (filters.startDate && filters.endDate) {
+        conditions.push("o.date BETWEEN ? AND ?");
+        params.push(filters.startDate, filters.endDate);
+    }
+
+    // Cashier
+    if (filters.cashier) {
+        conditions.push("o.cashier = ?");
+        params.push(parseInt(filters.cashier));
+    }
+
+    // Price range
+    if (filters.minPrice) {
+        conditions.push("o.price >= ?");
+        params.push(parseFloat(filters.minPrice));
+    }
+    if (filters.maxPrice) {
+        conditions.push("o.price <= ?");
+        params.push(parseFloat(filters.maxPrice));
+    }
+
+    if (conditions.length > 0) {
+        query += " WHERE " + conditions.join(" AND ");
+    }
+
+    query += " GROUP BY o.billno ORDER BY o.billno DESC";
+
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            console.error(err);
+            event.sender.send("search-orders-response", { orders: [] });
+        } else {
+            event.sender.send("search-orders-response", { orders: rows });
+        }
+    });
+});
+
+// Handle fetching all cashiers
+ipcMain.on("get-all-cashiers", (event) => {
+    db.all("SELECT userid, uname FROM User WHERE isadmin = 0 OR isadmin = 1", [], (err, rows) => {
+        if (err) {
+            console.error(err);
+            event.sender.send("all-cashiers-response", []);
+        } else {
+            event.sender.send("all-cashiers-response", rows);
+        }
+    });
+});
+
+//-------------------------------- Search Order (in History Section) Ends Here-------------------------------------
