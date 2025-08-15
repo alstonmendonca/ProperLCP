@@ -131,6 +131,24 @@ app.post('/sync/fooditems', async (req, res) => {
   }
 });
 
+// GET all users except _id and password_hash
+app.get('/users', async (req, res) => {
+  try {
+    const collection = db.collection('LCPUsers');
+    
+    // Projection to exclude _id and password_hash
+    const users = await collection.find({}, { projection: { _id: 0, password_hash: 0 } }).toArray();
+
+    res.json({
+      success: true,
+      users
+    });
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 
 // Start server after connecting to Mongo
 connectToMongo()
