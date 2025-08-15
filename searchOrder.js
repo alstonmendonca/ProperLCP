@@ -95,7 +95,7 @@ function loadSearchOrder(mainContent, billPanel) {
     document.getElementById("searchOrdersBtn").addEventListener("click", searchOrders);
     document.getElementById("clearFiltersBtn").addEventListener("click", clearFilters);
     document.getElementById("exportExcelBtn").addEventListener("click", () => {
-        const table = document.querySelector(".search-results-table");
+        const table = document.querySelector(".order-history-table");
         if (table) exportTableToExcel(table, "Search_Results");
         else createTextPopup("No data to export.");
     });
@@ -258,7 +258,7 @@ ipcRenderer.on("search-orders-response", (event, data) => {
 
     // Export button listener
     document.getElementById("exportExcelBtn").onclick = () => {
-        exportTableToExcel(".search-results-table", `Search_Results_${Date.now()}`);
+        exportTableToExcel(".order-history-table", `Search_Results_${Date.now()}`);
     };
 });
 
@@ -301,7 +301,7 @@ function sortSearchResults(column) {
     });
 
     let sortedHTML = `
-        <table class="search-results-table">
+        <table class="order-history-table">
             <thead>
                 <tr>
                     <th class="sortable" onclick="sortSearchResults('billno')">Bill No ${getSortIndicator('billno')}</th>

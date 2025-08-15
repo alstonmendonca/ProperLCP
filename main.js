@@ -184,6 +184,50 @@ async function syncFoodItemsToMongo() {
     console.error('Sync failed:', err);
   }
 }
+async function syncUsersFromMongo() {
+  try {
+    // 1. Fetch users from Mongo via the /users endpoint
+    const resp = await axios.get(`http://localhost:${process.env.MONGO_PORT}/users`);
+    
+    if (!resp.data.success || !Array.isArray(resp.data.users)) {
+      throw new Error('Invalid data from Mongo /users endpoint');
+    }
+    
+    const users = resp.data.users;
+
+    // 2. Clear the SQLite User table
+    await new Promise((resolve, reject) => {
+      db.run(`DELETE FROM User`, function (err) {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+
+    // 3. Insert each user into SQLite User table
+    const insertStmt = db.prepare(`
+      INSERT INTO User (userid, uname, isadmin, username, email)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    await new Promise((resolve, reject) => {
+      db.serialize(() => {
+        for (const u of users) {
+          insertStmt.run(u.userid, u.uname, u.isadmin, u.username, u.email, err => {
+            if (err) return reject(err);
+          });
+        }
+        insertStmt.finalize(err => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+    });
+
+    console.log(`Synced ${users.length} users from Mongo to SQLite.`);
+  } catch (err) {
+    console.error('Error syncing users from Mongo:', err.message);
+  }
+}
 
 async function waitForServerReady(retries = 20, delay = 500) {
   const url = `http://localhost:${process.env.MONGO_PORT}/ping`;
@@ -216,6 +260,7 @@ app.whenReady().then(async () => {
 
   // ✅ Now safe to sync
   await syncFoodItemsToMongo();
+  await syncUsersFromMongo();
     // Create main window
     mainWindow = new BrowserWindow({
         width: 1200,
@@ -1824,12 +1869,13 @@ ipcMain.on("get-todays-orders", (event) => {
             User.uname AS cashier_name, 
             GROUP_CONCAT(FoodItem.fname || ' (x' || OrderDetails.quantity || ')', ', ') AS food_items
         FROM Orders
-        JOIN User ON Orders.cashier = User.userid
-        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
-        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
-        WHERE Orders.date = date('now', 'localtime')  -- Ensure correct format match
+        LEFT JOIN User ON Orders.cashier = User.userid
+        LEFT JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        LEFT JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        WHERE date(Orders.date) = date('now', 'localtime')
         GROUP BY Orders.billno
-        ORDER BY Orders.billno DESC
+        ORDER BY Orders.billno DESC;
+
     `;
 
     db.all(query, [], (err, rows) => {
@@ -1852,12 +1898,12 @@ ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
             User.uname AS cashier_name, 
             GROUP_CONCAT(FoodItem.fname || ' (x' || OrderDetails.quantity || ')', ', ') AS food_items
         FROM Orders
-        JOIN User ON Orders.cashier = User.userid
-        JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
-        JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
+        LEFT JOIN User ON Orders.cashier = User.userid
+        LEFT JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
+        LEFT JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
         WHERE date(Orders.date) BETWEEN date(?) AND date(?)
         GROUP BY Orders.billno
-        ORDER BY Orders.date DESC
+        ORDER BY Orders.date DESC;
     `;
 
     db.all(query, [startDate, endDate], (err, rows) => {
@@ -1946,8 +1992,6 @@ ipcMain.on("get-categories-event", (event) => {
 });
 
 ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
-    //console.log("Fetching order history...");
-
     const query = `
         SELECT 
             Orders.*, 
@@ -1957,7 +2001,7 @@ ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
         JOIN User ON Orders.cashier = User.userid
         JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
         JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
-        WHERE date(Orders.date) BETWEEN date(?) AND date(?)
+        WHERE DATE(TRIM(Orders.date)) BETWEEN DATE(?) AND DATE(?)
         AND Orders.billno IN (
             SELECT DISTINCT OrderDetails.orderid 
             FROM OrderDetails
@@ -1965,7 +2009,7 @@ ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
             WHERE FoodItem.category = ?
         )
         GROUP BY Orders.billno
-        ORDER BY Orders.date DESC
+        ORDER BY DATE(TRIM(Orders.date)) DESC
     `;
 
     db.all(query, [startDate, endDate, category], (err, rows) => {
@@ -1974,10 +2018,10 @@ ipcMain.on("get-category-wise", (event, { startDate, endDate, category }) => {
             event.reply("category-wise-response", { success: false, orders: [] });
             return;
         }
-        //console.log("Category wise fetched:", rows); 
         event.reply("category-wise-response", { success: true, orders: rows });
     });
 });
+
 
 
 
