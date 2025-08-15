@@ -67,7 +67,7 @@ const { loadBestInCategory } = require('./bestInCategory');
 const { loadTaxOnItems } = require('./taxOnItems');
 const { loadReceiptEditor } = require("./receiptEditor");
 const { loadPrinterConfiguration } = require("./printerConfiguration");
-const { loadSearchOrder, searchOrders} = require("./searchOrder");
+const { loadSearchOrder, searchOrders, sortSearchResults} = require("./searchOrder");
 
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;

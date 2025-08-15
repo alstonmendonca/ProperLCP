@@ -16,9 +16,14 @@ function loadSearchOrder(mainContent, billPanel) {
     const today = new Date().toISOString().split("T")[0];
 
     mainContent.innerHTML = `
-        <div class="search-order-header">
-            <h1>Search Orders</h1>
-            <div class="filters-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 20px 0;">
+        <div>
+            <div class="search-order-header">
+                <h2>Search Order</h2>
+            </div>
+
+            <div class="date-filters" 
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 20px 0; 
+            background-color:#8cbbe8; padding:10px; border-radius:14px;">
                 <!-- Bill No Range -->
                 <div>
                     <label>Bill No From:</label>
@@ -69,10 +74,12 @@ function loadSearchOrder(mainContent, billPanel) {
                 </div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <button id="searchOrdersBtn" class="btn-primary">Search Orders</button>
-                <button id="clearFiltersBtn" class="btn-secondary">Clear Filters</button>
-                <button id="exportExcelBtn" class="btn-secondary">Export to Excel</button>
+            <div style="margin-bottom: 20px; display:flex; justify-content:space-between;">
+                <button id="searchOrdersBtn" class="btn-primary">Search Order</button>
+                <div>
+                    <button id="clearFiltersBtn" class="btn-secondary">Clear Filters</button>
+                    <button id="exportExcelBtn" class="btn-secondary">Export to Excel</button>
+                </div>
             </div>
         </div>
         <div id="searchResults"></div>
@@ -210,7 +217,7 @@ ipcRenderer.on("search-orders-response", (event, data) => {
 
     // Build table
     let tableHTML = `
-        <table class="search-results-table">
+        <table class="order-history-table">
             <thead>
                 <tr>
                     <th class="sortable" onclick="sortSearchResults('billno')">Bill No ${getSortIndicator('billno')}</th>
@@ -355,4 +362,4 @@ function getSortIndicator(sortBy) {
     return '';
 }
 
-module.exports = { loadSearchOrder, searchOrders };
+module.exports = { loadSearchOrder, searchOrders, sortSearchResults };
