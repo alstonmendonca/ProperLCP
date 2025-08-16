@@ -215,8 +215,8 @@
   </button>
 </div>
 </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
         const role = localStorage.getItem('userRole');
         const userName = localStorage.getItem('userName');
 
@@ -226,13 +226,22 @@
             document.getElementById('Analytics').style.display = 'none';
             document.getElementById('History').style.display = 'none';
         }
-                // Optional: show greeting
+
+        // Optional: show greeting
         const welcome = document.getElementById('welcome-user');
         if (welcome && userName) {
             welcome.textContent = `Welcome, ${userName}`;
         }
+
+        // 👇 Check query param and click Home if needed
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('goHome') === 'true') {
+            const homeBtn = document.getElementById('Home');
+            if (homeBtn) homeBtn.click();
+        }
     });
-    </script>
+</script>
+
   <script src="renderer.js"></script>
   <script src="table.js"></script>
   <script src="bill.js"></script>

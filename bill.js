@@ -263,8 +263,9 @@ async function DeductInventory() {
 
 
 // Function to only save the bill
-function saveBill() {
-    const cashier = 1; // Replace with actual cashier ID
+async function saveBill() {
+    const user = await ipcRenderer.invoke("get-session-user");
+    const cashier = user.userid; // Replace with actual cashier ID
     const date = new Date().toISOString().split("T")[0];
 
     const billItems = document.querySelectorAll(".bill-item");
@@ -305,8 +306,9 @@ function saveBill() {
     NewOrder();
 }
 
-function saveAndPrintBill() {
-    const cashier = 1; // Replace with actual cashier ID
+async function saveAndPrintBill() {
+    const user = await ipcRenderer.invoke("get-session-user");
+    const cashier = user.userid; // Replace with actual cashier ID
     const date = new Date().toISOString().split("T")[0];
 
     const billItems = document.querySelectorAll(".bill-item");
@@ -553,9 +555,10 @@ window.printBill = printBill;
 
 //---------------------------------------------------------------------------------------------------------------------------
 
-function holdBill() {
+async function holdBill() {
     // Get cashier ID (Assume it's set somewhere in the UI)
-    const cashier = 1; // Replace with actual cashier ID
+    const user = await ipcRenderer.invoke("get-session-user");
+    const cashier = user.userid; // Replace with actual cashier ID
 
     // Get current date in YYYY-MM-DD format
     const date = new Date().toISOString().split("T")[0];
