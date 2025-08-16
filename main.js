@@ -249,18 +249,10 @@ async function waitForServerReady(retries = 20, delay = 500) {
   throw new Error('❌ Express server did not become ready in time.');
 }
 app.whenReady().then(async () => {
-  await startGetOnlineServer(); // WebSocket server
-  await startExpressServer();   // Spawn Express server
-
-  // 🕒 Wait for Express to actually start
-  await waitForServerReady();
-
-  await initStore();
-  await checkAndResetFoodItems();
-
-  // ✅ Now safe to sync
-  await syncFoodItemsToMongo();
-  await syncUsersFromMongo();
+            // 🕒 Wait for Express to actually start
+    await startExpressServer();   // Spawn Express server
+    await waitForServerReady();
+    await initStore();
     // Create main window
     mainWindow = new BrowserWindow({
         width: 1200,
@@ -290,6 +282,11 @@ app.whenReady().then(async () => {
         if (response.data.success) {
         const user = response.data.user;
         console.log("Login successful:", user);
+        await startGetOnlineServer(); // WebSocket server
+        await checkAndResetFoodItems();
+        // ✅ Now safe to sync
+        await syncFoodItemsToMongo();
+        await syncUsersFromMongo();
         // Save user to local session (electron-store)
         store.set('sessionUser', user);
         return user; // return to renderer
@@ -3129,6 +3126,8 @@ ipcMain.on('refresh-menu', (event) => {
 ipcMain.on("exit-app", (event) => {
     // Close the database connection before quitting
       closeDatabase();
+      // Clear Session Storage
+      store.clear();
        app.quit(); // Close the app
   });
 
