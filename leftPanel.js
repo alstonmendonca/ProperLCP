@@ -56,7 +56,6 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="Charts" onclick="updateMainContent('Charts')">Charts</button>
                 <button class="category" id="BestInCategory" onclick="updateMainContent('BestInCategory')">Best In Category</button>
                 <button class="category" id="TaxOnItems" onclick="updateMainContent('TaxOnItems')">Tax On Items</button>
-                <button class="category" id="Notes" onclick="updateMainContent('Notes')">Notes</button>
             `;
             break;
 
@@ -104,7 +103,6 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="DriverConfiguration" onclick="updateMainContent('DriverConfiguration')">Driver Configuration</button>
                 <button class="category" id="Receipt" onclick="updateMainContent('Receipt')">Receipt</button>
                 <button class="category" id="ConnectedDevices" onclick="updateMainContent('ConnectedDevices')">Connected Devices</button>
-                <button class="category" id="QRMenu" onclick="updateMainContent('QRMenu')">QR Menu</button>
                 <button class="category" id="BackupDatabase" onclick="updateMainContent('BackupDatabase')">Backup Database</button>
                 <button class="category" id="RestoreDatabase" onclick="updateMainContent('RestoreDatabase')">Restore Database</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>

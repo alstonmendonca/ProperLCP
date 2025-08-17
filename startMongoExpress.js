@@ -149,6 +149,99 @@ app.get('/users', async (req, res) => {
   }
 });
 
+// Edit user profile
+app.post('/edituser', async (req, res) => {
+  try {
+    const { userid, name, email, username } = req.body;
+
+    if (!userid || !name || !email || !username) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'User ID, name, email, and username are required' 
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Please provide a valid email address' 
+      });
+    }
+
+    // Check if email is already taken by another user
+    const existingEmailUser = await db.collection('LCPUsers').findOne({ 
+      email: email, 
+      userid: { $ne: userid } 
+    });
+
+    if (existingEmailUser) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email address is already in use by another user' 
+      });
+    }
+
+    // Check if username is already taken by another user
+    const existingUsernameUser = await db.collection('LCPUsers').findOne({ 
+      username: username, 
+      userid: { $ne: userid } 
+    });
+
+    if (existingUsernameUser) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Username is already taken by another user' 
+      });
+    }
+
+    // Update user profile
+    const result = await db.collection('LCPUsers').updateOne(
+      { userid: userid },
+      { 
+        $set: { 
+          uname: name,
+          username: username,
+          email: email,
+          updatedAt: new Date()
+        } 
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+
+    if (result.modifiedCount === 0) {
+      return res.status(200).json({ 
+        success: true, 
+        message: 'No changes were made to the profile' 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Profile updated successfully. Please login again.',
+      user: {
+        userid: userid,
+        name: name,
+        username: username,
+        email: email
+      }
+    });
+  } catch (err) {
+    console.error('Error updating user profile:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
+});
+
 
 // Start server after connecting to Mongo
 connectToMongo()

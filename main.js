@@ -8,17 +8,21 @@ escpos.USB = require("escpos-usb");
 const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
 const { fork, spawn } = require('child_process');
 let mainWindow;
+let splash;
 let userRole = null;
 let store; // Will be initialized after dynamic import
+let onlineProcess;
 const axios = require('axios');
+
 // Connect to the SQLite database
-const db = new sqlite3.Database('LC.db', (err) => {
+const db = new sqlite3.Database("LC.db", (err) => {
     if (err) {
-        console.error("Failed to connect to the database:", err.message);
+      console.error("❌ Failed to connect to the database:", err.message);
     } else {
-        console.log("Connected to the SQLite database.");
+      console.log("✅ Connected to the SQLite database.");
+      initializeSchema();
     }
-});
+  });
 
 
 async function initStore() {
@@ -248,108 +252,150 @@ async function waitForServerReady(retries = 20, delay = 500) {
 
   throw new Error('❌ Express server did not become ready in time.');
 }
-app.whenReady().then(async () => {
-            // 🕒 Wait for Express to actually start
-    await startExpressServer();   // Spawn Express server
-    await waitForServerReady();
-    await initStore();
-    // Create main window
-    mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 800,
-        icon: path.join(__dirname, 'assets/images', 'snacc.ico'), // Use .ico on Windows
-        show: false,
-        fullscreen: false,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        },
-    });
 
-    mainWindow.maximize();
-    mainWindow.once("ready-to-show", () => mainWindow.show());
-    Menu.setApplicationMenu(null);
-    mainWindow.loadFile('login.html').catch(console.error);
+// === Create splash window ===
+function createSplash() {
+  splash = new BrowserWindow({
+    width: 400,
+    height: 300,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    movable: true,
+    show: true,
+  });
 
-        // IPC handlers
-    ipcMain.handle('login', async (event, { username, password }) => {
+  splash.loadFile(path.join(__dirname, "splash.html"));
+}
+
+// === Create main window ===
+function createMainWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    icon: path.join(__dirname, "assets/images", "lassicorner.ico"),
+    show: false,
+    fullscreen: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  Menu.setApplicationMenu(null);
+
+  mainWindow.loadFile("login.html").catch(console.error);
+
+  mainWindow.once("ready-to-show", () => {
+      // Tell splash to fade out
+    if (splash && !splash.isDestroyed()) {
+        splash.webContents.executeJavaScript("window.fadeOutSplash()");
+        setTimeout(() => {
+        if (!splash.isDestroyed()) splash.close();
+        }, 700); // Allow time for fade before closing
+    }
+
+    mainWindow.show();
+  });
+}
+
+// === Do startup tasks (Express, DB, etc.) ===
+async function runStartupTasks() {
+  await startExpressServer();
+  await waitForServerReady();
+  await initStore();
+}
+
+// === Setup IPC handlers ===
+function setupIPC() {
+  ipcMain.handle("login", async (event, { username, password }) => {
     try {
-        const response = await axios.post(`http://localhost:${MONGO_PORT}/login`, {
+      const response = await axios.post(`http://localhost:${MONGO_PORT}/login`, {
         username,
-        password
-        });
+        password,
+      });
 
-        if (response.data.success) {
+      if (response.data.success) {
         const user = response.data.user;
         console.log("Login successful:", user);
-        await startGetOnlineServer(); // WebSocket server
+        await startGetOnlineServer();
         await checkAndResetFoodItems();
-        // ✅ Now safe to sync
         await syncFoodItemsToMongo();
         await syncUsersFromMongo();
-        // Save user to local session (electron-store)
-        store.set('sessionUser', user);
-        return user; // return to renderer
-        } else {
+        store.set("sessionUser", user);
+        return user;
+      } else {
         return null;
-        }
+      }
     } catch (err) {
-        console.error("Login API error:", err.message);
-        return null;
+      console.error("Login API error:", err.message);
+      return null;
     }
-    });
-    ipcMain.handle('get-session-user', () => {
-        return store.get('sessionUser') || null;
-    });
-    ipcMain.handle('logout', () => {
-        store.delete('sessionUser');
-        return true;
+  });
+
+  ipcMain.handle("get-session-user", () => {
+    return store.get("sessionUser") || null;
+  });
+
+  ipcMain.handle("logout", () => {
+    store.delete("sessionUser");
+    return true;
+  });
+
+  ipcMain.handle("get-user-role", () => userRole);
+
+  ipcMain.handle("get-printer-config", () => {
+    const config = store.get("printerConfig", {
+      vendorId: "0x0525",
+      productId: "0xA700",
     });
 
-    ipcMain.handle('get-user-role', () => userRole);
+    return {
+      vendorId: config.vendorId,
+      productId: config.productId,
+      vendorIdDec: parseInt(config.vendorId, 16),
+      productIdDec: parseInt(config.productId, 16),
+    };
+  });
 
-    // Printer configuration handlers
-    ipcMain.handle('get-printer-config', () => {
-        const config = store.get('printerConfig', {
-            vendorId: '0x0525',
-            productId: '0xA700'
-        });
-        
-        // Convert hex to decimal for the UI
-        return {
-            vendorId: config.vendorId,
-            productId: config.productId,
-            vendorIdDec: parseInt(config.vendorId, 16),
-            productIdDec: parseInt(config.productId, 16)
-        };
-    });
+  ipcMain.handle("save-printer-config", (event, config) => {
+    try {
+      if (!config || !config.vendorId || !config.productId) {
+        throw new Error("Both Vendor ID and Product ID are required");
+      }
 
-    ipcMain.handle('save-printer-config', (event, config) => {
-        try {
-            // Validate the input (now expecting hex strings)
-            if (!config || !config.vendorId || !config.productId) {
-                throw new Error('Both Vendor ID and Product ID are required');
-            }
-    
-            // Validate hex format
-            const hexRegex = /^0x[0-9a-fA-F]{4}$/;
-            if (!hexRegex.test(config.vendorId) || !hexRegex.test(config.productId)) {
-                throw new Error('Invalid hexadecimal format');
-            }
-    
-            // Validate numeric conversion
-            const vendorId = parseInt(config.vendorId, 16);
-            const productId = parseInt(config.productId, 16);
-            if (isNaN(vendorId) || isNaN(productId)) {
-                throw new Error('Invalid hexadecimal values');
-            }
-    
-            store.set('printerConfig', config);
-            return { success: true };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    });
+      const hexRegex = /^0x[0-9a-fA-F]{4}$/;
+      if (!hexRegex.test(config.vendorId) || !hexRegex.test(config.productId)) {
+        throw new Error("Invalid hexadecimal format");
+      }
+
+      const vendorId = parseInt(config.vendorId, 16);
+      const productId = parseInt(config.productId, 16);
+      if (isNaN(vendorId) || isNaN(productId)) {
+        throw new Error("Invalid hexadecimal values");
+      }
+
+      store.set("printerConfig", config);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+}
+
+// === App lifecycle ===
+app.whenReady().then(async () => {
+  createSplash();
+
+  try {
+    await runStartupTasks();
+    createMainWindow();
+    setupIPC();
+  } catch (err) {
+    console.error("Startup error:", err);
+    if (splash) splash.close();
+  }
 });
 
 app.on("activate", () => {
@@ -3288,6 +3334,148 @@ ipcMain.handle('update-online-order', async (event, { orderId, status }) => {
 });
 //----------------------------------- ONLINE ORDERS SECTION ENDS HERE -------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');
+
+//----------------------------------- Packaging Code --------------------------------------
+function initializeSchema() {
+    db.serialize(() => {
+      db.run(`CREATE TABLE IF NOT EXISTS Category (
+        catid INTEGER PRIMARY KEY AUTOINCREMENT,
+        catname TEXT NOT NULL,
+        active INTEGER NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS Customer (
+        cid INTEGER PRIMARY KEY AUTOINCREMENT,
+        cname TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        address TEXT
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS User (
+        userid INTEGER PRIMARY KEY AUTOINCREMENT,
+        uname TEXT NOT NULL,
+        isadmin INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        email TEXT NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS FoodItem (
+        fid INTEGER PRIMARY KEY AUTOINCREMENT,
+        fname TEXT NOT NULL,
+        category INTEGER NOT NULL,
+        cost NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL DEFAULT 0,
+        cgst NUMERIC NOT NULL DEFAULT 0,
+        tax NUMERIC NOT NULL DEFAULT 0,
+        active INTEGER NOT NULL DEFAULT 1,
+        is_on INTEGER NOT NULL DEFAULT 1,
+        veg INTEGER NOT NULL DEFAULT 0,
+        depend_inv TEXT DEFAULT NULL,
+        FOREIGN KEY (category) REFERENCES Category(catid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS Orders (
+        billno INTEGER PRIMARY KEY AUTOINCREMENT,
+        kot INTEGER NOT NULL,
+        price NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL,
+        cgst NUMERIC NOT NULL,
+        tax NUMERIC NOT NULL,
+        cashier INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        is_offline INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (cashier) REFERENCES User(userid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS OrderDetails (
+        orderid INTEGER NOT NULL,
+        foodid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        PRIMARY KEY(orderid, foodid),
+        FOREIGN KEY (orderid) REFERENCES Orders(billno),
+        FOREIGN KEY (foodid) REFERENCES FoodItem(fid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS DiscountedOrders (
+        billno INTEGER PRIMARY KEY,
+        Initial_price NUMERIC NOT NULL,
+        discount_percentage NUMERIC NOT NULL,
+        discount_amount NUMERIC NOT NULL,
+        FOREIGN KEY (billno) REFERENCES Orders(billno) ON DELETE CASCADE
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS HeldOrders (
+        heldid INTEGER PRIMARY KEY AUTOINCREMENT,
+        price NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL,
+        cgst NUMERIC NOT NULL,
+        tax NUMERIC NOT NULL,
+        cashier INTEGER NOT NULL,
+        FOREIGN KEY (cashier) REFERENCES User(userid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS HeldOrderDetails (
+        heldid INTEGER NOT NULL,
+        foodid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        PRIMARY KEY(heldid, foodid),
+        FOREIGN KEY (heldid) REFERENCES HeldOrders(heldid),
+        FOREIGN KEY (foodid) REFERENCES FoodItem(fid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS DeletedOrders (
+        billno INTEGER PRIMARY KEY,
+        kot INTEGER NOT NULL,
+        price NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL,
+        cgst NUMERIC NOT NULL,
+        tax NUMERIC NOT NULL,
+        cashier INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        is_offline INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (cashier) REFERENCES User(userid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS DeletedOrderDetails (
+        orderid INTEGER NOT NULL,
+        foodid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        PRIMARY KEY(orderid, foodid),
+        FOREIGN KEY (orderid) REFERENCES DeletedOrders(billno),
+        FOREIGN KEY (foodid) REFERENCES FoodItem(fid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS Inventory (
+        inv_no INTEGER PRIMARY KEY AUTOINCREMENT,
+        inv_item TEXT NOT NULL,
+        current_stock INTEGER NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS OnlineOrders (
+        orderId TEXT PRIMARY KEY,
+        customerName TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        datetime TEXT NOT NULL,
+        paymentId TEXT,
+        paymentMethod TEXT NOT NULL,
+        totalPrice NUMERIC NOT NULL,
+        source TEXT NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS OnlineOrderItems (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        orderId TEXT NOT NULL,
+        fid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        price NUMERIC NOT NULL,
+        FOREIGN KEY (orderId) REFERENCES OnlineOrders(orderId) ON DELETE CASCADE,
+        FOREIGN KEY (fid) REFERENCES FoodItem(fid)
+      )`);
+  
+      console.log("📦 Database schema ensured (tables created if missing).");
+    });
+  }
 
 
 

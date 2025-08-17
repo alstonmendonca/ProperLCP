@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lassi Corner - Loading</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      opacity: 1; /* Start visible */
+      transition: opacity 0.6s ease; /* Smooth fade */
+    }
+
+    .container {
+      width: 350px;
+      height: 250px;
+      background: linear-gradient(135deg, #ffffff, #f5f8fa);
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #e0e0e0;
+      border-top: 6px solid #0D3B66;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    h1 {
+      color: #0D3B66;
+      font-size: 1.8rem;
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      color: #0D3B66;
+      opacity: 0.8;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    /* Animations */
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spinner"></div>
+    <h1>Lassi Corner</h1>
+    <p>Loading, please wait...</p>
+  </div>
+
+  <script>
+    // Called from main process when app is ready
+    window.fadeOutSplash = function () {
+      document.body.style.opacity = "0"; // Fade out body
+      setTimeout(() => {
+        window.close(); // Close splash window
+      }, 600); // match transition duration
+    }
+  </script>
+</body>
+</html>

@@ -92,6 +92,14 @@ async function loadHome(mainContent, billPanel) {
                 quantityElement.textContent = currentQuantity + 1;
             });
         });
+    } else {
+    // Show message when no items are available
+    mainContent.innerHTML = `
+        <div style="text-align: center; margin-top: 100px; color: #555;">
+            <h2>No food items available 🍽️</h2>
+            <p>Please add items to the menu from the admin panel.</p>
+        </div>
+    `;
     }
 }
 

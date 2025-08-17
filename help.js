@@ -7,14 +7,7 @@ function loadHelpSection() {
     billPanel.style.display = 'none';
 
     mainContent.innerHTML = `
-        <div style="
-            background: linear-gradient(135deg, #0D3B66 0%, #0D3B66 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        ">
+        <div class="section-title">
             <h2 style="
                 margin: 0;
                 font-size: 28px;
@@ -74,14 +67,16 @@ function loadHelpSection() {
                     <div style="margin-left: 40px;">
                         <p style="margin: 15px 0;">
                             <strong style="color: #333; min-width: 80px; display: inline-block;">Email:</strong>
-                            <a href="mailto:support@lassicorner.com" style="color: #0D3B66; text-decoration: none;">
-                                support@lassicorner.com
+                            <a style="color: #0D3B66; text-decoration: none;">
+                                alstondmendonca@gmail.com<br>
+                                reevandmello@gmail.com
                             </a>
                         </p>
                         <p style="margin: 15px 0;">
                             <strong style="color: #333; min-width: 80px; display: inline-block;">Phone:</strong>
-                            <a href="tel:+919876543210" style="color: #0D3B66; text-decoration: none;">
-                                +91 98765 43210
+                            <a style="color: #0D3B66; text-decoration: none;">
+                                +91 91088 16244<br>
+                                +91 97410 04258
                             </a>
                         </p>
                     </div>
@@ -157,9 +152,7 @@ function loadHelpSection() {
                 <div style="margin-left: 40px;">
                     <p style="margin: 15px 0; line-height: 1.6;">
                         If you encounter any bugs or issues with the system, please report them to our 
-                        <a href="mailto:support@lassicorner.com" style="color: #0D3B66; text-decoration: none;">
-                            support email
-                        </a> with screenshots and detailed steps to reproduce the issue.
+                        support email or call us at the numbers provided.
                     </p>
                 </div>
             </div>
@@ -193,26 +186,8 @@ function loadHelpSection() {
                 </h3>
                 <div style="margin-left: 40px;">
                     <p style="margin: 15px 0; line-height: 1.6;">
-                        Your feedback helps us improve! Share your suggestions at 
-                        <a href="mailto:feedback@lassicorner.com" style="color: #0D3B66; text-decoration: none;">
-                            feedback@lassicorner.com
-                        </a>
+                        If you have any feedback about this application, please contact Alston or Reevan!
                     </p>
-                    <button style="
-                        background: #0D3B66;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-weight: 500;
-                        margin-top: 10px;
-                        transition: all 0.2s;
-                    " 
-                    onmouseover="this.style.backgroundColor='#0D3B66'" 
-                    onmouseout="this.style.backgroundColor='#0D3B66'">
-                        Send Feedback
-                    </button>
                 </div>
             </div>
         </div>

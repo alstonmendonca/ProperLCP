@@ -206,6 +206,7 @@
             <input type="password" id="password" placeholder="Password" required>
         </div>
         <button type="submit" id="login-btn">Sign In</button>
+        <button id="exitbtn">Exit</button>
         <div id="error-message" class="error-message">Incorrect credentials. Please try again.</div>
         <div class="footer-text">Lassi Corner POS System © 2025</div>
     </div>
@@ -250,6 +251,9 @@
             if (e.key === 'Enter') {
                 document.getElementById('login-btn').click();
             }
+        });
+        document.getElementById("exitbtn").addEventListener("click", async() => {
+            ipcRenderer.send("exit-app");
         });
     </script>
 
