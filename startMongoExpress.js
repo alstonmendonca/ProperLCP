@@ -4,7 +4,18 @@ const { MongoClient, ObjectId } = require('mongodb');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const app = express();
+const dotenv = require('dotenv');
+const fs = require('fs');
 app.use(express.json());
+// Only main.js has access to app, so we need relative path in child
+const envPath = process.env.APP_ENV_PATH || path.join(__dirname, ".env");
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  console.log(`✅ Child loaded env from: ${envPath}`);
+} else {
+  console.warn(`⚠️ Child .env not found at: ${envPath}`);
+}
 
 const MONGO_PORT = process.env.MONGO_PORT;
 const MONGO_URL = process.env.MONGO_DB_URL;

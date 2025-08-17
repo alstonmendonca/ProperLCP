@@ -45,22 +45,9 @@ function fetchCategoriesList() {
 ipcRenderer.on("categories-list-response", (event, data) => {
     const categories = data.categories;
     const categoriesTabDiv = document.getElementById("categoriesTabDiv");
-    categoriesTabDiv.innerHTML = "";
+    categoriesTabDiv.innerHTML = ""; // clear old content
 
-    if (categories.length === 0) {
-        categoriesTabDiv.innerHTML = `
-            <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <p>No categories found</p>
-            </div>
-        `;
-        return;
-    }
-
+    // Start the categories grid with the Add Category box
     let gridHTML = `
         <div class="categories-grid">
             <div class="category-box" id="addCategoryBox" onclick="openAddCategoryPopup()">
@@ -73,45 +60,49 @@ ipcRenderer.on("categories-list-response", (event, data) => {
             </div>
     `;
 
-    categories.forEach(category => {
+    if (categories.length === 0) {
+        // Show empty state below Add Category button
         gridHTML += `
-            <div class="category-box">
-                <h3>${category.catname}</h3>
-                <div class="category-meta">
-                    <div class="category-id">ID: ${category.catid}</div>
-                    <span class="status-badge ${category.active === 1 ? 'active' : 'inactive'}">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            ${category.active === 1 ? 
-                                '<circle cx="12" cy="12" r="10"></circle>' : 
-                                '<path d="M10 10l4 4m0-4l-4 4"></path>'
-                            }
-                        </svg>
-                        ${category.active === 1 ? "Active" : "Inactive"}
-                    </span>
-                </div>
-                <div class="category-actions">
-                    <button class="remove-btn" onclick="confirmDeleteCategory(${category.catid})">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                        Delete
-                    </button>
-                    <button class="edit-btn" onclick="openEditCategoryPopup(${category.catid}, '${category.catname}', ${category.active})">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                        Edit
-                    </button>
-                </div>
+            <div class="empty-state" style="margin-top: 20px; text-align: center; width: 100%;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <p>No categories found</p>
             </div>
         `;
-    });
+    } else {
+        // Add each category box
+        categories.forEach(category => {
+            gridHTML += `
+                <div class="category-box">
+                    <h3>${category.catname}</h3>
+                    <div class="category-meta">
+                        <div class="category-id">ID: ${category.catid}</div>
+                        <span class="status-badge ${category.active === 1 ? 'active' : 'inactive'}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                ${category.active === 1 ? 
+                                    '<circle cx="12" cy="12" r="10"></circle>' : 
+                                    '<path d="M10 10l4 4m0-4l-4 4"></path>'
+                                }
+                            </svg>
+                            ${category.active === 1 ? "Active" : "Inactive"}
+                        </span>
+                    </div>
+                    <div class="category-actions">
+                        <button class="remove-btn" onclick="confirmDeleteCategory(${category.catid})">Delete</button>
+                        <button class="edit-btn" onclick="openEditCategoryPopup(${category.catid}, '${category.catname}', ${category.active})">Edit</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
 
-    gridHTML += `</div>`;
+    gridHTML += `</div>`; // close categories-grid
     categoriesTabDiv.innerHTML = gridHTML;
 });
+
 
 function confirmDeleteCategory(categoryId) {
     const overlay = document.createElement("div");

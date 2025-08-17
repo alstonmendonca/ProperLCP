@@ -55,14 +55,13 @@ function createConfirmPopup(message) {
 
 
 async function displayMenu() {
-
-
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
 
     // Store scroll position before updating content
     const currentScrollPosition = mainContent.scrollTop;
     document.getElementById('top-panel').classList.add('disabled');
+
     // Show loading message with spinner immediately
     mainContent.innerHTML = `
     <div class="loading-message" id="loading-message" style="
@@ -88,34 +87,24 @@ async function displayMenu() {
     `;
 
     billPanel.style.display = "none";
-    try {
-        // Optional delay for 1 second to show the spinner clearly
-        await new Promise(res => setTimeout(res, 400));
 
+    try {
+        // small delay so spinner is visible
+        await new Promise(res => setTimeout(res, 200));
+
+        // Fetch items once
         const foodItems = await ipcRenderer.invoke("get-menu-items");
 
-        // Remove loading message
-        mainContent.innerHTML = "";
+        // Build UI: header, search bar, grid start with Add button ALWAYS
+        let menuContent = `
+            <div class="menu-section-title">
+                <h2>Menu</h2>
+            </div>
 
-        // Continue with displaying foodItems here...
-    } catch (error) {
-        console.error("Error loading menu:", error);
-    }
-    try {
-        const foodItems = await ipcRenderer.invoke("get-menu-items");
+            <input type="text" id="searchBar" placeholder="Search..." style="padding: 10px; border: 3px solid #ccc; border-radius: 25px; width: 100%; margin-bottom: 20px; box-sizing: border-box;">
 
-        // Remove loading message
-        mainContent.innerHTML = "";
-
-        if (foodItems.length > 0) {
-            let menuContent = `
-                
-                <div class="menu-section-title">
-                    <h2>Menu</h2>
-                </div>
-                <input type="text" id="searchBar" placeholder="Search..." style="padding: 10px; border: 3px solid #ccc; border-radius: 25px; width: 1490px; margin-bottom: 20px;">
-                <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                    <button id="addNewItem" style="padding: 10px; text-align: center; background-color:rgb(255, 255, 255); border: 2px dashed #aaa; border-radius: 10px; color:black; font-size: 16px;">
+            <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                <button id="addNewItem" style="padding: 10px; text-align: center; background-color:rgb(255, 255, 255); border: 2px dashed #aaa; border-radius: 10px; color:black; font-size: 16px;">
                     <svg class="add-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -123,10 +112,25 @@ async function displayMenu() {
                     </svg>
                     <br>
                     Add New Item
-                    </button>
-            `;
+                </button>
+        `;
 
-            foodItems.forEach((item) => {
+        if (!Array.isArray(foodItems) || foodItems.length === 0) {
+            // Empty state (below add button)
+            menuContent += `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #64748b;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:12px;">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <div style="font-size: 18px; margin-bottom: 6px;">No items available</div>
+                    <div style="color:#94a3b8;">Click <strong>Add New Item</strong> to create the first menu item.</div>
+                </div>
+            `;
+        } else {
+            // Render each item
+            for (const item of foodItems) {
                 menuContent += `
                     <div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center; border-radius: 10px; background: ${item.veg == 1 ? '#EFFBF0' : '#FFEBEB'};" data-fid="${item.fid}">
                         <h3>${item.fname} <br style="line-height:5px; display:block"> 
@@ -135,12 +139,8 @@ async function displayMenu() {
                         <p>Category: ${item.category_name}</p>
                         <p>Food ID: ${item.fid}</p>
                         <p>Price: ₹${item.cost}</p>
-                        <!-- <p><strong>Depends On:</strong> ${item.depend_inv_names || 'None'}</p> -->
 
-                        <!-- Toggle Switches Container -->
                         <div class="toggle-container" style="display: flex; justify-content: center; gap: 18px; align-items: center;">
-
-                            <!-- ACTIVE Toggle Switch -->
                             <div class="toggle-group" style="display: flex; flex-direction: column; align-items: center; font-size: 12px;">
                                 <label class="switch" style="transform: scale(0.85);">
                                     <input type="checkbox" class="active-toggle-switch" data-fid="${item.fid}" ${item.active ? "checked" : ""}>
@@ -149,7 +149,6 @@ async function displayMenu() {
                                 <p class="status active-status">${item.active ? "ACTIVE ✅" : "INACTIVE ❌"}</p>
                             </div>
 
-                            <!-- IS_ON Toggle Switch (Initially Hidden if Not Active) -->
                             <div class="toggle-group is-on-container" style="display: ${item.active ? 'flex' : 'none'}; flex-direction: column; align-items: center; font-size: 12px;">
                                 <label class="switch" style="transform: scale(0.85);">
                                     <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
@@ -157,97 +156,94 @@ async function displayMenu() {
                                 </label>
                                 <p class="status is-on-status">${item.is_on ? "ON ✅" : "OFF ❌"}</p>
                             </div>
-
                         </div>
 
-                        <!-- Delete Button -->
-                        <button class="delete-btn" data-fid="${item.fid}" 
-                            style="background: red; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
+                        <button class="delete-btn" data-fid="${item.fid}" style="background: red; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
                             Delete
                         </button>
-                        <!-- Edit Button -->
-                        <button class="edit-btn" data-fid="${item.fid}" 
-                            style="background: grey; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
+                        <button class="edit-btn" data-fid="${item.fid}" style="background: grey; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
                             Edit
                         </button>
                     </div>
                 `;
+            }
+        }
 
+        // Close grid
+        menuContent += `</div>`;
+        mainContent.innerHTML = menuContent;
+
+        // Restore previous scroll position
+        mainContent.scrollTop = currentScrollPosition;
+
+        // Always attach the Add New Item button handler
+        const addBtn = document.querySelector("#addNewItem");
+        if (addBtn) addBtn.addEventListener("click", toggleAddItemPopup);
+
+        // Attach search filter (works even when zero items)
+        const searchBar = document.querySelector("#searchBar");
+        if (searchBar) {
+            searchBar.addEventListener("input", (event) => {
+                const searchQuery = event.target.value.trim().toLowerCase();
+                document.querySelectorAll(".food-item").forEach((itemEl) => {
+                    const foodName = itemEl.querySelector("h3").textContent.trim().toLowerCase();
+                    itemEl.style.display = foodName.includes(searchQuery) ? "block" : "none";
+                });
             });
+        }
 
-            menuContent += `</div>`;
-            mainContent.innerHTML = menuContent;
-
-            // Restore previous scroll position
-            mainContent.scrollTop = currentScrollPosition;
-            // Add event listeners to Add New Item button
-            document.querySelector("#addNewItem").addEventListener("click", toggleAddItemPopup);
-
-
-
-            // Add event listeners to IS_ON toggle switches
+        // If items exist, attach interactive listeners
+        if (Array.isArray(foodItems) && foodItems.length > 0) {
+            // IS_ON toggles
             document.querySelectorAll(".toggle-switch").forEach((switchEl) => {
                 switchEl.addEventListener("change", async (event) => {
                     const fid = event.target.getAttribute("data-fid");
                     await ipcRenderer.invoke("toggle-menu-item", parseInt(fid));
 
-                    // Update the toggle switch and status directly
                     const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                    if (!foodItemElement) return;
                     const statusElement = foodItemElement.querySelector(".is-on-status");
                     const isChecked = event.target.checked;
-
-                    statusElement.textContent = isChecked ? "ON ✅" : "OFF ❌";
+                    if (statusElement) statusElement.textContent = isChecked ? "ON ✅" : "OFF ❌";
                 });
             });
 
-            // Add event listeners to ACTIVE toggle switches
+            // ACTIVE toggles
             document.querySelectorAll(".active-toggle-switch").forEach((switchEl) => {
                 switchEl.addEventListener("change", async (event) => {
                     const fid = event.target.getAttribute("data-fid");
                     await ipcRenderer.invoke("toggle-menu-item-active", parseInt(fid));
 
-                    // Update the toggle switch and status directly
                     const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                    if (!foodItemElement) return;
                     const statusElement = foodItemElement.querySelector(".active-status");
+                    const isOnContainer = foodItemElement.querySelector(".is-on-container");
                     const isChecked = event.target.checked;
 
-                    statusElement.textContent = isChecked ? "ACTIVE ✅" : "INACTIVE ❌";
-
-                    // Show or hide the IS_ON toggle switch container
-                    const isOnContainer = foodItemElement.querySelector(".is-on-container");
-                    if (isChecked) {
-                        isOnContainer.style.display = "flex";
-                    } else {
-                        isOnContainer.style.display = "none";
-                    }
+                    if (statusElement) statusElement.textContent = isChecked ? "ACTIVE ✅" : "INACTIVE ❌";
+                    if (isOnContainer) isOnContainer.style.display = isChecked ? "flex" : "none";
                 });
             });
 
-
-            // Add event listeners to delete buttons
+            // Delete buttons
             document.querySelectorAll(".delete-btn").forEach((button) => {
                 button.addEventListener("click", async (event) => {
                     const fid = event.target.getAttribute("data-fid");
                     const confirmDelete = await createConfirmPopup("Are you sure you want to delete this item?");
                     if (confirmDelete) {
                         await ipcRenderer.invoke("delete-menu-item", parseInt(fid));
+                        const removed = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                        if (removed) removed.remove();
 
-                        // Remove the food item from the DOM instead of reloading everything
-                        document.querySelector(`.food-item[data-fid="${fid}"]`).remove();
+                        // if now no items, refresh the menu to show empty state (keeps Add button visible)
+                        if (document.querySelectorAll(".food-item").length === 0) {
+                            displayMenu();
+                        }
                     }
                 });
             });
-            // Add event listeners for search bar
-            document.querySelector("#searchBar").addEventListener("input", (event) => {
-                const searchQuery = event.target.value.trim().toLowerCase();
-                document.querySelectorAll(".food-item").forEach((item) => {
-                    const foodName = item.querySelector("h3").textContent.trim().toLowerCase();
-                    item.style.display = foodName.includes(searchQuery) ? "block" : "none";
-                });
-            });
 
-            // Add event listeners to edit buttons
-            // Add event listeners to edit buttons
+            // Edit buttons — full edit popup logic (copied from your original code)
             document.querySelectorAll(".edit-btn").forEach((button) => {
                 button.addEventListener("click", async (event) => {
                     const fid = event.target.getAttribute("data-fid");
@@ -314,12 +310,12 @@ async function displayMenu() {
                     });
 
                     // Load categories for dropdown
-                    async function loadCategories() {
+                    async function loadCategoriesForEdit() {
                         try {
                             const categories = await ipcRenderer.invoke("get-categories-for-additem");
                             const categorySelect = document.getElementById("category");
 
-                            // Clear existing options except the first one
+                            // Clear existing options
                             categorySelect.innerHTML = '';
 
                             categories.forEach(cat => {
@@ -338,48 +334,49 @@ async function displayMenu() {
                             console.error("Failed to load categories:", error);
                         }
                     }
-                    async function loadInventoryItems() {
+
+                    async function loadInventoryItemsForEdit() {
                         try {
                             const inventoryItems = await ipcRenderer.invoke("get-all-inventory-items");
                             const container = document.getElementById("dependant-items-container");
-                    
+
                             container.innerHTML = ''; // clear previous content
-                    
+
                             inventoryItems.forEach(inv => {
                                 const checkbox = document.createElement("input");
                                 checkbox.type = "checkbox";
                                 checkbox.value = inv.inv_no;
                                 checkbox.id = `inv_${inv.inv_no}`;
                                 checkbox.name = "dependant_inv";
-                    
+
                                 // Pre-check if this item is in depend_inv
                                 const dependArray = (item.depend_inv || "").split(",").map(i => i.trim()).filter(i => i);
                                 if (dependArray.includes(inv.inv_no.toString())) {
                                     checkbox.checked = true;
                                 }
-                    
+
                                 const label = document.createElement("label");
                                 label.htmlFor = `inv_${inv.inv_no}`;
                                 label.textContent = inv.inv_item;
                                 label.style.marginRight = "10px";
-                    
+
                                 const wrapper = document.createElement("div");
                                 wrapper.appendChild(checkbox);
                                 wrapper.appendChild(label);
-                    
+
                                 container.appendChild(wrapper);
                             });
-                    
+
                         } catch (error) {
                             console.error("Failed to load inventory items:", error);
                             const container = document.getElementById("dependant-items-container");
                             container.textContent = "Failed to load inventory items.";
                         }
                     }
-                    
 
-                    loadCategories();
-                    loadInventoryItems();
+                    loadCategoriesForEdit();
+                    loadInventoryItemsForEdit();
+
                     // Close popup when clicking "Cancel"
                     document.getElementById("closePopup").addEventListener("click", () => {
                         document.body.removeChild(popupOverlay);
@@ -398,7 +395,6 @@ async function displayMenu() {
                         const selectedInvCheckboxes = document.querySelectorAll("input[name='dependant_inv']:checked");
                         const depend_inv = Array.from(selectedInvCheckboxes).map(cb => cb.value).join(",") || null;
 
-
                         // Validate inputs
                         if (!updatedFname || isNaN(updatedCost) || updatedCost <= 0) {
                             createTextPopup("Please enter valid details");
@@ -416,7 +412,6 @@ async function displayMenu() {
                             veg: updatedveg,
                             depend_inv
                         });
-                        
 
                         if (response.success) {
                             // Remove the popup
@@ -432,17 +427,16 @@ async function displayMenu() {
                     });
                 });
             });
-            document.getElementById('top-panel').classList.remove('disabled');
-
-
-        } else {
-            mainContent.innerHTML = `<p>No items available in this category.</p>`;
         }
+
+        document.getElementById('top-panel').classList.remove('disabled');
     } catch (error) {
-        mainContent.innerHTML = `<p>Error loading menu items: ${error.message}</p>`;
+        mainContent.innerHTML = `<p style="color: #ef4444; padding: 20px;">Error loading menu items: ${error.message}</p>`;
         console.error("Error fetching menu:", error);
+        document.getElementById('top-panel').classList.remove('disabled');
     }
 }
+
 
 // Listening for the 'refresh-menu' event to trigger menu reload
 ipcRenderer.on("refresh-menu", async () => {
