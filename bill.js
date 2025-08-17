@@ -122,7 +122,6 @@ function updateQuantityInput(itemId, price) {
 }
 
 // Function to remove an item from the bill
-// Function to remove an item from the bill
 function removeFromBill(itemId) {
     const billItem = document.getElementById(`bill-item-${itemId}`);
     if (billItem) {
