@@ -648,12 +648,6 @@ input[type="date"] {
     background-size: 18px;
 }
 
-/* .date-filters input[type="date"] {
-    padding: 5px;
-    font-size: 1rem;
-    border: 1px solid #ccc; 
-    border-radius: 5px; 
-} */
 
 .date-filters select {
     padding: 5px;
