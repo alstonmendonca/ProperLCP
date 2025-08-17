@@ -14,6 +14,7 @@
   "build": {
     "appId": "com.lassicorner.app",
     "productName": "Lassi Corner",
+    "artifactName": "Lassi Corner Setup.exe",
     "extraResources": [
       { "from": ".env", "to": ".env" },
       { "from": "getOnline.js", "to": "getOnline.js" },
@@ -31,8 +32,7 @@
       "allowElevation": false,
       "runAfterFinish": true,
       "installerIcon": "assets/images/lassicorner.ico",
-      "uninstallerIcon": "assets/images/lassicorner.ico",
-      "script": "build/installer.nsh"
+      "uninstallerIcon": "assets/images/lassicorner.ico"
     }
   },
   "devDependencies": {
