@@ -1,6 +1,14 @@
 const WebSocket = require('ws');
-require('dotenv').config();
-
+const fs = require('fs');
+// Only main.js has access to app, so we need relative path in child
+const envPath = process.env.APP_ENV_PATH || path.join(__dirname, ".env");
+const dotenv = require('dotenv');
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  console.log(`✅ Child loaded env from: ${envPath}`);
+} else {
+  console.warn(`⚠️ Child .env not found at: ${envPath}`);
+}
 let socket;
 let reconnectTimeout = null;
 const RECONNECT_DELAY = 5000;

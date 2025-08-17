@@ -53,123 +53,133 @@ function fetchInventoryList() {
 }
 
 ipcRenderer.on("inventory-list-response", (event, data) => {
-    const inventoryItems = data.inventory;
-    const inventoryTabDiv = document.getElementById("inventoryTabDivInv");
-    const lowStockBanner = document.getElementById("lowStockBannerInv");
-    const lowStockItemsDiv = document.getElementById("lowStockItemsInv");
-    
-    inventoryTabDiv.innerHTML = "";
-    lowStockItemsDiv.innerHTML = "";
+  const inventoryItems = Array.isArray(data.inventory) ? data.inventory : [];
+  const inventoryTabDiv = document.getElementById("inventoryTabDivInv");
+  const lowStockBanner = document.getElementById("lowStockBannerInv");
+  const lowStockItemsDiv = document.getElementById("lowStockItemsInv");
 
-    if (inventoryItems.length === 0) {
-        inventoryTabDiv.innerHTML = `
-            <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <p>No inventory items found</p>
+  // Clear previous contents
+  inventoryTabDiv.innerHTML = "";
+  lowStockItemsDiv.innerHTML = "";
+
+  // Start grid with Add box always visible
+  let gridHTML = `
+    <div class="inventory-grid">
+      <div class="inventory-item-box" id="addInventoryItemBoxInv" onclick="window.InventoryFunctions.openAddInventoryItemPopupInv()">
+        <svg class="add-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+        <p>Add New Item</p>
+      </div>
+  `;
+
+  // Partition low-stock (<5) and normal items
+  const lowStockItems = inventoryItems.filter(item => Number(item.current_stock) < 5);
+  const normalStockItems = inventoryItems.filter(item => Number(item.current_stock) >= 5);
+
+  // Build low-stock section (use a local string and set once)
+  if (lowStockItems.length > 0) {
+    lowStockBanner.style.display = "flex";
+
+    let lowHtml = "";
+    for (const item of lowStockItems) {
+      // escape single quotes to safely inject into onclick single-quoted args
+      const safeName = String(item.inv_item).replace(/'/g, "\\'").replace(/\n/g, " ");
+      lowHtml += `
+        <div class="inventory-item-box low-stock">
+          <h3>${item.inv_item}</h3>
+          <div class="inventory-meta-inv">
+            <div class="inventory-id-inv">ID: ${item.inv_no}</div>
+            <div class="stock-count-inv ${item.current_stock < 1 ? 'out-of-stock' : ''}">
+              Stock: ${item.current_stock}
             </div>
-        `;
-        return;
+          </div>
+          <div class="inventory-actions-inv">
+            <button class="restock-btn-inv" onclick="window.InventoryFunctions.openRestockPopupInv(${item.inv_no}, '${safeName}', ${item.current_stock})">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h3l3-9 6 18 3-9h3"></path>
+              </svg>
+              Restock
+            </button>
+            <button class="edit-btn-inv" onclick="window.InventoryFunctions.openEditInventoryItemPopupInv(${item.inv_no}, '${safeName}', ${item.current_stock})">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Edit
+            </button>
+          </div>
+        </div>
+      `;
     }
+    lowStockItemsDiv.innerHTML = lowHtml;
+  } else {
+    lowStockBanner.style.display = "none";
+  }
 
-    let gridHTML = `
-        <div class="inventory-grid">
-            <div class="inventory-item-box" id="addInventoryItemBoxInv" onclick="window.InventoryFunctions.openAddInventoryItemPopupInv()">
-                <svg class="add-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-                <p>Add New Item</p>
-            </div>
+  // If no normal-stock items and no low-stock items, show empty state below Add button
+  if (normalStockItems.length === 0 && lowStockItems.length === 0) {
+    gridHTML += `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #64748b;">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:12px;">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <div style="font-size: 18px; margin-bottom: 6px;">No inventory items found</div>
+        <div style="color:#94a3b8;">Click <strong>Add New Item</strong> to create the first inventory item.</div>
+      </div>
     `;
-
-    // Separate low stock items (stock < 5)
-    const lowStockItems = inventoryItems.filter(item => item.current_stock < 5);
-    const normalStockItems = inventoryItems.filter(item => item.current_stock >= 5);
-
-    // Display low stock items first
-    if (lowStockItems.length > 0) {
-        lowStockBanner.style.display = "flex";
-        
-        lowStockItems.forEach(item => {
-            lowStockItemsDiv.innerHTML += `
-                <div class="inventory-item-box low-stock">
-                    <h3>${item.inv_item}</h3>
-                    <div class="inventory-meta-inv">
-                        <div class="inventory-id-inv">ID: ${item.inv_no}</div>
-                        <div class="stock-count-inv ${item.current_stock < 1 ? 'out-of-stock' : ''}">
-                            Stock: ${item.current_stock}
-                        </div>
-                    </div>
-                    <div class="inventory-actions-inv">
-                        <button class="restock-btn-inv" onclick="window.InventoryFunctions.openRestockPopupInv(${item.inv_no}, '${item.inv_item}', ${item.current_stock})">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 12h3l3-9 6 18 3-9h3"></path>
-                            </svg>
-                            Restock
-                        </button>
-                        <button class="edit-btn-inv" onclick="window.InventoryFunctions.openEditInventoryItemPopupInv(${item.inv_no}, '${item.inv_item}', ${item.current_stock})">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                            Edit
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-    } else {
-        lowStockBanner.style.display = "none";
+  } else {
+    // Append normal-stock item boxes
+    for (const item of normalStockItems) {
+      const safeName = String(item.inv_item).replace(/'/g, "\\'").replace(/\n/g, " ");
+      gridHTML += `
+        <div class="inventory-item-box">
+          <h3>${item.inv_item}</h3>
+          <div class="inventory-meta-inv">
+            <div class="inventory-id-inv">ID: ${item.inv_no}</div>
+            <div class="stock-count-inv">
+              Stock: ${item.current_stock}
+            </div>
+          </div>
+          <div class="inventory-actions-inv">
+            <button class="restock-btn-inv" onclick="window.InventoryFunctions.openRestockPopupInv(${item.inv_no}, '${safeName}', ${item.current_stock})">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h3l3-9 6 18 3-9h3"></path>
+              </svg>
+              Restock
+            </button>
+            <button class="edit-btn-inv" onclick="window.InventoryFunctions.openEditInventoryItemPopupInv(${item.inv_no}, '${safeName}', ${item.current_stock})">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Edit
+            </button>
+            <button class="delete-btn-inv" onclick="window.InventoryFunctions.openDeleteInventoryItemPopupInv(${item.inv_no}, '${safeName}')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18"></path>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              Delete
+            </button>
+          </div>
+        </div>
+      `;
     }
+  }
 
-    // Display normal stock items
-    normalStockItems.forEach(item => {
-        gridHTML += `
-            <div class="inventory-item-box">
-            <h3>${item.inv_item}</h3>
-            <div class="inventory-meta-inv">
-                <div class="inventory-id-inv">ID: ${item.inv_no}</div>
-                <div class="stock-count-inv">
-                Stock: ${item.current_stock}
-                </div>
-            </div>
-            <div class="inventory-actions-inv">
-                <button class="restock-btn-inv" onclick="window.InventoryFunctions.openRestockPopupInv(${item.inv_no}, '${item.inv_item}', ${item.current_stock})">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12h3l3-9 6 18 3-9h3"></path>
-                </svg>
-                Restock
-                </button>
-                <button class="edit-btn-inv" onclick="window.InventoryFunctions.openEditInventoryItemPopupInv(${item.inv_no}, '${item.inv_item}', ${item.current_stock})">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Edit
-                </button>
-                <button class="delete-btn-inv" onclick="window.InventoryFunctions.openDeleteInventoryItemPopupInv(${item.inv_no}, '${item.inv_item}')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 6h18"></path>
-                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                </svg>
-                Delete
-                </button>
-            </div>
-            </div>
-        `;
-    });
-
-    gridHTML += `</div>`;
-    inventoryTabDiv.innerHTML = gridHTML;
+  // Close grid and render
+  gridHTML += `</div>`;
+  inventoryTabDiv.innerHTML = gridHTML;
 });
+
 
 function openRestockPopupInv(inv_no, inv_item, current_stock) {
     closeModalInv();

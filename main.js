@@ -13,7 +13,19 @@ let userRole = null;
 let store; // Will be initialized after dynamic import
 let onlineProcess;
 const axios = require('axios');
+const basePath = app.isPackaged ? process.resourcesPath : __dirname;
+const dotenv = require('dotenv');
+// Determine env file path based on dev vs packaged
+const envPath = app.isPackaged
+  ? path.join(process.resourcesPath, ".env") // packaged location
+  : path.join(__dirname, ".env");           // dev location
 
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  console.log(`✅ Loaded env from: ${envPath}`);
+} else {
+  console.warn(`⚠️ .env file not found at: ${envPath}`);
+}
 // Connect to the SQLite database
 const db = new sqlite3.Database("LC.db", (err) => {
     if (err) {
@@ -26,7 +38,12 @@ const db = new sqlite3.Database("LC.db", (err) => {
 
 
 async function initStore() {
-    const Store = (await import('electron-store')).default;
+    let Store;
+    try {
+    Store = require('electron-store'); // CommonJS
+    } catch (err) {
+    console.error("Failed to require electron-store:", err);
+    }
     store = new Store({
         defaults: {
             printerConfig: {
@@ -121,10 +138,10 @@ function saveOrderToDatabase(order) {
 }
 // Spawn getOnline.js as a background process
 function startGetOnlineServer() {
-  const scriptPath = path.join(__dirname, 'getOnline.js');
+  const scriptPath = path.join(basePath, "getOnline.js");
 
   onlineProcess = fork(scriptPath, {
-    env: process.env,
+    env: { ...process.env, APP_ENV_PATH: envPath },
   });
 
   // Listen for messages from getOnline.js
@@ -148,12 +165,12 @@ function startGetOnlineServer() {
 let expressProcess = null;
 
 function startExpressServer() {
-  const scriptPath = path.join(__dirname, 'startMongoExpress.js');
+  const scriptPath = path.join(basePath, "startMongoExpress.js");
 
   const child = spawn('node', [scriptPath], {
     detached: true,
     stdio: 'ignore', // fully detached, no stdio inherited
-    env: process.env,
+    env: { ...process.env, APP_ENV_PATH: envPath },
     shell: false, // Use shell to allow environment variables
   });
 
