@@ -53,7 +53,30 @@ async function loadUserProfile(mainContent, billPanel) {
     --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 5px 10px -5px rgba(0, 0, 0, 0.02);
     --transition: all 0.3s ease;
   }
-  
+          #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 59, 102, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .spinner {
+            border: 6px solid rgba(255, 255, 255, 0.2);
+            border-top: 6px solid #FFFFFF;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
   .profile-container {
     max-width: 800px;
     margin: 0 auto;
@@ -265,7 +288,9 @@ async function loadUserProfile(mainContent, billPanel) {
     }
   }
 </style>
-
+<div id="loading-overlay">
+    <div class="spinner"></div>
+</div>
 <div class="profile-container">
   <div class="profile-header">
     <div class="avatar-container">
@@ -339,6 +364,11 @@ async function loadUserProfile(mainContent, billPanel) {
 
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     const { ipcRenderer } = require("electron");
+    const overlay = document.getElementById('loading-overlay');
+    setTimeout(() => {
+      overlay.style.display = 'flex';
+    },2000);
+    overlay.style.display = 'flex';
     await ipcRenderer.invoke("logout");
     window.location.href = "login.html";
   });

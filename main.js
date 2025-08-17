@@ -257,7 +257,7 @@ app.whenReady().then(async () => {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
-        icon: path.join(__dirname, 'assets/images', 'snacc.ico'), // Use .ico on Windows
+        icon: path.join(__dirname, 'assets/images', 'lassicorner.ico'), // Use .ico on Windows
         show: false,
         fullscreen: false,
         webPreferences: {
