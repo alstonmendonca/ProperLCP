@@ -34,7 +34,7 @@
 }
 
 .category-row {
-    background-color: var(--fourth-color); /* Light gray background for category rows */
+    background-color: #ddd; /* Light gray background for category rows */
     font-weight: bold;
     border: 1px solid #ddd; /* Add a border between rows */
 }

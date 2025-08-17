@@ -630,12 +630,30 @@ h1 {
     color: #2c3e50; /* Match the heading color */
 }
 
-.date-filters input[type="date"] {
+/* Style for date inputs specifically */
+input[type="date"] {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: white;
+    color: #333;
+    font-size: 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 18px;
+}
+
+/* .date-filters input[type="date"] {
     padding: 5px;
     font-size: 1rem;
-    border: 1px solid #ccc; /* Light border */
-    border-radius: 5px; /* Rounded corners */
-}
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+} */
 
 .date-filters select {
     padding: 5px;
@@ -689,6 +707,7 @@ h1 {
 .top-selling-table th, .employee-table th, .day-wise-table th, .month-wise-table th, .year-wise-table th {
     padding: 10px; 
     cursor: pointer;
+    border-right: 1px solid #fff;
 }
 .top-selling-table th:hover, .employee-table th:hover, .day-wise-table th:hover, .month-wise-table th:hover, .year-wise-table th:hover {
     background-color: #11487b;
