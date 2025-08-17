@@ -6,8 +6,19 @@
         "start": "electron .",
         "dev": "electronmon ."
     },
+      "build": {
+    "extraResources": [
+      {
+        "from": ".env",
+        "to": ".env"
+      }
+    ]
+  },
     "devDependencies": {
+        "@electron/packager": "^18.4.2",
+        "cross-env": "^10.0.0",
         "electron": "^25.9.8",
+        "electron-builder": "^26.0.12",
         "electron-rebuild": "^3.2.9",
         "electronmon": "^2.0.3"
     },

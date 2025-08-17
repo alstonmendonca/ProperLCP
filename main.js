@@ -8,10 +8,12 @@ escpos.USB = require("escpos-usb");
 const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
 const { fork, spawn } = require('child_process');
 let mainWindow;
+let splash;
 let userRole = null;
 let store; // Will be initialized after dynamic import
 let onlineProcess;
 const axios = require('axios');
+
 // Connect to the SQLite database
 const db = new sqlite3.Database("LC.db", (err) => {
     if (err) {
@@ -249,108 +251,150 @@ async function waitForServerReady(retries = 20, delay = 500) {
 
   throw new Error('❌ Express server did not become ready in time.');
 }
-app.whenReady().then(async () => {
-            // 🕒 Wait for Express to actually start
-    await startExpressServer();   // Spawn Express server
-    await waitForServerReady();
-    await initStore();
-    // Create main window
-    mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 800,
-        icon: path.join(__dirname, 'assets/images', 'lassicorner.ico'), // Use .ico on Windows
-        show: false,
-        fullscreen: true,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        },
-    });
 
-    mainWindow.maximize();
-    mainWindow.once("ready-to-show", () => mainWindow.show());
-    Menu.setApplicationMenu(null);
-    mainWindow.loadFile('login.html').catch(console.error);
+// === Create splash window ===
+function createSplash() {
+  splash = new BrowserWindow({
+    width: 400,
+    height: 300,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    movable: true,
+    show: true,
+  });
 
-        // IPC handlers
-    ipcMain.handle('login', async (event, { username, password }) => {
+  splash.loadFile(path.join(__dirname, "splash.html"));
+}
+
+// === Create main window ===
+function createMainWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    icon: path.join(__dirname, "assets/images", "lassicorner.ico"),
+    show: false,
+    fullscreen: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  Menu.setApplicationMenu(null);
+
+  mainWindow.loadFile("login.html").catch(console.error);
+
+  mainWindow.once("ready-to-show", () => {
+      // Tell splash to fade out
+    if (splash && !splash.isDestroyed()) {
+        splash.webContents.executeJavaScript("window.fadeOutSplash()");
+        setTimeout(() => {
+        if (!splash.isDestroyed()) splash.close();
+        }, 700); // Allow time for fade before closing
+    }
+
+    mainWindow.show();
+  });
+}
+
+// === Do startup tasks (Express, DB, etc.) ===
+async function runStartupTasks() {
+  await startExpressServer();
+  await waitForServerReady();
+  await initStore();
+}
+
+// === Setup IPC handlers ===
+function setupIPC() {
+  ipcMain.handle("login", async (event, { username, password }) => {
     try {
-        const response = await axios.post(`http://localhost:${MONGO_PORT}/login`, {
+      const response = await axios.post(`http://localhost:${MONGO_PORT}/login`, {
         username,
-        password
-        });
+        password,
+      });
 
-        if (response.data.success) {
+      if (response.data.success) {
         const user = response.data.user;
         console.log("Login successful:", user);
-        await startGetOnlineServer(); // WebSocket server
+        await startGetOnlineServer();
         await checkAndResetFoodItems();
-        // ✅ Now safe to sync
         await syncFoodItemsToMongo();
         await syncUsersFromMongo();
-        // Save user to local session (electron-store)
-        store.set('sessionUser', user);
-        return user; // return to renderer
-        } else {
+        store.set("sessionUser", user);
+        return user;
+      } else {
         return null;
-        }
+      }
     } catch (err) {
-        console.error("Login API error:", err.message);
-        return null;
+      console.error("Login API error:", err.message);
+      return null;
     }
-    });
-    ipcMain.handle('get-session-user', () => {
-        return store.get('sessionUser') || null;
-    });
-    ipcMain.handle('logout', () => {
-        store.delete('sessionUser');
-        return true;
+  });
+
+  ipcMain.handle("get-session-user", () => {
+    return store.get("sessionUser") || null;
+  });
+
+  ipcMain.handle("logout", () => {
+    store.delete("sessionUser");
+    return true;
+  });
+
+  ipcMain.handle("get-user-role", () => userRole);
+
+  ipcMain.handle("get-printer-config", () => {
+    const config = store.get("printerConfig", {
+      vendorId: "0x0525",
+      productId: "0xA700",
     });
 
-    ipcMain.handle('get-user-role', () => userRole);
+    return {
+      vendorId: config.vendorId,
+      productId: config.productId,
+      vendorIdDec: parseInt(config.vendorId, 16),
+      productIdDec: parseInt(config.productId, 16),
+    };
+  });
 
-    // Printer configuration handlers
-    ipcMain.handle('get-printer-config', () => {
-        const config = store.get('printerConfig', {
-            vendorId: '0x0525',
-            productId: '0xA700'
-        });
-        
-        // Convert hex to decimal for the UI
-        return {
-            vendorId: config.vendorId,
-            productId: config.productId,
-            vendorIdDec: parseInt(config.vendorId, 16),
-            productIdDec: parseInt(config.productId, 16)
-        };
-    });
+  ipcMain.handle("save-printer-config", (event, config) => {
+    try {
+      if (!config || !config.vendorId || !config.productId) {
+        throw new Error("Both Vendor ID and Product ID are required");
+      }
 
-    ipcMain.handle('save-printer-config', (event, config) => {
-        try {
-            // Validate the input (now expecting hex strings)
-            if (!config || !config.vendorId || !config.productId) {
-                throw new Error('Both Vendor ID and Product ID are required');
-            }
-    
-            // Validate hex format
-            const hexRegex = /^0x[0-9a-fA-F]{4}$/;
-            if (!hexRegex.test(config.vendorId) || !hexRegex.test(config.productId)) {
-                throw new Error('Invalid hexadecimal format');
-            }
-    
-            // Validate numeric conversion
-            const vendorId = parseInt(config.vendorId, 16);
-            const productId = parseInt(config.productId, 16);
-            if (isNaN(vendorId) || isNaN(productId)) {
-                throw new Error('Invalid hexadecimal values');
-            }
-    
-            store.set('printerConfig', config);
-            return { success: true };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    });
+      const hexRegex = /^0x[0-9a-fA-F]{4}$/;
+      if (!hexRegex.test(config.vendorId) || !hexRegex.test(config.productId)) {
+        throw new Error("Invalid hexadecimal format");
+      }
+
+      const vendorId = parseInt(config.vendorId, 16);
+      const productId = parseInt(config.productId, 16);
+      if (isNaN(vendorId) || isNaN(productId)) {
+        throw new Error("Invalid hexadecimal values");
+      }
+
+      store.set("printerConfig", config);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+}
+
+// === App lifecycle ===
+app.whenReady().then(async () => {
+  createSplash();
+
+  try {
+    await runStartupTasks();
+    createMainWindow();
+    setupIPC();
+  } catch (err) {
+    console.error("Startup error:", err);
+    if (splash) splash.close();
+  }
 });
 
 app.on("activate", () => {
