@@ -33,8 +33,8 @@ function loadSalesOverview(mainContent, billPanel) {
             <table id="salesTable">
                 <thead>
                     <tr>
-                        <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('date')">Date <span id="dateSortIndicator">▲</span></th>
-                        <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('sales')">Total Sales <span id="salesSortIndicator"></span></th>
+                        <th style="padding: 10px; cursor: pointer; border-right: 1px solid #fff;" onclick="sortSalesOverviewTable('date')">Date <span id="dateSortIndicator">▲</span></th>
+                        <th style="padding: 10px; cursor: pointer; border-right: 1px solid #fff;" onclick="sortSalesOverviewTable('sales')">Total Sales <span id="salesSortIndicator"></span></th>
                         <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('revenue')">Total Revenue <span id="revenueSortIndicator"></span></th>
                     </tr>
                 </thead>

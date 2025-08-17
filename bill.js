@@ -305,6 +305,7 @@ async function saveBill() {
     NewOrder();
 }
 
+//This function gets called when user clicks on 'Save and Print' in bill panel
 async function saveAndPrintBill() {
     const user = await ipcRenderer.invoke("get-session-user");
     const cashier = user.userid; // Replace with actual cashier ID

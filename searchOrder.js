@@ -22,36 +22,36 @@ function loadSearchOrder(mainContent, billPanel) {
             </div>
 
             <div class="date-filters" 
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 20px 0; 
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 20px 0; 
             background-color:#8cbbe8; padding:10px; border-radius:14px;">
                 <!-- Bill No Range -->
                 <div>
                     <label>Bill No From:</label>
-                    <input type="number" id="billNoFrom" placeholder="e.g. 100" min="1">
+                    <input type="number" id="billNoFrom" placeholder="..." min="1">
                 </div>
                 <div>
                     <label>Bill No To:</label>
-                    <input type="number" id="billNoTo" placeholder="e.g. 500" min="1">
+                    <input type="number" id="billNoTo" placeholder="..." min="1">
                 </div>
 
                 <!-- KOT Range -->
                 <div>
                     <label>KOT From:</label>
-                    <input type="number" id="kotFrom" placeholder="e.g. 1" min="1">
+                    <input type="number" id="kotFrom" placeholder="..." min="1">
                 </div>
                 <div>
                     <label>KOT To:</label>
-                    <input type="number" id="kotTo" placeholder="e.g. 100" min="1">
+                    <input type="number" id="kotTo" placeholder="..." min="1">
                 </div>
 
-                <!-- Date Range -->
+                <!-- Price Range -->
                 <div>
-                    <label>Start Date:</label>
-                    <input type="date" id="startDate" value="${today}">
+                    <label>Min Price (₹):</label>
+                    <input type="number" id="minPrice" placeholder="..." step="0.01" min="0">
                 </div>
                 <div>
-                    <label>End Date:</label>
-                    <input type="date" id="endDate" value="${today}">
+                    <label>Max Price (₹):</label>
+                    <input type="number" id="maxPrice" placeholder="..." step="0.01" min="0">
                 </div>
 
                 <!-- Cashier Filter -->
@@ -63,14 +63,14 @@ function loadSearchOrder(mainContent, billPanel) {
                     </select>
                 </div>
 
-                <!-- Price Range -->
+                <!-- Date Range -->
                 <div>
-                    <label>Min Price (₹):</label>
-                    <input type="number" id="minPrice" placeholder="e.g. 50" step="0.01" min="0">
+                    <label>Start Date:</label>
+                    <input type="date" id="startDate" value="${today}">
                 </div>
                 <div>
-                    <label>Max Price (₹):</label>
-                    <input type="number" id="maxPrice" placeholder="e.g. 1000" step="0.01" min="0">
+                    <label>End Date:</label>
+                    <input type="date" id="endDate" value="${today}">
                 </div>
             </div>
 

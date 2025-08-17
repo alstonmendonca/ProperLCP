@@ -29,6 +29,20 @@
     margin-right: 40px; /* Space between inputs and button */
 }
 
+.date-filters input[type="number"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.date-filters input[type="number"]:focus {
+  border-color: #4f46e5; /* Indigo */
+  box-shadow: 0 0 5px rgba(79, 70, 229, 0.4);
+}
+
+
 /* Order History Table */
 .order-history-table {
     width: 100%;
