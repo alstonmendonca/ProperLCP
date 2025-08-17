@@ -12,13 +12,14 @@ let userRole = null;
 let store; // Will be initialized after dynamic import
 const axios = require('axios');
 // Connect to the SQLite database
-const db = new sqlite3.Database('LC.db', (err) => {
+const db = new sqlite3.Database("LC.db", (err) => {
     if (err) {
-        console.error("Failed to connect to the database:", err.message);
+      console.error("❌ Failed to connect to the database:", err.message);
     } else {
-        console.log("Connected to the SQLite database.");
+      console.log("✅ Connected to the SQLite database.");
+      initializeSchema();
     }
-});
+  });
 
 
 async function initStore() {
@@ -3264,3 +3265,145 @@ ipcMain.handle('update-online-order', async (event, { orderId, status }) => {
 });
 //----------------------------------- ONLINE ORDERS SECTION ENDS HERE -------------------
 app.commandLine.appendSwitch('ignore-certificate-errors');
+
+//----------------------------------- Packaging Code --------------------------------------
+function initializeSchema() {
+    db.serialize(() => {
+      db.run(`CREATE TABLE IF NOT EXISTS Category (
+        catid INTEGER PRIMARY KEY AUTOINCREMENT,
+        catname TEXT NOT NULL,
+        active INTEGER NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS Customer (
+        cid INTEGER PRIMARY KEY AUTOINCREMENT,
+        cname TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        address TEXT
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS User (
+        userid INTEGER PRIMARY KEY AUTOINCREMENT,
+        uname TEXT NOT NULL,
+        isadmin INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        email TEXT NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS FoodItem (
+        fid INTEGER PRIMARY KEY AUTOINCREMENT,
+        fname TEXT NOT NULL,
+        category INTEGER NOT NULL,
+        cost NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL DEFAULT 0,
+        cgst NUMERIC NOT NULL DEFAULT 0,
+        tax NUMERIC NOT NULL DEFAULT 0,
+        active INTEGER NOT NULL DEFAULT 1,
+        is_on INTEGER NOT NULL DEFAULT 1,
+        veg INTEGER NOT NULL DEFAULT 0,
+        depend_inv TEXT DEFAULT NULL,
+        FOREIGN KEY (category) REFERENCES Category(catid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS Orders (
+        billno INTEGER PRIMARY KEY AUTOINCREMENT,
+        kot INTEGER NOT NULL,
+        price NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL,
+        cgst NUMERIC NOT NULL,
+        tax NUMERIC NOT NULL,
+        cashier INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        is_offline INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (cashier) REFERENCES User(userid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS OrderDetails (
+        orderid INTEGER NOT NULL,
+        foodid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        PRIMARY KEY(orderid, foodid),
+        FOREIGN KEY (orderid) REFERENCES Orders(billno),
+        FOREIGN KEY (foodid) REFERENCES FoodItem(fid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS DiscountedOrders (
+        billno INTEGER PRIMARY KEY,
+        Initial_price NUMERIC NOT NULL,
+        discount_percentage NUMERIC NOT NULL,
+        discount_amount NUMERIC NOT NULL,
+        FOREIGN KEY (billno) REFERENCES Orders(billno) ON DELETE CASCADE
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS HeldOrders (
+        heldid INTEGER PRIMARY KEY AUTOINCREMENT,
+        price NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL,
+        cgst NUMERIC NOT NULL,
+        tax NUMERIC NOT NULL,
+        cashier INTEGER NOT NULL,
+        FOREIGN KEY (cashier) REFERENCES User(userid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS HeldOrderDetails (
+        heldid INTEGER NOT NULL,
+        foodid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        PRIMARY KEY(heldid, foodid),
+        FOREIGN KEY (heldid) REFERENCES HeldOrders(heldid),
+        FOREIGN KEY (foodid) REFERENCES FoodItem(fid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS DeletedOrders (
+        billno INTEGER PRIMARY KEY,
+        kot INTEGER NOT NULL,
+        price NUMERIC NOT NULL,
+        sgst NUMERIC NOT NULL,
+        cgst NUMERIC NOT NULL,
+        tax NUMERIC NOT NULL,
+        cashier INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        is_offline INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (cashier) REFERENCES User(userid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS DeletedOrderDetails (
+        orderid INTEGER NOT NULL,
+        foodid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        PRIMARY KEY(orderid, foodid),
+        FOREIGN KEY (orderid) REFERENCES DeletedOrders(billno),
+        FOREIGN KEY (foodid) REFERENCES FoodItem(fid)
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS Inventory (
+        inv_no INTEGER PRIMARY KEY AUTOINCREMENT,
+        inv_item TEXT NOT NULL,
+        current_stock INTEGER NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS OnlineOrders (
+        orderId TEXT PRIMARY KEY,
+        customerName TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        datetime TEXT NOT NULL,
+        paymentId TEXT,
+        paymentMethod TEXT NOT NULL,
+        totalPrice NUMERIC NOT NULL,
+        source TEXT NOT NULL
+      )`);
+  
+      db.run(`CREATE TABLE IF NOT EXISTS OnlineOrderItems (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        orderId TEXT NOT NULL,
+        fid INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        price NUMERIC NOT NULL,
+        FOREIGN KEY (orderId) REFERENCES OnlineOrders(orderId) ON DELETE CASCADE,
+        FOREIGN KEY (fid) REFERENCES FoodItem(fid)
+      )`);
+  
+      console.log("📦 Database schema ensured (tables created if missing).");
+    });
+  }

@@ -12,16 +12,16 @@ async function updateMainContent(contentType) {
     const historyButtons = [
         'todaysOrders', 'orderHistory', 'categoryHistory', 'itemHistory', 
         'deletedOrders', 'discountedOrders', 'dayWise', 'monthWise', 
-        'yearWise', 'filterHistory', 'customer', 'makeATable', 'yourTables'
+        'yearWise', 'customer'
     ];
     const analyticsButtons = [
         'SalesOverview', 'ItemSummary', 'DayEndSummary', 'TopSellingItems', 
-        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'Notes', 'SpecialStatistics', 'TaxOnItems',
+        'TopSellingCategory', 'CategoryWiseSales', 'EmployeeAnalysis', 'SpecialStatistics', 'TaxOnItems',
         'Charts', 'RateOfSale', 'BestInCategory'
     ];
     const settingsButtons = [
         'UserProfile', 'BusinessInfo',  
-        'Receipt', 'DriverConfiguration', 'QRMenu', 'BackupDatabase', 'RestoreDatabase',
+        'Receipt', 'DriverConfiguration', 'BackupDatabase', 'RestoreDatabase',
         'ConnectedDevices', 'Help'
     ];
     
@@ -244,9 +244,6 @@ async function updateMainContent(contentType) {
         else if (contentType === "BusinessInfo") {
             loadBusinessInfo(mainContent, billPanel);
         }
-        else if (contentType === "Notes"){
-            loadUserNotes(mainContent, billPanel);
-        }
         else if (contentType === "DriverConfiguration") {
             const mode = 'auto';
             loadPrinterConfiguration(mainContent, billPanel, mode);
@@ -259,17 +256,6 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "Help") {
             loadHelpSection();
-        }
-        else if (contentType === "QRMenu") {
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none';
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>QR Menu</h2>
-                </div>
-                <p>Qr Menu</p>
-            `;
         }
         else if (contentType === "BackupDatabase") {
             const { loadBackupUI } = require("./loadBackupUI");

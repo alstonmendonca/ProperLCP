@@ -344,8 +344,325 @@ async function loadUserProfile(mainContent, billPanel) {
   });
 
   document.getElementById("editProfileBtn").addEventListener("click", () => {
-    alert("Edit profile functionality would open here");
-    // Implement actual edit functionality
+    showEditProfileModal(user);
+  });
+}
+
+// Edit Profile Modal Functionality
+function showEditProfileModal(user) {
+  // Create modal overlay
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'modal-overlay';
+  modalOverlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+  `;
+
+  // Create modal content
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+  modalContent.style.cssText = `
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+  `;
+
+  // Add CSS animations
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-input:focus {
+      outline: none;
+      border-color: #0D3B66;
+      box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+    }
+    
+    .modal-input:disabled {
+      background-color: #f8f9fa;
+      color: #6c757d;
+      cursor: not-allowed;
+    }
+    
+    .modal-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-btn-primary {
+      background: #0D3B66;
+      color: white;
+    }
+    
+    .modal-btn-primary:hover {
+      background: #0A2E4D;
+      transform: translateY(-1px);
+    }
+    
+    .modal-btn-secondary {
+      background: #f8f9fa;
+      color: #6c757d;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .modal-btn-secondary:hover {
+      background: #e9ecef;
+    }
+    
+    .modal-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6c757d;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+      background: #f8f9fa;
+      color: #374151;
+    }
+    
+    .error-message {
+      color: #dc2626;
+      font-size: 14px;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .success-message {
+      color: #059669;
+      font-size: 14px;
+      margin-top: 0.5rem;
+      display: none;
+    }
+  `;
+  document.head.appendChild(style);
+
+  modalContent.innerHTML = `
+    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+    <h2 style="margin-bottom: 1.5rem; color: #0D3B66; font-size: 1.5rem; font-weight: 600;">Edit Profile</h2>
+    
+    <div style="margin-bottom: 1.5rem;">
+      <label class="modal-label">User ID</label>
+      <input type="text" class="modal-input" value="${user.userid || ''}" disabled>
+    </div>
+    
+         <div style="margin-bottom: 1.5rem;">
+       <label class="modal-label">Username *</label>
+       <input type="text" id="editUsername" class="modal-input" value="${user.username || ''}" placeholder="Enter your username">
+     </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+      <label class="modal-label">Role</label>
+      <input type="text" class="modal-input" value="${user.role ? user.role.toUpperCase() : ''}" disabled>
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+      <label class="modal-label">Name *</label>
+      <input type="text" id="editName" class="modal-input" value="${user.name || ''}" placeholder="Enter your full name">
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+      <label class="modal-label">Email *</label>
+      <input type="email" id="editEmail" class="modal-input" value="${user.email || ''}" placeholder="Enter your email address">
+    </div>
+    
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" id="confirmEditBtn">Confirm Changes</button>
+    </div>
+  `;
+
+  modalOverlay.appendChild(modalContent);
+  document.body.appendChild(modalOverlay);
+
+  // Handle confirm button click
+  document.getElementById('confirmEditBtn').addEventListener('click', async () => {
+    const nameInput = document.getElementById('editName');
+    const usernameInput = document.getElementById('editUsername');
+    const emailInput = document.getElementById('editEmail');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const confirmBtn = document.getElementById('confirmEditBtn');
+
+    // Clear previous messages
+    errorMessage.style.display = 'none';
+    successMessage.style.display = 'none';
+
+    // Get values
+    const name = nameInput.value.trim();
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+
+    // Validation
+    if (!name) {
+      errorMessage.textContent = 'Name is required';
+      errorMessage.style.display = 'block';
+      return;
+    }
+
+    if (!username) {
+      errorMessage.textContent = 'Username is required';
+      errorMessage.style.display = 'block';
+      return;
+    }
+
+    if (!email) {
+      errorMessage.textContent = 'Email is required';
+      errorMessage.style.display = 'block';
+      return;
+    }
+
+    // Username validation (alphanumeric and underscores only)
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      errorMessage.textContent = 'Username can only contain letters, numbers, and underscores';
+      errorMessage.style.display = 'block';
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errorMessage.textContent = 'Please enter a valid email address';
+      errorMessage.style.display = 'block';
+      return;
+    }
+
+    // Disable button and show loading
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Updating...';
+
+    try {
+      // Get MONGO_PORT from environment or use default
+      const MONGO_PORT = process.env.MONGO_PORT;
+      
+      const response = await fetch(`http://localhost:${MONGO_PORT}/edituser`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userid: user.userid,
+          name: name,
+          username: username,
+          email: email
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        successMessage.textContent = result.message || 'Profile updated successfully! Please login again.';
+        successMessage.style.display = 'block';
+        
+        // Update the user object in localStorage
+        const updatedUser = { ...user, name: name, username: username, email: email };
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          modalOverlay.remove();
+          // Reload the profile to show updated information
+          document.getElementById("logoutBtn").click();
+        }, 3000);
+      } else {
+        errorMessage.textContent = result.message || 'Failed to update profile';
+        errorMessage.style.display = 'block';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Changes';
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      errorMessage.textContent = 'Network error. Please try again.';
+      errorMessage.style.display = 'block';
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Changes';
+    }
+  });
+
+  // Close modal when clicking outside
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      modalOverlay.remove();
+    }
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function closeModal(e) {
+    if (e.key === 'Escape') {
+      modalOverlay.remove();
+      document.removeEventListener('keydown', closeModal);
+    }
   });
 }
 
