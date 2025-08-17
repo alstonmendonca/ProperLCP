@@ -10,6 +10,7 @@ const { fork, spawn } = require('child_process');
 let mainWindow;
 let userRole = null;
 let store; // Will be initialized after dynamic import
+let onlineProcess;
 const axios = require('axios');
 // Connect to the SQLite database
 const db = new sqlite3.Database("LC.db", (err) => {
@@ -259,7 +260,7 @@ app.whenReady().then(async () => {
         height: 800,
         icon: path.join(__dirname, 'assets/images', 'lassicorner.ico'), // Use .ico on Windows
         show: false,
-        fullscreen: false,
+        fullscreen: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
