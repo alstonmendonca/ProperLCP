@@ -486,28 +486,6 @@ async function updateMainContent(contentType) {
         else if(contentType === "yearWise"){
             loadYearWiseAnalysis(mainContent, billPanel);
         }
-        else if(contentType === "makeATable"){
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; 
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Make A Table</h2>
-                </div>
-                <p>Coming Soon...</p>
-            `;
-        }
-        else if(contentType === "yourTables"){
-            mainContent.style.marginLeft = "200px";
-            mainContent.style.marginRight = "0px";
-            billPanel.style.display = 'none'; 
-            mainContent.innerHTML = `
-                <div class='section-title'>
-                    <h2>Your Tables</h2>
-                </div>
-                <p>Coming Soon...</p>
-            `;
-        }
 
         //-----------------------HISTORY TAB ENDS HERE-----------------------------------------------------
         //----------------------------- MENU TAB STARTS HERE------------------------------------------------

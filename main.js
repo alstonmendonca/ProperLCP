@@ -1406,7 +1406,6 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
     });
 });
 
-// Add this to your main.js IPC handlers
 ipcMain.handle('test-printer', async (event, { printerName, testData }) => {
     if (isPrinting) {
         throw new Error('Printer is busy with another job');
@@ -1460,7 +1459,6 @@ ipcMain.handle('test-printer', async (event, { printerName, testData }) => {
     }
 });
 
-// Add this function to main.js
 function generateTestReceipt(testData) {
     const template = store.get('receiptTemplate', {
         title: 'THE LASSI CORNER',
