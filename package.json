@@ -12,6 +12,9 @@
     "make": "electron-builder"
   },
   "build": {
+    "asarUnpack": [
+    "node_modules/ws"
+    ],
     "appId": "com.lassicorner.app",
     "productName": "Lassi Corner",
     "artifactName": "Lassi Corner Setup.exe",

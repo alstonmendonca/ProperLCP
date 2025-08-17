@@ -141,7 +141,8 @@ function startGetOnlineServer() {
   const scriptPath = path.join(basePath, "getOnline.js");
 
   onlineProcess = fork(scriptPath, {
-    env: { ...process.env, APP_ENV_PATH: envPath },
+    env: { ...process.env, APP_ENV_PATH: envPath, NODE_PATH: path.join(__dirname, "node_modules") },
+   
   });
 
   // Listen for messages from getOnline.js
