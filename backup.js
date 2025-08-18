@@ -4,7 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
-dotenv.config();
+const envPath = app.isPackaged
+  ? path.join(process.resourcesPath, ".env") // packaged location
+  : path.join(__dirname, ".env");           // dev location
+
+dotenv.config({path:envPath});
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:3000/oauth2callback';

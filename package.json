@@ -21,7 +21,8 @@
     "extraResources": [
       { "from": ".env", "to": ".env" },
       { "from": "getOnline.js", "to": "getOnline.js" },
-      { "from": "startMongoExpress.js", "to": "startMongoExpress.js" }
+      { "from": "startMongoExpress.js", "to": "startMongoExpress.js" },
+      { "from": "LC.db", "to": "LC.db" }
     ],
     "win": {
       "target": "nsis"

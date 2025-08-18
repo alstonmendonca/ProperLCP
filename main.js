@@ -27,7 +27,7 @@ if (fs.existsSync(envPath)) {
   console.warn(`⚠️ .env file not found at: ${envPath}`);
 }
 // Connect to the SQLite database
-const db = new sqlite3.Database("LC.db", (err) => {
+const db = new sqlite3.Database(path.join(process.resourcesPath,"LC.db"), (err) => {
     if (err) {
       console.error("❌ Failed to connect to the database:", err.message);
     } else {
