@@ -144,7 +144,7 @@ async function backupLCdb() {
     const timestamp = getFormattedTimestamp();
     const fileName = `DatabaseBackup-${timestamp}.db`;
 
-    const filePath = path.join(__dirname, 'LC.db');
+    const filePath = path.join(process.resourcesPath, 'LC.db');
     const media = {
       mimeType: 'application/octet-stream',
       body: fs.createReadStream(filePath),

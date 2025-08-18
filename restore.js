@@ -30,7 +30,7 @@ async function restoreLCdb() {
             return false;  // Return false if no backup file found
         }
 
-        const destPath = path.join(__dirname, 'LC.db');
+        const destPath = path.join(process.resourcesPath, 'LC.db');
         const dest = fs.createWriteStream(destPath);
 
         const download = await drive.files.get(
