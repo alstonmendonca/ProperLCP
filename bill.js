@@ -308,7 +308,7 @@ async function saveBill() {
 //This function gets called when user clicks on 'Save and Print' in bill panel
 async function saveAndPrintBill() {
     const user = await ipcRenderer.invoke("get-session-user");
-    const cashier = user.userid; // Replace with actual cashier ID
+    const cashier = user.userid;
     const date = new Date().toISOString().split("T")[0];
 
     const billItems = document.querySelectorAll(".bill-item");
@@ -316,12 +316,10 @@ async function saveAndPrintBill() {
     let totalAmount = 0;
 
     billItems.forEach(item => {
-        let foodId = item.id.replace("bill-item-", ""); // Extract item ID
+        let foodId = item.id.replace("bill-item-", "");
         let quantity = parseInt(item.querySelector(".bill-quantity").value);
         let itemTotal = parseFloat(item.querySelector(".bill-total").textContent);
-        if (!isNaN(itemTotal)) {
-            totalAmount += itemTotal;
-        }
+        if (!isNaN(itemTotal)) totalAmount += itemTotal;
         orderItems.push({ foodId: parseInt(foodId), quantity });
     });
 
@@ -330,7 +328,7 @@ async function saveAndPrintBill() {
         return;
     }
 
-    // Check if a discounted total exists
+    // Handle discount
     let discountField = document.getElementById("discounted-total");
     let discountedTotal = discountField?.value ? parseFloat(discountField.value) : totalAmount;
 
@@ -341,40 +339,39 @@ async function saveAndPrintBill() {
         price: parseFloat(item.querySelector(".bill-total").textContent)
     }));
 
-    // Generate KOT and OrderID server-side or here
-    const kot = "KOT-" + Math.floor(Math.random() * 1000); // Or use better logic
-    const orderId = "ORD-" + Date.now();
+    // 👉 Save bill first, DB will assign kot & orderId
+    ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
 
-    // First attempt to print, then save
-    ipcRenderer.send("print-bill", {
-        billItems: itemsForPrinting,
-        totalAmount: discountedTotal,
-        kot,
-        orderId,
-        dateTime: new Date().toLocaleString()
-    });
+    ipcRenderer.once("bill-saved", (event, { kot, orderId }) => {
+        // Now we print with the official kot & orderId
+        ipcRenderer.send("print-bill", {
+            billItems: itemsForPrinting,
+            totalAmount: discountedTotal,
+            kot,
+            orderId,
+            dateTime: new Date().toLocaleString()
+        });
 
-    ipcRenderer.once('print-success-with-data', (event, { kot, orderId }) => {
-        // Now save the bill with the generated KOT and OrderID
-        ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal, kot, orderId });
+        ipcRenderer.once("print-success-with-data", () => {
+            const billPanel = document.getElementById("bill-panel");
+            billPanel.classList.add("glow");
 
-        const billPanel = document.getElementById("bill-panel");
-        billPanel.classList.add("glow");
-
-        setTimeout(() => {
-            billPanel.classList.remove("glow");
-            NewOrder();
-        }, 800);
-    });
-
-    ipcRenderer.once('print-error', (event, error) => {
-        createTextPopup(`Print Failed: ${error}`);
+            setTimeout(() => {
+                billPanel.classList.remove("glow");
+                NewOrder();
+            }, 800);
+        });
     });
 
     ipcRenderer.once("bill-error", (event, { error }) => {
         createTextPopup(`Save Error: ${error}`);
     });
+
+    ipcRenderer.once("print-error", (event, error) => {
+        createTextPopup(`Print Failed: ${error}`);
+    });
 }
+
 
 function generateEscPosCommands(billItems, totalAmount, kot, orderId) {
     // Prepare items for printing

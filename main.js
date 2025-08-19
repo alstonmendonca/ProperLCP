@@ -171,7 +171,7 @@ function startExpressServer() {
   const child = spawn('node', [scriptPath], {
     detached: true,
     stdio: 'ignore', // fully detached, no stdio inherited
-    env: { ...process.env, APP_ENV_PATH: envPath },
+    env: { ...process.env, APP_ENV_PATH: envPath,  NODE_PATH: path.join(__dirname, 'node_modules') },
     shell: false, // Use shell to allow environment variables
   });
 
@@ -303,7 +303,7 @@ function createMainWindow() {
 
   Menu.setApplicationMenu(null);
 
-  mainWindow.loadFile("login.html").catch(console.error);
+  mainWindow.loadFile("index.html").catch(console.error);
 
   mainWindow.once("ready-to-show", () => {
       // Tell splash to fade out
@@ -1333,16 +1333,16 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     const customerReceipt = `
 \x1B\x40\x1B\x61\x01\x1D\x21\x11
 ${template.title}
-\x1D\x21\x00\x1B\x61\x01  // Center align subtitle
+\x1D\x21\x00\x1B\x61\x01
 ${template.subtitle}
 \x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
 TOKEN: ${kot}
 \x1D\x21\x00\x1B\x45\x00\x1B\x61\x00
-Date: ${new Date().toLocaleString()}
+Date:          ${new Date().toLocaleString()}
 Bill #: ${orderId}
-${'-'.repeat(32)}  // Standard width for 80mm paper
+${'-'.repeat(32)}
 \x1B\x45\x01
-ITEM                              QTY     PRICE 
+ITEM                      QTY     PRICE 
 \x1B\x45\x00
 ${formattedItems}
 ${'-'.repeat(32)}
@@ -1365,7 +1365,7 @@ ITEM                                   QTY
 ${kotItems}
 \x1D\x56\x41\x00`;  // Partial cut
 
-return kotReceipt;
+return customerReceipt + kotReceipt;
 }
 
 ipcMain.on('get-receipt-template', (event, defaults) => {

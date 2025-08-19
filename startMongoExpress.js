@@ -7,6 +7,9 @@ const app = express();
 const dotenv = require('dotenv');
 const fs = require('fs');
 app.use(express.json());
+const path = require('path');
+process.env.NODE_PATH = path.join(__dirname, 'node_modules');
+require('module').Module._initPaths(); // refresh module paths
 // Only main.js has access to app, so we need relative path in child
 const envPath = process.env.APP_ENV_PATH || path.join(__dirname, ".env");
 
