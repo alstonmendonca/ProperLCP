@@ -25,7 +25,7 @@
       { "from": "getOnline.js", "to": "getOnline.js" },
       { "from": "startMongoExpress.js", "to": "startMongoExpress.js" },
       { "from": "LC.db", "to": "LC.db" },
-      { "from": "expressmodules/node_modules", "to": "node_modules" },
+      { "from": "expressmodules/node_modules_for_express", "to": "node_modules" },
       { "from": "expressmodules/package.json", "to": "package.json" },
       { "from": "expressmodules/package-lock.json", "to": "package-lock.json" }
 
