@@ -9,9 +9,11 @@
     "start": "electron .",
     "dev": "electronmon .",
     "package": "electron-builder --dir",
-    "make": "electron-builder"
+    "make": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
+    "icon": "assets/images/favicon.ico",
     "asarUnpack": [
     "node_modules/ws"
     ],
@@ -25,6 +27,7 @@
       { "from": "LC.db", "to": "LC.db" }
     ],
     "win": {
+      "icon": "assets/images/favicon.ico",
       "target": "nsis"
     },
     "nsis": {
@@ -35,8 +38,8 @@
       "shortcutName": "Lassi Corner POS System",
       "allowElevation": false,
       "runAfterFinish": true,
-      "installerIcon": "assets/images/lassicorner.ico",
-      "uninstallerIcon": "assets/images/lassicorner.ico"
+      "installerIcon": "assets/images/favicon.ico",
+      "uninstallerIcon": "assets/images/uninstall.ico"
     }
   },
   "devDependencies": {

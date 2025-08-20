@@ -14,6 +14,7 @@ let store; // Will be initialized after dynamic import
 let onlineProcess;
 const axios = require('axios');
 const basePath = app.isPackaged ? process.resourcesPath : __dirname;
+console.log(`Base path: ${basePath}`);
 const dotenv = require('dotenv');
 // Determine env file path based on dev vs packaged
 const envPath = app.isPackaged
@@ -166,22 +167,37 @@ function startGetOnlineServer() {
 let expressProcess = null;
 
 function startExpressServer() {
-  const scriptPath = path.join(basePath, "startMongoExpress.js");
+  const scriptPath = path.join(__dirname, 'startMongoExpress.js');
 
+  // Spawn Express server as a child process
   const child = spawn('node', [scriptPath], {
-    detached: true,
-    stdio: 'ignore', // fully detached, no stdio inherited
-    env: { ...process.env, APP_ENV_PATH: envPath,  NODE_PATH: path.join(__dirname, 'node_modules') },
-    shell: false, // Use shell to allow environment variables
+    detached: false,      // easier for Electron to track
+    stdio: 'inherit',     // logs will appear in Electron console
   });
 
-  child.unref(); // So Electron can quit independently if needed
+  expressProcess = child;
 
-  expressProcess = child; // Store reference for kill()
+  child.on('error', (err) => {
+    console.error('Failed to start Express server:', err);
+  });
 
-  console.log(`✅ Started detached Express server (PID: ${child.pid})`);
+  child.on('exit', (code, signal) => {
+    console.log(`Express server exited with code ${code}, signal ${signal}`);
+    expressProcess = null;
+  });
+
+  console.log(`✅ Started Express server (PID: ${child.pid})`);
 
   return child;
+}
+
+// Optional: kill the server if needed
+function stopExpressServer() {
+  if (expressProcess) {
+    expressProcess.kill();
+    expressProcess = null;
+    console.log('🛑 Express server stopped');
+  }
 }
 
 // 1. Read all items from SQLite:
@@ -209,7 +225,7 @@ async function syncFoodItemsToMongo() {
 async function syncUsersFromMongo() {
   try {
     // 1. Fetch users from Mongo via the /users endpoint
-    const resp = await axios.get(`http://localhost:${process.env.MONGO_PORT}/users`);
+    const resp = await axios.get(`http://localhost:34234/users`);
     
     if (!resp.data.success || !Array.isArray(resp.data.users)) {
       throw new Error('Invalid data from Mongo /users endpoint');
@@ -303,7 +319,7 @@ function createMainWindow() {
 
   Menu.setApplicationMenu(null);
 
-  mainWindow.loadFile("index.html").catch(console.error);
+  mainWindow.loadFile("login.html").catch(console.error);
 
   mainWindow.once("ready-to-show", () => {
       // Tell splash to fade out
