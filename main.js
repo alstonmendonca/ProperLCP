@@ -167,12 +167,13 @@ function startGetOnlineServer() {
 let expressProcess = null;
 
 function startExpressServer() {
-  const scriptPath = path.join(__dirname, 'startMongoExpress.js');
+  const scriptPath = path.join(basePath, 'startMongoExpress.js');
 
   // Spawn Express server as a child process
   const child = spawn('node', [scriptPath], {
     detached: false,      // easier for Electron to track
-    stdio: 'inherit',     // logs will appear in Electron console
+    stdio: 'ignore',
+    windowsHide: true     // logs will appear in Electron console
   });
 
   expressProcess = child;
