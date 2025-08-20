@@ -172,8 +172,8 @@ function startExpressServer() {
   // Spawn Express server as a child process
   const child = spawn('node', [scriptPath], {
     detached: false,      // easier for Electron to track
-    stdio: 'ignore',      // don't open a console, don't pipe output
-    windowsHide: true     // prevents new terminal window on Windows
+    stdio: 'ignore',
+    windowsHide: true     // logs will appear in Electron console
   });
 
   expressProcess = child;
