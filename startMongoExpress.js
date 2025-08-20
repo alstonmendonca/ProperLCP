@@ -11,7 +11,7 @@ process.env.NODE_PATH = path.join(__dirname, 'node_modules');
 require('module').Module._initPaths(); // refresh module paths
 
 // Hardcoded MongoDB settings
-const MONGO_PORT = 34234;
+const MONGO_PORT = 5551;
 const MONGO_URL = 'mongodb+srv://lassicornersjec:u08BVrU1pMIUajtJ@lassicorner.uusow64.mongodb.net/';
 
 let db;
