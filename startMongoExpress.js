@@ -11,7 +11,7 @@ process.env.NODE_PATH = path.join(__dirname, 'node_modules');
 require('module').Module._initPaths(); // refresh module paths
 
 // Hardcoded MongoDB settings
-const MONGO_PORT = 34234;
+const MONGO_PORT = 34233;
 const MONGO_URL = 'mongodb+srv://lassicornersjec:u08BVrU1pMIUajtJ@lassicorner.uusow64.mongodb.net/';
 
 let db;
@@ -128,6 +128,36 @@ app.post('/sync/fooditems', async (req, res) => {
     });
   } catch (err) {
     console.error('Error syncing food items:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/sync/categories', async (req, res) => {
+  try {
+    const categories = req.body;
+    if (!Array.isArray(categories)) {
+      return res.status(400).json({ success: false, message: 'Request body must be an array of categories' });
+    }
+
+    const collection = db.collection('Category');
+    await collection.deleteMany({});
+
+    const docs = categories.map(cat => ({
+      catid: cat.catid,
+      catname: cat.catname,
+      active: cat.active,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }));
+
+    const result = await collection.insertMany(docs);
+
+    res.json({
+      success: true,
+      message: `Synced ${result.insertedCount} categories to MongoDB.`
+    });
+  } catch (err) {
+    console.error('Error syncing categories:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });

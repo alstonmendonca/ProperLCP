@@ -28,7 +28,7 @@ if (fs.existsSync(envPath)) {
   console.warn(`⚠️ .env file not found at: ${envPath}`);
 }
 // Connect to the SQLite database
-const db = new sqlite3.Database(path.join(process.resourcesPath,"LC.db"), (err) => {
+const db = new sqlite3.Database(path.join(basePath,"LC.db"), (err) => {
     if (err) {
       console.error("❌ Failed to connect to the database:", err.message);
     } else {
@@ -213,20 +213,44 @@ function fetchAllFoodItems() {
   });
 }
 
+// 1. Fetch all Categories from SQLite
+function fetchAllCategories() {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database('LC.db');
+    db.all(`SELECT catid, catname, active FROM Category`, [], (err, rows) => {
+      db.close();
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+}
 // 2. POST them to your Express route:
 async function syncFoodItemsToMongo() {
   try {
     const items = await fetchAllFoodItems();
-    const resp = await axios.post(`http://localhost:${process.env.MONGO_PORT}/sync/fooditems`, items);
-    console.log(resp.data.message);
+    const categories = await fetchAllCategories();
+
+    const respItems = await axios.post(
+      `http://localhost:${process.env.MONGO_PORT}/sync/fooditems`,
+      items
+    );
+    console.log(respItems.data.message);
+
+    const respCats = await axios.post(
+      `http://localhost:${process.env.MONGO_PORT}/sync/categories`,
+      categories
+    );
+    console.log(respCats.data.message);
+
   } catch (err) {
     console.error('Sync failed:', err);
   }
 }
+
 async function syncUsersFromMongo() {
   try {
     // 1. Fetch users from Mongo via the /users endpoint
-    const resp = await axios.get(`http://localhost:34234/users`);
+    const resp = await axios.get(`http://localhost:${MONGO_PORT}/users`);
     
     if (!resp.data.success || !Array.isArray(resp.data.users)) {
       throw new Error('Invalid data from Mongo /users endpoint');
