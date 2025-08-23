@@ -15,20 +15,28 @@
   "build": {
     "icon": "assets/images/favicon.ico",
     "asarUnpack": [
-    "node_modules/ws"
+      "node_modules/ws"
     ],
     "appId": "com.lassicorner.app",
     "productName": "Lassi Corner",
     "artifactName": "Lassi Corner Setup.exe",
     "extraResources": [
-      { "from": ".env", "to": ".env" },
-      { "from": "getOnline.js", "to": "getOnline.js" },
-      { "from": "startMongoExpress.js", "to": "startMongoExpress.js" },
-      { "from": "LC.db", "to": "LC.db" },
-      { "from": "expressmodules/node_modules_for_express", "to": "node_modules" },
-      { "from": "expressmodules/package.json", "to": "package.json" },
-      { "from": "expressmodules/package-lock.json", "to": "package-lock.json" }
-
+      {
+        "from": ".env",
+        "to": ".env"
+      },
+      {
+        "from": "getOnline.js",
+        "to": "getOnline.js"
+      },
+      {
+        "from": "LC.db",
+        "to": "LC.db"
+      },
+      {
+        "from": "startMongoExpress.exe",
+        "to": "startMongoExpress.exe"
+      }
     ],
     "win": {
       "icon": "assets/images/favicon.ico",
@@ -59,6 +67,7 @@
   "dependencies": {
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
     "better-sqlite3": "^11.10.0",
     "chart.js": "^4.4.8",
     "cloudflared": "^0.7.0",

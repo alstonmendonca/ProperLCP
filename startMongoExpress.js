@@ -1,26 +1,56 @@
-// startMongoExpressserver.js
+// startMongoExpress.js
+// Express wrapper used by the packaged exe. Uses bcryptjs (pure JS) instead of native bcrypt.
+
+console.log('[startMongoExpress] starting script. pid=', process.pid, 'cwd=', __dirname, 'env.MONGO_PORT=', process.env.MONGO_PORT);
+
+// quick module existence checks (fail fast with clear message)
+try {
+  require.resolve('mongodb');
+  require.resolve('bcryptjs');
+  console.log('[startMongoExpress] required modules found: mongodb, bcryptjs');
+} catch (err) {
+  console.error('[startMongoExpress] missing module:', err && err.code ? err.code : err);
+  console.error(err);
+  process.exit(1);
+}
+
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // pure-JS bcrypt replacement
 const app = express();
 const fs = require('fs');
 const path = require('path');
 
 app.use(express.json());
-process.env.NODE_PATH = path.join(__dirname, 'node_modules');
-require('module').Module._initPaths(); // refresh module paths
 
-// Hardcoded MongoDB settings
-const MONGO_PORT = 5551;
-const MONGO_URL = 'mongodb+srv://lassicornersjec:u08BVrU1pMIUajtJ@lassicorner.uusow64.mongodb.net/';
+// Prefer environment port; fallback to same default you used earlier
+const MONGO_PORT = Number(process.env.MONGO_PORT || 34235);
+
+// Use your Atlas connection string - keep it in env for production ideally
+const MONGO_URL = process.env.MONGO_URL || 'mongodb+srv://lassicornersjec:u08BVrU1pMIUajtJ@lassicorner.uusow64.mongodb.net/';
 
 let db;
 
+// connect with a short serverSelectionTimeout so we fail fast on network/SSL issues
 async function connectToMongo() {
-  const client = new MongoClient(MONGO_URL);
-  await client.connect();
-  db = client.db('LC'); // your DB name
-  console.log('✅ Connected to MongoDB');
+  const opts = {
+    serverSelectionTimeoutMS: 10000, // 10s
+    // tls is enabled by default for mongodb+srv but explicitly set if desired:
+    // tls: true
+  };
+
+  const client = new MongoClient(MONGO_URL, opts);
+
+  try {
+    await client.connect();
+    db = client.db('LC');
+    console.log('[startMongoExpress] ✅ Connected to MongoDB');
+  } catch (err) {
+    console.error('[startMongoExpress] Failed to connect to MongoDB:', err && err.message ? err.message : err);
+    // show full error for debugging
+    console.error(err);
+    process.exit(1); // exit with non-zero so parent process sees the failure
+  }
 }
 
 app.get('/ping', (req, res) => {
@@ -47,7 +77,8 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'No password hash set for user' });
     }
 
-    const match = await bcrypt.compare(password, hash);
+    // bcryptjs: use compareSync for simplicity in this script
+    const match = bcrypt.compareSync(password, hash);
 
     if (!match) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -64,7 +95,7 @@ app.post('/login', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('[startMongoExpress] Login error:', err);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -89,7 +120,7 @@ app.post('/order/:orderId/status', async (req, res) => {
 
     res.json({ success: true, message: `Order status updated to ${status}` });
   } catch (err) {
-    console.error(err);
+    console.error('[startMongoExpress] order status error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -127,7 +158,37 @@ app.post('/sync/fooditems', async (req, res) => {
       message: `Synced ${result.insertedCount} food items to MongoDB.`
     });
   } catch (err) {
-    console.error('Error syncing food items:', err);
+    console.error('[startMongoExpress] Error syncing food items:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/sync/categories', async (req, res) => {
+  try {
+    const categories = req.body;
+    if (!Array.isArray(categories)) {
+      return res.status(400).json({ success: false, message: 'Request body must be an array of categories' });
+    }
+
+    const collection = db.collection('Category');
+    await collection.deleteMany({});
+
+    const docs = categories.map(cat => ({
+      catid: cat.catid,
+      catname: cat.catname,
+      active: cat.active,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }));
+
+    const result = await collection.insertMany(docs);
+
+    res.json({
+      success: true,
+      message: `Synced ${result.insertedCount} categories to MongoDB.`
+    });
+  } catch (err) {
+    console.error('[startMongoExpress] Error syncing categories:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -139,7 +200,7 @@ app.get('/users', async (req, res) => {
 
     res.json({ success: true, users });
   } catch (err) {
-    console.error('Error fetching users:', err);
+    console.error('[startMongoExpress] Error fetching users:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -186,7 +247,7 @@ app.post('/edituser', async (req, res) => {
       user: { userid, name, username, email }
     });
   } catch (err) {
-    console.error('Error updating user profile:', err);
+    console.error('[startMongoExpress] Error updating user profile:', err);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
@@ -194,10 +255,21 @@ app.post('/edituser', async (req, res) => {
 // Start server after connecting to Mongo
 connectToMongo()
   .then(() => {
-    app.listen(MONGO_PORT, () => {
-      console.log(`🚀 Express server running on http://localhost:${MONGO_PORT}`);
+    app.listen(MONGO_PORT, '127.0.0.1', () => {
+      console.log(`[startMongoExpress] 🚀 Express server running on http://127.0.0.1:${MONGO_PORT}`);
     });
   })
   .catch(err => {
-    console.error('Failed to connect to MongoDB', err);
+    console.error('[startMongoExpress] Failed to connect to MongoDB', err);
+    process.exit(1);
   });
+
+// crash handlers so child exits with log
+process.on('uncaughtException', (err) => {
+  console.error('[startMongoExpress] uncaughtException:', err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (err) => {
+  console.error('[startMongoExpress] unhandledRejection:', err && err.stack ? err.stack : err);
+  process.exit(1);
+});
