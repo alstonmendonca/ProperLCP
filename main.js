@@ -1404,51 +1404,45 @@ function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     });
 
     // Adjusted for 80mm paper (~42-48 chars per line)
+    const customerItemWidth = 27;
     const itemWidth = 35;  // More space for food names
-    const qtyWidth = 5;    // Right-aligned
+    const qtyWidth = 8;    // Right-aligned
+    const kotQtyWidth = 5;
     const priceWidth = 5;  // Right-aligned (for decimals)
     
     // Format items with better spacing
     const formattedItems = items.map(item => 
-        `${item.name.substring(0, itemWidth).padEnd(itemWidth)}` +
-        `${item.quantity.toString().padStart(qtyWidth)}` +
+        `${item.name.substring(0, itemWidth).padEnd(customerItemWidth)}` +
+        `${item.quantity.toString().padEnd(qtyWidth)}` +
         `${item.price.toFixed(2).padStart(priceWidth)}`
     ).join('\n');
     
     const kotItems = items.map(item => 
         `${item.name.substring(0, itemWidth).padEnd(itemWidth)}` +
-        `${item.quantity.toString().padStart(qtyWidth)}`
+        `${item.quantity.toString().padStart(kotQtyWidth)}`
     ).join('\n');
     
     // Customer receipt (optimized for 80mm)
-    const customerReceipt = `
-\x1B\x40\x1B\x61\x01\x1D\x21\x11
-${template.title}
-\x1D\x21\x00\x1B\x61\x01
-${template.subtitle}
+    const customerReceipt = `\x1B\x40\x1B\x61\x01\x1D\x21\x11${template.title}
+\x1D\x21\x00\x1B\x61\x01${template.subtitle}
 \x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
 TOKEN: ${kot}
 \x1D\x21\x00\x1B\x45\x00\x1B\x61\x00
-Date:          ${new Date().toLocaleString()}
+Date:${new Date().toLocaleString()}
 Bill #: ${orderId}
-${'-'.repeat(32)}
-\x1B\x45\x01
-ITEM                      QTY     PRICE 
-\x1B\x45\x00
-${formattedItems}
-${'-'.repeat(32)}
-\x1B\x45\x01
-TOTAL: Rs. ${totalAmount.toFixed(2).padStart(8)}
-\x1B\x45\x00\x1B\x61\x01
-${template.footer}
+${'-'.repeat(42)}
+\x1B\x45\x01ITEM                      QTY      PRICE 
+\x1B\x45\x00${formattedItems}
+${'-'.repeat(42)}
+\x1B\x45\x01                        TOTAL: Rs.${totalAmount.toFixed(2).padStart(2)}
+\x1B\x45\x00\x1B\x61\x01${template.footer}
 \x1D\x56\x41\x00`;  // Partial cut
 
 // KOT receipt (larger KOT #)
 const kotReceipt = `\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01\x1B\x2D\x00${kot}
 \x1B\x33\x03
 \x1D\x21\x00\x1B\x45\x00\x1B\x2D\x00
-Time: ${new Date().toLocaleTimeString()}
-\x1B\x61\x00\x1B\x45\x01\x1B\x2D\x00
+Time: ${new Date().toLocaleTimeString()}\x1B\x61\x00\x1B\x45\x01\x1B\x2D\x00               Rs ${totalAmount}
 ------------------------------------------
 ITEM                                   QTY
 ------------------------------------------
@@ -1456,7 +1450,7 @@ ITEM                                   QTY
 ${kotItems}
 \x1D\x56\x41\x00`;  // Partial cut
 
-return customerReceipt + kotReceipt;
+return  customerReceipt+kotReceipt;
 }
 
 ipcMain.on('get-receipt-template', (event, defaults) => {
