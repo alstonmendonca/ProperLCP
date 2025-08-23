@@ -20,13 +20,15 @@ const dotenv = require('dotenv');
 const envPath = app.isPackaged
   ? path.join(process.resourcesPath, ".env") // packaged location
   : path.join(__dirname, ".env");           // dev location
-
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
   console.log(`✅ Loaded env from: ${envPath}`);
 } else {
   console.warn(`⚠️ .env file not found at: ${envPath}`);
 }
+
+const MONGO_PORT = process.env.MONGO_PORT
+console.log(`MONGO PORT IS ${MONGO_PORT}`);
 // Connect to the SQLite database
 const db = new sqlite3.Database(path.join(basePath,"LC.db"), (err) => {
     if (err) {
@@ -166,31 +168,79 @@ function startGetOnlineServer() {
 }
 let expressProcess = null;
 
+// startExpressServer: spawn a standalone EXE built with `pkg` (Option A)
 function startExpressServer() {
-  const scriptPath = path.join(basePath, 'startMongoExpress.js');
+  const exeName = 'startMongoExpress.exe'; // adjust for other OS if needed
+  const candidatePaths = [
+    // packaged location (electron-builder extraResources lands files under process.resourcesPath)
+    path.join(process.resourcesPath, exeName),
+    // common alternative if you put it inside a 'build' folder in resources
+    // dev locations
+    path.join(basePath, exeName),
+  ];
 
-  // Spawn Express server as a child process
-  const child = spawn('node', [scriptPath], {
-    detached: false,      // easier for Electron to track
-    stdio: 'ignore',
-    windowsHide: true     // logs will appear in Electron console
+  // pick first existing path
+  const exePath = candidatePaths.find(p => fs.existsSync(p));
+
+  console.log('startExpressServer: looking for exe. candidates=', candidatePaths);
+  if (!exePath) {
+    const niceList = candidatePaths.map(p => `\n  - ${p}`).join('');
+    throw new Error(`startExpressServer: could not find ${exeName} at any of:${niceList}\nMake sure you added it to extraResources (or placed the exe in dev folder).`);
+  }
+
+  // if there's an already-running expressProcess, try to kill it first
+  if (expressProcess && expressProcess.pid) {
+    try {
+      console.log('startExpressServer: killing previous expressProcess pid=', expressProcess.pid);
+      process.kill(expressProcess.pid);
+    } catch (e) {
+      console.warn('startExpressServer: failed to kill previous child', e && e.message ? e.message : e);
+    }
+    expressProcess = null;
+  }
+
+  console.log('startExpressServer: starting exe at:', exePath);
+
+  // spawn the exe, pass MONGO_PORT in env
+  const child = spawn(exePath, [], {
+    cwd: path.dirname(exePath),
+    detached: true,                     // run independently of parent
+    stdio: ['ignore', 'pipe', 'pipe'],  // capture stdout/stderr (stdin ignored)
+    env: { ...process.env, MONGO_PORT: String(MONGO_PORT) }
   });
 
+  // Remember the child so we can kill it on app quit
   expressProcess = child;
 
+  // Stream logs into your main process console (helpful for debugging)
+  if (child.stdout) child.stdout.on('data', d => {
+    console.log('[startExpress exe stdout]', d.toString().trim());
+  });
+  if (child.stderr) child.stderr.on('data', d => {
+    console.error('[startExpress exe stderr]', d.toString().trim());
+  });
+
   child.on('error', (err) => {
-    console.error('Failed to start Express server:', err);
+    console.error('startExpressServer: child process error:', err);
   });
 
   child.on('exit', (code, signal) => {
-    console.log(`Express server exited with code ${code}, signal ${signal}`);
+    console.log(`startExpressServer: child exited code=${code} signal=${signal}`);
     expressProcess = null;
   });
 
-  console.log(`✅ Started Express server (PID: ${child.pid})`);
+  // allow the child to continue running after the parent exits (optional)
+  try {
+    child.unref();
+  } catch (e) {
+    // unref may throw in some environments; it's non-critical
+    console.warn('startExpressServer: child.unref() failed:', e && e.message ? e.message : e);
+  }
 
+  console.log(`✅ Started Express exe (PID: ${child.pid}) at ${exePath}`);
   return child;
 }
+
 
 // Optional: kill the server if needed
 function stopExpressServer() {
@@ -231,13 +281,13 @@ async function syncFoodItemsToMongo() {
     const categories = await fetchAllCategories();
 
     const respItems = await axios.post(
-      `http://localhost:${process.env.MONGO_PORT}/sync/fooditems`,
+      `http://127.0.0.1:${MONGO_PORT}/sync/fooditems`,
       items
     );
     console.log(respItems.data.message);
 
     const respCats = await axios.post(
-      `http://localhost:${process.env.MONGO_PORT}/sync/categories`,
+      `http://127.0.0.1:${MONGO_PORT}/sync/categories`,
       categories
     );
     console.log(respCats.data.message);
@@ -250,7 +300,7 @@ async function syncFoodItemsToMongo() {
 async function syncUsersFromMongo() {
   try {
     // 1. Fetch users from Mongo via the /users endpoint
-    const resp = await axios.get(`http://localhost:${MONGO_PORT}/users`);
+    const resp = await axios.get(`http://127.0.0.1:${MONGO_PORT}/users`);
     
     if (!resp.data.success || !Array.isArray(resp.data.users)) {
       throw new Error('Invalid data from Mongo /users endpoint');
@@ -293,10 +343,10 @@ async function syncUsersFromMongo() {
 }
 
 async function waitForServerReady(retries = 20, delay = 500) {
-  const url = `http://localhost:${process.env.MONGO_PORT}/ping`;
+  const url = `http://127.0.0.1:${MONGO_PORT}/ping`;
 
   for (let i = 0; i < retries; i++) {
-    console.log(`⏳ Waiting for Express server... (${i + 1}/${retries})`);
+    console.log(`⏳ Waiting for Express server on ${url}... (${i + 1}/${retries})`);
     try {
       const res = await axios.get(url);
       if (res.status === 200) {
@@ -370,7 +420,7 @@ async function runStartupTasks() {
 function setupIPC() {
   ipcMain.handle("login", async (event, { username, password }) => {
     try {
-      const response = await axios.post(`http://localhost:${MONGO_PORT}/login`, {
+      const response = await axios.post(`http://127.0.0.1:${MONGO_PORT}/login`, {
         username,
         password,
       });
@@ -3296,9 +3346,8 @@ ipcMain.on('restore-database', async (event) => {
 
 //---------------------------------- ONLINE ORDERS SECTION STARTS HERE -------------------
 // In Electron renderer or main, using fetch or axios
-const MONGO_PORT = process.env.MONGO_PORT;
 async function updateOrderStatus(orderId, status) {
-  const response = await fetch(`http://localhost:${MONGO_PORT}/order/${orderId}/status`, {
+  const response = await fetch(`http://127.0.0.1:${MONGO_PORT}/order/${orderId}/status`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status })
