@@ -97,8 +97,30 @@ async function displayMenu() {
 
         // Build UI: header, search bar, grid start with Add button ALWAYS
         let menuContent = `
-            <div class="menu-section-title">
-                <h2>Menu</h2>
+            <div class="menu-section-title" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px; position: relative;">
+                <h2 style="margin: 0;">Menu</h2>
+                <button id="syncToOnlineBtn" style="
+                    padding: 10px 20px;
+                    background: #0D3B66;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    position: absolute;
+                    right: 0;
+                " onmouseover="this.style.backgroundColor='#11487b'" 
+                   onmouseout="this.style.backgroundColor='#0D3B66'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                    </svg>
+                    SYNC TO ONLINE
+                </button>
             </div>
 
             <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center;">
@@ -276,6 +298,96 @@ async function displayMenu() {
             });
         }
 
+        document.getElementById('syncToOnlineBtn').addEventListener('click', async () => {
+            const syncBtn = document.getElementById('syncToOnlineBtn');
+            
+            // Create loading overlay
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'sync-loading-overlay';
+            loadingOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            `;
+            
+            loadingOverlay.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 16px;
+                    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+                    text-align: center;
+                    min-width: 200px;
+                ">
+                    <div style="
+                        border: 4px solid #f3f3f3;
+                        border-top: 4px solid #0D3B66;
+                        border-radius: 50%;
+                        width: 40px;
+                        height: 40px;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 20px auto;
+                    "></div>
+                    <h3 style="
+                        margin: 0 0 10px 0;
+                        color: #1e293b;
+                        font-size: 18px;
+                        font-weight: 600;
+                    ">Syncing to Online Database</h3>
+                    <p style="
+                        margin: 0;
+                        color: #64748b;
+                        font-size: 14px;
+                    ">Please wait while we sync your menu items...</p>
+                </div>
+            `;
+            
+            // Disable the button and show loading state
+            syncBtn.disabled = true;
+            syncBtn.style.opacity = '0.7';
+            syncBtn.style.cursor = 'not-allowed';
+            
+            // Add the overlay to the page
+            document.body.appendChild(loadingOverlay);
+            
+            try {
+                const result = await ipcRenderer.invoke("sync-menu-items-to-mongo");
+                
+                // Remove loading overlay
+                document.body.removeChild(loadingOverlay);
+                
+                // Re-enable button
+                syncBtn.disabled = false;
+                syncBtn.style.opacity = '1';
+                syncBtn.style.cursor = 'pointer';
+                
+                if(result.success){
+                    createTextPopup("Menu items synced successfully!");
+                } else {
+                    createTextPopup("Failed to sync to Online Database");
+                }
+            } catch (error) {
+                // Remove loading overlay on error
+                document.body.removeChild(loadingOverlay);
+                
+                // Re-enable button
+                syncBtn.disabled = false;
+                syncBtn.style.opacity = '1';
+                syncBtn.style.cursor = 'pointer';
+                
+                createTextPopup("Failed to sync to Online Database");
+                console.error("Sync error:", error);
+            }
+        });
         // If items exist, attach interactive listeners
         if (Array.isArray(foodItems) && foodItems.length > 0) {
             // IS_ON toggles
@@ -308,7 +420,6 @@ async function displayMenu() {
                     if (isOnContainer) isOnContainer.style.display = isChecked ? "flex" : "none";
                 });
             });
-
             // Delete buttons
             document.querySelectorAll(".delete-btn").forEach((button) => {
                 button.addEventListener("click", async (event) => {

@@ -2872,6 +2872,15 @@ ipcMain.handle("get-categories", async () => {
     });
 });
 //----------------------------------------------MENU TAB--------------------------------------------
+ipcMain.handle('sync-menu-items-to-mongo', async () => {
+    try {
+        await syncFoodItemsToMongo();
+        return { success: true };
+    } catch (err) {
+        console.error("Sync failed:", err);
+        return { success: false, error: err.message };
+    }
+});
 // Fetch Food Items when requested from the renderer process
 ipcMain.handle("get-menu-items", async () => {
     const foodQuery = `
