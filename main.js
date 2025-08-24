@@ -1376,7 +1376,7 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
 });
 
 function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
-    const template = store.get('receiptTemplate', {
+    const template = loadReceiptTemplate({ // Change from store.get to loadReceiptTemplate
         title: 'THE LASSI CORNER',
         subtitle: 'SJEC, VAMANJOOR',
         footer: 'Thank you for visiting!',

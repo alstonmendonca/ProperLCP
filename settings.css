@@ -433,10 +433,6 @@ input[type="number"]::-webkit-inner-spin-button {
     color: white;
 }
 
-.preview-section {
-    flex: 1;
-    min-width: 500px;  /* Added minimum width */
-}
 
 .format-editor textarea {
     width: 100%;
