@@ -154,34 +154,38 @@ body {
 #bill-panel {
     position: fixed;
     right: 0;
-    width: 600px; /* Adjust width as needed */
-    padding: 20px;
-    border-radius: 0px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 600px;
+    padding: 15px 20px;
+    border-left: 2px solid #e0e0e0;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
     margin-left: 20px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 50px); /* Full height minus the top panel */
-    overflow: auto; /* Prevents the entire panel from scrolling */
-    background: linear-gradient(135deg, #fbf9f9, #ffffff);
+    height: calc(100vh - 50px);
+    background: #ffffff;
+    z-index: 100;
 }
 
 #bill-panel h3 {
     margin-top: 0;
+    color: #0D3B66;
+    font-size: 1.2em;
 }
 
 /* Scrollable Bill Items List */
 #bill-items-list {
-    padding-right: 5px;
-    margin-top: 10px;
-    border: 2px solid #0D3B66;
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     flex-grow: 1;
-    overflow-y: auto; /* Enables scrolling */
-    height: calc(100% - 140px); /* Ensures it occupies a set height */
-    min-height: 200px; /* Prevents it from collapsing when empty */
+    overflow-y: auto;
+    height: calc(100vh - 300px);
+    min-height: 200px;
     display: flex;
     flex-direction: column;
+    background: #f8f9fa;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Separation line between content and bill panel */
@@ -242,22 +246,28 @@ body {
 /* Total Amount & Discount Applied display */
 #total-discount-container {
     display: flex;
-    justify-content: space-between; /* Places discount on left, total on right */
-    align-items: center; /* Aligns them vertically */
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    margin: 10px 0;
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
 }
 
 #discount-applied-display {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: left; /* Align discount to the left */
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    color: #666;
 }
 
 #total-amount {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
-    text-align: right; /* Align total to the right */
+    text-align: right;
+    color: #0D3B66;
 }
 
 /* Bill Buttons - Fixed at Bottom */
@@ -266,22 +276,40 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: white;
-    padding: 10px;
+    background: #ffffff;
+    padding: 15px;
     display: flex;
-    justify-content: center; /* Center align buttons */
-    border-top: 1px solid #ddd;
-    gap: 10px; /* Space between buttons */
+    justify-content: space-between;
+    border-top: 1px solid #e0e0e0;
+    gap: 10px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
 #bill-buttons button {
-    flex: 1; /* Make all buttons take equal width */
-    padding: 10px; /* Ensure good spacing inside buttons */
-    text-align: center; /* Align text properly */
+    flex: 1;
+    padding: 12px;
+    text-align: center;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     justify-content: center;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: #0D3B66;
+    color: white;
+}
+
+#bill-buttons button:hover {
+    background: #11487b;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#bill-buttons button:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 /* Apply Discount Inputs */
@@ -685,17 +713,119 @@ input[type="date"] {
     max-height: 90vh;
     overflow-y: auto;
 }
-#discount-popup{
+#discount-popup {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+#discount-popup .popup-content {
+    width: 380px;
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    max-height: 90vh;
-    overflow-y: auto;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 28px;
+    animation: slideUp 0.3s ease-out;
+}
+
+#discount-popup h3 {
+    font-size: 24px;
+    color: #0D3B66;
+    margin: 0 0 24px 0;
+    text-align: center;
+    font-weight: 600;
+}
+
+#discount-popup .input-group {
+    margin-bottom: 20px;
+}
+
+#discount-popup label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+#discount-popup input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s;
+    background-color: #f8fafc;
+}
+
+#discount-popup input:focus {
+    border-color: #0D3B66;
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+    background-color: white;
+    outline: none;
+}
+
+#discount-popup input:disabled {
+    background-color: #edf2f7;
+    cursor: not-allowed;
+}
+
+#discount-popup .popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+#discount-popup button {
+    min-width: 120px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+#discount-popup #apply-discount-btn {
+    background-color: #0D3B66;
+    color: white;
+    border: none;
+}
+
+#discount-popup #apply-discount-btn:hover {
+    background-color: #11487b;
+    transform: translateY(-1px);
+}
+
+#discount-popup #closePopup {
+    background-color: white;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+}
+
+#discount-popup #closePopup:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .top-selling-table th, .employee-table th, .day-wise-table th, .month-wise-table th, .year-wise-table th {
