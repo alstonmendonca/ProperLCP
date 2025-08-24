@@ -268,34 +268,264 @@ async function displayMenu() {
                     const popupContent = document.createElement("div");
                     popupContent.classList.add("menu-edit-popup");
                     popupContent.innerHTML = `
-                        <div class="menu-popup-content">
-                            <h3>Edit Food Item</h3>
-                            <label>Name:</label>
-                            <input type="text" id="editFname" value="${item.fname}">
-                            <label>Price:</label>
-                            <input type="number" id="editCost" value="${item.cost}">
-                            <label for="category">Category:</label>
-                            <select id="category" required>
-                                <option value="${item.category}">${item.category_name}</option>
-                            </select>
-                            <label>SGST:</label>
-                            <input type="number" id="editsgst" value="${item.sgst}" min="0">
-                            <label>CGST:</label>
-                            <input type="number" id="editcgst" value="${item.cgst}" min="0">
-                            <label>VEG:</label>
-                            <label class="switch">
-                                <input type="checkbox" id="editveg" ${item.veg == 1 ? "checked" : ""}>
-                                <span class="slider round"></span>
-                            </label>
-                            <br>
-                            <label>Dependant Items:</label>
-                            <div id="dependant-items-container" class="checkbox-container">
-                                Loading...
-                            </div>
-                            <div class="menu-popup-buttons">
-                                <button id="saveChanges">Save</button>
-                                <button id="closePopup">Cancel</button>
-                            </div>
+                        <div class="menu-popup-content" style="
+                            pointer-events: auto;
+                            max-width: 500px;
+                            width: 100%;
+                            background: #ffffff;
+                            padding: 30px;
+                            border-radius: 16px;
+                            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+                            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                        ">
+                            <style>
+                                .edit-popup-input:focus, .edit-popup-select:focus {
+                                    border-color: #6366f1;
+                                    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+                                    outline: none;
+                                }
+                                .edit-popup-switch {
+                                    position: relative;
+                                    display: inline-block;
+                                    width: 44px;
+                                    height: 24px;
+                                }
+                                .edit-popup-switch input { 
+                                    opacity: 0;
+                                    width: 0;
+                                    height: 0;
+                                }
+                                .edit-popup-slider {
+                                    position: absolute;
+                                    cursor: pointer;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background-color: #e2e8f0;
+                                    transition: .3s;
+                                    border-radius: 24px;
+                                }
+                                .edit-popup-slider:before {
+                                    position: absolute;
+                                    content: "";
+                                    height: 18px;
+                                    width: 18px;
+                                    left: 3px;
+                                    bottom: 3px;
+                                    background-color: white;
+                                    transition: .3s;
+                                    border-radius: 50%;
+                                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                                }
+                                input:checked + .edit-popup-slider {
+                                    background-color: #4f46e5;
+                                }
+                                input:checked + .edit-popup-slider:before {
+                                    transform: translateX(20px);
+                                }
+                                .edit-popup-btn {
+                                    transition: all 0.2s ease;
+                                    font-weight: 500;
+                                    border-radius: 8px;
+                                    padding: 10px 22px;
+                                    font-size: 14px;
+                                    cursor: pointer;
+                                }
+                                .edit-popup-btn:active {
+                                    transform: translateY(1px);
+                                }
+                                .edit-checkbox-item {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    padding: 6px 10px;
+                                    border-radius: 6px;
+                                    background: #f8fafc;
+                                    border: 1px solid #e2e8f0;
+                                }
+                            </style>
+                            
+                            <h3 style="
+                                text-align: center;
+                                margin-bottom: 24px;
+                                font-size: 22px;
+                                font-weight: 700;
+                                color: #1e293b;
+                                letter-spacing: -0.02em;
+                            ">
+                                Edit Food Item
+                            </h3>
+                            
+                            <form style="display: flex; flex-direction: column; gap: 18px;">
+                                <div class="form-group">
+                                    <label for="editFname" style="
+                                        display: block;
+                                        font-size: 14px;
+                                        color: #475569;
+                                        margin-bottom: 6px;
+                                        font-weight: 500;
+                                    ">Food Name</label>
+                                    <input type="text" id="editFname" value="${item.fname}" class="edit-popup-input" style="
+                                        width: 100%;
+                                        padding: 12px;
+                                        border: 1px solid #cbd5e1;
+                                        border-radius: 8px;
+                                        font-size: 14px;
+                                        background: #f8fafc;
+                                        transition: border 0.2s, box-shadow 0.2s;
+                                    ">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="category" style="
+                                        display: block;
+                                        font-size: 14px;
+                                        color: #475569;
+                                        margin-bottom: 6px;
+                                        font-weight: 500;
+                                    ">Category</label>
+                                    <select id="category" required class="edit-popup-select" style="
+                                        width: 100%;
+                                        padding: 12px;
+                                        border: 1px solid #cbd5e1;
+                                        border-radius: 8px;
+                                        font-size: 14px;
+                                        background: #f8fafc;
+                                        appearance: none;
+                                        background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" viewBox=\"0 0 16 16\"><path d=\"M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z\"/></svg>');
+                                        background-repeat: no-repeat;
+                                        background-position: right 12px center;
+                                        background-size: 14px;
+                                        transition: border 0.2s, box-shadow 0.2s;
+                                    ">
+                                        <option value="${item.category}">${item.category_name}</option>
+                                    </select>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                    <div class="form-group">
+                                        <label for="editCost" style="
+                                            display: block;
+                                            font-size: 14px;
+                                            color: #475569;
+                                            margin-bottom: 6px;
+                                            font-weight: 500;
+                                        ">Cost (₹)</label>
+                                        <input type="number" id="editCost" value="${item.cost}" step="0.01" class="edit-popup-input" style="
+                                            width: 100%;
+                                            padding: 12px;
+                                            border: 1px solid #cbd5e1;
+                                            border-radius: 8px;
+                                            font-size: 14px;
+                                            background: #f8fafc;
+                                            transition: border 0.2s, box-shadow 0.2s;
+                                        ">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editsgst" style="
+                                            display: block;
+                                            font-size: 14px;
+                                            color: #475569;
+                                            margin-bottom: 6px;
+                                            font-weight: 500;
+                                        ">SGST (%)</label>
+                                        <input type="number" id="editsgst" value="${item.sgst}" step="0.01" min="0" class="edit-popup-input" style="
+                                            width: 100%;
+                                            padding: 12px;
+                                            border: 1px solid #cbd5e1;
+                                            border-radius: 8px;
+                                            font-size: 14px;
+                                            background: #f8fafc;
+                                            transition: border 0.2s, box-shadow 0.2s;
+                                        ">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editcgst" style="
+                                            display: block;
+                                            font-size: 14px;
+                                            color: #475569;
+                                            margin-bottom: 6px;
+                                            font-weight: 500;
+                                        ">CGST (%)</label>
+                                        <input type="number" id="editcgst" value="${item.cgst}" step="0.01" min="0" class="edit-popup-input" style="
+                                            width: 100%;
+                                            padding: 12px;
+                                            border: 1px solid #cbd5e1;
+                                            border-radius: 8px;
+                                            font-size: 14px;
+                                            background: #f8fafc;
+                                            transition: border 0.2s, box-shadow 0.2s;
+                                        ">
+                                    </div>
+                                </div>
+
+                                <div style="
+                                    display: flex;
+                                    justify-content: center;
+                                    background: #f1f5f9;
+                                    padding: 16px;
+                                    border-radius: 10px;
+                                    margin-top: 8px;
+                                ">
+                                    <div class="form-group" style="
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: space-between;
+                                        min-width: 120px;
+                                    ">
+                                        <label for="editveg" style="font-size: 14px; color: #334155; font-weight: 500;">Vegetarian</label>
+                                        <label class="edit-popup-switch">
+                                            <input type="checkbox" id="editveg" ${item.veg == 1 ? "checked" : ""}>
+                                            <span class="edit-popup-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label style="
+                                        display: block;
+                                        font-size: 14px;
+                                        color: #475569;
+                                        margin-bottom: 6px;
+                                        font-weight: 500;
+                                    ">Inventory Dependencies</label>
+                                    <div id="dependant-items-container" style="
+                                        display: flex;
+                                        flex-wrap: wrap;
+                                        gap: 10px;
+                                        padding: 16px;
+                                        border: 1px solid #e2e8f0;
+                                        border-radius: 10px;
+                                        max-height: 140px;
+                                        overflow-y: auto;
+                                        background: #ffffff;
+                                    ">
+                                        Loading...
+                                    </div>
+                                </div>
+
+                                <div style="
+                                    display: flex;
+                                    justify-content: center;
+                                    gap: 12px;
+                                    margin-top: 10px;
+                                    padding-top: 8px;
+                                    border-top: 1px solid #f1f5f9;
+                                ">
+                                    <button type="button" id="saveChanges" class="edit-popup-btn" style="
+                                        background: #4f46e5;
+                                        color: white;
+                                        border: none;
+                                        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+                                    ">Save Changes</button>
+                                    <button type="button" id="closePopup" class="edit-popup-btn" style="
+                                        background: #ffffff;
+                                        color: #64748b;
+                                        border: 1px solid #e2e8f0;
+                                    ">Cancel</button>
+                                </div>
+                            </form>
                         </div>
                     `;
 
@@ -342,12 +572,16 @@ async function displayMenu() {
 
                             container.innerHTML = ''; // clear previous content
 
+                            // Create document fragment for batch DOM insertion
+                            const fragment = new DocumentFragment();
+
                             inventoryItems.forEach(inv => {
                                 const checkbox = document.createElement("input");
                                 checkbox.type = "checkbox";
                                 checkbox.value = inv.inv_no;
-                                checkbox.id = `inv_${inv.inv_no}`;
+                                checkbox.id = `edit_inv_${inv.inv_no}`;
                                 checkbox.name = "dependant_inv";
+                                checkbox.style.accentColor = "#4f46e5";
 
                                 // Pre-check if this item is in depend_inv
                                 const dependArray = (item.depend_inv || "").split(",").map(i => i.trim()).filter(i => i);
@@ -356,21 +590,42 @@ async function displayMenu() {
                                 }
 
                                 const label = document.createElement("label");
-                                label.htmlFor = `inv_${inv.inv_no}`;
+                                label.htmlFor = `edit_inv_${inv.inv_no}`;
                                 label.textContent = inv.inv_item;
-                                label.style.marginRight = "10px";
+                                label.style.fontSize = "13px";
+                                label.style.color = "#475569";
+                                label.style.cursor = "pointer";
 
                                 const wrapper = document.createElement("div");
+                                wrapper.className = "edit-checkbox-item";
                                 wrapper.appendChild(checkbox);
                                 wrapper.appendChild(label);
 
-                                container.appendChild(wrapper);
+                                fragment.appendChild(wrapper);
                             });
+
+                            container.appendChild(fragment);
+
+                            // Add empty state message if needed
+                            if (inventoryItems.length === 0) {
+                                container.innerHTML = `<div style="
+                                    color: #94a3b8;
+                                    font-style: italic;
+                                    padding: 10px;
+                                    text-align: center;
+                                    width: 100%;
+                                ">No inventory items available</div>`;
+                            }
 
                         } catch (error) {
                             console.error("Failed to load inventory items:", error);
                             const container = document.getElementById("dependant-items-container");
-                            container.textContent = "Failed to load inventory items.";
+                            container.innerHTML = `<div style="
+                                color: #ef4444;
+                                padding: 10px;
+                                text-align: center;
+                                font-size: 13px;
+                            ">Failed to load inventory items</div>`;
                         }
                     }
 
