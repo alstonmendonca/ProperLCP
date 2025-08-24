@@ -1,5 +1,6 @@
 const { ipcRenderer } = require("electron");
 const  {createTextPopup} = require("./textPopup");
+const { exportTableToExcel } = require("./export");
 
 function loadEmployeeAnalysis(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -17,6 +18,7 @@ function loadEmployeeAnalysis(mainContent, billPanel) {
                 <input type="date" id="empEndDate">
                 
                 <button class="showEmployeeAnalysis">Generate Report</button>
+                <button id="exportExcelButton">Export to Excel</button>
             </div>
         </div>
         <div id="employeeAnalysisDiv"></div>
@@ -94,6 +96,12 @@ ipcRenderer.on("employee-analysis-response", (event, data) => {
 
     tableHTML += `</tbody></table>`;
     container.innerHTML = tableHTML;
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".employee-table");
+        });
+    }, 100);
 });
 
 let currentEmpSort = { column: 'name', order: 'asc' };

@@ -1,6 +1,7 @@
 // taxOnItems.js
 const { ipcRenderer } = require("electron");
 const { createTextPopup } = require("./textPopup");
+const { exportTableToExcel } = require("./export");
 
 function loadTaxOnItems(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -19,6 +20,7 @@ function loadTaxOnItems(mainContent, billPanel) {
                 <input type="date" id="endDate">
                 
                 <button class="showTaxButton">Generate Report</button>
+                <button id="exportExcelButton">Export to Excel</button>
             </div>
         </div>
         <div id="taxOnItemsDiv"></div>
@@ -174,6 +176,12 @@ ipcRenderer.on("tax-on-items-response", (event, data) => {
 
     // Initialize sorting
     window.sortTaxTable = sortTaxTable;
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".tax-table");
+        });
+    }, 100);
 });
 
 let currentTaxSort = { column: null, direction: 'asc' };

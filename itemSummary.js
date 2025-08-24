@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-const XLSX = require('xlsx'); // Import the xlsx library
+const { exportTableToExcel } = require("./export");
 const  {createTextPopup} = require("./textPopup");
 
 // Function to load the Item Summary content
@@ -45,8 +45,11 @@ function loadItemSummary(mainContent, billPanel) {
         fetchItemSummary(startDate, endDate); // Fetch item summary for the selected date range
     });
 
-    // Add event listener for the Export to Excel button
-    document.getElementById("exportExcelButton").addEventListener("click", exportToExcel);
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".item-summary-table");
+        });
+    }, 100);
 }
 
 // Function to fetch item summary data for a specific date range
@@ -174,28 +177,6 @@ function getSortIndicator(sortBy) {
         return window.currentSortOrder === "asc" ? "▲" : "▼";
     }
     return ""; // No indicator if the column is not sorted
-}
-
-// Function to export the table to Excel
-function exportToExcel() {
-    const table = document.querySelector(".item-summary-table");
-
-    if (!table) {
-        createTextPopup("No data to export.");
-        return;
-    }
-
-    // Convert the table to a worksheet
-    const worksheet = XLSX.utils.table_to_sheet(table);
-
-    // Create a new workbook and add the worksheet
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Item Summary");
-
-    // Write the workbook to a file
-    XLSX.writeFile(workbook, "ItemSummary.xlsx");
-
-    createTextPopup("Exported to ItemSummary.xlsx");
 }
 
 // Utility function to get today's date in YYYY-MM-DD format

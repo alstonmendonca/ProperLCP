@@ -1,5 +1,6 @@
 const { ipcRenderer } = require("electron");
 const  {createTextPopup} = require("./textPopup");
+const { exportTableToExcel } = require("./export");
 
 // Function to load the Top Selling Items content
 function loadTopSellingItems(mainContent, billPanel) {
@@ -19,6 +20,7 @@ function loadTopSellingItems(mainContent, billPanel) {
                 <input type="date" id="endDate">
                 
                 <button class="showTopSellingButton">Show Top Selling</button>
+                <button id="exportExcelButton">Export to Excel</button>
             </div>
         </div>
         <div id="topSellingItemsDiv"></div>
@@ -97,6 +99,12 @@ ipcRenderer.on("top-selling-items-response", (event, data) => {
 
     tableHTML += `</tbody></table>`;
     topSellingItemsDiv.innerHTML = tableHTML;
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".top-selling-table");
+        });
+    }, 100);
 });
 
 let currentSortOrder = 'asc';
