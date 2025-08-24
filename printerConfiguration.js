@@ -17,11 +17,17 @@ function loadPrinterConfiguration(mainContent, billPanel, mode = 'auto') {
             
             <div class="printer-tabs">
                 <button class="tab-btn ${mode === 'auto' ? 'active' : ''}" data-mode="auto">
-                    <i class="tab-icon fas fa-search"></i>
+                    <svg class="tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
                     <span>Auto Detect</span>
                 </button>
                 <button class="tab-btn ${mode === 'manual' ? 'active' : ''}" data-mode="manual">
-                    <i class="tab-icon fas fa-cog"></i>
+                    <svg class="tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
                     <span>Manual Setup</span>
                 </button>
             </div>
@@ -76,7 +82,11 @@ async function loadAutoConfig() {
         const helpSection = printers.length === 0 ? `
             <div class="printer-help">
                 <div class="help-header">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
                     <h3>No printers found</h3>
                 </div>
                 <p>Make sure your printer is connected and drivers are installed.</p>
@@ -85,15 +95,27 @@ async function loadAutoConfig() {
                     <h4>Download Drivers</h4>
                     <div class="driver-grid">
                         <a href="https://www.tvs-e.in/downloads/thermal-printer-drivers" target="_blank" class="driver-card">
-                            <i class="fas fa-print"></i>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
                             <span>TVS RP3220 STAR</span>
                         </a>
                         <a href="https://epson.com/Support/Printers/Point-of-Sale/TM-series/Epson-TM-T88IV/s/SPT_C31CA85011" target="_blank" class="driver-card">
-                            <i class="fas fa-print"></i>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
                             <span>Epson TM-T88IV</span>
                         </a>
                         <a href="https://www.pos-x.com/support/downloads" target="_blank" class="driver-card">
-                            <i class="fas fa-print"></i>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
                             <span>POS-X EVO</span>
                         </a>
                     </div>
@@ -110,20 +132,28 @@ async function loadAutoConfig() {
                             <select id="printerSelect" class="form-select">
                                 ${printerOptions.length ? printerOptions : '<option disabled selected>No printers available</option>'}
                             </select>
-                            <i class="fas fa-chevron-down select-arrow"></i>
+                            <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
                         </div>
                     </div>
                     
                     <div class="button-group">
-                        <button type="button" id="testPrinterBtn" class="btn btn-test">
-                            <i class="fas fa-paper-plane"></i>
-                            Test Printer
-                        </button>
+                        // <button type="button" id="testPrinterBtn" class="btn btn-test">
+                        //     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        //         <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        //     </svg>
+                        //     Test Printer
+                        // </button>
                         <span id="printerStatus" class="status-message"></span>
                     </div>
                     
                     <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save"></i>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
                         Save Configuration
                     </button>
                 </form>
@@ -141,7 +171,7 @@ async function loadAutoConfig() {
             }
 
             const statusElement = document.getElementById('printerStatus');
-            statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            statusElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"></path></svg> Testing...';
             statusElement.className = 'status-message testing';
 
             try {
@@ -159,14 +189,14 @@ async function loadAutoConfig() {
                 });
                 
                 if (success) {
-                    statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Printer test successful';
+                    statusElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Printer test successful';
                     statusElement.className = 'status-message success';
                 } else {
-                    statusElement.innerHTML = '<i class="fas fa-times-circle"></i> Printer test failed';
+                    statusElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Printer test failed';
                     statusElement.className = 'status-message error';
                 }
             } catch (error) {
-                statusElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error: ${error.message}`;
+                statusElement.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Error: ${error.message}`;
                 statusElement.className = 'status-message error';
             }
         });
@@ -192,7 +222,11 @@ async function loadAutoConfig() {
     } catch (error) {
         section.innerHTML = `
             <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
                 Error loading printer configuration: ${error.message}
             </div>
         `;
@@ -226,7 +260,11 @@ function loadManualConfig() {
                     </div>
                     
                     <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save"></i>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
                         Save Configuration
                     </button>
                 </form>
