@@ -1375,21 +1375,6 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
     }
 });
 
-ipcMain.on('update-receipt-template', (event, updates) => {
-    try {
-        store.set('receiptTemplate', {
-            ...updates,
-            lastUpdated: new Date().toISOString()
-        });
-        event.reply('receipt-template-updated', { success: true });
-    } catch (error) {
-        event.reply('receipt-template-updated', { 
-            success: false,
-            error: error.message 
-        });
-    }
-});
-
 function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     const template = store.get('receiptTemplate', {
         title: 'THE LASSI CORNER',
@@ -1453,9 +1438,43 @@ ${kotItems}
 return  customerReceipt+kotReceipt;
 }
 
+function loadReceiptTemplate(defaults) {
+  try {
+    if (fs.existsSync(RECEIPT_FORMAT_PATH)) {
+      const raw = fs.readFileSync(RECEIPT_FORMAT_PATH, 'utf-8');
+      return JSON.parse(raw);
+    }
+  } catch (err) {
+    console.error("Failed to read receipt format:", err);
+  }
+  return defaults; // fall back to defaults
+}
+
+function saveReceiptTemplate(template) {
+  try {
+    fs.writeFileSync(RECEIPT_FORMAT_PATH, JSON.stringify(template, null, 2));
+    return true;
+  } catch (err) {
+    console.error("Failed to save receipt format:", err);
+    return false;
+  }
+}
+
+// IPC handlers
 ipcMain.on('get-receipt-template', (event, defaults) => {
-    const template = store.get('receiptTemplate', defaults);
-    event.returnValue = template;
+  const template = loadReceiptTemplate(defaults);
+  event.returnValue = template;
+});
+
+ipcMain.on('update-receipt-template', (event, updates) => {
+  try {
+    const current = loadReceiptTemplate({});
+    const newTemplate = { ...current, ...updates, lastUpdated: new Date().toISOString() };
+    saveReceiptTemplate(newTemplate);
+    event.reply('receipt-template-updated', { success: true });
+  } catch (err) {
+    event.reply('receipt-template-updated', { success: false, error: err.message });
+  }
 });
 
 ipcMain.on('get-order-for-printing', (event, billno) => {

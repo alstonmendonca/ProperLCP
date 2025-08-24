@@ -52,33 +52,37 @@ function loadReceiptEditor(mainContent, billPanel) {
                         </div>
                         
                         <div class="receipt-details">
-                            <p><strong>Token No:</strong> ${sampleBill.kot}</p>
+                            <p class="kot-title"><strong>Token:</strong> ${sampleBill.kot}</p>
                             <p><strong>Date:</strong> ${sampleBill.dateTime}</p>
-                            <p><strong>BILL NUMBER:</strong> ${sampleBill.orderId}</p>
+                            <p><strong>BILL #:</strong> ${sampleBill.orderId}</p>
                         </div>
                         
-                        <div class="receipt-divider">${'-'.repeat(32)}</div>
+                        <div class="receipt-divider">${'-'.repeat(49)}</div>
                         
-                        <div class="receipt-items-header">
-                            <span class="item-header">${template.itemHeader}</span>
-                            <span class="qty-header">${template.qtyHeader}</span>
-                            <span class="price-header">${template.priceHeader}</span>
-                        </div>
+                        <table class="receipt">
+                            <thead>
+                                <tr>
+                                <th class="margin:100px;">ITEM</th>
+                                <th>QTY</th>
+                                <th>PRICE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sampleBill.items.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td style="text-align:center;">${item.quantity}</td>
+                                    <td style="text-align:right;">${item.price.toFixed(2)}</td>
+                                </tr>
+                                `).join('')}
+                            </tbody>
+                            </table>
+
                         
-                        <div class="receipt-items">
-                            ${sampleBill.items.map(item => `
-                                <div class="receipt-item">
-                                    <span class="item-name">${item.name.substring(0, 14).padEnd(14)}</span>
-                                    <span class="item-qty">${item.quantity.toString().padStart(3)}</span>
-                                    <span class="item-price">${item.price.toFixed(2).padStart(8)}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        
-                        <div class="receipt-divider">${'-'.repeat(32)}</div>
+                        <div class="receipt-divider">${'-'.repeat(49)}</div>
                         
                         <div class="receipt-total">
-                            <strong class="total-text">${template.totalText} ${sampleBill.totalAmount.toFixed(2)}</strong>
+                            <strong class="total-text">TOTAL: Rs. ${sampleBill.totalAmount.toFixed(2)}</strong>
                         </div>
                         
                         <div class="receipt-footer">
@@ -88,14 +92,16 @@ function loadReceiptEditor(mainContent, billPanel) {
                         <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
                         
                         <div class="kot-section">
-                            <h4 class="kot-title">${template.kotTitle}</h4>
-                            <p><strong>KOT #:</strong> ${sampleBill.kot}</p>
-                            <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
-                            <div class="receipt-divider">${'-'.repeat(32)}</div>
+                            <h4 class="kot-title">123</h4>
+                            <div class="kot-items-header">
+                                <span class="kot-item-header"><strong>Time:</strong> ${new Date().toLocaleTimeString()}</span>
+                                <span class="kot-qty-header">Rs 100</span>
+                            </div>
+                            <div class="receipt-divider">${'-'.repeat(49)}</div>
                             
                             <div class="kot-items-header">
-                                <span class="kot-item-header">${template.kotItemHeader}</span>
-                                <span class="kot-qty-header">${template.kotQtyHeader}</span>
+                                <span class="kot-item-header">ITEM</span>
+                                <span class="kot-qty-header">QTY</span>
                             </div>
                             
                             <div class="kot-items">
@@ -107,7 +113,7 @@ function loadReceiptEditor(mainContent, billPanel) {
                                 `).join('')}
                             </div>
                             
-                            <div class="receipt-divider">${'-'.repeat(32)}</div>
+                            <div class="receipt-divider">${'-'.repeat(49)}</div>
                         </div>
                         
                         <div class="receipt-cut-line">••••••••••••••••••••••••••••••••</div>
@@ -274,17 +280,8 @@ function enableReceiptEditing() {
     const subtitle = document.querySelector('.receipt-subtitle');
     const footer = document.querySelector('.receipt-footer p');
     
-    // New fields
-    const kotTitle = document.querySelector('.kot-title');
-    const itemHeader = document.querySelector('.item-header');
-    const qtyHeader = document.querySelector('.qty-header');
-    const priceHeader = document.querySelector('.price-header');
-    const totalText = document.querySelector('.total-text');
-    const kotItemHeader = document.querySelector('.kot-item-header');
-    const kotQtyHeader = document.querySelector('.kot-qty-header');
-    
     // Make editable
-    [title, subtitle, footer, kotTitle, itemHeader, qtyHeader, priceHeader, totalText, kotItemHeader, kotQtyHeader].forEach(el => {
+    [title, subtitle, footer].forEach(el => {
         el.contentEditable = true;
         el.style.backgroundColor = '#f0f8ff';
         el.style.outline = '2px dashed #1DB954';
@@ -309,17 +306,10 @@ function saveReceiptChanges() {
         title: document.querySelector('.receipt-title').textContent,
         subtitle: document.querySelector('.receipt-subtitle').textContent,
         footer: document.querySelector('.receipt-footer p').textContent,
-        kotTitle: document.querySelector('.kot-title').textContent,
-        itemHeader: document.querySelector('.item-header').textContent,
-        qtyHeader: document.querySelector('.qty-header').textContent,
-        priceHeader: document.querySelector('.price-header').textContent,
-        totalText: document.querySelector('.total-text').textContent.replace(/[\d.]+$/, '').trim(),
-        kotItemHeader: document.querySelector('.kot-item-header').textContent,
-        kotQtyHeader: document.querySelector('.kot-qty-header').textContent,
     };
     
     // Validate required fields
-    if (!updates.title || !updates.itemHeader || !updates.qtyHeader || !updates.priceHeader) {
+    if (!updates.title) {
         createTextPopup("Required fields cannot be empty");
         return;
     }

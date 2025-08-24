@@ -363,10 +363,44 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 /* ====================================== Receipt Editor Section STARTS HERE ============================================ */
-.receipt-editor-container {
-    padding: 20px;
-    max-width: 1400px;  /* Increased from 1200px */
-    margin: 0 auto;
+
+/* Make sure the table behaves properly */
+.receipt table {
+    width: 100%;              /* stretch across receipt */
+    border-collapse: collapse; /* keeps columns aligned neatly */
+    table-layout: fixed;       /* ensures consistent column widths */
+}
+
+/* Control padding (space inside cells) */
+.receipt th, 
+.receipt td {
+    padding: 1px 24px;        /* top-bottom, left-right */
+    font-size: 12px;          /* adjust for receipt look */
+}
+
+/* Optional: Control column widths */
+.receipt th:nth-child(1), 
+.receipt td:nth-child(1) {
+    width: 60%;               /* ITEM column */
+    text-align: left;
+}
+
+.receipt th:nth-child(2), 
+.receipt td:nth-child(2) {
+    width: 15%;               /* QTY column */
+    text-align: center;
+}
+
+.receipt th:nth-child(3), 
+.receipt td:nth-child(3) {
+    width: 25%;               /* PRICE column */
+    text-align: right;
+}
+
+.receipt-items-header,
+.receipt-item {
+  font-family: monospace;
+  white-space: pre;
 }
 
 .receipt-controls {
@@ -397,17 +431,6 @@ input[type="number"]::-webkit-inner-spin-button {
 #testPrint {
     background-color: #2196F3;
     color: white;
-}
-
-.editor-columns {
-    display: flex;
-    gap: 30px;  /* Increased gap */
-    min-height: 700px;  /* Added minimum height */
-}
-
-.format-editor {
-    flex: 1.2;  /* Increased flex ratio */
-    min-width: 500px;  /* Added minimum width */
 }
 
 .preview-section {
@@ -528,8 +551,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .receipt {
-    margin-bottom: 30px;
-    border: 1px dashed #ccc;
+    margin-bottom: 10px;
     padding: 15px;
     background: #fffff8;
 }
