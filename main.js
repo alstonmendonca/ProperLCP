@@ -5,7 +5,6 @@ const escpos = require("escpos");
 const fs = require('fs');
 const { backupLCdb } = require("./backup");
 escpos.USB = require("escpos-usb");
-const RECEIPT_FORMAT_PATH = path.join(app.getPath('userData'), 'receiptFormat.json');
 const { fork, spawn } = require('child_process');
 let mainWindow;
 let splash;
@@ -15,6 +14,7 @@ let onlineProcess;
 const axios = require('axios');
 const basePath = app.isPackaged ? process.resourcesPath : __dirname;
 console.log(`Base path: ${basePath}`);
+const RECEIPT_FORMAT_PATH = path.join(basePath, 'receiptFormat.json');
 const dotenv = require('dotenv');
 // Determine env file path based on dev vs packaged
 const envPath = app.isPackaged
@@ -2872,6 +2872,15 @@ ipcMain.handle("get-categories", async () => {
     });
 });
 //----------------------------------------------MENU TAB--------------------------------------------
+ipcMain.handle('sync-menu-items-to-mongo', async () => {
+    try {
+        await syncFoodItemsToMongo();
+        return { success: true };
+    } catch (err) {
+        console.error("Sync failed:", err);
+        return { success: false, error: err.message };
+    }
+});
 // Fetch Food Items when requested from the renderer process
 ipcMain.handle("get-menu-items", async () => {
     const foodQuery = `
@@ -3227,7 +3236,7 @@ ipcMain.on("open-add-item-window", () => {
             }
         });
 
-        addItemWindow.loadFile(path.join(__dirname, "AddItem.html"));
+        addItemWindow.loadFile(path.join(basePath, "AddItem.html"));
 
         addItemWindow.on("closed", () => {
             addItemWindow = null;
@@ -3298,7 +3307,7 @@ ipcMain.on("exit-app", (event) => {
   });
 
 // --------------------------------- BUSINESS INFO SECTION -----------------------------
-const savePath = path.join(__dirname, 'businessInfo.json');
+const savePath = path.join(basePath, 'businessInfo.json');
 
 ipcMain.on('save-business-info', (event, businessData) => {
     fs.writeFile(savePath, JSON.stringify(businessData, null, 4), 'utf-8', (err) => {
@@ -3312,7 +3321,7 @@ ipcMain.on('save-business-info', (event, businessData) => {
     });
 });
 
-const dataPath = path.join(__dirname, 'businessInfo.json');
+const dataPath = path.join(basePath, 'businessInfo.json');
 
 ipcMain.handle('load-business-info', async () => {
     try {

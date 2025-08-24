@@ -16,73 +16,288 @@ function loadSearchOrder(mainContent, billPanel) {
     const today = new Date().toISOString().split("T")[0];
 
     mainContent.innerHTML = `
-        <div>
+        <style>
+            .search-order-container {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                padding: 20px;
+                background: #f8fafc;
+                min-height: 100vh;
+            }
+            
+            .search-order-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            
+            .search-order-header h2 {
+                color: #0D3B66;
+                font-size: 28px;
+                font-weight: 700;
+                margin: 0;
+                letter-spacing: -0.02em;
+            }
+            
+            .filters-card {
+                background: white;
+                border-radius: 16px;
+                padding: 30px;
+                box-shadow: 0 4px 16px rgba(13, 59, 102, 0.1);
+                margin-bottom: 30px;
+                border: 1px solid #e2e8f0;
+            }
+            
+            .filters-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                align-items: end;
+            }
+            
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .form-group label {
+                color: #0D3B66;
+                font-weight: 500;
+                font-size: 14px;
+                margin: 0;
+            }
+            
+            .form-group input,
+            .form-group select {
+                padding: 12px 16px;
+                border: 2px solid #cbd5e1;
+                border-radius: 8px;
+                font-size: 14px;
+                background: #f8fafc;
+                color: #1e293b;
+                transition: all 0.2s ease;
+                font-family: inherit;
+            }
+            
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #0D3B66;
+                box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+                background: white;
+            }
+            
+            .actions-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .btn-primary {
+                background: #0D3B66;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .btn-primary:hover {
+                background: #11487b;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(13, 59, 102, 0.3);
+            }
+            
+            .btn-secondary {
+                background: white;
+                color: #0D3B66;
+                border: 2px solid #0D3B66;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                margin-left: 10px;
+            }
+            
+            .btn-secondary:hover {
+                background: #0D3B66;
+                color: white;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(13, 59, 102, 0.2);
+            }
+            
+            .results-container {
+                background: white;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 4px 16px rgba(13, 59, 102, 0.1);
+                border: 1px solid #e2e8f0;
+            }
+            
+            .order-history-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+                font-size: 14px;
+            }
+            
+            .order-history-table th {
+                background: #0D3B66;
+                color: white;
+                padding: 16px 12px;
+                text-align: left;
+                font-weight: 600;
+                border: none;
+                font-size: 13px;
+                letter-spacing: 0.02em;
+            }
+            
+            .order-history-table th:first-child {
+                border-top-left-radius: 8px;
+            }
+            
+            .order-history-table th:last-child {
+                border-top-right-radius: 8px;
+            }
+            
+            .order-history-table td {
+                padding: 12px;
+                border-bottom: 1px solid #e2e8f0;
+                color: #1e293b;
+            }
+            
+            .order-history-table tr:hover {
+                background: #f8fafc;
+            }
+            
+            .order-history-table tr:last-child td {
+                border-bottom: none;
+            }
+            
+            .sortable {
+                cursor: pointer;
+                user-select: none;
+                position: relative;
+                transition: background-color 0.2s ease;
+            }
+            
+            .sortable:hover {
+                background: #11487b;
+            }
+            
+            .no-results {
+                text-align: center;
+                padding: 60px 20px;
+                color: #64748b;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 16px rgba(13, 59, 102, 0.1);
+                border: 1px solid #e2e8f0;
+            }
+            
+            .no-results-icon {
+                font-size: 48px;
+                margin-bottom: 20px;
+                color: #cbd5e1;
+            }
+            
+            .no-results-title {
+                font-size: 24px;
+                font-weight: 600;
+                color: #0D3B66;
+                margin-bottom: 10px;
+            }
+            
+            .no-results-text {
+                font-size: 16px;
+                color: #64748b;
+            }
+        </style>
+        
+        <div class="search-order-container">
             <div class="search-order-header">
                 <h2>Search Order</h2>
             </div>
 
-            <div class="date-filters" 
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; row-gap:44px; margin: 20px 0; 
-            background-color:#555;  padding:20px; border-radius:14px;">
-                <!-- Bill No Range -->
-                <div>
-                    <label style="color:white;">Bill No From:</label>
-                    <input type="number" id="billNoFrom" placeholder="..." min="1">
-                </div>
-                <div>
-                    <label style="color:white;">Bill No To:</label>
-                    <input type="number" id="billNoTo" placeholder="..." min="1">
-                </div>
+            <div class="filters-card">
+                <div class="filters-grid">
+                    <!-- Bill No Range -->
+                    <div class="form-group">
+                        <label>Bill No From:</label>
+                        <input type="number" id="billNoFrom" placeholder="Enter bill number..." min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Bill No To:</label>
+                        <input type="number" id="billNoTo" placeholder="Enter bill number..." min="1">
+                    </div>
 
-                <!-- KOT Range -->
-                <div>
-                    <label style="color:white;">KOT From:</label>
-                    <input type="number" id="kotFrom" placeholder="..." min="1">
-                </div>
-                <div>
-                    <label style="color:white;">KOT To:</label>
-                    <input type="number" id="kotTo" placeholder="..." min="1">
-                </div>
+                    <!-- KOT Range -->
+                    <div class="form-group">
+                        <label>KOT From:</label>
+                        <input type="number" id="kotFrom" placeholder="Enter KOT number..." min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>KOT To:</label>
+                        <input type="number" id="kotTo" placeholder="Enter KOT number..." min="1">
+                    </div>
 
-                <!-- Price Range -->
-                <div>
-                    <label style="color:white;">Min Price (₹):</label>
-                    <input type="number" id="minPrice" placeholder="..." step="0.01" min="0">
-                </div>
-                <div>
-                    <label style="color:white;">Max Price (₹):</label>
-                    <input type="number" id="maxPrice" placeholder="..." step="0.01" min="0">
-                </div>
+                    <!-- Price Range -->
+                    <div class="form-group">
+                        <label>Min Price (₹):</label>
+                        <input type="number" id="minPrice" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Price (₹):</label>
+                        <input type="number" id="maxPrice" placeholder="0.00" step="0.01" min="0">
+                    </div>
 
-                <!-- Cashier Filter -->
-                <div style="display:flex;">
-                    <label style="color:white; padding-top:8px; padding-right:12px;">Cashier:</label>
-                    <select id="cashierSelect">
-                        <option value="">All Cashiers</option>
-                        <!-- Filled dynamically -->
-                    </select>
-                </div>
+                    <!-- Cashier Filter -->
+                    <div class="form-group">
+                        <label>Cashier:</label>
+                        <select id="cashierSelect">
+                            <option value="">All Cashiers</option>
+                            <!-- Filled dynamically -->
+                        </select>
+                    </div>
 
-                <!-- Date Range -->
-                <div style="display:flex; margin-left:30px;">
-                    <label style="color:white;">Start Date:</label>
-                    <input type="date" id="startDate" value="${today}">
-                </div>
-                <div style="display:flex; margin-left:30px;">
-                    <label style="color:white;">End Date:</label>
-                    <input type="date" id="endDate" value="${today}">
+                    <!-- Date Range -->
+                    <div class="form-group">
+                        <label>Start Date:</label>
+                        <input type="date" id="startDate" value="${today}">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date:</label>
+                        <input type="date" id="endDate" value="${today}">
+                    </div>
                 </div>
             </div>
 
-            <div style="margin-bottom: 20px; display:flex; justify-content:space-between;">
-                <button id="searchOrdersBtn" class="btn-primary">Search Order</button>
+            <div class="actions-row">
+                <button id="searchOrdersBtn" class="btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    Search Orders
+                </button>
                 <div>
                     <button id="clearFiltersBtn" class="btn-secondary">Clear Filters</button>
                     <button id="exportExcelButton">Export to Excel</button>
                 </div>
             </div>
+            
+            <div id="searchResults"></div>
         </div>
-        <div id="searchResults"></div>
     `;
 
     // Load saved filters from sessionStorage
@@ -204,12 +419,10 @@ ipcRenderer.on("search-orders-response", (event, data) => {
 
     if (orders.length === 0) {
         searchResults.innerHTML = `
-            <div style="text-align: center; font-family: 'Arial', sans-serif; background-color: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; height: 70vh; margin: 0;">
-                <div>
-                    <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">
-                        No Orders Found!
-                    </div>
-                </div>
+            <div class="no-results">
+                <div class="no-results-icon">📋</div>
+                <div class="no-results-title">No Orders Found</div>
+                <div class="no-results-text">Try adjusting your search criteria to find more results.</div>
             </div>
         `;
         return;
@@ -217,21 +430,22 @@ ipcRenderer.on("search-orders-response", (event, data) => {
 
     // Build table
     let tableHTML = `
-        <table class="order-history-table">
-            <thead>
-                <tr>
-                    <th class="sortable" onclick="sortSearchResults('billno')">Bill No ${getSortIndicator('billno')}</th>
-                    <th class="date-column sortable" onclick="sortSearchResults('date')">Date ${getSortIndicator('date')}</th>
-                    <th class="sortable" onclick="sortSearchResults('cashier_name')">Cashier ${getSortIndicator('cashier_name')}</th>
-                    <th class="sortable" onclick="sortSearchResults('kot')">KOT ${getSortIndicator('kot')}</th>
-                    <th class="sortable" onclick="sortSearchResults('price')">Price (₹) ${getSortIndicator('price')}</th>
-                    <th class="sortable" onclick="sortSearchResults('sgst')">SGST (₹) ${getSortIndicator('sgst')}</th>
-                    <th class="sortable" onclick="sortSearchResults('cgst')">CGST (₹) ${getSortIndicator('cgst')}</th>
-                    <th class="sortable" onclick="sortSearchResults('tax')">Tax (₹) ${getSortIndicator('tax')}</th>
-                    <th>Food Items</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="results-container">
+            <table class="order-history-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" onclick="sortSearchResults('billno')">Bill No ${getSortIndicator('billno')}</th>
+                        <th class="date-column sortable" onclick="sortSearchResults('date')">Date ${getSortIndicator('date')}</th>
+                        <th class="sortable" onclick="sortSearchResults('cashier_name')">Cashier ${getSortIndicator('cashier_name')}</th>
+                        <th class="sortable" onclick="sortSearchResults('kot')">KOT ${getSortIndicator('kot')}</th>
+                        <th class="sortable" onclick="sortSearchResults('price')">Price (₹) ${getSortIndicator('price')}</th>
+                        <th class="sortable" onclick="sortSearchResults('sgst')">SGST (₹) ${getSortIndicator('sgst')}</th>
+                        <th class="sortable" onclick="sortSearchResults('cgst')">CGST (₹) ${getSortIndicator('cgst')}</th>
+                        <th class="sortable" onclick="sortSearchResults('tax')">Tax (₹) ${getSortIndicator('tax')}</th>
+                        <th>Food Items</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
     orders.forEach(order => {
@@ -250,7 +464,7 @@ ipcRenderer.on("search-orders-response", (event, data) => {
         `;
     });
 
-    tableHTML += `</tbody></table>`;
+    tableHTML += `</tbody></table></div>`;
     searchResults.innerHTML = tableHTML;
 
     // Attach context menu (e.g., for re-print, view details)
@@ -302,21 +516,22 @@ function sortSearchResults(column) {
     });
 
     let sortedHTML = `
-        <table class="order-history-table">
-            <thead>
-                <tr>
-                    <th class="sortable" onclick="sortSearchResults('billno')">Bill No ${getSortIndicator('billno')}</th>
-                    <th class="date-column sortable" onclick="sortSearchResults('date')">Date ${getSortIndicator('date')}</th>
-                    <th class="sortable" onclick="sortSearchResults('cashier_name')">Cashier ${getSortIndicator('cashier_name')}</th>
-                    <th class="sortable" onclick="sortSearchResults('kot')">KOT ${getSortIndicator('kot')}</th>
-                    <th class="sortable" onclick="sortSearchResults('price')">Price (₹) ${getSortIndicator('price')}</th>
-                    <th class="sortable" onclick="sortSearchResults('sgst')">SGST (₹) ${getSortIndicator('sgst')}</th>
-                    <th class="sortable" onclick="sortSearchResults('cgst')">CGST (₹) ${getSortIndicator('cgst')}</th>
-                    <th class="sortable" onclick="sortSearchResults('tax')">Tax (₹) ${getSortIndicator('tax')}</th>
-                    <th>Food Items</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="results-container">
+            <table class="order-history-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" onclick="sortSearchResults('billno')">Bill No ${getSortIndicator('billno')}</th>
+                        <th class="date-column sortable" onclick="sortSearchResults('date')">Date ${getSortIndicator('date')}</th>
+                        <th class="sortable" onclick="sortSearchResults('cashier_name')">Cashier ${getSortIndicator('cashier_name')}</th>
+                        <th class="sortable" onclick="sortSearchResults('kot')">KOT ${getSortIndicator('kot')}</th>
+                        <th class="sortable" onclick="sortSearchResults('price')">Price (₹) ${getSortIndicator('price')}</th>
+                        <th class="sortable" onclick="sortSearchResults('sgst')">SGST (₹) ${getSortIndicator('sgst')}</th>
+                        <th class="sortable" onclick="sortSearchResults('cgst')">CGST (₹) ${getSortIndicator('cgst')}</th>
+                        <th class="sortable" onclick="sortSearchResults('tax')">Tax (₹) ${getSortIndicator('tax')}</th>
+                        <th>Food Items</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
     rows.forEach(row => {
@@ -335,7 +550,7 @@ function sortSearchResults(column) {
         `;
     });
 
-    sortedHTML += `</tbody></table>`;
+    sortedHTML += `</tbody></table></div>`;
     resultsDiv.innerHTML = sortedHTML;
     attachContextMenu(".search-results-table");
 }

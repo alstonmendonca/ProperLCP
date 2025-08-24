@@ -21,22 +21,13 @@
     "productName": "Lassi Corner",
     "artifactName": "Lassi Corner Setup.exe",
     "extraResources": [
-      {
-        "from": ".env",
-        "to": ".env"
-      },
-      {
-        "from": "getOnline.js",
-        "to": "getOnline.js"
-      },
-      {
-        "from": "LC.db",
-        "to": "LC.db"
-      },
-      {
-        "from": "startMongoExpress.exe",
-        "to": "startMongoExpress.exe"
-      }
+      { "from": ".env", "to": ".env" },
+      { "from": "getOnline.js", "to": "getOnline.js" },
+      { "from": "LC.db", "to": "LC.db" },
+      { "from": "startMongoExpress.exe", "to": "startMongoExpress.exe" },
+      { "from": "businessInfo.json", "to": "businessInfo.json" },
+      {"from": "receiptFormat.json", "to": "receiptFormat.json"},
+      { "from": "AddItem.html", "to": "AddItem.html" }
     ],
     "win": {
       "icon": "assets/images/favicon.ico",
