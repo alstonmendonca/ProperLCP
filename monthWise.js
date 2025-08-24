@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+const { exportTableToExcel } = require("./export");
 
 function loadMonthWiseAnalysis(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -93,6 +94,7 @@ function loadMonthWiseAnalysis(mainContent, billPanel) {
                     </svg>
                     Generate Report
                 </button>
+                <button id="exportExcelButton">Export to Excel</button>
             </div>
         </div>
         <div id="monthWiseDiv"></div>
@@ -165,6 +167,12 @@ ipcRenderer.on("month-wise-data-response", (event, data) => {
     // Initialize with month sorted in ascending order
     currentMonthSort = { column: 'month', order: 'asc' };
     updateMonthSortIndicators();
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".month-wise-table");
+        });
+    }, 100);
 });
 
 function getMonthName(monthNumber) {

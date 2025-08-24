@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 const  {createTextPopup} = require("./textPopup");
+const { exportTableToExcel } = require("./export");
 
 function loadDayWiseAnalysis(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -19,6 +20,7 @@ function loadDayWiseAnalysis(mainContent, billPanel) {
                 <input type="date" id="dayEndDate" value="${today}">
                 
                 <button class="showDayWiseButton">Generate Report</button>
+                <button id="exportExcelButton">Export to Excel</button>
             </div>
         </div>
         <div id="dayWiseDiv"></div>
@@ -99,6 +101,12 @@ ipcRenderer.on("day-wise-data-response", (event, data) => {
 
     tableHTML += `</tbody></table>`;
     container.innerHTML = tableHTML;
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".day-wise-table");
+        });
+    }, 100);
 });
 
 function formatDate(dateString) {

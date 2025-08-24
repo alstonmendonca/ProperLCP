@@ -1,5 +1,6 @@
 // yearWise.js
 const { ipcRenderer } = require('electron');
+const { exportTableToExcel } = require("./export");
 
 function loadYearWiseAnalysis(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -10,6 +11,7 @@ function loadYearWiseAnalysis(mainContent, billPanel) {
         <div class="section-title">
             <h2>Year-Wise Sales Report</h2>
         </div>
+        <button id="exportExcelButton">Export to Excel</button>
         <div id="yearWiseDiv" style="margin-top: 20px;"></div>
     `;
 
@@ -67,6 +69,12 @@ ipcRenderer.on("year-wise-data-response", (event, data) => {
     // Initialize with year sorted in descending order (most recent first)
     currentYearSort = { column: 'year', order: 'desc' };
     updateYearSortIndicators();
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".year-wise-table");
+        });
+    }, 100);
 });
 
 let currentYearSort = { column: 'year', order: 'desc' };

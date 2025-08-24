@@ -78,7 +78,7 @@ function loadSearchOrder(mainContent, billPanel) {
                 <button id="searchOrdersBtn" class="btn-primary">Search Order</button>
                 <div>
                     <button id="clearFiltersBtn" class="btn-secondary">Clear Filters</button>
-                    <button id="exportExcelBtn" class="btn-secondary">Export to Excel</button>
+                    <button id="exportExcelButton">Export to Excel</button>
                 </div>
             </div>
         </div>
@@ -256,10 +256,11 @@ ipcRenderer.on("search-orders-response", (event, data) => {
     // Attach context menu (e.g., for re-print, view details)
     attachContextMenu(".search-results-table");
 
-    // Export button listener
-    document.getElementById("exportExcelBtn").onclick = () => {
-        exportTableToExcel(".order-history-table", `Search_Results_${Date.now()}`);
-    };
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".order-history-table");
+        });
+    }, 100);
 });
 
 // Sorting logic

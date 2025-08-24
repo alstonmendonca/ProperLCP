@@ -1,5 +1,6 @@
 const { ipcRenderer } = require("electron");
 const  {createTextPopup} = require("./textPopup");
+const { exportTableToExcel } = require("./export");
 
 let currentSortBy = null;
 let currentSortOrder = 'asc';
@@ -15,6 +16,7 @@ function loadCustomers(mainContent, billPanel) {
             <h2>Customers</h2>
             <button id="addCustomerBtn">Add Customer</button>
             <button id="clearCustomerDataBtn">Clear Customer Data</button>
+            <button id="exportExcelButton">Export to Excel</button>
         </div>
         <div id="customersDiv"></div>
     `;
@@ -38,6 +40,12 @@ function setupCustomerEventListeners() {
             fetchCustomers(); // Refresh customer list
         });
     });
+
+    setTimeout(() => {
+        document.getElementById("exportExcelButton").addEventListener("click", () => {
+            exportTableToExcel(".order-history-table");
+        });
+    }, 100);
 }
 
 // Function to fetch customers
