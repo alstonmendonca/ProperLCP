@@ -101,10 +101,54 @@ async function displayMenu() {
                 <h2>Menu</h2>
             </div>
 
-            <input type="text" id="searchBar" placeholder="Search..." style="padding: 10px; border: 3px solid #ccc; border-radius: 25px; width: 100%; margin-bottom: 20px; box-sizing: border-box;">
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center;">
+                <input type="text" id="searchBar" placeholder="Search..." style="
+                    padding: 10px 16px; 
+                    border: 2px solid #cbd5e1; 
+                    border-radius: 8px; 
+                    flex: 1; 
+                    font-size: 14px;
+                    background: #f8fafc;
+                    transition: border-color 0.2s ease;
+                    box-sizing: border-box;
+                " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
+                   onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                
+                <select id="categoryFilter" style="
+                    padding: 10px 16px;
+                    border: 2px solid #cbd5e1;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    background: #f8fafc;
+                    min-width: 150px;
+                    cursor: pointer;
+                    transition: border-color 0.2s ease;
+                " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
+                   onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                    <option value="">All Categories</option>
+                </select>
+                
+                <select id="vegFilter" style="
+                    padding: 10px 16px;
+                    border: 2px solid #cbd5e1;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    background: #f8fafc;
+                    min-width: 120px;
+                    cursor: pointer;
+                    transition: border-color 0.2s ease;
+                " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
+                   onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                    <option value="">All Items</option>
+                    <option value="1">🌱 Vegetarian</option>
+                    <option value="0">🍖 Non-Vegetarian</option>
+                </select>
+            </div>
 
             <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                <button id="addNewItem" style="padding: 10px; text-align: center; background-color:rgb(255, 255, 255); border: 2px dashed #aaa; border-radius: 10px; color:black; font-size: 16px;">
+                <button id="addNewItem" style="padding: 20px; text-align: center; background-color: #ffffff; border: 2px dashed #0D3B66; border-radius: 12px; color: #0D3B66; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;" 
+                        onmouseover="this.style.backgroundColor='#f8fafc'; this.style.borderColor='#11487b'" 
+                        onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#0D3B66'">
                     <svg class="add-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -132,7 +176,7 @@ async function displayMenu() {
             // Render each item
             for (const item of foodItems) {
                 menuContent += `
-                    <div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center; border-radius: 10px; background: ${item.veg == 1 ? '#EFFBF0' : '#FFEBEB'};" data-fid="${item.fid}">
+                    <div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center; border-radius: 10px; background: ${item.veg == 1 ? '#EFFBF0' : '#FFEBEB'};" data-fid="${item.fid}" data-category="${item.category}" data-veg="${item.veg}">
                         <h3>${item.fname} <br style="line-height:5px; display:block"> 
                             ${item.veg == 1 ? "🌱" : "🍖"}
                         </h3>
@@ -173,6 +217,9 @@ async function displayMenu() {
         menuContent += `</div>`;
         mainContent.innerHTML = menuContent;
 
+        // Populate category filter dropdown
+        await populateCategoryFilter();
+
         // Restore previous scroll position
         mainContent.scrollTop = currentScrollPosition;
 
@@ -184,11 +231,48 @@ async function displayMenu() {
         const searchBar = document.querySelector("#searchBar");
         if (searchBar) {
             searchBar.addEventListener("input", (event) => {
-                const searchQuery = event.target.value.trim().toLowerCase();
-                document.querySelectorAll(".food-item").forEach((itemEl) => {
-                    const foodName = itemEl.querySelector("h3").textContent.trim().toLowerCase();
-                    itemEl.style.display = foodName.includes(searchQuery) ? "block" : "none";
-                });
+                applyFilters();
+            });
+        }
+
+        // Attach category filter
+        const categoryFilter = document.querySelector("#categoryFilter");
+        if (categoryFilter) {
+            categoryFilter.addEventListener("change", (event) => {
+                applyFilters();
+            });
+        }
+
+        // Attach veg filter
+        const vegFilter = document.querySelector("#vegFilter");
+        if (vegFilter) {
+            vegFilter.addEventListener("change", (event) => {
+                applyFilters();
+            });
+        }
+
+        // Function to apply all filters simultaneously
+        function applyFilters() {
+            const searchQuery = document.querySelector("#searchBar")?.value.trim().toLowerCase() || "";
+            const categoryValue = document.querySelector("#categoryFilter")?.value || "";
+            const vegValue = document.querySelector("#vegFilter")?.value || "";
+
+            document.querySelectorAll(".food-item").forEach((itemEl) => {
+                const foodName = itemEl.querySelector("h3").textContent.trim().toLowerCase();
+                const itemCategory = itemEl.getAttribute("data-category");
+                const itemVeg = itemEl.getAttribute("data-veg");
+
+                // Check search filter
+                const matchesSearch = foodName.includes(searchQuery);
+                
+                // Check category filter
+                const matchesCategory = !categoryValue || itemCategory === categoryValue;
+                
+                // Check veg filter
+                const matchesVeg = !vegValue || itemVeg === vegValue;
+
+                // Show item only if it matches all filters
+                itemEl.style.display = (matchesSearch && matchesCategory && matchesVeg) ? "block" : "none";
             });
         }
 
@@ -697,6 +781,29 @@ async function displayMenu() {
 ipcRenderer.on("refresh-menu", async () => {
     await displayMenu();
 });
+
+// Function to populate category filter dropdown
+async function populateCategoryFilter() {
+    try {
+        const categories = await ipcRenderer.invoke("get-categories-for-additem");
+        const categorySelect = document.getElementById("categoryFilter");
+        
+        if (categorySelect) {
+            // Clear existing options except "All Categories"
+            categorySelect.innerHTML = '<option value="">All Categories</option>';
+            
+            // Add each category as an option
+            categories.forEach(cat => {
+                const option = document.createElement("option");
+                option.value = cat.catid;
+                option.textContent = cat.catname;
+                categorySelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error("Failed to load categories for filter:", error);
+    }
+}
 function toggleAddItemPopup() {
     let existingPopup = document.getElementById("add-item-popup-overlay");
     if (existingPopup) {
