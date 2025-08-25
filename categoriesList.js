@@ -120,6 +120,19 @@ function confirmDeleteCategory(categoryId) {
             </svg>
             <h2 style="margin-bottom: 15px;">Confirm Deletion</h2>
             <p style="margin-bottom: 20px;">Are you sure you want to delete this category?</p>
+            <div style="margin-bottom: 20px;">
+                <label for="masterPasswordInput" style="display: block; margin-bottom: 8px; font-weight: 500; color: #0D3B66;">
+                    Enter Master Password:
+                </label>
+                <input type="password" id="masterPasswordInput" placeholder="Enter master password to confirm deletion" 
+                       style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; 
+                              font-size: 14px; background: #f8fafc; transition: border-color 0.2s ease;"
+                       onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'"
+                       onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                <div id="passwordError" style="color: #dc2626; font-size: 12px; margin-top: 6px; display: none;">
+                    Incorrect master password. Please try again.
+                </div>
+            </div>
             <div class="popup-buttons">
                 <button id="cancelDeleteBtn" class="secondary-btn">
                     Cancel
@@ -138,9 +151,84 @@ function confirmDeleteCategory(categoryId) {
     document.body.appendChild(overlay);
     document.body.appendChild(popup);
 
-    document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
-        ipcRenderer.send("delete-category", categoryId);
-        closeModal();
+    // Focus on password input
+    document.getElementById("masterPasswordInput").focus();
+
+    // Hide error message when user starts typing
+    document.getElementById("masterPasswordInput").addEventListener("input", () => {
+        document.getElementById("passwordError").style.display = "none";
+    });
+
+    // Allow Enter key to trigger deletion
+    document.getElementById("masterPasswordInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            document.getElementById("confirmDeleteBtn").click();
+        }
+    });
+
+    document.getElementById("confirmDeleteBtn").addEventListener("click", async () => {
+        const enteredPassword = document.getElementById("masterPasswordInput").value.trim();
+        const deleteBtn = document.getElementById("confirmDeleteBtn");
+        const passwordError = document.getElementById("passwordError");
+
+        if (!enteredPassword) {
+            passwordError.textContent = "Please enter the master password.";
+            passwordError.style.display = "block";
+            return;
+        }
+
+        // Disable button and show loading state
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = `
+            <div style="border: 2px solid transparent; border-top: 2px solid currentColor; 
+                        border-radius: 50%; width: 16px; height: 16px; 
+                        animation: spin 1s linear infinite; margin-right: 8px;"></div>
+            Verifying...
+        `;
+
+        try {
+            // Get master password from database
+            const masterPassword = await ipcRenderer.invoke("get-master-password");
+            
+            if (enteredPassword === masterPassword) {
+                // Password is correct, proceed with deletion
+                ipcRenderer.send("delete-category", categoryId);
+                closeModal();
+                createTextPopup("Category deleted successfully!");
+            } else {
+                // Password is incorrect
+                passwordError.textContent = "Incorrect master password. Please try again.";
+                passwordError.style.display = "block";
+                
+                // Re-enable button and restore original text
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Delete
+                `;
+                
+                // Clear password field and focus it again
+                document.getElementById("masterPasswordInput").value = "";
+                document.getElementById("masterPasswordInput").focus();
+            }
+        } catch (error) {
+            console.error("Error verifying master password:", error);
+            passwordError.textContent = "Error verifying password. Please try again.";
+            passwordError.style.display = "block";
+            
+            // Re-enable button and restore original text
+            deleteBtn.disabled = false;
+            deleteBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Delete
+            `;
+        }
     });
 
     document.getElementById("cancelDeleteBtn").addEventListener("click", closeModal);

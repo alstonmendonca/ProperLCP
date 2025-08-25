@@ -3700,3 +3700,17 @@ ipcMain.on("get-all-cashiers", (event) => {
 });
 
 //-------------------------------- Search Order (in History Section) Ends Here-------------------------------------
+
+//------------------------------- Master Password Implementation Starts Here ----------------------------------------
+ipcMain.handle('get-master-password', async () => {
+    return new Promise((resolve, reject) => {
+        db.get("SELECT ItemValue FROM Miscellaneous WHERE ItemName = 'master_password'", [], (err, row) => {
+            if (err) {
+                console.error(err);
+                reject("Failed to retrieve master password");
+            } else {
+                resolve(row ? row.ItemValue : null);
+            }
+        });
+    });
+});
