@@ -2052,9 +2052,22 @@ ipcMain.on("get-todays-orders", (event) => {
 });
 
 // Listen for order history requests
-ipcMain.on("get-order-history", (event, { startDate, endDate }) => {
-    //console.log("Fetching order history...");
-    
+ipcMain.on("get-order-history", (event, data) => {
+    // Add safety check to prevent destructuring undefined
+    if (!data) {
+        console.error("No data provided for get-order-history");
+        event.reply("order-history-response", { success: false, orders: [], message: "No data provided" });
+        return;
+    }
+
+    const { startDate, endDate } = data;
+
+    if (!startDate || !endDate) {
+        console.error("Missing startDate or endDate for get-order-history");
+        event.reply("order-history-response", { success: false, orders: [], message: "Missing date parameters" });
+        return;
+    }
+
     const query = `
         SELECT 
             Orders.*, 
@@ -2432,7 +2445,7 @@ ipcMain.on("get-item-history", (event, { startDate, endDate, foodItem }) => {
         SELECT 
             Orders.billno, 
             Orders.date, 
-            User.uname AS cashier_name,  -- Corrected column name
+            User.uname AS cashier_name,  
             Orders.kot, 
             Orders.price, 
             Orders.sgst,
@@ -2442,7 +2455,7 @@ ipcMain.on("get-item-history", (event, { startDate, endDate, foodItem }) => {
         FROM Orders
         JOIN OrderDetails ON Orders.billno = OrderDetails.orderid
         JOIN FoodItem ON OrderDetails.foodid = FoodItem.fid
-        JOIN User ON Orders.cashier = User.userid  -- Correct join condition
+        JOIN User ON Orders.cashier = User.userid  
         WHERE FoodItem.fid = ? AND date(Orders.date) BETWEEN date(?) AND date(?)
         GROUP BY Orders.billno
         ORDER BY Orders.date DESC;

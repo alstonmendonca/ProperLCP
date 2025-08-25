@@ -182,7 +182,7 @@ function displayCategoryWiseSales(orders) {
     // ✅ Store the fetched category-wise sales in sessionStorage
     sessionStorage.setItem("categoryWiseData", JSON.stringify(orders));
 
-    attachContextMenu(".order-history-table");
+    attachContextMenu(".order-history-table","categoryWiseTable");
 
     // Attach export button functionality
     setTimeout(() => {

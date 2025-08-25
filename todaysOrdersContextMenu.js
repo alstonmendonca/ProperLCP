@@ -89,4 +89,4 @@ function openDeleteOrderPopup(billNo, sourceSection) {
     });
 }
 
-module.exports = { attachTodaysOrdersContextMenu };
+module.exports = { attachTodaysOrdersContextMenu};

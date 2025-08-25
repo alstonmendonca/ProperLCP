@@ -1,6 +1,5 @@
 const { ipcRenderer } = require("electron");
 const { attachContextMenu } = require("./contextMenu");
-const { deleteOrder } = require("./deleteOrder");
 const { exportTableToExcel } = require("./export");
 const  {createTextPopup} = require("./textPopup");
 
@@ -128,7 +127,7 @@ ipcRenderer.on("order-history-response", (event, data) => {
     tableHTML += `</tbody></table>`;
     orderHistoryDiv.innerHTML = tableHTML;
 
-    attachContextMenu(".order-history-table");
+    attachContextMenu(".order-history-table", "orderHistory");
 
     setTimeout(() => {
         document.getElementById("exportExcelButton").addEventListener("click", () => {
@@ -253,5 +252,19 @@ function formatDate(dateString) {
     const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
     return `${day}-${month}-${year}`;
 }
+
+ipcRenderer.on("refresh-order-history", () => {
+    const savedStartDate = sessionStorage.getItem("orderHistoryStartDate");
+    const savedEndDate = sessionStorage.getItem("orderHistoryEndDate");
+    
+    // Add null checks to ensure we have valid dates
+    if (savedStartDate && savedEndDate) {
+        fetchOrderHistory(savedStartDate, savedEndDate);
+    } else {
+        // Fallback to today's date if no saved dates
+        const today = new Date().toISOString().split("T")[0];
+        fetchOrderHistory(today, today);
+    }
+});
 
 module.exports = { fetchOrderHistory, sortOrderHistoryTable, loadOrderHistory };

@@ -1,4 +1,6 @@
+// contextMenu.js - Replace the existing order context menu section
 const { ipcRenderer } = require("electron");
+const { createTextPopup } = require("./textPopup"); // Make sure this is imported
 
 function attachContextMenu(tableSelector, sourceSection) {
     const tableRows = document.querySelectorAll(`${tableSelector} tbody tr`);
@@ -33,16 +35,25 @@ function attachContextMenu(tableSelector, sourceSection) {
                 });
 
             } 
-            // Existing Order Context Menu (Do not modify)
+            // NEW: Updated Order Context Menu (same as todaysOrdersContextMenu)
             else {
                 const billNo = row.getAttribute("data-billno");
                 menu.innerHTML = `
                     <div class="context-option" id="deleteOrder">🗑️ Delete Order (Bill No: ${billNo})</div>
+                    <div class="context-option" id="printBill">🖨️ Print Bill (Bill No: ${billNo})</div>
                     <div class="context-option">📄 View Details</div>
                 `;
 
+                // Handle delete order (using the new popup)
                 menu.querySelector("#deleteOrder").addEventListener("click", () => {
-                    ipcRenderer.send("open-delete-order-window", { billNo, source: sourceSection });
+                    openDeleteOrderPopup(billNo, sourceSection || "orderHistory");
+                    menu.remove();
+                });
+
+                // Handle print bill
+                menu.querySelector("#printBill").addEventListener("click", () => {
+                    // You'll need to implement printBill function or import it
+                    printBill(billNo);
                     menu.remove();
                 });
             }
@@ -55,6 +66,48 @@ function attachContextMenu(tableSelector, sourceSection) {
                 menu.remove();
             }, { once: true });
         });
+    });
+}
+
+// Add this function to contextMenu.js (same as in todaysOrdersContextMenu)
+function openDeleteOrderPopup(billNo, sourceSection) {
+    const popup = document.createElement("div");
+    popup.classList.add("delete-order-popup");
+    popup.innerHTML = `
+        <div class="delete-order-popup-content">
+            <h3>Delete Order</h3>
+            <label>Reason for Deletion:</label>
+            <input type="text" id="deleteReason" placeholder="Enter reason">
+            <div class="delete-order-popup-buttons">
+                <button id="confirmDeleteOrder">Delete</button>
+                <button id="cancelDeleteOrder">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Handle confirm delete
+    popup.querySelector("#confirmDeleteOrder").addEventListener("click", () => {
+        const reason = popup.querySelector("#deleteReason").value.trim();
+        if (reason) {
+            ipcRenderer.send("confirm-delete-order", { billNo, reason, source: sourceSection });
+            document.body.removeChild(popup);
+        } else {
+            createTextPopup("Please enter a reason for deletion.");
+        }
+    });
+
+    // Handle cancel delete
+    popup.querySelector("#cancelDeleteOrder").addEventListener("click", () => {
+        document.body.removeChild(popup);
+    });
+
+    // Close popup when clicking outside
+    popup.addEventListener("click", (e) => {
+        if (e.target === popup) {
+            document.body.removeChild(popup);
+        }
     });
 }
 
