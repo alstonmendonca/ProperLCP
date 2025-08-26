@@ -6,6 +6,8 @@ const fs = require('fs');
 const { backupLCdb } = require("./backup");
 escpos.USB = require("escpos-usb");
 const { fork, spawn } = require('child_process');
+const { updateElectronApp } = require('update-electron-app')
+updateElectronApp()
 let mainWindow;
 let splash;
 let userRole = null;
