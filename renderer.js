@@ -68,6 +68,7 @@ const { loadTaxOnItems } = require('./taxOnItems');
 const { loadReceiptEditor } = require("./receiptEditor");
 const { loadPrinterConfiguration } = require("./printerConfiguration");
 const { loadSearchOrder, searchOrders, sortSearchResults} = require("./searchOrder");
+const { loadCustomizeLeftPanel } = require("./customizeLeftPanel");
 
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;

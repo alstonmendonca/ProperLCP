@@ -1037,3 +1037,104 @@ input:checked + .user-slider:before {
     border: 1px dashed #dee2e6;
 }
 /* USER PROFILE Section ENDS HERE */
+
+.customize-panel-wrapper {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.customize-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.customize-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.customize-subtitle {
+    color: #666;
+    font-size: 14px;
+}
+
+.categories-list-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.section-description {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.sortable-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sortable-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: move;
+    transition: all 0.2s ease;
+}
+
+.sortable-item:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+}
+
+.sortable-item.dragging {
+    background: #e3f2fd;
+    border-color: #2196f3;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+.item-handle {
+    margin-right: 12px;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+}
+
+.item-name {
+    flex: 1;
+    font-weight: 500;
+    color: #333;
+}
+
+.item-badge {
+    background: #6c757d;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.customize-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}

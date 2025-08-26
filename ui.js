@@ -22,7 +22,7 @@ async function updateMainContent(contentType) {
     const settingsButtons = [
         'UserProfile', 'BusinessInfo',  
         'Receipt', 'DriverConfiguration', 'BackupDatabase', 'RestoreDatabase',
-        'ConnectedDevices', 'Help'
+        'ConnectedDevices', 'Help', 'customizeLeftPanel'
     ];
     
     // Highlight top panel button for any top-level section
@@ -186,7 +186,6 @@ async function updateMainContent(contentType) {
                 });
             });
         }
-        // Menu Management -----REMOVED-----------
 
         // -------------------------------------------------ANALYTICS STARTS HERE---------------------------------------------------
         else if (contentType === "SalesOverview") {
@@ -254,6 +253,9 @@ async function updateMainContent(contentType) {
         else if (contentType === "ConnectedDevices") {
             loadConnectedDevices(mainContent, billPanel);
         }
+        else if (contentType === "customizeLeftPanel") {
+            loadCustomizeLeftPanel(mainContent, billPanel);
+        }
         else if (contentType === "Help") {
             loadHelpSection();
         }
@@ -264,7 +266,6 @@ async function updateMainContent(contentType) {
         else if (contentType === "RestoreDatabase") {
             const { loadRestoreUI } = require("./loadRestoreUI");
             loadRestoreUI(mainContent, billPanel); // Call the restore UI function
-
         }
         else if (contentType === "Exit") {
             const  {createConfirmPopup} = require("./textPopup");

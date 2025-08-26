@@ -2573,7 +2573,6 @@ ipcMain.on("update-order", (event, { billno, orderItems }) => {
         });
 
         // Execute all insert statements
-        // Execute all insert statements
         Promise.all(statements)
             .then(() => {
                 console.log("Order items updated successfully.");
@@ -2950,13 +2949,56 @@ ipcMain.handle('save-printer-configuration', (event, printerName) => {
 
 //----------------------------------------------SETTINGS TAB ENDS HERE--------------------------------------------
 
+// Store for category order
+let categoryOrderStore = new Store({ name: 'category-order' });
+
+// Get category order
+ipcMain.handle("get-category-order", async () => {
+    return categoryOrderStore.get('order', []);
+});
+
+// Save category order
+ipcMain.handle("save-category-order", async (event, order) => {
+    categoryOrderStore.set('order', order);
+    return true;
+});
+
+// Reset category order
+ipcMain.handle("reset-category-order", async () => {
+    categoryOrderStore.delete('order');
+    return true;
+});
+
+// Modified get-categories handler to respect custom order
 ipcMain.handle("get-categories", async () => {
     return new Promise((resolve, reject) => {
-        db.all("SELECT catname FROM Category WHERE active = 1", [], (err, rows) => {
+        db.all("SELECT catid, catname FROM Category WHERE active = 1", [], (err, rows) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(rows);
+                // Get custom order if exists
+                const customOrder = categoryOrderStore.get('order', []);
+                
+                if (customOrder.length > 0) {
+                    // Sort categories according to custom order
+                    const orderedCategories = [];
+                    const unorderedCategories = [];
+                    
+                    rows.forEach(category => {
+                        const index = customOrder.indexOf(category.catname);
+                        if (index !== -1) {
+                            orderedCategories[index] = category;
+                        } else {
+                            unorderedCategories.push(category);
+                        }
+                    });
+                    
+                    // Remove undefined slots and combine with unordered categories
+                    const filteredOrdered = orderedCategories.filter(cat => cat !== undefined);
+                    resolve([...filteredOrdered, ...unorderedCategories]);
+                } else {
+                    resolve(rows);
+                }
             }
         });
     });
