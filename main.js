@@ -1375,6 +1375,83 @@ ipcMain.on("print-bill", (event, { billItems, totalAmount, kot, orderId }) => {
     }
 });
 
+// Improve the rollback function
+ipcMain.on("rollback-order", (event, orderId) => {
+    db.serialize(() => {
+        // Use transactions for atomicity
+        db.run("BEGIN TRANSACTION");
+        
+        db.run("DELETE FROM OrderDetails WHERE orderid = ?", [orderId], function(err) {
+            if (err) {
+                console.error("Error deleting order details:", err);
+                db.run("ROLLBACK");
+                return;
+            }
+            
+            db.run("DELETE FROM DiscountedOrders WHERE billno = ?", [orderId], function(err) {
+                if (err) {
+                    console.error("Error deleting discount:", err);
+                    db.run("ROLLBACK");
+                    return;
+                }
+                
+                db.run("DELETE FROM Orders WHERE billno = ?", [orderId], function(err) {
+                    if (err) {
+                        console.error("Error deleting order:", err);
+                        db.run("ROLLBACK");
+                    } else {
+                        db.run("COMMIT");
+                        console.log(`Order ${orderId} successfully rolled back`);
+                    }
+                });
+            });
+        });
+    });
+});
+
+ipcMain.handle("test-printer-connection", async (event) => {
+    if (isPrinting) {
+        throw new Error('Printer is busy');
+    }
+    isPrinting = true;
+
+    try {
+        const config = store.get('printerConfig', {
+            vendorId: '0x0525',
+            productId: '0xA700'
+        });
+
+        const vendorId = parseInt(config.vendorId, 16);
+        const productId = parseInt(config.productId, 16);
+
+        if (isNaN(vendorId) || isNaN(productId)) {
+            throw new Error('Invalid printer configuration');
+        }
+
+        const device = new escpos.USB(vendorId, productId);
+        
+        return new Promise((resolve, reject) => {
+            device.open((err) => {
+                isPrinting = false;
+                if (err) {
+                    reject(new Error(`Printer connection failed: ${err.message}`));
+                } else {
+                    device.close((closeErr) => {
+                        if (closeErr) {
+                            reject(new Error(`Printer test failed: ${closeErr.message}`));
+                        } else {
+                            resolve(true);
+                        }
+                    });
+                }
+            });
+        });
+    } catch (error) {
+        isPrinting = false;
+        throw error;
+    }
+});
+
 function generateHardcodedReceipt(items, totalAmount, kot, orderId) {
     const template = loadReceiptTemplate({ // Change from store.get to loadReceiptTemplate
         title: 'THE LASSI CORNER',

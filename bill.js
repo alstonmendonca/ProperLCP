@@ -339,37 +339,55 @@ async function saveAndPrintBill() {
         price: parseFloat(item.querySelector(".bill-total").textContent)
     }));
 
-    // 👉 Save bill first, DB will assign kot & orderId
-    ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
+    try {
+        // 👉 FIRST test if printer is available
+        await ipcRenderer.invoke("test-printer-connection");
+        
+        // 👉 ONLY if printer test succeeds, then save to database
+        ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
 
-    ipcRenderer.once("bill-saved", (event, { kot, orderId }) => {
-        // Now we print with the official kot & orderId
-        ipcRenderer.send("print-bill", {
-            billItems: itemsForPrinting,
-            totalAmount: discountedTotal,
-            kot,
-            orderId,
-            dateTime: new Date().toLocaleString()
+        ipcRenderer.once("bill-saved", (event, { kot, orderId }) => {
+            // Now we print with the official kot & orderId
+            ipcRenderer.send("print-bill", {
+                billItems: itemsForPrinting,
+                totalAmount: discountedTotal,
+                kot,
+                orderId,
+                dateTime: new Date().toLocaleString()
+            });
+
+            ipcRenderer.once("print-success-with-data", () => {
+                DeductInventory();
+                const billPanel = document.getElementById("bill-panel");
+                billPanel.classList.add("glow");
+
+                setTimeout(() => {
+                    billPanel.classList.remove("glow");
+                    NewOrder();
+                }, 800);
+            });
+
+            ipcRenderer.once("print-error", (event, error) => {
+                // Even if final print fails, at least we tested the printer was available
+                createTextPopup(`Print failed after saving: ${error}`);
+                DeductInventory();
+                const billPanel = document.getElementById("bill-panel");
+                billPanel.classList.add("glow");
+
+                setTimeout(() => {
+                    billPanel.classList.remove("glow");
+                    NewOrder();
+                }, 800);
+            });
         });
 
-        ipcRenderer.once("print-success-with-data", () => {
-            const billPanel = document.getElementById("bill-panel");
-            billPanel.classList.add("glow");
-
-            setTimeout(() => {
-                billPanel.classList.remove("glow");
-                NewOrder();
-            }, 800);
+        ipcRenderer.once("bill-error", (event, { error }) => {
+            createTextPopup(`Save Error: ${error}`);
         });
-    });
 
-    ipcRenderer.once("bill-error", (event, { error }) => {
-        createTextPopup(`Save Error: ${error}`);
-    });
-
-    ipcRenderer.once("print-error", (event, error) => {
-        createTextPopup(`Print Failed: ${error}`);
-    });
+    } catch (error) {
+        createTextPopup(`Printer not available: ${error}. Order was not saved.`);
+    }
 }
 
 
