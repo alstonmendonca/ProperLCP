@@ -10,8 +10,7 @@
     "dev": "electronmon .",
     "package": "electron-builder --dir",
     "make": "electron-builder",
-    "postinstall": "electron-builder install-app-deps",
-    "release":"electron-builder"
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "icon": "assets/images/favicon.ico",
