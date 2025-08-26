@@ -6,8 +6,11 @@ const fs = require('fs');
 const { backupLCdb } = require("./backup");
 escpos.USB = require("escpos-usb");
 const { fork, spawn } = require('child_process');
-const { updateElectronApp } = require('update-electron-app')
-updateElectronApp()
+const { autoUpdater } = require('electron-updater')
+const log = require('electron-log')
+
+autoUpdater.logger = log
+autoUpdater.logger.transports.file.level = 'info'
 let mainWindow;
 let splash;
 let userRole = null;
@@ -497,6 +500,7 @@ function setupIPC() {
 
 // === App lifecycle ===
 app.whenReady().then(async () => {
+    autoUpdater.checkForUpdatesAndNotify();
   createSplash();
 
   try {

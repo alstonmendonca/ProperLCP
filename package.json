@@ -5,7 +5,7 @@
   "description": "Lassi Corner POS System",
   "author": "Alston Daniel Mendonca",
   "license": "MIT",
-    "repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/alstonmendonca/ProperLCP.git"
   },
@@ -20,6 +20,13 @@
     "icon": "assets/images/favicon.ico",
     "asarUnpack": [
       "node_modules/ws"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "alstonmendonca",
+        "repo": "ProperLCP"
+      }
     ],
     "appId": "com.lassicorner.app",
     "productName": "Lassi Corner",
