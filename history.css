@@ -542,7 +542,7 @@
 
 /* Hover effect for order box */
 .todays-order-box:hover {
-    border-color: #4CAF50; /* Change border color on hover */
+    border-color: #104475; /* Change border color on hover */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Slightly larger shadow on hover */
 }
 
