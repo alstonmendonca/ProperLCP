@@ -98,6 +98,7 @@
     "chart.js": "^4.4.8",
     "cloudflared": "^0.7.0",
     "dotenv": "^16.5.0",
+    "electron-log": "^5.4.3",
     "electron-store": "^8.0.2",
     "electron-updater": "^6.6.2",
     "escpos": "3.0.0-alpha.6",
