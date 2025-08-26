@@ -390,6 +390,91 @@ async function saveAndPrintBill() {
     }
 }
 
+// This function gets called when user clicks on 'KOT' button in bill panel
+async function saveAndPrintKOT() {
+    const user = await ipcRenderer.invoke("get-session-user");
+    const cashier = user.userid;
+    const date = new Date().toISOString().split("T")[0];
+
+    const billItems = document.querySelectorAll(".bill-item");
+    let orderItems = [];
+    let totalAmount = 0;
+
+    billItems.forEach(item => {
+        let foodId = item.id.replace("bill-item-", "");
+        let quantity = parseInt(item.querySelector(".bill-quantity").value);
+        let itemTotal = parseFloat(item.querySelector(".bill-total").textContent);
+        if (!isNaN(itemTotal)) totalAmount += itemTotal;
+        orderItems.push({ foodId: parseInt(foodId), quantity });
+    });
+
+    if (orderItems.length === 0) {
+        createTextPopup("No items in the bill. Please add items before proceeding.");
+        return;
+    }
+
+    // Handle discount
+    let discountField = document.getElementById("discounted-total");
+    let discountedTotal = discountField?.value ? parseFloat(discountField.value) : totalAmount;
+
+    // Prepare items for printing
+    const itemsForPrinting = Array.from(billItems).map(item => ({
+        name: item.querySelector(".bill-item-name").textContent,
+        quantity: item.querySelector(".bill-quantity").value,
+        price: parseFloat(item.querySelector(".bill-total").textContent)
+    }));
+
+    try {
+        // 👉 FIRST test if printer is available
+        await ipcRenderer.invoke("test-printer-connection");
+        
+        // 👉 ONLY if printer test succeeds, then save to database
+        ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
+
+        ipcRenderer.once("bill-saved", (event, { kot, orderId }) => {
+            // Now we print only the KOT (no customer receipt)
+            ipcRenderer.send("print-kot-only", {
+                billItems: itemsForPrinting,
+                totalAmount: discountedTotal,
+                kot,
+                orderId,
+                dateTime: new Date().toLocaleString()
+            });
+
+            ipcRenderer.once("print-kot-success", () => {
+                DeductInventory();
+                const billPanel = document.getElementById("bill-panel");
+                billPanel.classList.add("glow");
+
+                setTimeout(() => {
+                    billPanel.classList.remove("glow");
+                    NewOrder();
+                }, 800);
+            });
+
+            ipcRenderer.once("print-error", (event, error) => {
+                // Even if KOT print fails, at least we tested the printer was available
+                createTextPopup(`KOT print failed after saving: ${error}`);
+                DeductInventory();
+                const billPanel = document.getElementById("bill-panel");
+                billPanel.classList.add("glow");
+
+                setTimeout(() => {
+                    billPanel.classList.remove("glow");
+                    NewOrder();
+                }, 800);
+            });
+        });
+
+        ipcRenderer.once("bill-error", (event, { error }) => {
+            createTextPopup(`Save Error: ${error}`);
+        });
+
+    } catch (error) {
+        createTextPopup(`Printer not available: ${error}. Order was not saved.`);
+    }
+}
+
 
 function generateEscPosCommands(billItems, totalAmount, kot, orderId) {
     // Prepare items for printing

@@ -1521,6 +1521,93 @@ ${kotItems}
 return  customerReceipt+kotReceipt;
 }
 
+// Add this to main.js
+ipcMain.on("print-kot-only", (event, { billItems, totalAmount, kot, orderId }) => {
+    if (isPrinting) {
+        event.sender.send('print-error', 'Printer is busy');
+        return;
+    }
+    isPrinting = true;
+
+    try {
+        const config = store.get('printerConfig', {
+            vendorId: '0x0525',
+            productId: '0xA700'
+        });
+
+        const vendorId = parseInt(config.vendorId, 16);
+        const productId = parseInt(config.productId, 16);
+
+        if (isNaN(vendorId) || isNaN(productId)) {
+            throw new Error('Invalid printer configuration - please check Vendor/Product IDs');
+        }
+
+        const device = new escpos.USB(vendorId, productId);
+        const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
+
+        device.open((err) => {
+            if (err) {
+                event.sender.send('print-error', `Printer connection failed: ${err.message}`);
+                return;
+            }
+
+            // Generate only KOT commands (no customer receipt)
+            const commands = generateKOTOnly(billItems, totalAmount, kot, orderId);
+            
+            printer
+                .raw(Buffer.from(commands, 'utf8'))
+                .close((err) => {
+                    if (err) {
+                        event.sender.send('print-error', `Print failed: ${err.message}`);
+                    } else {
+                        event.sender.send('print-kot-success', { kot, orderId });
+                    }
+                });
+        });
+    } catch (error) {
+        event.sender.send('print-error', `System error: ${error.message}`);
+    } finally {
+        isPrinting = false;
+    }
+});
+
+// Function to generate only KOT (no customer receipt)
+function generateKOTOnly(items, totalAmount, kot, orderId) {
+    const template = loadReceiptTemplate({
+        title: 'THE LASSI CORNER',
+        subtitle: 'SJEC, VAMANJOOR',
+        footer: 'Thank you for visiting!',
+        itemHeader: 'ITEM',
+        qtyHeader: 'QTY',
+        priceHeader: 'PRICE',
+        totalText: 'TOTAL: Rs.',
+        kotItemHeader: 'ITEM',
+        kotQtyHeader: 'QTY'
+    });
+
+    const itemWidth = 35;  // More space for food names
+    const kotQtyWidth = 5;
+    
+    const kotItems = items.map(item => 
+        `${item.name.substring(0, itemWidth).padEnd(itemWidth)}` +
+        `${item.quantity.toString().padStart(kotQtyWidth)}`
+    ).join('\n');
+    
+    // KOT receipt only (larger KOT #)
+    const kotReceipt = `\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01\x1B\x2D\x00${kot}
+    \x1B\x33\x03
+    \x1D\x21\x00\x1B\x45\x00\x1B\x2D\x00
+    Time: ${new Date().toLocaleTimeString()}\x1B\x61\x00\x1B\x45\x01\x1B\x2D\x00               Rs ${totalAmount.toFixed(2)}
+    ------------------------------------------
+    ITEM                                   QTY
+    ------------------------------------------
+    \x1B\x45\x00\x1B\x2D\x00
+    ${kotItems}
+    \x1D\x56\x41\x00`;  // Partial cut
+
+    return kotReceipt;
+}
+
 function loadReceiptTemplate(defaults) {
   try {
     if (fs.existsSync(RECEIPT_FORMAT_PATH)) {
