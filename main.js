@@ -11,6 +11,18 @@ const log = require('electron-log')
 
 autoUpdater.logger = log
 autoUpdater.logger.transports.file.level = 'info'
+autoUpdater.on("update-downloaded", (info) => {
+  console.log("📦 Update downloaded", info);
+
+  dialog.showMessageBox({
+    type: "info",
+    buttons: ["Restart Now", "Later"],
+    title: "Update Ready",
+    message: "A new version has been downloaded. Restart now to install?"
+  }).then(result => {
+    if (result.response === 0) autoUpdater.quitAndInstall();
+  });
+});
 let mainWindow;
 let splash;
 let userRole = null;
