@@ -10,7 +10,8 @@
     "dev": "electronmon .",
     "package": "electron-builder --dir",
     "make": "electron-builder",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "release":"electron-builder"
   },
   "build": {
     "icon": "assets/images/favicon.ico",
@@ -21,17 +22,39 @@
     "productName": "Lassi Corner",
     "artifactName": "Lassi Corner Setup.exe",
     "extraResources": [
-      { "from": ".env", "to": ".env" },
-      { "from": "getOnline.js", "to": "getOnline.js" },
-      { "from": "LC.db", "to": "LC.db" },
-      { "from": "startMongoExpress.exe", "to": "startMongoExpress.exe" },
-      { "from": "businessInfo.json", "to": "businessInfo.json" },
-      {"from": "receiptFormat.json", "to": "receiptFormat.json"},
-      { "from": "AddItem.html", "to": "AddItem.html" }
+      {
+        "from": ".env",
+        "to": ".env"
+      },
+      {
+        "from": "getOnline.js",
+        "to": "getOnline.js"
+      },
+      {
+        "from": "LC.db",
+        "to": "LC.db"
+      },
+      {
+        "from": "startMongoExpress.exe",
+        "to": "startMongoExpress.exe"
+      },
+      {
+        "from": "businessInfo.json",
+        "to": "businessInfo.json"
+      },
+      {
+        "from": "receiptFormat.json",
+        "to": "receiptFormat.json"
+      },
+      {
+        "from": "AddItem.html",
+        "to": "AddItem.html"
+      }
     ],
     "win": {
       "icon": "assets/images/favicon.ico",
-      "target": "nsis"
+      "target": "nsis",
+      "publish":["github"]
     },
     "nsis": {
       "oneClick": false,
@@ -64,6 +87,7 @@
     "cloudflared": "^0.7.0",
     "dotenv": "^16.5.0",
     "electron-store": "^8.0.2",
+    "electron-updater": "^6.6.2",
     "escpos": "3.0.0-alpha.6",
     "escpos-usb": "3.0.0-alpha.4",
     "express": "^5.1.0",
