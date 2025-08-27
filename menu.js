@@ -1,58 +1,151 @@
-//REEVANS JOB - MOVE THIS CONFIRM POPUP INTO ANOTHER FILE. ELSE IT WONT DELETE BUTTON
-function createConfirmPopup(message) {
-    return new Promise((resolve) => {
-        let existingPopup = document.getElementById("custom-confirm-popup");
-        if (existingPopup) {
-            existingPopup.remove();
-        }
+function createConfirmPopup(message, callback) {
+    // Remove existing popup if it exists
+    let existingPopup = document.getElementById("custom-confirm-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+    }
 
-        // Create overlay
-        const overlay = document.createElement("div");
-        overlay.id = "custom-confirm-popup";
-        overlay.style.position = "fixed";
-        overlay.style.top = "0";
-        overlay.style.left = "0";
-        overlay.style.width = "100vw";
-        overlay.style.height = "100vh";
-        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-        overlay.style.display = "flex";
-        overlay.style.alignItems = "center";
-        overlay.style.justifyContent = "center";
-        overlay.style.zIndex = "9999";
+    // Create popup container
+    const popup = document.createElement("div");
+    popup.id = "custom-confirm-popup";
+    popup.classList.add("confirm-popup");
 
-        overlay.innerHTML = `
-                <div class="menu-popup-content" style="background: white; padding: 20px; border-radius: 10px; width: 300px; pointer-events: auto;">
-                    <p>${message}</p>
-                    <br>
-                    <div class="menu-popup-buttons" style="display: flex; justify-content: center; gap: 10px;">
-                        <button id="confirmYes" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Yes</button>
-                        <button id="confirmNo" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">No</button>
-                    </div>
-                </div>
-            `;
+    popup.style.cssText = `
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    `;
 
-        // Close on outside click
-        overlay.addEventListener("click", (e) => {
-            if (e.target === overlay) {
-                overlay.remove();
-                resolve(false);
-            }
-        });
+    popup.innerHTML = `
+        <div style="
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(13, 59, 102, 0.15);
+            width: 420px;
+            max-width: 90%;
+            text-align: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            animation: popupSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        ">
+            <style>
+                @keyframes popupSlideIn {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.8) translateY(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1) translateY(0);
+                    }
+                }
+                
+                .confirm-btn:hover {
+                    transform: translateY(-2px);
+                }
+                
+                .confirm-btn:active {
+                    transform: translateY(0);
+                }
+                
+                .ok-btn:hover {
+                    box-shadow: 0 8px 24px rgba(13, 59, 102, 0.3);
+                }
+                
+                .cancel-btn:hover {
+                    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+                }
+            </style>
+            
+            <div style="
+                width: 64px;
+                height: 64px;
+                background: linear-gradient(135deg, #ff9800, #f57c00);
+                border-radius: 50%;
+                margin: 0 auto 24px auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 8px 24px rgba(255, 152, 0, 0.2);
+            ">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            
+            <p style="
+                font-size: 18px;
+                line-height: 1.5;
+                margin-bottom: 32px;
+                color: #1e293b;
+                font-weight: 500;
+                letter-spacing: -0.01em;
+            ">${message}</p>
 
-        document.body.appendChild(overlay);
+            <div style="
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                flex-wrap: wrap;
+            ">
+                <button id="confirmPopup_okButton" class="confirm-btn ok-btn" style="
+                    background: linear-gradient(135deg, #0D3B66, #1a5490);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    padding: 14px 28px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    box-shadow: 0 4px 16px rgba(13, 59, 102, 0.2);
+                    font-family: inherit;
+                    letter-spacing: 0.02em;
+                    min-width: 120px;
+                ">OK</button>
 
-        document.getElementById("confirmYes").addEventListener("click", () => {
-            overlay.remove();
-            resolve(true);
-        });
+                <button id="confirmPopup_cancelButton" class="confirm-btn cancel-btn" style="
+                    background: linear-gradient(135deg, #ef4444, #dc2626);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    padding: 14px 28px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+                    font-family: inherit;
+                    letter-spacing: 0.02em;
+                    min-width: 120px;
+                ">Cancel</button>
+            </div>
+        </div>
+    `;
 
-        document.getElementById("confirmNo").addEventListener("click", () => {
-            overlay.remove();
-            resolve(false);
-        });
+    document.body.appendChild(popup);
+
+    // Add event listeners for both buttons
+    document.getElementById("confirmPopup_okButton").addEventListener("click", () => {
+        popup.remove(); // Close the popup
+        callback(true); // Call the callback with 'true' (OK clicked)
+    });
+
+    document.getElementById("confirmPopup_cancelButton").addEventListener("click", () => {
+        popup.remove(); // Close the popup
+        callback(false); // Call the callback with 'false' (Cancel clicked)
     });
 }
-
 
 async function displayMenu() {
     const mainContent = document.getElementById("main-content");

@@ -871,7 +871,7 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
 
     const style = document.createElement('style');
     style.textContent = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     body, .popup-container {
         font-family: 'Inter', sans-serif;
@@ -883,9 +883,15 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.4);  /* Semi-transparent black */
-        backdrop-filter: blur(8px);  /* Optional: Adds a blur effect */
-        z-index: 999;  /* Ensure the overlay is above the background content */
+        background: rgba(13, 59, 102, 0.15);
+        backdrop-filter: blur(12px);
+        z-index: 999;
+        animation: overlayFadeIn 0.3s ease-out;
+    }
+
+    @keyframes overlayFadeIn {
+        from { opacity: 0; backdrop-filter: blur(0px); }
+        to { opacity: 1; backdrop-filter: blur(12px); }
     }
 
     .held-popup {
@@ -893,200 +899,372 @@ ipcRenderer.on('held-orders-data', (event, heldOrders) => {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(255, 255, 255, 0.9);  /* White background for the popup */
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.06);
-        width: 90%;
-        max-width: 1000px;
-        max-height: 90vh;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 
+            0 25px 50px rgba(13, 59, 102, 0.25),
+            0 10px 25px rgba(13, 59, 102, 0.15),
+            0 0 0 1px rgba(13, 59, 102, 0.1);
+        width: 95%;
+        max-width: 1200px;
+        max-height: 95vh;
         overflow: hidden;
-        animation: popupEntrance 0.3s ease-out;
-        padding: 0 !important;
-        margin: 0 !important;
-        border: none !important;
-        z-index: 1000;  /* Ensure the popup is above the overlay */
+        animation: popupEntrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 1000;
     }
 
     @keyframes popupEntrance {
-        0% { transform: translate(-50%, -60%); opacity: 0; }
-        100% { transform: translate(-50%, -50%); opacity: 1; }
+        0% { 
+            transform: translate(-50%, -60%) scale(0.8); 
+            opacity: 0; 
+        }
+        100% { 
+            transform: translate(-50%, -50%) scale(1); 
+            opacity: 1; 
+        }
     }
 
     .popup-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: linear-gradient(135deg,#0D3B66,#0D3B66);
+        background: linear-gradient(135deg, #0D3B66 0%, #1a5490 100%);
         color: white;
-        padding: 0.5rem 1rem;
+        padding: 1.25rem 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .popup-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
     }
 
     .popup-title {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
         flex: 1;
         justify-content: center;
-        pointer-events: none;
         margin: 0;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .spacer {
-        width: 40px;
+        width: 48px;
     }
 
     .close-btn {
-        background: none;
+        background: rgba(255, 255, 255, 0.15);
         border: none;
         color: white;
-        font-size: 2rem;
+        font-size: 1.5rem;
         cursor: pointer;
-        padding: 0.25rem 0.75rem;
-        line-height: 1;
-        border-radius: 8px;
-        transition: transform 0.2s, background 0.2s;
+        padding: 0.5rem;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
+        backdrop-filter: blur(10px);
     }
 
     .close-btn:hover {
-        transform: scale(1.1);
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .close-btn:active {
+        transform: scale(0.95);
     }
 
     .orders-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.5rem;
-        padding: 1.5rem;
-        max-height: 70vh;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        padding: 2rem;
+        max-height: 75vh;
         overflow-y: auto;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
     }
 
     .order-card {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 16px;
+        border: 2px solid transparent;
+        box-shadow: 
+            0 8px 25px rgba(13, 59, 102, 0.12),
+            0 3px 10px rgba(13, 59, 102, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
-        animation: fadeInUp 0.3s ease both;
+        animation: cardFadeIn 0.5s ease-out;
+        position: relative;
+    }
+
+    .order-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0D3B66, #1a5490);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
     }
 
     .order-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        transform: translateY(-8px);
+        border-color: rgba(13, 59, 102, 0.2);
+        box-shadow: 
+            0 20px 40px rgba(13, 59, 102, 0.2),
+            0 8px 20px rgba(13, 59, 102, 0.12);
     }
 
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(10px); }
+    .order-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     .card-header {
-        padding: 1rem;
-        background: linear-gradient(135deg, #e0eafc, #cfdef3);
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #0D3B66 0%, rgba(13, 59, 102, 0.9) 100%);
+        color: white;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
     }
 
     .order-id {
-        font-weight: 600;
-        color: #2c3e50;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: white;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 1;
     }
 
     .cashier-badge {
-        background: #e9ecef;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
         font-size: 0.9rem;
+        font-weight: 500;
         display: flex;
         align-items: center;
-        gap: 0.3rem;
+        gap: 0.5rem;
+        backdrop-filter: blur(10px);
+        position: relative;
+        z-index: 1;
     }
 
     .order-items {
-        padding: 1rem;
+        padding: 1.5rem;
         display: grid;
-        gap: 0.5rem;
-        height: 150px;
+        gap: 0.75rem;
+        min-height: 180px;
+        max-height: 180px;
         overflow-y: auto;
+        background: linear-gradient(to bottom, #ffffff, #f8fafc);
     }
 
     .order-item {
-        padding: 0.5rem;
-        background: #f8f9fa;
-        border-radius: 4px;
-        font-size: 0.9rem;
+        padding: 0.75rem 1rem;
+        background: white;
+        border: 1px solid rgba(13, 59, 102, 0.1);
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #0D3B66;
         display: flex;
         align-items: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(13, 59, 102, 0.05);
+    }
+
+    .order-item:hover {
+        background: #f8fafc;
+        border-color: rgba(13, 59, 102, 0.2);
+        transform: translateX(4px);
     }
 
     .card-footer {
-        padding: 1rem;
-        background: #f8f9fa;
-        border-top: 1px solid #dee2e6;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-top: 1px solid rgba(13, 59, 102, 0.1);
     }
 
     .order-total {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 1rem;
+        align-items: center;
+        margin-bottom: 1.25rem;
         font-weight: 600;
+        font-size: 1.1rem;
+        color: #0D3B66;
+    }
+
+    .total-label {
+        color: #0D3B66;
+        opacity: 0.8;
+    }
+
+    .total-amount {
+        color: #0D3B66;
+        font-weight: 700;
+        font-size: 1.2rem;
     }
 
     .action-buttons {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     .btn-add, .btn-delete {
-        padding: 0.5rem 1rem;
+        padding: 0.875rem 1.25rem;
         border: none;
-        border-radius: 6px;
+        border-radius: 12px;
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+        font-weight: 600;
+        font-size: 0.95rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
         justify-content: center;
-        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }
 
     .btn-add {
-        background: #28a745;
+        background: linear-gradient(135deg, #0D3B66 0%, #1a5490 100%);
         color: white;
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.3);
+    }
+
+    .btn-add::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-add:hover::before {
+        left: 100%;
     }
 
     .btn-delete {
-        background: #dc3545;
-        color: white;
+        background: white;
+        color: #0D3B66;
+        border: 2px solid #0D3B66;
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
     }
 
-    .btn-add:hover, .btn-delete:hover {
-        filter: brightness(0.95);
-        transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13, 59, 102, 0.4);
+    }
+
+    .btn-delete:hover {
+        background: #0D3B66;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13, 59, 102, 0.3);
+    }
+
+    .btn-add:active, .btn-delete:active {
+        transform: translateY(0);
     }
 
     .icon {
         display: inline-block;
         vertical-align: middle;
+        transition: transform 0.2s ease;
+    }
+
+    .btn-add:hover .icon, .btn-delete:hover .icon {
+        transform: scale(1.1);
     }
 
     ::-webkit-scrollbar {
-        width: 8px;
+        width: 12px;
     }
 
     ::-webkit-scrollbar-track {
-        background: #f1f3f5;
+        background: rgba(13, 59, 102, 0.05);
+        border-radius: 6px;
     }
 
     ::-webkit-scrollbar-thumb {
-        background: #adb5bd;
-        border-radius: 4px;
+        background: linear-gradient(135deg, #0D3B66, #1a5490);
+        border-radius: 6px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #1a5490, #0D3B66);
+        background-clip: content-box;
+    }
+
+    /* Empty state styling */
+    .orders-grid:empty::after {
+        content: 'No held orders found';
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #0D3B66;
+        opacity: 0.6;
+        background: white;
+        border-radius: 16px;
+        border: 2px dashed rgba(13, 59, 102, 0.2);
     }
     `;
     document.head.appendChild(style);
