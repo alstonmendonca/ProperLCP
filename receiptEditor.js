@@ -241,7 +241,7 @@ function loadReceiptEditor(mainContent, billPanel) {
                 display: block;
                 margin: 0 auto 20px auto; /* Center button with margin below */
                 padding: 10px 20px;
-                background-color: #1DB954;
+                background-color: #0D3B66;
                 color: white;
                 border: none;
                 border-radius: 4px;
@@ -250,7 +250,7 @@ function loadReceiptEditor(mainContent, billPanel) {
             }
 
             .edit-receipt-btn:hover {
-                background-color: #169c46;
+                background-color: #174c7dff;
             }
 
         </style>
