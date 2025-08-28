@@ -31,23 +31,90 @@ let onlineProcess;
 const axios = require('axios');
 const basePath = app.isPackaged ? process.resourcesPath : __dirname;
 console.log(`Base path: ${basePath}`);
-const RECEIPT_FORMAT_PATH = path.join(basePath, 'receiptFormat.json');
 const dotenv = require('dotenv');
 // Determine env file path based on dev vs packaged
 const envPath = app.isPackaged
   ? path.join(process.resourcesPath, ".env") // packaged location
   : path.join(__dirname, ".env");           // dev location
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-  console.log(`✅ Loaded env from: ${envPath}`);
-} else {
-  console.warn(`⚠️ .env file not found at: ${envPath}`);
-}
 
 const MONGO_PORT = process.env.MONGO_PORT
 console.log(`MONGO PORT IS ${MONGO_PORT}`);
-// Connect to the SQLite database
-const db = new sqlite3.Database(path.join(basePath,"LC.db"), (err) => {
+
+// Define user data paths
+const userDataPath = app.getPath('userData');
+const userDbPath = path.join(userDataPath, 'LC.db');
+const userReceiptFormatPath = path.join(userDataPath, 'receiptFormat.json');
+const userBusinessInfoPath = path.join(userDataPath, 'businessInfo.json');
+const userEnvPath = path.join(userDataPath, '.env');
+const userGetOnlinePath = path.join(userDataPath, 'getOnline.js');
+
+// Function to copy resources to user data on first launch
+async function copyResourcesToUserData() {
+    // Use a marker file to track if first-time setup has been completed
+    const setupMarkerFile = path.join(userDataPath, '.setup_completed');
+    
+    if (!fs.existsSync(setupMarkerFile)) {
+        console.log('🔄 First launch detected, copying resources to user data...');
+        
+        // Create user data directory if it doesn't exist
+        if (!fs.existsSync(userDataPath)) {
+            fs.mkdirSync(userDataPath, { recursive: true });
+        }
+        
+        // List of files to copy from resources to user data
+        const filesToCopy = [
+            { source: path.join(basePath, 'LC.db'), dest: userDbPath },
+            { source: path.join(basePath, 'receiptFormat.json'), dest: userReceiptFormatPath },
+            { source: path.join(basePath, 'businessInfo.json'), dest: userBusinessInfoPath },
+            { source: envPath, dest: userEnvPath },
+            { source: path.join(basePath, 'getOnline.js'), dest: userGetOnlinePath }
+        ];
+        
+        for (const file of filesToCopy) {
+            try {
+                if (fs.existsSync(file.source)) {
+                    // Create directory if it doesn't exist
+                    const destDir = path.dirname(file.dest);
+                    if (!fs.existsSync(destDir)) {
+                        fs.mkdirSync(destDir, { recursive: true });
+                    }
+                    
+                    // Copy file
+                    fs.copyFileSync(file.source, file.dest);
+                    console.log(`✅ Copied ${path.basename(file.source)} to user data`);
+                } else {
+                    console.warn(`⚠️ Source file not found: ${file.source}`);
+                }
+            } catch (error) {
+                console.error(`❌ Failed to copy ${path.basename(file.source)}:`, error.message);
+            }
+        }
+        
+        // Create marker file to indicate setup is complete
+        try {
+            fs.writeFileSync(setupMarkerFile, new Date().toISOString(), 'utf8');
+            console.log('✅ First-time setup completed');
+        } catch (error) {
+            console.error('❌ Failed to create setup marker file:', error.message);
+        }
+    } else {
+        console.log('📁 Using existing user data files');
+    }
+}
+
+// Function to get the appropriate file path (user data if exists, otherwise resources)
+function getFilePath(filename) {
+    const userDataFile = path.join(userDataPath, filename);
+    const resourceFile = path.join(basePath, filename);
+    
+    // Prefer user data file if it exists, otherwise fall back to resources
+    return fs.existsSync(userDataFile) ? userDataFile : resourceFile;
+}
+
+// Connect to the SQLite database (use user data version if available)
+const dbPath = getFilePath('LC.db');
+console.log(`📊 Using database at: ${dbPath}`);
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
       console.error("❌ Failed to connect to the database:", err.message);
     } else {
@@ -158,10 +225,10 @@ function saveOrderToDatabase(order) {
 }
 // Spawn getOnline.js as a background process
 function startGetOnlineServer() {
-  const scriptPath = path.join(basePath, "getOnline.js");
+  const scriptPath = getFilePath("getOnline.js");
 
   onlineProcess = fork(scriptPath, {
-    env: { ...process.env, APP_ENV_PATH: envPath, NODE_PATH: path.join(__dirname, "node_modules") },
+    env: { ...process.env, APP_ENV_PATH: getFilePath('.env'), NODE_PATH: path.join(__dirname, "node_modules") },
    
   });
 
@@ -428,6 +495,17 @@ function createMainWindow() {
 
 // === Do startup tasks (Express, DB, etc.) ===
 async function runStartupTasks() {
+  await copyResourcesToUserData();
+  
+  // Load environment variables after copying resources
+  const envFileToUse = getFilePath('.env');
+  if (fs.existsSync(envFileToUse)) {
+    dotenv.config({ path: envFileToUse });
+    console.log(`✅ Loaded env from: ${envFileToUse}`);
+  } else {
+    console.warn(`⚠️ .env file not found at: ${envFileToUse}`);
+  }
+  
   await startExpressServer();
   await waitForServerReady();
   await initStore();
@@ -1622,8 +1700,9 @@ function generateKOTOnly(items, totalAmount, kot, orderId) {
 
 function loadReceiptTemplate(defaults) {
   try {
-    if (fs.existsSync(RECEIPT_FORMAT_PATH)) {
-      const raw = fs.readFileSync(RECEIPT_FORMAT_PATH, 'utf-8');
+    const receiptFormatPath = getFilePath('receiptFormat.json');
+    if (fs.existsSync(receiptFormatPath)) {
+      const raw = fs.readFileSync(receiptFormatPath, 'utf-8');
       return JSON.parse(raw);
     }
   } catch (err) {
@@ -1634,7 +1713,8 @@ function loadReceiptTemplate(defaults) {
 
 function saveReceiptTemplate(template) {
   try {
-    fs.writeFileSync(RECEIPT_FORMAT_PATH, JSON.stringify(template, null, 2));
+    const receiptFormatPath = getFilePath('receiptFormat.json');
+    fs.writeFileSync(receiptFormatPath, JSON.stringify(template, null, 2));
     return true;
   } catch (err) {
     console.error("Failed to save receipt format:", err);
@@ -3543,9 +3623,9 @@ ipcMain.on("exit-app", (event) => {
   });
 
 // --------------------------------- BUSINESS INFO SECTION -----------------------------
-const savePath = path.join(basePath, 'businessInfo.json');
 
 ipcMain.on('save-business-info', (event, businessData) => {
+    const savePath = getFilePath('businessInfo.json');
     fs.writeFile(savePath, JSON.stringify(businessData, null, 4), 'utf-8', (err) => {
         if (err) {
             console.error('Error saving business info:', err);
@@ -3557,10 +3637,9 @@ ipcMain.on('save-business-info', (event, businessData) => {
     });
 });
 
-const dataPath = path.join(basePath, 'businessInfo.json');
-
 ipcMain.handle('load-business-info', async () => {
     try {
+        const dataPath = getFilePath('businessInfo.json');
         const fileData = await fs.promises.readFile(dataPath, 'utf-8');
         return JSON.parse(fileData);
     } catch (err) {
@@ -3576,7 +3655,8 @@ ipcMain.on('backup-database', async (event) => {
     const { backupLCdb } = require('./backup');
     
     try {
-        const success = await backupLCdb(); // Wait for the backup operation to finish
+        const dbPath = getFilePath('LC.db');
+        const success = await backupLCdb(dbPath); // Pass the user data database path
         event.reply('backup-completed', success); // Reply with the success value
     } catch (error) {
         event.reply('backup-completed', false); // If an error occurs, send failure
@@ -3589,7 +3669,8 @@ ipcMain.on('restore-database', async (event) => {
     const { restoreLCdb } = require('./restore'); // Assuming restoreLCdb is the restore function
 
     try {
-        const success = await restoreLCdb(); // Wait for the restore operation to finish
+        const dbPath = getFilePath('LC.db');
+        const success = await restoreLCdb(dbPath); // Pass the user data database path
         // Reply to renderer process with the success status
         event.reply('restore-completed', success);
     } catch (error) {
