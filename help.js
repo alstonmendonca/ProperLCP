@@ -75,7 +75,7 @@ function loadHelpSection() {
                         <p style="margin: 15px 0;">
                             <strong style="color: #333; min-width: 80px; display: inline-block;">Phone:</strong>
                             <a style="color: #0D3B66; text-decoration: none;">
-                                +91 91088 16244<br>
+                                <br>+91 91088 16244<br>
                                 +91 97410 04258
                             </a>
                         </p>
