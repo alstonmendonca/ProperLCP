@@ -48,8 +48,8 @@ function loadSearchOrder(mainContent, billPanel) {
             
             .filters-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 24px;
                 align-items: end;
             }
             
@@ -57,33 +57,53 @@ function loadSearchOrder(mainContent, billPanel) {
                 display: flex;
                 flex-direction: column;
                 gap: 8px;
+                width: 100%;
             }
             
             .form-group label {
                 color: #0D3B66;
-                font-weight: 500;
+                font-weight: 600;
                 font-size: 14px;
                 margin: 0;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
             
             .form-group input,
             .form-group select {
-                padding: 12px 16px;
-                border: 2px solid #cbd5e1;
-                border-radius: 8px;
-                font-size: 14px;
-                background: #f8fafc;
-                color: #1e293b;
-                transition: all 0.2s ease;
-                font-family: inherit;
+                width: 100%;
+                padding: 14px 16px;
+                border: 2px solid rgba(13, 59, 102, 0.2);
+                border-radius: 12px;
+                font-size: 15px;
+                background: white;
+                color: #0D3B66;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                box-sizing: border-box;
+                min-height: 50px;
             }
             
             .form-group input:focus,
             .form-group select:focus {
                 outline: none;
                 border-color: #0D3B66;
-                box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+                box-shadow: 
+                    0 0 0 4px rgba(13, 59, 102, 0.1),
+                    0 4px 12px rgba(13, 59, 102, 0.15);
                 background: white;
+                transform: translateY(-2px);
+            }
+            
+            .form-group input:hover,
+            .form-group select:hover {
+                border-color: rgba(13, 59, 102, 0.4);
+            }
+            
+            .form-group input::placeholder {
+                color: rgba(13, 59, 102, 0.5);
+                font-weight: 400;
             }
             
             .actions-row {
@@ -221,6 +241,64 @@ function loadSearchOrder(mainContent, billPanel) {
             .no-results-text {
                 font-size: 16px;
                 color: #64748b;
+            }
+            
+            /* Responsive design */
+            @media (max-width: 768px) {
+                .search-order-container {
+                    padding: 15px;
+                }
+                
+                .filters-card {
+                    padding: 20px;
+                }
+                
+                .filters-grid {
+                    grid-template-columns: 1fr;
+                    gap: 20px;
+                }
+                
+                .form-group input,
+                .form-group select {
+                    font-size: 16px; /* Prevents zoom on iOS */
+                    padding: 16px;
+                }
+                
+                .actions-row {
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 15px;
+                }
+                
+                .btn-primary,
+                .btn-secondary {
+                    width: 100%;
+                    justify-content: center;
+                }
+                
+                .order-history-table {
+                    font-size: 12px;
+                }
+                
+                .order-history-table th,
+                .order-history-table td {
+                    padding: 8px 6px;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .search-order-header h2 {
+                    font-size: 24px;
+                }
+                
+                .filters-card {
+                    padding: 15px;
+                }
+                
+                .form-group input,
+                .form-group select {
+                    padding: 14px 12px;
+                }
             }
         </style>
         
