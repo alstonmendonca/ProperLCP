@@ -1,5 +1,5 @@
 const { ipcRenderer } = require("electron");
-const  {createTextPopup} = require("./textPopup");
+const { createTextPopup, createConfirmPopup } = require("./textPopup");
 const { exportTableToExcel } = require("./export");
 
 let currentSortBy = null;
@@ -12,13 +12,279 @@ function loadCustomers(mainContent, billPanel) {
     billPanel.style.display = 'none';
     // Set up the HTML structure
     mainContent.innerHTML = `
-        <div class="customer-header">
-            <h2>Customers</h2>
-            <button id="addCustomerBtn">Add Customer</button>
-            <button id="clearCustomerDataBtn">Clear Customer Data</button>
-            <button id="exportExcelButton">Export to Excel</button>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            
+            .customer-container {
+                padding: 2rem;
+                background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+                min-height: 100vh;
+                font-family: 'Inter', sans-serif;
+            }
+            
+            .customer-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 2rem;
+                padding: 2rem;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 8px 25px rgba(13, 59, 102, 0.12);
+                border: 1px solid rgba(13, 59, 102, 0.1);
+            }
+            
+            .customer-header h2 {
+                color: #0D3B66;
+                font-size: 2rem;
+                font-weight: 700;
+                margin: 0;
+                position: relative;
+            }
+            
+            .customer-header h2::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: linear-gradient(90deg, #0D3B66, rgba(13, 59, 102, 0.6));
+                border-radius: 2px;
+            }
+            
+            .customer-header-buttons {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .customer-header button {
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 12px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                font-family: 'Inter', sans-serif;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            #addCustomerBtn {
+                background: linear-gradient(135deg, #0D3B66 0%, rgba(13, 59, 102, 0.9) 100%);
+                color: white;
+                box-shadow: 0 6px 16px rgba(13, 59, 102, 0.3);
+            }
+            
+            #addCustomerBtn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+            
+            #addCustomerBtn:hover::before {
+                left: 100%;
+            }
+            
+            #addCustomerBtn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(13, 59, 102, 0.4);
+            }
+            
+            #clearCustomerDataBtn {
+                background: white;
+                color: #dc3545;
+                border: 2px solid #dc3545;
+                box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+            }
+            
+            #clearCustomerDataBtn:hover {
+                background: #dc3545;
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+            }
+            
+            #exportExcelButton {
+                background: white;
+                color: #0D3B66;
+                border: 2px solid #0D3B66;
+                box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
+            }
+            
+            #exportExcelButton:hover {
+                background: #0D3B66;
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(13, 59, 102, 0.3);
+            }
+            
+            #customersDiv {
+                background: white;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(13, 59, 102, 0.12);
+                border: 1px solid rgba(13, 59, 102, 0.1);
+            }
+            
+            .order-history-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-family: 'Inter', sans-serif;
+                background: white;
+            }
+            
+            .order-history-table thead th {
+                background: linear-gradient(135deg, #0D3B66 0%, rgba(13, 59, 102, 0.9) 100%);
+                color: white;
+                padding: 1.5rem 1.25rem;
+                text-align: left;
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border: none;
+                position: relative;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .order-history-table thead th:hover {
+                background: linear-gradient(135deg, rgba(13, 59, 102, 0.9) 0%, #0D3B66 100%);
+            }
+            
+            .order-history-table thead th.sortable:after {
+                content: '';
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-bottom: 4px solid rgba(255, 255, 255, 0.6);
+                transition: all 0.3s ease;
+            }
+            
+            .order-history-table thead th.sortable:hover:after {
+                border-bottom-color: white;
+            }
+            
+            .order-history-table tbody tr {
+                transition: all 0.3s ease;
+                border-bottom: 1px solid rgba(13, 59, 102, 0.1);
+            }
+            
+            .order-history-table tbody tr:hover {
+                background: linear-gradient(135deg, rgba(13, 59, 102, 0.03) 0%, rgba(13, 59, 102, 0.08) 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(13, 59, 102, 0.1);
+            }
+            
+            .order-history-table tbody tr:last-child {
+                border-bottom: none;
+            }
+            
+            .order-history-table tbody td {
+                padding: 1.25rem;
+                color: #0D3B66;
+                font-weight: 500;
+                border: none;
+                position: relative;
+            }
+            
+            .order-history-table tbody td:first-child {
+                font-weight: 700;
+                color: #0D3B66;
+            }
+            
+            .no-customers {
+                text-align: center;
+                padding: 4rem 2rem;
+                color: #0D3B66;
+            }
+            
+            .no-customers-img {
+                width: 120px;
+                height: 120px;
+                opacity: 0.6;
+                margin-bottom: 1.5rem;
+                filter: sepia(1) hue-rotate(200deg) saturate(0.8);
+            }
+            
+            .no-customers p {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin: 0;
+                color: rgba(13, 59, 102, 0.7);
+            }
+            
+            /* Responsive design */
+            @media (max-width: 768px) {
+                .customer-header {
+                    flex-direction: column;
+                    gap: 1rem;
+                    align-items: stretch;
+                }
+                
+                .customer-header-buttons {
+                    justify-content: center;
+                }
+                
+                .order-history-table {
+                    font-size: 0.9rem;
+                }
+                
+                .order-history-table thead th,
+                .order-history-table tbody td {
+                    padding: 1rem 0.75rem;
+                }
+            }
+            
+            /* Animation for table rows */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .order-history-table tbody tr {
+                animation: fadeInUp 0.3s ease-out;
+                animation-fill-mode: both;
+            }
+            
+            .order-history-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+            .order-history-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+            .order-history-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+            .order-history-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+            .order-history-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+        </style>
+        <div class="customer-container">
+            <div class="customer-header">
+                <h2>Customers</h2>
+                <div class="customer-header-buttons">
+                    <button id="addCustomerBtn">Add Customer</button>
+                    <button id="clearCustomerDataBtn">Clear Customer Data</button>
+                    <button id="exportExcelButton">Export to Excel</button>
+                </div>
+            </div>
+            <div id="customersDiv"></div>
         </div>
-        <div id="customersDiv"></div>
     `;
 
     // Fetch and display customers
@@ -35,9 +301,11 @@ function setupCustomerEventListeners() {
 
     // Clear Customer Data button
     document.getElementById("clearCustomerDataBtn").addEventListener("click", async () => {
-        showConfirmPopup("Are you sure you want to permanently delete all customer data?", async () => {
-            await clearCustomerData();
-            fetchCustomers(); // Refresh customer list
+        createConfirmPopup("Are you sure you want to permanently delete all customer data?", async (confirmed) => {
+            if (confirmed) {
+                await clearCustomerData();
+                fetchCustomers(); // Refresh customer list
+            }
         });
     });
 
@@ -165,34 +433,182 @@ async function clearCustomerData() {
 }
 
 function showMessagePopup(title, message) {
-    if (document.getElementById("messagePopup")) {
-        document.getElementById("messagePopup").remove();
+    if (document.getElementById("modernMessageModal")) {
+        document.getElementById("modernMessageModal").remove();
     }
 
     const popup = document.createElement("div");
-    popup.id = "messagePopup";
+    popup.id = "modernMessageModal";
     popup.innerHTML = `
-        <div class="popup-content">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            
+            #modernMessageModal {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(13, 59, 102, 0.15) !important;
+                backdrop-filter: blur(12px) !important;
+                z-index: 10000 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                animation: overlayFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                font-family: 'Inter', sans-serif !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+            }
+            
+            @keyframes overlayFadeIn {
+                from { 
+                    opacity: 0; 
+                    backdrop-filter: blur(0px); 
+                }
+                to { 
+                    opacity: 1; 
+                    backdrop-filter: blur(12px); 
+                }
+            }
+            
+            .modern-message-modal-content {
+                background: white !important;
+                border-radius: 20px !important;
+                padding: 2.5rem !important;
+                width: 90% !important;
+                max-width: 450px !important;
+                position: relative !important;
+                box-shadow: 
+                    0 25px 50px rgba(13, 59, 102, 0.25),
+                    0 10px 25px rgba(13, 59, 102, 0.15),
+                    0 0 0 1px rgba(13, 59, 102, 0.1) !important;
+                animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                text-align: center !important;
+            }
+            
+            .modern-message-modal-content::before {
+                content: '' !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 6px !important;
+                background: linear-gradient(90deg, #0D3B66, rgba(13, 59, 102, 0.8), #0D3B66) !important;
+                animation: shimmer 3s infinite !important;
+            }
+            
+            @keyframes shimmer {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+            }
+            
+            @keyframes modalSlideIn {
+                0% { 
+                    opacity: 0; 
+                    transform: translateY(-30px) scale(0.9); 
+                }
+                100% { 
+                    opacity: 1; 
+                    transform: translateY(0) scale(1); 
+                }
+            }
+            
+            .modern-message-modal-content h2 {
+                margin: 0 0 1.5rem 0 !important;
+                color: #0D3B66 !important;
+                font-size: 1.75rem !important;
+                font-weight: 700 !important;
+                text-align: center !important;
+                position: relative !important;
+                padding-bottom: 1rem !important;
+            }
+            
+            .modern-message-modal-content h2::after {
+                content: '' !important;
+                position: absolute !important;
+                bottom: 0 !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 60px !important;
+                height: 3px !important;
+                background: linear-gradient(90deg, transparent, #0D3B66, transparent) !important;
+                border-radius: 2px !important;
+            }
+            
+            .modern-message-modal-content p {
+                margin: 0 0 2rem 0 !important;
+                color: #0D3B66 !important;
+                font-size: 1.1rem !important;
+                line-height: 1.6 !important;
+                opacity: 0.8 !important;
+            }
+            
+            .modern-message-modal-content button {
+                padding: 1rem 2.5rem !important;
+                border: none !important;
+                border-radius: 12px !important;
+                font-size: 1rem !important;
+                font-weight: 600 !important;
+                font-family: 'Inter', sans-serif !important;
+                cursor: pointer !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                position: relative !important;
+                overflow: hidden !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.5px !important;
+                background: linear-gradient(135deg, #0D3B66 0%, rgba(13, 59, 102, 0.9) 100%) !important;
+                color: white !important;
+                box-shadow: 0 8px 20px rgba(13, 59, 102, 0.3) !important;
+                min-width: 120px !important;
+            }
+            
+            .modern-message-modal-content button::before {
+                content: '' !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: -100% !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+                transition: left 0.5s !important;
+            }
+            
+            .modern-message-modal-content button:hover::before {
+                left: 100% !important;
+            }
+            
+            .modern-message-modal-content button:hover {
+                transform: translateY(-3px) !important;
+                box-shadow: 0 12px 28px rgba(13, 59, 102, 0.4) !important;
+            }
+            
+            .modern-message-modal-content button:active {
+                transform: translateY(-1px) !important;
+            }
+            
+            /* Responsive design */
+            @media (max-width: 600px) {
+                .modern-message-modal-content {
+                    margin: 1rem !important;
+                    padding: 2rem !important;
+                }
+            }
+        </style>
+        <div class="modern-message-modal-content">
             <h2>${title}</h2>
             <p>${message}</p>
-            <button id="closeMessagePopup">OK</button>
+            <button id="closeModernMessagePopup">OK</button>
         </div>
     `;
 
-    popup.style.position = "fixed";
-    popup.style.top = "50%";
-    popup.style.left = "50%";
-    popup.style.transform = "translate(-50%, -50%)";
-    popup.style.backgroundColor = "white";
-    popup.style.padding = "20px";
-    popup.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
-    popup.style.borderRadius = "8px";
-    popup.style.zIndex = "1001";
-    popup.style.textAlign = "center";
-
     document.body.appendChild(popup);
 
-    document.getElementById("closeMessagePopup").addEventListener("click", () => {
+    document.getElementById("closeModernMessagePopup").addEventListener("click", () => {
         popup.remove();
     });
 }
