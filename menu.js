@@ -320,7 +320,7 @@ async function displayMenu() {
                         <button class="delete-btn" data-fid="${item.fid}" style="background: red; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
                             Delete
                         </button>
-                        <button class="edit-btn" data-fid="${item.fid}" style="background: grey; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
+                        <button class="edit-btn" data-fid="${item.fid}" style="background: #0D3B66; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
                             Edit
                         </button>
                     </div>
@@ -568,7 +568,7 @@ async function displayMenu() {
                         ">
                             <style>
                                 .edit-popup-input:focus, .edit-popup-select:focus {
-                                    border-color: #6366f1;
+                                    border-color: #0D3B66;
                                     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
                                     outline: none;
                                 }
@@ -607,7 +607,7 @@ async function displayMenu() {
                                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
                                 }
                                 input:checked + .edit-popup-slider {
-                                    background-color: #4f46e5;
+                                    background-color: #0D3B66;
                                 }
                                 input:checked + .edit-popup-slider:before {
                                     transform: translateX(20px);
@@ -802,7 +802,7 @@ async function displayMenu() {
                                     border-top: 1px solid #f1f5f9;
                                 ">
                                     <button type="button" id="saveChanges" class="edit-popup-btn" style="
-                                        background: #4f46e5;
+                                        background: #0D3B66;
                                         color: white;
                                         border: none;
                                         box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
@@ -869,7 +869,7 @@ async function displayMenu() {
                                 checkbox.value = inv.inv_no;
                                 checkbox.id = `edit_inv_${inv.inv_no}`;
                                 checkbox.name = "dependant_inv";
-                                checkbox.style.accentColor = "#4f46e5";
+                                checkbox.style.accentColor = "#0D3B66";
 
                                 // Pre-check if this item is in depend_inv
                                 const dependArray = (item.depend_inv || "").split(",").map(i => i.trim()).filter(i => i);
@@ -1052,7 +1052,7 @@ function toggleAddItemPopup() {
                     <input type="checkbox" 
                         id="${itemId}" 
                         value="${inv.inv_no}" 
-                        style="accent-color: #4f46e5;">
+                        style="accent-color: #0D3B66;">
                     <label for="${itemId}" 
                         style="font-size: 13px; color: #475569; cursor: pointer;">
                         ${inv.inv_item}
@@ -1151,7 +1151,7 @@ function toggleAddItemPopup() {
                 box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
             input:checked + .popup-slider {
-                background-color: #4f46e5;
+                background-color: #0D3B66;
             }
             input:checked + .popup-slider:before {
                 transform: translateX(20px);
@@ -1374,7 +1374,7 @@ function toggleAddItemPopup() {
                 border-top: 1px solid #f1f5f9;
             ">
                 <button type="submit" id="addItemBtn" class="popup-btn" style="
-                    background: #4f46e5;
+                    background: #0D3B66;
                     color: white;
                     border: none;
                     box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
