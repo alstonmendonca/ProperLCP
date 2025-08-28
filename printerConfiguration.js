@@ -9,6 +9,372 @@ function loadPrinterConfiguration(mainContent, billPanel, mode = 'auto') {
 
     // Create modern tabbed interface
     mainContent.innerHTML = `
+        <style>
+            .printer-config-wrapper {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 20px;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(13, 59, 102, 0.1);
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            }
+
+            .printer-header {
+                text-align: center;
+                margin-bottom: 32px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #e2e8f0;
+            }
+
+            .printer-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #0D3B66;
+                margin: 0 0 8px 0;
+                letter-spacing: -0.02em;
+            }
+
+            .printer-subtitle {
+                font-size: 1.1rem;
+                color: #0D3B66;
+                margin: 0;
+                font-weight: 400;
+                opacity: 0.8;
+            }
+
+            .printer-tabs {
+                display: flex;
+                gap: 4px;
+                margin-bottom: 32px;
+                background: white;
+                padding: 4px;
+                border-radius: 12px;
+                border: 2px solid #0D3B66;
+            }
+
+            .tab-btn {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 12px 20px;
+                background: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #0D3B66;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .tab-btn.active {
+                background: #0D3B66;
+                color: white;
+                box-shadow: 0 2px 8px rgba(13, 59, 102, 0.3);
+                transform: translateY(-1px);
+            }
+
+            .tab-btn:not(.active):hover {
+                background: rgba(13, 59, 102, 0.1);
+                transform: translateY(-1px);
+            }
+
+            .tab-icon {
+                font-size: 16px;
+            }
+
+            .config-section {
+                display: none;
+                animation: fadeInUp 0.3s ease-out;
+            }
+
+            .config-section.active {
+                display: block;
+            }
+
+            .printer-config-card {
+                background: white;
+                border: 2px solid #0D3B66;
+                border-radius: 12px;
+                padding: 28px;
+                box-shadow: 0 2px 12px rgba(13, 59, 102, 0.1);
+            }
+
+            .form-group {
+                margin-bottom: 24px;
+            }
+
+            .form-label {
+                display: block;
+                font-size: 14px;
+                font-weight: 600;
+                color: #0D3B66;
+                margin-bottom: 8px;
+            }
+
+            .form-input, .form-select {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid #0D3B66;
+                border-radius: 8px;
+                font-size: 14px;
+                background: white;
+                transition: all 0.2s ease;
+                box-sizing: border-box;
+                color: #0D3B66;
+            }
+
+            .form-input:focus, .form-select:focus {
+                outline: none;
+                border-color: #0D3B66;
+                box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+                background-color: white;
+            }
+
+            .select-wrapper {
+                position: relative;
+            }
+
+            .select-arrow {
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #0D3B66;
+                pointer-events: none;
+                font-size: 12px;
+            }
+
+            .wide-number-input {
+                font-family: 'Courier New', monospace;
+                letter-spacing: 0.5px;
+            }
+
+            .form-hint {
+                display: block;
+                font-size: 12px;
+                color: #0D3B66;
+                margin-top: 4px;
+                font-style: italic;
+                opacity: 0.7;
+            }
+
+            .button-group {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-decoration: none;
+                min-height: 44px;
+            }
+
+            .btn-save {
+                background: #0D3B66;
+                color: white;
+                width: 100%;
+                box-shadow: 0 2px 8px rgba(13, 59, 102, 0.3);
+            }
+
+            .btn-save:hover {
+                background: #11487b;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(13, 59, 102, 0.4);
+            }
+
+            .btn-test {
+                background: white;
+                color: #0D3B66;
+                border: 2px solid #0D3B66;
+            }
+
+            .btn-test:hover {
+                background: #0D3B66;
+                color: white;
+                transform: translateY(-1px);
+            }
+
+            .status-message {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                padding: 8px 12px;
+                border-radius: 6px;
+                margin-left: auto;
+            }
+
+            .status-message.testing {
+                background: rgba(13, 59, 102, 0.1);
+                color: #0D3B66;
+                border: 1px solid #0D3B66;
+            }
+
+            .status-message.success {
+                background: white;
+                color: #0D3B66;
+                border: 2px solid #0D3B66;
+            }
+
+            .status-message.error {
+                background: #0D3B66;
+                color: white;
+                border: 2px solid #0D3B66;
+            }
+
+            .printer-help {
+                margin-top: 32px;
+                padding: 24px;
+                background: white;
+                border-radius: 12px;
+                border: 2px solid #0D3B66;
+            }
+
+            .help-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .help-header svg {
+                font-size: 20px;
+                color: #0D3B66;
+            }
+
+            .help-header h3 {
+                margin: 0;
+                color: #0D3B66;
+                font-size: 18px;
+            }
+
+            .printer-help p {
+                color: #0D3B66;
+                margin-bottom: 20px;
+                line-height: 1.6;
+                opacity: 0.8;
+            }
+
+            .printer-help h4 {
+                color: #0D3B66;
+                font-size: 16px;
+                margin-bottom: 12px;
+                font-weight: 600;
+            }
+
+            .driver-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 12px;
+            }
+
+            .driver-card {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 16px;
+                background: white;
+                border: 2px solid #0D3B66;
+                border-radius: 8px;
+                text-decoration: none;
+                color: #0D3B66;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+
+            .driver-card:hover {
+                background: #0D3B66;
+                color: white;
+                transform: translateY(-1px);
+            }
+
+            .driver-card svg {
+                font-size: 16px;
+                color: currentColor;
+            }
+
+            .error-message {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 16px;
+                background: white;
+                border: 2px solid #0D3B66;
+                border-radius: 8px;
+                color: #0D3B66;
+                font-weight: 500;
+            }
+
+            .error-message svg {
+                font-size: 18px;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .printer-config-wrapper {
+                    margin: 0 10px;
+                    padding: 16px;
+                }
+                
+                .printer-title {
+                    font-size: 2rem;
+                }
+                
+                .printer-tabs {
+                    flex-direction: column;
+                }
+                
+                .driver-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .button-group {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+                
+                .status-message {
+                    margin-left: 0;
+                    margin-top: 12px;
+                }
+            }
+        </style>
+        
         <div class="printer-config-wrapper">
             <div class="printer-header">
                 <h2 class="printer-title">Printer Configuration</h2>
@@ -82,7 +448,7 @@ async function loadAutoConfig() {
         const helpSection = printers.length === 0 ? `
             <div class="printer-help">
                 <div class="help-header">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D3B66" stroke-width="2">
                         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                         <line x1="12" y1="9" x2="12" y2="13"></line>
                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
