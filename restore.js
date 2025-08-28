@@ -6,7 +6,7 @@ const path = require('path');
 // You must import or define these two if you're using them from backup.js:
 const { getAccessTokenViaElectron, getOrCreateBackupFolder } = require('./backup');
 
-async function restoreLCdb() {
+async function restoreLCdb(dbPath = null) {
     try {
         await app.whenReady();
         const auth = await getAccessTokenViaElectron();
@@ -30,7 +30,19 @@ async function restoreLCdb() {
             return false;  // Return false if no backup file found
         }
 
-        const destPath = path.join(process.resourcesPath, 'LC.db');
+        // Use provided path or fall back to default logic
+        const destPath = dbPath || (app.isPackaged 
+            ? path.join(app.getPath('userData'), 'LC.db')  // User data for packaged app
+            : path.join(process.resourcesPath, 'LC.db'));   // Resources for dev
+
+        console.log(`🔄 Restoring database to: ${destPath}`);
+        
+        // Ensure the directory exists
+        const destDir = path.dirname(destPath);
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+        }
+
         const dest = fs.createWriteStream(destPath);
 
         const download = await drive.files.get(

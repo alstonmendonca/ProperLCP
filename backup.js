@@ -4,10 +4,20 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
-const envPath = app.isPackaged
-  ? path.join(process.resourcesPath, ".env") // packaged location
-  : path.join(__dirname, ".env");           // dev location
 
+// Function to get the appropriate file path (user data if exists, otherwise resources)
+function getFilePath(filename) {
+    const userDataPath = app.getPath('userData');
+    const userDataFile = path.join(userDataPath, filename);
+    const resourceFile = app.isPackaged
+        ? path.join(process.resourcesPath, filename)
+        : path.join(__dirname, filename);
+    
+    // Prefer user data file if it exists, otherwise fall back to resources
+    return fs.existsSync(userDataFile) ? userDataFile : resourceFile;
+}
+
+const envPath = getFilePath('.env');
 dotenv.config({path:envPath});
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -132,7 +142,7 @@ function getFormattedTimestamp() {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
 }
 
-async function backupLCdb() {
+async function backupLCdb(dbPath = null) {
   try {
     await app.whenReady();
 
@@ -144,7 +154,17 @@ async function backupLCdb() {
     const timestamp = getFormattedTimestamp();
     const fileName = `DatabaseBackup-${timestamp}.db`;
 
-    const filePath = path.join(process.resourcesPath, 'LC.db');
+    // Use provided path or fall back to default logic
+    const filePath = dbPath || (app.isPackaged 
+      ? path.join(app.getPath('userData'), 'LC.db')  // User data for packaged app
+      : path.join(process.resourcesPath, 'LC.db'));   // Resources for dev
+
+    console.log(`🔄 Backing up database from: ${filePath}`);
+    
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Database file not found at: ${filePath}`);
+    }
+
     const media = {
       mimeType: 'application/octet-stream',
       body: fs.createReadStream(filePath),
