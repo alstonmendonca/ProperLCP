@@ -139,12 +139,12 @@ async function loadAutoConfig() {
                     </div>
                     
                     <div class="button-group">
-                        // <button type="button" id="testPrinterBtn" class="btn btn-test">
-                        //     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        //         <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        //     </svg>
-                        //     Test Printer
-                        // </button>
+                        <button type="button" id="testPrinterBtn" class="btn btn-test">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            Test Printer
+                        </button>
                         <span id="printerStatus" class="status-message"></span>
                     </div>
                     
@@ -175,6 +175,10 @@ async function loadAutoConfig() {
             statusElement.className = 'status-message testing';
 
             try {
+                // Test printer connection first
+                await ipcRenderer.invoke('test-printer-connection');
+                
+                // If connection successful, send test print
                 const success = await ipcRenderer.invoke('test-printer', {
                     printerName,
                     testData: {
@@ -259,6 +263,16 @@ function loadManualConfig() {
                         <small class="form-hint">Common values: 42752 (0xA700), 22304 (0x5720)</small>
                     </div>
                     
+                    <div class="button-group">
+                        <button type="button" id="testManualPrinterBtn" class="btn btn-test">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            Test Printer
+                        </button>
+                        <span id="manualPrinterStatus" class="status-message"></span>
+                    </div>
+                    
                     <button type="submit" class="btn btn-save">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -270,6 +284,64 @@ function loadManualConfig() {
                 </form>
             </div>
         `;
+
+        // Test printer button for manual config
+        document.getElementById('testManualPrinterBtn').addEventListener('click', async () => {
+            const vendorId = document.getElementById('vendorId').value;
+            const productId = document.getElementById('productId').value;
+            
+            if (!vendorId || !productId) {
+                createTextPopup('Please enter both Vendor ID and Product ID');
+                return;
+            }
+
+            const vendorNum = parseInt(vendorId);
+            const productNum = parseInt(productId);
+            
+            if (isNaN(vendorNum) || isNaN(productNum)) {
+                createTextPopup('Please enter valid numbers for Vendor and Product IDs');
+                return;
+            }
+
+            const statusElement = document.getElementById('manualPrinterStatus');
+            statusElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"></path></svg> Testing...';
+            statusElement.className = 'status-message testing';
+
+            try {
+                // Convert to hex for the test
+                const vendorHex = '0x' + vendorNum.toString(16).padStart(4, '0');
+                const productHex = '0x' + productNum.toString(16).padStart(4, '0');
+
+                // Test printer connection first
+                await ipcRenderer.invoke('test-printer-connection');
+                
+                // If connection successful, send test print
+                const success = await ipcRenderer.invoke('test-printer', {
+                    vendorId: vendorHex,
+                    productId: productHex,
+                    testData: {
+                        items: [
+                            { name: "Test Item 1", quantity: 1, price: 10.00 },
+                            { name: "Test Item 2", quantity: 2, price: 20.00 }
+                        ],
+                        totalAmount: 30.00,
+                        kot: "TEST123",
+                        orderId: "TEST456"
+                    }
+                });
+                
+                if (success) {
+                    statusElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Printer test successful';
+                    statusElement.className = 'status-message success';
+                } else {
+                    statusElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Printer test failed';
+                    statusElement.className = 'status-message error';
+                }
+            } catch (error) {
+                statusElement.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Error: ${error.message}`;
+                statusElement.className = 'status-message error';
+            }
+        });
 
         // Handle form submission
         document.getElementById('manualPrinterConfigForm').addEventListener('submit', (e) => {

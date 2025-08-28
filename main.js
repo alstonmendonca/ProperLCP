@@ -1710,28 +1710,27 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
     });
 });
 
-ipcMain.handle('test-printer', async (event, { printerName, testData }) => {
+ipcMain.handle('test-printer', async (event, { printerName, vendorId, productId, testData }) => {
     if (isPrinting) {
         throw new Error('Printer is busy with another job');
     }
     isPrinting = true;
 
     try {
-        // Get printer config
-        const config = store.get('printerConfig', {
-            vendorId: '0x0525',
-            productId: '0xA700'
-        });
+        let device;
+        
+        if (printerName) {
+            // Use printer name approach (for auto detection)
+            device = new escpos.Network(printerName);
+        } else if (vendorId && productId) {
+            // Use USB vendor/product ID approach (for manual config)
+            const vendorNum = parseInt(vendorId, 16);
+            const productNum = parseInt(productId, 16);
+            device = new escpos.USB(vendorNum, productNum);
+        } else {
+            throw new Error('No printer configuration provided');
+        }
 
-        // Convert hex strings to numbers
-        const vendorId = parseInt(config.vendorId, 16);
-        const productId = parseInt(config.productId, 16);
-
-        // Validate IDs
-        if (isNaN(vendorId)) throw new Error('Invalid Vendor ID');
-        if (isNaN(productId)) throw new Error('Invalid Product ID');
-
-        const device = new escpos.USB(vendorId, productId);
         const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
 
         // Generate test receipt
@@ -1757,7 +1756,7 @@ ipcMain.handle('test-printer', async (event, { printerName, testData }) => {
             });
         });
     } catch (error) {
-        event.sender.send('print-error', `System error: ${error.message}`);
+        throw error;
     } finally {
         isPrinting = false;
     }
