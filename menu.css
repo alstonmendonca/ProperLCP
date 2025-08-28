@@ -60,7 +60,7 @@
 
 /* Checked state */
 input:checked + .slider {
-    background-color: green;
+    background-color: #0D3B66;
 }
 
 /* Move the toggle knob when checked */

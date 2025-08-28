@@ -317,12 +317,41 @@ async function displayMenu() {
                             </div>
                         </div>
 
-                        <button class="delete-btn" data-fid="${item.fid}" style="background: red; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
-                            Delete
-                        </button>
-                        <button class="edit-btn" data-fid="${item.fid}" style="background: #0D3B66; color: white; padding: 5px; border: none; cursor: pointer; margin-top: 5px;">
-                            Edit
-                        </button>
+                        <div style="display: flex; flex-direction: row; gap: 8px; margin-top: 15px;">
+                            <button class="edit-btn" data-fid="${item.fid}" style="
+                                background: linear-gradient(135deg, #0D3B66, #1a5490);
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                padding: 12px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                font-size: 14px;
+                                transition: all 0.2s ease;
+                                box-shadow: 0 2px 8px rgba(13, 59, 102, 0.2);
+                                width: 100%;
+                            " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(13, 59, 102, 0.3)'" 
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(13, 59, 102, 0.2)'">
+                                Edit
+                            </button>
+                            
+                            <button class="delete-btn" data-fid="${item.fid}" style="
+                                background: linear-gradient(135deg, #ef4444, #dc2626);
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                padding: 12px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                font-size: 14px;
+                                transition: all 0.2s ease;
+                                box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+                                width: 100%;
+                            " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" 
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(239, 68, 68, 0.2)'">
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 `;
             }
@@ -531,7 +560,6 @@ async function displayMenu() {
                 });
             });
 
-            // Edit buttons — full edit popup logic (copied from your original code)
             document.querySelectorAll(".edit-btn").forEach((button) => {
                 button.addEventListener("click", async (event) => {
                     const fid = event.target.getAttribute("data-fid");

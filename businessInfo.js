@@ -305,19 +305,6 @@ async function loadBusinessInfo(mainContent, billPanel) {
                 text-align: center;
             }
 
-            .header-input {
-                color: var(--text);
-                font-size: 2.5rem;
-                font-weight: 800;
-                border: none;
-                text-align: center;
-                width: 100%;
-                padding: 0.5rem;
-                background: transparent;
-                transition: all 0.3s ease;
-                margin-bottom: 1rem;
-            }
-
             .header-divider {
                 height: 4px;
                 width: 120px;
@@ -578,6 +565,19 @@ async function loadBusinessInfo(mainContent, billPanel) {
                 outline: none;
                 border-color: var(--primary) !important;
                 box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+            }
+
+            .header-input {
+                color: var(--text);
+                font-size: 2.5rem;
+                font-weight: 800;
+                border: none;
+                text-align: center;
+                width: 100%;
+                padding: 0.5rem;
+                background: transparent;
+                transition: all 0.3s ease;
+                margin-bottom: 1rem;
             }
 
             .description-textarea {

@@ -460,8 +460,8 @@ h1 {
 }
 
 .toggle-switch:checked {
-    background: green;
-    accent-color: green;   
+    background: #0D3B66;
+    accent-color: #0D3B66;   
 }
 
 .toggle-switch::before {

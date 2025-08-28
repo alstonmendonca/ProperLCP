@@ -50,7 +50,6 @@ function loadPrinterConfiguration(mainContent, billPanel, mode = 'auto') {
                 background: white;
                 padding: 4px;
                 border-radius: 12px;
-                border: 2px solid #0D3B66;
             }
 
             .tab-btn {
@@ -81,6 +80,7 @@ function loadPrinterConfiguration(mainContent, billPanel, mode = 'auto') {
             .tab-btn:not(.active):hover {
                 background: rgba(13, 59, 102, 0.1);
                 transform: translateY(-1px);
+                color: #0D3B66;
             }
 
             .tab-icon {
@@ -98,7 +98,6 @@ function loadPrinterConfiguration(mainContent, billPanel, mode = 'auto') {
 
             .printer-config-card {
                 background: white;
-                border: 2px solid #0D3B66;
                 border-radius: 12px;
                 padding: 28px;
                 box-shadow: 0 2px 12px rgba(13, 59, 102, 0.1);
