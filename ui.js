@@ -22,7 +22,7 @@ async function updateMainContent(contentType) {
     const settingsButtons = [
         'UserProfile', 'BusinessInfo',  
         'Receipt', 'DriverConfiguration', 'BackupDatabase', 'RestoreDatabase',
-        'ConnectedDevices', 'Help', 'customizeLeftPanel'
+        'ConnectedDevices', 'Help', 'customizeLeftPanel', 'ChangeMasterPassword'
     ];
     
     // Highlight top panel button for any top-level section
@@ -266,6 +266,10 @@ async function updateMainContent(contentType) {
         else if (contentType === "RestoreDatabase") {
             const { loadRestoreUI } = require("./loadRestoreUI");
             loadRestoreUI(mainContent, billPanel); // Call the restore UI function
+        }
+        else if (contentType === "ChangeMasterPassword") {
+            const { ChangeMasterPassword } = require("./ChangeMasterPassword");
+            ChangeMasterPassword(mainContent, billPanel);
         }
         else if (contentType === "Exit") {
             const  {createConfirmPopup} = require("./textPopup");

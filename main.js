@@ -3917,7 +3917,21 @@ function initializeSchema() {
         FOREIGN KEY (orderId) REFERENCES OnlineOrders(orderId) ON DELETE CASCADE,
         FOREIGN KEY (fid) REFERENCES FoodItem(fid)
       )`);
-  
+      db.run(`CREATE TABLE IF NOT EXISTS "Miscellaneous" (
+        "MiscNo"	INTEGER NOT NULL,
+        "ItemName"	TEXT NOT NULL,
+        "ItemValue"	TEXT NOT NULL,
+        PRIMARY KEY("MiscNo" AUTOINCREMENT)
+    )`);
+        // Only insert master_password if it does not exist
+        db.get(`SELECT MiscNo FROM Miscellaneous WHERE ItemName = 'master_password'`, [], (err, row) => {
+          if (err) {
+            console.error("Error checking for master_password:", err);
+          } else if (!row) {
+            db.run(`INSERT INTO Miscellaneous (ItemName, ItemValue) VALUES ('master_password', 'test123')`);
+          }
+        });
+
       console.log("📦 Database schema ensured (tables created if missing).");
     });
   }
@@ -4021,12 +4035,52 @@ ipcMain.on("get-all-cashiers", (event) => {
 //------------------------------- Master Password Implementation Starts Here ----------------------------------------
 ipcMain.handle('get-master-password', async () => {
     return new Promise((resolve, reject) => {
+        console.log('Retrieving master password from database...');
         db.get("SELECT ItemValue FROM Miscellaneous WHERE ItemName = 'master_password'", [], (err, row) => {
             if (err) {
-                console.error(err);
-                reject("Failed to retrieve master password");
+                console.error('Database error when getting password:', err);
+                reject("Failed to retrieve master password: " + err.message);
             } else {
+                console.log('Master password query result:', row ? 'Password found' : 'No password found');
                 resolve(row ? row.ItemValue : null);
+            }
+        });
+    });
+});
+ipcMain.handle('set-master-password', async (event, newPassword) => {
+    return new Promise((resolve, reject) => {
+        console.log('Setting master password in database...');
+        
+        // First check if master_password entry exists
+        db.get("SELECT MiscNo FROM Miscellaneous WHERE ItemName = 'master_password'", [], (err, row) => {
+            if (err) {
+                console.error('Database error when checking for existing password:', err);
+                reject("Failed to check existing master password: " + err.message);
+                return;
+            }
+            
+            if (row) {
+                // Update existing entry
+                db.run("UPDATE Miscellaneous SET ItemValue = ? WHERE ItemName = 'master_password'", [newPassword], function(err) {
+                    if (err) {
+                        console.error('Database error when updating password:', err);
+                        reject("Failed to update master password: " + err.message);
+                    } else {
+                        console.log('Master password updated successfully. Changes:', this.changes);
+                        resolve();
+                    }
+                });
+            } else {
+                // Insert new entry
+                db.run("INSERT INTO Miscellaneous (ItemName, ItemValue) VALUES ('master_password', ?)", [newPassword], function(err) {
+                    if (err) {
+                        console.error('Database error when inserting password:', err);
+                        reject("Failed to insert master password: " + err.message);
+                    } else {
+                        console.log('Master password inserted successfully. Changes:', this.changes);
+                        resolve();
+                    }
+                });
             }
         });
     });
