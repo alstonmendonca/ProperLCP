@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-const { createTextPopup } = require("./textPopup");
+const { createTextPopup, createConfirmPopup } = require("./textPopup");
 
 function loadCustomizeLeftPanel(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
@@ -53,12 +53,21 @@ function loadCustomizeLeftPanel(mainContent, billPanel) {
                      Save Layout
                 </button>
                 
-                <button id="resetLayoutBtn" style="background: white; color: #0D3B66; border: 2px solid #0D3B66; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;">
+                <button id="resetCategoriesBtn" style="background: white; color: #dc3545; border: 2px solid #dc3545; padding: 12px 30px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-right: 10px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2.5 2v6h6M21.5 22v-6h-6"></path>
                         <path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"></path>
                     </svg>
-                     Reset to Default
+                     Reset Categories
+                </button>
+                
+                <button id="resetFrequentBtn" style="background: white; color: #dc3545; border: 2px solid #dc3545; padding: 12px 30px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        <path d="m9 14 2 2 4-4"></path>
+                    </svg>
+                     Clear Frequent Items
                 </button>
             </div>
         </div>
@@ -310,10 +319,12 @@ function getDragAfterElement(container, y) {
 function setupEventListeners() {
     // Save layout button
     const saveBtn = document.getElementById("saveLayoutBtn");
-    const resetBtn = document.getElementById("resetLayoutBtn");
+    const resetCategoriesBtn = document.getElementById("resetCategoriesBtn");
+    const resetFrequentBtn = document.getElementById("resetFrequentBtn");
     
     saveBtn.addEventListener("click", saveCategoryOrder);
-    resetBtn.addEventListener("click", resetCategoryOrder);
+    resetCategoriesBtn.addEventListener("click", resetCategoryOrder);
+    resetFrequentBtn.addEventListener("click", resetFrequentItems);
     
     // Add hover effects for buttons
     saveBtn.addEventListener('mouseenter', () => {
@@ -328,18 +339,34 @@ function setupEventListeners() {
         saveBtn.style.boxShadow = '0 3px 8px rgba(13, 59, 102, 0.3)';
     });
     
-    resetBtn.addEventListener('mouseenter', () => {
-        resetBtn.style.backgroundColor = '#0D3B66';
-        resetBtn.style.color = 'white';
-        resetBtn.style.transform = 'translateY(-2px)';
-        resetBtn.style.boxShadow = '0 3px 8px rgba(13, 59, 102, 0.3)';
+    // Reset categories button hover effects
+    resetCategoriesBtn.addEventListener('mouseenter', () => {
+        resetCategoriesBtn.style.backgroundColor = '#dc3545';
+        resetCategoriesBtn.style.color = 'white';
+        resetCategoriesBtn.style.transform = 'translateY(-2px)';
+        resetCategoriesBtn.style.boxShadow = '0 3px 8px rgba(220, 53, 69, 0.3)';
     });
     
-    resetBtn.addEventListener('mouseleave', () => {
-        resetBtn.style.backgroundColor = 'white';
-        resetBtn.style.color = '#0D3B66';
-        resetBtn.style.transform = 'translateY(0)';
-        resetBtn.style.boxShadow = 'none';
+    resetCategoriesBtn.addEventListener('mouseleave', () => {
+        resetCategoriesBtn.style.backgroundColor = 'white';
+        resetCategoriesBtn.style.color = '#dc3545';
+        resetCategoriesBtn.style.transform = 'translateY(0)';
+        resetCategoriesBtn.style.boxShadow = 'none';
+    });
+    
+    // Reset frequent items button hover effects
+    resetFrequentBtn.addEventListener('mouseenter', () => {
+        resetFrequentBtn.style.backgroundColor = '#dc3545';
+        resetFrequentBtn.style.color = 'white';
+        resetFrequentBtn.style.transform = 'translateY(-2px)';
+        resetFrequentBtn.style.boxShadow = '0 3px 8px rgba(220, 53, 69, 0.3)';
+    });
+    
+    resetFrequentBtn.addEventListener('mouseleave', () => {
+        resetFrequentBtn.style.backgroundColor = 'white';
+        resetFrequentBtn.style.color = '#dc3545';
+        resetFrequentBtn.style.transform = 'translateY(0)';
+        resetFrequentBtn.style.boxShadow = 'none';
     });
 }
 
@@ -385,19 +412,39 @@ async function saveCategoryOrder() {
 
 async function resetCategoryOrder() {
     try {
-        const confirmed = confirm("Are you sure you want to reset the category order to default? This cannot be undone.");
-        if (!confirmed) return;
-        
-        await ipcRenderer.invoke("reset-category-order");
-        createTextPopup("Layout reset to default successfully!");
-        
-        // Reload the categories list and frequent items
-        loadCategoriesForCustomization();
-        loadFrequentItemsForCustomization();
+        const { createConfirmPopup } = require("./textPopup");
+        createConfirmPopup("Are you sure you want to reset the category order to default? This cannot be undone.", async () => {
+            await ipcRenderer.invoke("reset-category-order");
+            createTextPopup("Category order reset to default successfully!");
+            
+            // Reload the categories list
+            loadCategoriesForCustomization();
+        });
         
     } catch (error) {
         console.error("Error resetting category order:", error);
-        createTextPopup("Error resetting layout. Please try again.");
+        createTextPopup("Error resetting category order. Please try again.");
+    }
+}
+
+async function resetFrequentItems() {
+    try {
+        const { createConfirmPopup } = require("./textPopup");
+        createConfirmPopup("Are you sure you want to clear all frequent items? This cannot be undone.", async () => {
+            // Clear all frequent items
+            const miscData = await ipcRenderer.invoke("load-miscellaneous");
+            miscData.frequentItems = [];
+            
+            ipcRenderer.send('save-miscellaneous', miscData);
+            createTextPopup("All frequent items cleared successfully!");
+            
+            // Reload the frequent items list
+            loadFrequentItemsForCustomization();
+        });
+        
+    } catch (error) {
+        console.error("Error clearing frequent items:", error);
+        createTextPopup("Error clearing frequent items. Please try again.");
     }
 }
 
