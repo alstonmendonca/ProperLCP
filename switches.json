@@ -1,4 +1,4 @@
 {
-    "showAllButton": true,
-    "showFrequentButton": true
+  "showAllButton": false,
+  "showFrequentButton": true
 }
