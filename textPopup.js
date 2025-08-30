@@ -34,7 +34,7 @@ function createTextPopup(message) {
             max-width: 90%;
             text-align: center;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #0D3B66;
             position: relative;
             animation: popupSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         ">
@@ -53,6 +53,7 @@ function createTextPopup(message) {
                 .popup-btn:hover {
                     transform: translateY(-2px);
                     box-shadow: 0 8px 24px rgba(13, 59, 102, 0.3);
+                    background: #0D3B66 !important;
                 }
                 
                 .popup-btn:active {
@@ -63,7 +64,7 @@ function createTextPopup(message) {
             <div style="
                 width: 64px;
                 height: 64px;
-                background: linear-gradient(135deg, #0D3B66, #1a5490);
+                background: #0D3B66;
                 border-radius: 50%;
                 margin: 0 auto 24px auto;
                 display: flex;
@@ -71,9 +72,9 @@ function createTextPopup(message) {
                 justify-content: center;
                 box-shadow: 0 8px 24px rgba(13, 59, 102, 0.2);
             ">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-                    <path d="M9 12l2 2 4-4"></path>
-                    <circle cx="12" cy="12" r="10"></circle>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="m9 12 2 2 4-4"/>
                 </svg>
             </div>
             
@@ -81,13 +82,13 @@ function createTextPopup(message) {
                 font-size: 18px;
                 line-height: 1.5;
                 margin-bottom: 28px;
-                color: #1e293b;
-                font-weight: 500;
+                color: #0D3B66;
+                font-weight: 600;
                 letter-spacing: -0.01em;
             ">${message}</p>
 
             <button id="textPopup_closePopup" class="popup-btn" style="
-                background: linear-gradient(135deg, #0D3B66, #1a5490);
+                background: #0D3B66;
                 color: white;
                 border: none;
                 border-radius: 12px;
@@ -145,7 +146,7 @@ function createConfirmPopup(message, callback) {
             max-width: 90%;
             text-align: center;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #0D3B66;
             position: relative;
             animation: popupSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         ">
@@ -171,28 +172,33 @@ function createConfirmPopup(message, callback) {
                 
                 .ok-btn:hover {
                     box-shadow: 0 8px 24px rgba(13, 59, 102, 0.3);
+                    background: #0D3B66 !important;
+                    color: white !important;
                 }
                 
                 .cancel-btn:hover {
-                    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+                    box-shadow: 0 8px 24px rgba(13, 59, 102, 0.3);
+                    background: #0D3B66 !important;
+                    color: white !important;
                 }
             </style>
             
             <div style="
                 width: 64px;
                 height: 64px;
-                background: linear-gradient(135deg, #ff9800, #f57c00);
+                background: white;
+                border: 3px solid #0D3B66;
                 border-radius: 50%;
                 margin: 0 auto 24px auto;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 8px 24px rgba(255, 152, 0, 0.2);
+                box-shadow: 0 8px 24px rgba(13, 59, 102, 0.2);
             ">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0D3B66" stroke-width="2.5">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
             </div>
             
@@ -200,8 +206,8 @@ function createConfirmPopup(message, callback) {
                 font-size: 18px;
                 line-height: 1.5;
                 margin-bottom: 32px;
-                color: #1e293b;
-                font-weight: 500;
+                color: #0D3B66;
+                font-weight: 600;
                 letter-spacing: -0.01em;
             ">${message}</p>
 
@@ -212,7 +218,7 @@ function createConfirmPopup(message, callback) {
                 flex-wrap: wrap;
             ">
                 <button id="confirmPopup_okButton" class="confirm-btn ok-btn" style="
-                    background: linear-gradient(135deg, #0D3B66, #1a5490);
+                    background: #0D3B66;
                     color: white;
                     border: none;
                     border-radius: 12px;
@@ -225,23 +231,34 @@ function createConfirmPopup(message, callback) {
                     font-family: inherit;
                     letter-spacing: 0.02em;
                     min-width: 120px;
-                ">OK</button>
+                ">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: middle;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    OK
+                </button>
 
                 <button id="confirmPopup_cancelButton" class="confirm-btn cancel-btn" style="
-                    background: linear-gradient(135deg, #ef4444, #dc2626);
-                    color: white;
-                    border: none;
+                    background: white;
+                    color: #0D3B66;
+                    border: 2px solid #0D3B66;
                     border-radius: 12px;
                     padding: 14px 28px;
                     font-size: 16px;
                     font-weight: 600;
                     cursor: pointer;
                     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-                    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+                    box-shadow: 0 4px 16px rgba(13, 59, 102, 0.1);
                     font-family: inherit;
                     letter-spacing: 0.02em;
                     min-width: 120px;
-                ">Cancel</button>
+                ">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: middle;">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    Cancel
+                </button>
             </div>
         </div>
     `;

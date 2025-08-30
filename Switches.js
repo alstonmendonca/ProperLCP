@@ -121,37 +121,39 @@ async function Switches(mainContent, billPanel){
     // Reset to defaults
     resetDefaults.addEventListener('click', async () => {
         const {createConfirmPopup} = require("./textPopup");
-        createConfirmPopup('Are you sure you want to reset all switches to their default values?', () => {
-            const defaultSwitches = {
-                showAllButton: true,
-                showFrequentButton: true
-            };
+        createConfirmPopup('Are you sure you want to reset all switches to their default values?', (confirmed) => {
+            if (confirmed) {
+                const defaultSwitches = {
+                    showAllButton: true,
+                    showFrequentButton: true
+                };
 
-            // Reset the UI for All button
-            showAllButton.checked = true;
-            const allSlider = showAllButton.nextElementSibling;
-            const allSliderButton = allSlider.querySelector('span:last-child');
-            allSlider.style.backgroundColor = '#0D3B66';
-            allSliderButton.style.left = '34px';
+                // Reset the UI for All button
+                showAllButton.checked = true;
+                const allSlider = showAllButton.nextElementSibling;
+                const allSliderButton = allSlider.querySelector('span:last-child');
+                allSlider.style.backgroundColor = '#0D3B66';
+                allSliderButton.style.left = '34px';
 
-            // Reset the UI for Frequent button
-            showFrequentButton.checked = true;
-            const frequentSlider = showFrequentButton.nextElementSibling;
-            const frequentSliderButton = frequentSlider.querySelector('span:last-child');
-            frequentSlider.style.backgroundColor = '#0D3B66';
-            frequentSliderButton.style.left = '34px';
+                // Reset the UI for Frequent button
+                showFrequentButton.checked = true;
+                const frequentSlider = showFrequentButton.nextElementSibling;
+                const frequentSliderButton = frequentSlider.querySelector('span:last-child');
+                frequentSlider.style.backgroundColor = '#0D3B66';
+                frequentSliderButton.style.left = '34px';
 
-            // Save defaults
-            ipcRenderer.send('save-switches', defaultSwitches);
-            
-            ipcRenderer.once('save-switches-response', (event, response) => {
-                if (response.success) {
-                    showSuccessMessage();
-                } else {
-                    const { createTextPopup } = require("./textPopup");
-                    createTextPopup('Failed to reset switches: ' + response.message);
-                }
-            });
+                // Save defaults
+                ipcRenderer.send('save-switches', defaultSwitches);
+                
+                ipcRenderer.once('save-switches-response', (event, response) => {
+                    if (response.success) {
+                        showSuccessMessage();
+                    } else {
+                        const { createTextPopup } = require("./textPopup");
+                        createTextPopup('Failed to reset switches: ' + response.message);
+                    }
+                });
+            }
         });
     });
 
