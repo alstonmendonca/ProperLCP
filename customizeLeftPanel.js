@@ -413,12 +413,14 @@ async function saveCategoryOrder() {
 async function resetCategoryOrder() {
     try {
         const { createConfirmPopup } = require("./textPopup");
-        createConfirmPopup("Are you sure you want to reset the category order to default? This cannot be undone.", async () => {
-            await ipcRenderer.invoke("reset-category-order");
-            createTextPopup("Category order reset to default successfully!");
-            
-            // Reload the categories list
-            loadCategoriesForCustomization();
+        createConfirmPopup("Are you sure you want to reset the category order to default? This cannot be undone.", async (confirmed) => {
+            if (confirmed) {
+                await ipcRenderer.invoke("reset-category-order");
+                createTextPopup("Category order reset to default successfully!");
+                
+                // Reload the categories list
+                loadCategoriesForCustomization();
+            }
         });
         
     } catch (error) {
@@ -430,16 +432,18 @@ async function resetCategoryOrder() {
 async function resetFrequentItems() {
     try {
         const { createConfirmPopup } = require("./textPopup");
-        createConfirmPopup("Are you sure you want to clear all frequent items? This cannot be undone.", async () => {
-            // Clear all frequent items
-            const miscData = await ipcRenderer.invoke("load-miscellaneous");
-            miscData.frequentItems = [];
-            
-            ipcRenderer.send('save-miscellaneous', miscData);
-            createTextPopup("All frequent items cleared successfully!");
-            
-            // Reload the frequent items list
-            loadFrequentItemsForCustomization();
+        createConfirmPopup("Are you sure you want to clear all frequent items? This cannot be undone.", async (confirmed) => {
+            if (confirmed) {
+                // Clear all frequent items
+                const miscData = await ipcRenderer.invoke("load-miscellaneous");
+                miscData.frequentItems = [];
+                
+                ipcRenderer.send('save-miscellaneous', miscData);
+                createTextPopup("All frequent items cleared successfully!");
+                
+                // Reload the frequent items list
+                loadFrequentItemsForCustomization();
+            }
         });
         
     } catch (error) {
