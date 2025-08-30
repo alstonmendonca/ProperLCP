@@ -10,8 +10,9 @@ async function Switches(mainContent, billPanel){
     
     mainContent.innerHTML = `
         <div style="padding: 20px;">
-            <h2 style="margin-bottom: 30px; color: #333;">System Switches</h2>
-            
+        <div class="section-title">
+            <h2>System Switches</h2>
+        </div>
             <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
                 <h3 style="margin-bottom: 15px; color: #555;">Interface Settings</h3>
                 
