@@ -105,6 +105,11 @@ async function updateMainContent(contentType) {
     if (contentType === "Home") {
         await loadHome(mainContent, billPanel);
     }
+    // Frequent items screen  
+    else if (contentType === "Frequent") {
+        const { loadFrequent } = require("./home");
+        await loadFrequent(mainContent, billPanel);
+    }
     // Fetch and display food items dynamically
     else {
         const foodItems = await ipcRenderer.invoke("get-food-items", contentType);

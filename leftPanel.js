@@ -25,6 +25,11 @@ async function updateLeftPanel(contentType) {
                     categoryPanel.innerHTML = '';
                 }
                 
+                // Only show "Frequent" button if the switch is enabled
+                if (switches.showFrequentButton) {
+                    categoryPanel.innerHTML += `<button class="category" id="Frequent" onclick="updateMainContent('Frequent')">Frequent</button>`;
+                }
+                
                 categoryPanel.innerHTML += categories
                     .map(
                         (category) =>
@@ -38,8 +43,10 @@ async function updateLeftPanel(contentType) {
                     document.getElementById(lastCategoryButton).classList.add('active');
                 } else if (switches.showAllButton && document.getElementById('All')) {
                     document.getElementById('All').classList.add('active');
+                } else if (switches.showFrequentButton && document.getElementById('Frequent')) {
+                    document.getElementById('Frequent').classList.add('active');
                 } else if (categories.length > 0) {
-                    // If "All" button is hidden, highlight the first category
+                    // If both "All" and "Frequent" buttons are hidden, highlight the first category
                     document.getElementById(categories[0].catname).classList.add('active');
                 }
 

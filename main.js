@@ -46,6 +46,7 @@ const userDbPath = path.join(userDataPath, 'LC.db');
 const userReceiptFormatPath = path.join(userDataPath, 'receiptFormat.json');
 const userBusinessInfoPath = path.join(userDataPath, 'businessInfo.json');
 const userSwitchesPath = path.join(userDataPath, 'switches.json');
+const userMiscellaneousPath = path.join(userDataPath, 'Miscellaneous.json');
 const userEnvPath = path.join(userDataPath, '.env');
 const userGetOnlinePath = path.join(userDataPath, 'getOnline.js');
 
@@ -68,6 +69,7 @@ async function copyResourcesToUserData() {
             { source: path.join(basePath, 'receiptFormat.json'), dest: userReceiptFormatPath },
             { source: path.join(basePath, 'businessInfo.json'), dest: userBusinessInfoPath },
             { source: path.join(basePath, 'switches.json'), dest: userSwitchesPath },
+            { source: path.join(basePath, 'Miscellaneous.json'), dest: userMiscellaneousPath },
             { source: envPath, dest: userEnvPath },
             { source: path.join(basePath, 'getOnline.js'), dest: userGetOnlinePath }
         ];
@@ -3403,6 +3405,57 @@ ipcMain.handle("get-all-food-items", async () => {
     });
 });
 
+// Get frequent items based on the miscellaneous configuration
+ipcMain.handle("get-frequent-items", async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Load frequent items list from miscellaneous data
+            const miscData = await new Promise((resolve, reject) => {
+                const dataPath = getFilePath('Miscellaneous.json');
+                fs.readFile(dataPath, 'utf-8', (err, data) => {
+                    if (err) {
+                        resolve({ frequentItems: [] }); // Default if file doesn't exist
+                    } else {
+                        try {
+                            resolve(JSON.parse(data));
+                        } catch (parseErr) {
+                            resolve({ frequentItems: [] }); // Default if parsing fails
+                        }
+                    }
+                });
+            });
+
+            if (!miscData.frequentItems || miscData.frequentItems.length === 0) {
+                resolve([]);
+                return;
+            }
+
+            // Get food items that match the frequent items list
+            const placeholders = miscData.frequentItems.map(() => '?').join(',');
+            const query = `
+                SELECT f.fid, f.fname, f.cost, f.veg, f.category 
+                FROM FoodItem f 
+                JOIN Category c ON f.category = c.catid
+                WHERE f.active = 1 
+                AND f.is_on = 1 
+                AND c.active = 1
+                AND f.fid IN (${placeholders})
+                ORDER BY f.fname;
+            `;
+
+            db.all(query, miscData.frequentItems, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        } catch (error) {
+            reject(error);
+        }
+    });
+});
+
 // Fetch inventory items for a given food item
 ipcMain.handle("get-inventory-for-food", async (event, foodId) => {
     const query = `
@@ -3660,7 +3713,8 @@ ipcMain.handle('load-switches', async () => {
         console.error('Failed to load switches:', err);
         // Return default switches if file doesn't exist
         return {
-            showAllButton: true
+            showAllButton: true,
+            showFrequentButton: true
         };
     }
 });
@@ -3679,6 +3733,36 @@ ipcMain.on('save-switches', (event, switchesData) => {
 });
 
 // ------------------------------- SWITCHES SECTION ENDS HERE ------------------------
+
+// ------------------------------- MISCELLANEOUS SECTION STARTS HERE ------------------------
+ipcMain.handle('load-miscellaneous', async () => {
+    try {
+        const dataPath = getFilePath('Miscellaneous.json');
+        const fileData = await fs.promises.readFile(dataPath, 'utf-8');
+        return JSON.parse(fileData);
+    } catch (err) {
+        console.error('Failed to load miscellaneous data:', err);
+        // Return default structure if file doesn't exist
+        return {
+            frequentItems: []
+        };
+    }
+});
+
+ipcMain.on('save-miscellaneous', (event, miscData) => {
+    const savePath = getFilePath('Miscellaneous.json');
+    fs.writeFile(savePath, JSON.stringify(miscData, null, 2), 'utf-8', (err) => {
+        if (err) {
+            console.error('Failed to save miscellaneous data:', err);
+            event.reply('save-miscellaneous-response', { success: false, message: err.message });
+        } else {
+            console.log('Miscellaneous data saved successfully');
+            event.reply('save-miscellaneous-response', { success: true });
+        }
+    });
+});
+
+// ------------------------------- MISCELLANEOUS SECTION ENDS HERE ------------------------
 
 // ------------------------------- BUSINESS INFO SECTION ENDS HERE ------------------------
 //----------------------------------- BACKUP AND RESTORE SECTION STARTS HERE -------------------

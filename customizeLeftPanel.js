@@ -10,7 +10,7 @@ function loadCustomizeLeftPanel(mainContent, billPanel) {
         <div class="customize-panel-wrapper">
             <div class="customize-header">
                 <h2 class="customize-title">Customize Home Panel Layout</h2>
-                <p class="customize-subtitle">Drag and drop to rearrange the categories displayed in the Home tab</p>
+                <p class="customize-subtitle">Manage categories order and frequent items</p>
             </div>
             
             <div class="customize-content">
@@ -21,6 +21,15 @@ function loadCustomizeLeftPanel(mainContent, billPanel) {
                     <ul id="categoriesSortableList" class="sortable-list">
                         <!-- Categories will be populated here -->
                     </ul>
+                </div>
+                
+                <div class="frequent-items-container" style="margin-top: 30px;">
+                    <h3 class="section-title">Frequent Items</h3>
+                    <p class="section-description">Mark items as frequent to show them in the Frequent section</p>
+                    
+                    <div id="frequentItemsSection">
+                        <!-- Frequent items will be populated here -->
+                    </div>
                 </div>
                 
                 <div class="customize-actions">
@@ -46,6 +55,7 @@ function loadCustomizeLeftPanel(mainContent, billPanel) {
     `;
 
     loadCategoriesForCustomization();
+    loadFrequentItemsForCustomization();
     setupEventListeners();
 }
 
@@ -120,6 +130,78 @@ async function loadCategoriesForCustomization() {
     } catch (error) {
         console.error("Error loading categories:", error);
         createTextPopup("Error loading categories. Please try again.");
+    }
+}
+
+async function loadFrequentItemsForCustomization() {
+    try {
+        // Get all food items
+        const allItems = await ipcRenderer.invoke("get-all-food-items");
+        
+        // Get current frequent items
+        const miscData = await ipcRenderer.invoke("load-miscellaneous");
+        const frequentItemIds = miscData.frequentItems || [];
+        
+        const frequentSection = document.getElementById("frequentItemsSection");
+        
+        if (allItems.length === 0) {
+            frequentSection.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #666;">
+                    <p>No items available to mark as frequent.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        frequentSection.innerHTML = `
+            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+                ${allItems.map(item => `
+                    <div class="frequent-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 16px;">${item.veg ? "🌱" : "🍖"}</span>
+                            <span style="font-weight: 500;">${item.fname}</span>
+                            <span style="color: #666; font-size: 14px;">₹${item.cost}</span>
+                        </div>
+                        <label class="frequent-toggle" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                            <input type="checkbox" class="frequent-checkbox" data-fid="${item.fid}" 
+                                ${frequentItemIds.includes(item.fid) ? 'checked' : ''} 
+                                style="opacity: 0; width: 0; height: 0;">
+                            <span class="frequent-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
+                                background-color: ${frequentItemIds.includes(item.fid) ? '#4CAF50' : '#ccc'}; 
+                                transition: .4s; border-radius: 24px;">
+                                <span style="position: absolute; content: ''; height: 18px; width: 18px; 
+                                    left: ${frequentItemIds.includes(item.fid) ? '26px' : '3px'}; bottom: 3px; 
+                                    background-color: white; transition: .4s; border-radius: 50%;"></span>
+                            </span>
+                        </label>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // Add event listeners for toggle switches
+        const toggles = document.querySelectorAll('.frequent-checkbox');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('change', handleFrequentToggle);
+        });
+        
+    } catch (error) {
+        console.error("Error loading frequent items:", error);
+        createTextPopup("Error loading frequent items. Please try again.");
+    }
+}
+
+function handleFrequentToggle(event) {
+    const checkbox = event.target;
+    const slider = checkbox.nextElementSibling;
+    const sliderButton = slider.querySelector('span');
+    
+    if (checkbox.checked) {
+        slider.style.backgroundColor = '#4CAF50';
+        sliderButton.style.left = '26px';
+    } else {
+        slider.style.backgroundColor = '#ccc';
+        sliderButton.style.left = '3px';
     }
 }
 
@@ -199,8 +281,33 @@ async function saveCategoryOrder() {
             categoryOrder.push(items[i].dataset.category);
         }
         
+        // Get frequent items
+        const frequentCheckboxes = document.querySelectorAll('.frequent-checkbox');
+        const frequentItems = [];
+        
+        frequentCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                frequentItems.push(parseInt(checkbox.dataset.fid));
+            }
+        });
+        
+        // Save category order
         await ipcRenderer.invoke("save-category-order", categoryOrder);
-        createTextPopup("Layout saved successfully! The changes will take effect when you return to the Home tab.");
+        
+        // Save frequent items
+        const miscData = await ipcRenderer.invoke("load-miscellaneous");
+        miscData.frequentItems = frequentItems;
+        
+        ipcRenderer.send('save-miscellaneous', miscData);
+        
+        // Wait for save response
+        ipcRenderer.once('save-miscellaneous-response', (event, response) => {
+            if (response.success) {
+                createTextPopup("Layout and frequent items saved successfully! The changes will take effect when you return to the Home tab.");
+            } else {
+                createTextPopup("Error saving frequent items: " + response.message);
+            }
+        });
         
     } catch (error) {
         console.error("Error saving category order:", error);
@@ -216,8 +323,9 @@ async function resetCategoryOrder() {
         await ipcRenderer.invoke("reset-category-order");
         createTextPopup("Layout reset to default successfully!");
         
-        // Reload the categories list
+        // Reload the categories list and frequent items
         loadCategoriesForCustomization();
+        loadFrequentItemsForCustomization();
         
     } catch (error) {
         console.error("Error resetting category order:", error);
