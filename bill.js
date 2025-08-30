@@ -1756,7 +1756,6 @@ function closeTodaysOrdersPopup() {
 // ------------ SAVE TO ORDER FUNCTIONALITY ENDS HERE ------------------
 function NewOrder() {
     resetBill();
-    updateMainContent('Home');
 }
 // ----------------ONLINE ORDERS FUNCTIONALITY STARTS HERE ------------------
 function getOnlineOrders() {
