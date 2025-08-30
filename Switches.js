@@ -1,5 +1,5 @@
 const { ipcRenderer } = require("electron");
-
+const { createConfirmPopup } = require("./textPopup");
 async function Switches(mainContent, billPanel){
     mainContent.style.marginLeft = "200px";
     mainContent.style.marginRight = "0px";
@@ -120,7 +120,8 @@ async function Switches(mainContent, billPanel){
 
     // Reset to defaults
     resetDefaults.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to reset all switches to their default values?')) {
+        const {createConfirmPopup} = require("./textPopup");
+        createConfirmPopup('Are you sure you want to reset all switches to their default values?', () => {
             const defaultSwitches = {
                 showAllButton: true,
                 showFrequentButton: true
@@ -147,11 +148,11 @@ async function Switches(mainContent, billPanel){
                 if (response.success) {
                     showSuccessMessage();
                 } else {
-                    const createTextPopup = require("./textPopup");
-                    createTextPopup('Failed to reset switches');
+                    const { createTextPopup } = require("./textPopup");
+                    createTextPopup('Failed to reset switches: ' + response.message);
                 }
             });
-        }
+        });
     });
 
     // Add hover effects for buttons
