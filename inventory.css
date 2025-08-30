@@ -201,13 +201,13 @@
 }
 
 .primary-btn-inv {
-    background-color: #1976d2;
+    background-color: #0D3B66;
     color: white;
     border: none;
 }
 
 .primary-btn-inv:hover {
-    background-color: #1565c0;
+    background-color: #184876;
 }
 
 .secondary-btn-inv {
@@ -344,5 +344,11 @@
     transform: scale(1.2);
     accent-color: #4caf50;  /* Custom checkbox color */
     cursor: pointer;
+}
+
+.delete-btn-inv {
+    background-color: #ffebee;
+    color: #c62828;
+    border: none;
 }
 /* -------------------------------------------- INVENTORY ENDS HERE -------------------------------------------------------------------- */
