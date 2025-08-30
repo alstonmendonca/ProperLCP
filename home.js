@@ -6,8 +6,24 @@ async function loadHome(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
     mainContent.style.marginRight = "600px";
 
-    // Fetch all food items
-    const foodItems = await ipcRenderer.invoke("get-all-food-items");
+    // Check switches to see if "All" button should be shown
+    const switches = await ipcRenderer.invoke("load-switches");
+    
+    let foodItems;
+    
+    if (switches.showAllButton) {
+        // Original behavior - show all food items
+        foodItems = await ipcRenderer.invoke("get-all-food-items");
+    } else {
+        // When "All" button is hidden, show items from first category
+        const categories = await ipcRenderer.invoke("get-categories");
+        if (categories.length > 0) {
+            const firstCategory = categories[0].catname;
+            foodItems = await ipcRenderer.invoke("get-food-items", firstCategory);
+        } else {
+            foodItems = [];
+        }
+    }
 
     if (foodItems.length > 0) {
         mainContent.innerHTML = `

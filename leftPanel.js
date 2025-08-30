@@ -15,9 +15,16 @@ async function updateLeftPanel(contentType) {
             categoryPanel.style.display = "block";
             // Render Home-related buttons
             const categories = await ipcRenderer.invoke("get-categories");
+            const switches = await ipcRenderer.invoke("load-switches");
 
             if (categories.length > 0) {
-                categoryPanel.innerHTML = `<button class="category" id="All" onclick="updateMainContent('Home')">All</button>`
+                // Only show "All" button if the switch is enabled
+                if (switches.showAllButton) {
+                    categoryPanel.innerHTML = `<button class="category" id="All" onclick="updateMainContent('Home')">All</button>`;
+                } else {
+                    categoryPanel.innerHTML = '';
+                }
+                
                 categoryPanel.innerHTML += categories
                     .map(
                         (category) =>
@@ -29,8 +36,11 @@ async function updateLeftPanel(contentType) {
                 const lastCategoryButton = sessionStorage.getItem('lastCategoryButton');
                 if (lastCategoryButton && document.getElementById(lastCategoryButton)) {
                     document.getElementById(lastCategoryButton).classList.add('active');
-                } else {
+                } else if (switches.showAllButton && document.getElementById('All')) {
                     document.getElementById('All').classList.add('active');
+                } else if (categories.length > 0) {
+                    // If "All" button is hidden, highlight the first category
+                    document.getElementById(categories[0].catname).classList.add('active');
                 }
 
             } else {
@@ -106,6 +116,7 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="BackupDatabase" onclick="updateMainContent('BackupDatabase')">Backup Database</button>
                 <button class="category" id="RestoreDatabase" onclick="updateMainContent('RestoreDatabase')">Restore Database</button>
                 <button class="category" id="customizeLeftPanel" onclick="updateMainContent('customizeLeftPanel')">Customize Panel</button>
+                <button class="category" id="Switches" onclick="updateMainContent('Switches')">Switches</button>
                 <button class="category" id="ChangeMasterPassword" onclick="updateMainContent('ChangeMasterPassword')">Change Master Password</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>
                 <button class="category" id="Exit" onclick="updateMainContent('Exit')">Exit</button>

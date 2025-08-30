@@ -45,6 +45,7 @@ const userDataPath = app.getPath('userData');
 const userDbPath = path.join(userDataPath, 'LC.db');
 const userReceiptFormatPath = path.join(userDataPath, 'receiptFormat.json');
 const userBusinessInfoPath = path.join(userDataPath, 'businessInfo.json');
+const userSwitchesPath = path.join(userDataPath, 'switches.json');
 const userEnvPath = path.join(userDataPath, '.env');
 const userGetOnlinePath = path.join(userDataPath, 'getOnline.js');
 
@@ -66,6 +67,7 @@ async function copyResourcesToUserData() {
             { source: path.join(basePath, 'LC.db'), dest: userDbPath },
             { source: path.join(basePath, 'receiptFormat.json'), dest: userReceiptFormatPath },
             { source: path.join(basePath, 'businessInfo.json'), dest: userBusinessInfoPath },
+            { source: path.join(basePath, 'switches.json'), dest: userSwitchesPath },
             { source: envPath, dest: userEnvPath },
             { source: path.join(basePath, 'getOnline.js'), dest: userGetOnlinePath }
         ];
@@ -3647,6 +3649,36 @@ ipcMain.handle('load-business-info', async () => {
         return null; // or return default data if file is missing
     }
 });
+
+// ------------------------------- SWITCHES SECTION STARTS HERE ------------------------
+ipcMain.handle('load-switches', async () => {
+    try {
+        const dataPath = getFilePath('switches.json');
+        const fileData = await fs.promises.readFile(dataPath, 'utf-8');
+        return JSON.parse(fileData);
+    } catch (err) {
+        console.error('Failed to load switches:', err);
+        // Return default switches if file doesn't exist
+        return {
+            showAllButton: true
+        };
+    }
+});
+
+ipcMain.on('save-switches', (event, switchesData) => {
+    const savePath = getFilePath('switches.json');
+    fs.writeFile(savePath, JSON.stringify(switchesData, null, 2), 'utf-8', (err) => {
+        if (err) {
+            console.error('Failed to save switches:', err);
+            event.reply('save-switches-response', { success: false, message: err.message });
+        } else {
+            console.log('Switches saved successfully');
+            event.reply('save-switches-response', { success: true });
+        }
+    });
+});
+
+// ------------------------------- SWITCHES SECTION ENDS HERE ------------------------
 
 // ------------------------------- BUSINESS INFO SECTION ENDS HERE ------------------------
 //----------------------------------- BACKUP AND RESTORE SECTION STARTS HERE -------------------

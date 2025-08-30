@@ -22,7 +22,7 @@ async function updateMainContent(contentType) {
     const settingsButtons = [
         'UserProfile', 'BusinessInfo',  
         'Receipt', 'DriverConfiguration', 'BackupDatabase', 'RestoreDatabase',
-        'ConnectedDevices', 'Help', 'customizeLeftPanel', 'ChangeMasterPassword'
+        'ConnectedDevices', 'Help', 'customizeLeftPanel', 'Switches', 'ChangeMasterPassword'
     ];
     
     // Highlight top panel button for any top-level section
@@ -255,6 +255,12 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "customizeLeftPanel") {
             loadCustomizeLeftPanel(mainContent, billPanel);
+        }
+        else if (contentType === "Switches") {
+            mainContent.style.marginLeft = "200px";
+            mainContent.style.marginRight = "0px";
+            const { Switches } = require("./Switches");
+            Switches(mainContent, billPanel);
         }
         else if (contentType === "Help") {
             loadHelpSection();
