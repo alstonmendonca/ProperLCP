@@ -112,7 +112,8 @@ async function Switches(mainContent, billPanel){
                 // Show success message
                 showSuccessMessage();
             } else {
-                alert('Failed to save switches: ' + response.message);
+                    const createTextPopup = require("./textPopup");
+                    createTextPopup('Failed to save switches');
             }
         });
     });
@@ -146,7 +147,8 @@ async function Switches(mainContent, billPanel){
                 if (response.success) {
                     showSuccessMessage();
                 } else {
-                    alert('Failed to reset switches: ' + response.message);
+                    const createTextPopup = require("./textPopup");
+                    createTextPopup('Failed to reset switches');
                 }
             });
         }

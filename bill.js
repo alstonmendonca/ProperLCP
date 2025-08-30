@@ -2066,7 +2066,8 @@ function getOnlineOrders() {
     ipcRenderer.send("get-online-orders"); // Request online orders from the main process
     ipcRenderer.once('online-orders-response', (event, response) => {
         if (response.error) {
-            alert('Failed to fetch online orders: ' + response.message);
+            const createTextPopup = require("./textPopup");
+            createTextPopup('Failed to fetch online orders: ' + response.message);
             return;
         }
 

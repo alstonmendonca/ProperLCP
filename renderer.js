@@ -128,7 +128,8 @@ ipcRenderer.on('set-user-role', (event, role) => {
 });
 
 ipcRenderer.on("delete-order-response", (event, data) => {
-    alert(data.message);
+    const createTextPopup = require("./textPopup");
+    createTextPopup(data.message);
     if (data.success) {
         fetchOrderHistory(); // Refresh the order list
     }
