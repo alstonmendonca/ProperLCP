@@ -1,5 +1,6 @@
 // startMongoExpress.js
 // Express wrapper used by the packaged exe. Uses bcryptjs (pure JS) instead of native bcrypt.
+//always convert to pkg exe using pkg startMongoExpress.js --target node18-win-x64 --output startMongoExpress.exe
 
 console.log('[startMongoExpress] starting script. pid=', process.pid, 'cwd=', __dirname, 'env.MONGO_PORT=', process.env.MONGO_PORT);
 
@@ -22,6 +23,14 @@ const fs = require('fs');
 const path = require('path');
 
 app.use(express.json());
+
+// Add CORS headers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 // Prefer environment port; fallback to same default you used earlier
 const MONGO_PORT = Number(process.env.MONGO_PORT || 34235);
@@ -248,6 +257,59 @@ app.post('/edituser', async (req, res) => {
     });
   } catch (err) {
     console.error('[startMongoExpress] Error updating user profile:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.post('/change-password', async (req, res) => {
+  try {
+    const { userid, currentPassword, newPassword } = req.body;
+
+    if (!userid || !currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'User ID, current password, and new password are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long' });
+    }
+
+    // Find the user
+    const user = await db.collection('LCPUsers').findOne({ userid: userid });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Verify current password
+    const currentHash = user.password_hash;
+    if (!currentHash || (Array.isArray(currentHash) && currentHash.length === 0)) {
+      return res.status(400).json({ success: false, message: 'No password set for user' });
+    }
+
+    const isCurrentPasswordValid = bcrypt.compareSync(currentPassword, currentHash);
+    if (!isCurrentPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+    }
+
+    // Hash the new password
+    const saltRounds = 12;
+    const newPasswordHash = bcrypt.hashSync(newPassword, saltRounds);
+
+    // Update the password
+    const result = await db.collection('LCPUsers').updateOne(
+      { userid: userid },
+      { $set: { password_hash: newPasswordHash, updatedAt: new Date() } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({ success: false, message: 'Failed to update password' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully. Please login again with your new password.'
+    });
+  } catch (err) {
+    console.error('[startMongoExpress] Error changing password:', err);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });

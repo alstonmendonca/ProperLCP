@@ -553,6 +553,10 @@ function setupIPC() {
 
   ipcMain.handle("get-user-role", () => userRole);
 
+  ipcMain.handle("get-mongo-port", () => {
+    return MONGO_PORT || 34235;
+  });
+
   ipcMain.handle("get-printer-config", () => {
     const config = store.get("printerConfig", {
       vendorId: "0x0525",
