@@ -169,26 +169,10 @@ async function displayMenu() {
 
     // Show loading message with spinner immediately
     mainContent.innerHTML = `
-    <div class="loading-message" id="loading-message" style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        font-size: 18px;
-        color: #555;
-    ">
-        <div class="spinner" style="
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 0.4s linear infinite;
-            margin-bottom: 15px;
-        "></div>
-        <p>Loading menu...</p>
-    </div>
+        <div class="loading-message" id="loading-message">
+            <div class="loading-spinner"></div>
+            <p>Loading menu...</p>
+        </div>
     `;
 
     billPanel.style.display = "none";
@@ -202,69 +186,24 @@ async function displayMenu() {
 
         // Build UI: header, search bar, grid start with Add button ALWAYS
         let menuContent = `
-            <div class="menu-section-title" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px; position: relative;">
-                <h2 style="margin: 0;">Menu</h2>
+            <div class="menu-section-title">
+                <h2>Menu</h2>
             </div>
 
-            <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center;">
-                <input type="text" id="searchBar" placeholder="Search..." style="
-                    padding: 10px 16px; 
-                    border: 2px solid #cbd5e1; 
-                    border-radius: 8px; 
-                    flex: 1; 
-                    font-size: 14px;
-                    background: #f8fafc;
-                    transition: border-color 0.2s ease;
-                    box-sizing: border-box;
-                " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
-                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+            <div class="menu-controls-container">
+                <input type="text" id="searchBar" class="search-input" placeholder="Search...">
                 
-                <select id="categoryFilter" style="
-                    padding: 10px 16px;
-                    border: 2px solid #cbd5e1;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    background: #f8fafc;
-                    min-width: 150px;
-                    cursor: pointer;
-                    transition: border-color 0.2s ease;
-                " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
-                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                <select id="categoryFilter" class="filter-select">
                     <option value="">All Categories</option>
                 </select>
                 
-                <select id="vegFilter" style="
-                    padding: 10px 16px;
-                    border: 2px solid #cbd5e1;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    background: #f8fafc;
-                    min-width: 120px;
-                    cursor: pointer;
-                    transition: border-color 0.2s ease;
-                " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
-                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                <select id="vegFilter" class="filter-select veg-filter-select">
                     <option value="">All Items</option>
                     <option value="1">🌱 Vegetarian</option>
                     <option value="0">🍖 Non-Vegetarian</option>
                 </select>
                 
-                <button id="bulkEditBtn" style="
-                    padding: 10px 20px;
-                    background: linear-gradient(135deg, #059669, #047857);
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    white-space: nowrap;
-                " onmouseover="this.style.backgroundColor='#065f46'; this.style.transform='translateY(-1px)'" 
-                onmouseout="this.style.backgroundColor='#059669'; this.style.transform='translateY(0)'">
+                <button id="bulkEditBtn" class="action-button bulk-edit-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -272,22 +211,7 @@ async function displayMenu() {
                     BULK EDIT
                 </button>
                 
-                <button id="syncToOnlineBtn" style="
-                    padding: 10px 20px;
-                    background: #0D3B66;
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    white-space: nowrap;
-                " onmouseover="this.style.backgroundColor='#11487b'; this.style.transform='translateY(-1px)'" 
-                onmouseout="this.style.backgroundColor='#0D3B66'; this.style.transform='translateY(0)'">
+                <button id="syncToOnlineBtn" class="action-button sync-online-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
                     </svg>
@@ -295,10 +219,8 @@ async function displayMenu() {
                 </button>
             </div>
 
-            <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                <button id="addNewItem" style="padding: 20px; text-align: center; background-color: #ffffff; border: 2px dashed #0D3B66; border-radius: 12px; color: #0D3B66; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;" 
-                        onmouseover="this.style.backgroundColor='#f8fafc'; this.style.borderColor='#11487b'" 
-                        onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#0D3B66'">
+            <div class="food-items-grid">
+                <button id="addNewItem" class="add-item-button">
                     <svg class="add-icon" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -312,21 +234,23 @@ async function displayMenu() {
         if (!Array.isArray(foodItems) || foodItems.length === 0) {
             // Empty state (below add button)
             menuContent += `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #64748b;">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:12px;">
+                <div class="empty-state">
+                    <svg class="empty-state-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                         <line x1="12" y1="9" x2="12" y2="13"></line>
                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
-                    <div style="font-size: 18px; margin-bottom: 6px;">No items available</div>
-                    <div style="color:#94a3b8;">Click <strong>Add New Item</strong> to create the first menu item.</div>
+                    <div class="empty-state-title">No items available</div>
+                    <div class="empty-state-subtitle">Click <strong>Add New Item</strong> to create the first menu item.</div>
                 </div>
             `;
         } else {
             // Render each item
             for (const item of foodItems) {
+                const foodItemClass = item.veg == 1 ? 'food-item-card food-item-veg' : 'food-item-card food-item-nonveg';
+                
                 menuContent += `
-                    <div class="food-item" style="border: 2px solid ${item.veg == 1 ? 'green' : 'red'}; padding: 10px; text-align: center; border-radius: 10px; background: ${item.veg == 1 ? '#EFFBF0' : '#FFEBEB'};" data-fid="${item.fid}" data-category="${item.category}" data-veg="${item.veg}">
+                    <div class="${foodItemClass}" data-fid="${item.fid}" data-category="${item.category}" data-veg="${item.veg}">
                         <h3>${item.fname} <br style="line-height:5px; display:block"> 
                             ${item.veg == 1 ? "🌱" : "🍖"}
                         </h3>
@@ -334,17 +258,17 @@ async function displayMenu() {
                         <p>Food ID: ${item.fid}</p>
                         <p>Price: ₹${item.cost}</p>
 
-                        <div class="toggle-container" style="display: flex; justify-content: center; gap: 18px; align-items: center;">
-                            <div class="toggle-group" style="display: flex; flex-direction: column; align-items: center; font-size: 12px;">
-                                <label class="switch" style="transform: scale(0.85);">
+                        <div class="toggle-container">
+                            <div class="toggle-group">
+                                <label class="switch">
                                     <input type="checkbox" class="active-toggle-switch" data-fid="${item.fid}" ${item.active ? "checked" : ""}>
                                     <span class="slider round"></span>
                                 </label>
                                 <p class="status active-status">${item.active ? "ACTIVE ✅" : "INACTIVE ❌"}</p>
                             </div>
 
-                            <div class="toggle-group is-on-container" style="display: ${item.active ? 'flex' : 'none'}; flex-direction: column; align-items: center; font-size: 12px;">
-                                <label class="switch" style="transform: scale(0.85);">
+                            <div class="toggle-group is-on-container" style="display: ${item.active ? 'flex' : 'none'}">
+                                <label class="switch">
                                     <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
                                     <span class="slider round"></span>
                                 </label>
@@ -352,38 +276,12 @@ async function displayMenu() {
                             </div>
                         </div>
 
-                        <div style="display: flex; flex-direction: row; gap: 8px; margin-top: 15px;">
-                            <button class="edit-btn" data-fid="${item.fid}" style="
-                                background: linear-gradient(135deg, #0D3B66, #1a5490);
-                                color: white;
-                                border: none;
-                                border-radius: 8px;
-                                padding: 12px;
-                                cursor: pointer;
-                                font-weight: 600;
-                                font-size: 14px;
-                                transition: all 0.2s ease;
-                                box-shadow: 0 2px 8px rgba(13, 59, 102, 0.2);
-                                width: 100%;
-                            " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(13, 59, 102, 0.3)'" 
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(13, 59, 102, 0.2)'">
+                        <div class="action-buttons-container">
+                            <button class="edit-button edit-btn" data-fid="${item.fid}">
                                 Edit
                             </button>
                             
-                            <button class="delete-btn" data-fid="${item.fid}" style="
-                                background: linear-gradient(135deg, #ef4444, #dc2626);
-                                color: white;
-                                border: none;
-                                border-radius: 8px;
-                                padding: 12px;
-                                cursor: pointer;
-                                font-weight: 600;
-                                font-size: 14px;
-                                transition: all 0.2s ease;
-                                box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
-                                width: 100%;
-                            " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" 
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(239, 68, 68, 0.2)'">
+                            <button class="delete-button delete-btn" data-fid="${item.fid}">
                                 Delete
                             </button>
                         </div>
@@ -461,50 +359,13 @@ async function displayMenu() {
             // Create loading overlay
             const loadingOverlay = document.createElement('div');
             loadingOverlay.id = 'sync-loading-overlay';
-            loadingOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: rgba(0, 0, 0, 0.6);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                z-index: 10000;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            `;
+            loadingOverlay.className = 'sync-loading-overlay';
             
             loadingOverlay.innerHTML = `
-                <div style="
-                    background: white;
-                    padding: 30px;
-                    border-radius: 16px;
-                    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-                    text-align: center;
-                    min-width: 200px;
-                ">
-                    <div style="
-                        border: 4px solid #f3f3f3;
-                        border-top: 4px solid #0D3B66;
-                        border-radius: 50%;
-                        width: 40px;
-                        height: 40px;
-                        animation: spin 1s linear infinite;
-                        margin: 0 auto 20px auto;
-                    "></div>
-                    <h3 style="
-                        margin: 0 0 10px 0;
-                        color: #1e293b;
-                        font-size: 18px;
-                        font-weight: 600;
-                    ">Syncing to Online Database</h3>
-                    <p style="
-                        margin: 0;
-                        color: #64748b;
-                        font-size: 14px;
-                    ">Please wait while we sync your menu items...</p>
+                <div class="sync-loading-content">
+                    <div class="sync-loading-spinner"></div>
+                    <h3 class="sync-loading-title">Syncing to Online Database</h3>
+                    <p class="sync-loading-text">Please wait while we sync your menu items...</p>
                 </div>
             `;
             

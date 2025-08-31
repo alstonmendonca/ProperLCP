@@ -199,16 +199,343 @@ input:checked + .slider:before {
     cursor: pointer;
 }
 
-/* ============================================= MENU SECTION TITLE ============================================== */
-.menu-section-title{
-    text-align: center; /* Center the content */
-    margin-bottom: 5px; /* Add some spacing below the header */
+/* ============================================= MENU SECTION TITLE STARTS HERE ============================================== */
+.menu-section-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
 }
-.menu-section-title h2{
-    font-size: 2.5rem; /* Increase font size */
-    font-weight: bold; /* Make it bold */
-    color: #2c3e50; /* Use a dark, professional color */
-    margin-bottom: 10px; /* Add spacing below the heading */
-    text-transform: uppercase; /* Uppercase the text for emphasis */
-    letter-spacing: 2px; /* Add spacing between letters */
+
+.menu-section-title h2 {
+    margin: 0;
 }
+/* ============================================= MENU SECTION TITLE ENDS HERE ============================================== */
+
+.menu-controls-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.search-input {
+    padding: 10px 16px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    flex: 1;
+    font-size: 14px;
+    background: #f8fafc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    border-color: #0D3B66;
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+    outline: none;
+}
+
+.search-input:blur {
+    border-color: #cbd5e1;
+    box-shadow: none;
+}
+
+.filter-select {
+    padding: 10px 16px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f8fafc;
+    min-width: 150px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    appearance: none;
+}
+
+.filter-select:focus {
+    border-color: #0D3B66;
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+    outline: none;
+}
+
+.filter-select:blur {
+    border-color: #cbd5e1;
+    box-shadow: none;
+}
+
+.veg-filter-select {
+    min-width: 120px;
+}
+
+.action-button {
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.bulk-edit-btn {
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+.bulk-edit-btn:hover {
+    background: #065f46;
+    transform: translateY(-1px);
+}
+
+.bulk-edit-btn:not(:hover) {
+    background: #059669;
+    transform: translateY(0);
+}
+
+.sync-online-btn {
+    background: #0D3B66;
+}
+
+.sync-online-btn:hover {
+    background: #11487b;
+    transform: translateY(-1px);
+}
+
+.sync-online-btn:not(:hover) {
+    background: #0D3B66;
+    transform: translateY(0);
+}
+
+.food-items-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.add-item-button {
+    padding: 20px;
+    text-align: center;
+    background-color: #ffffff;
+    border: 2px dashed #0D3B66;
+    border-radius: 12px;
+    color: #0D3B66;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-item-button:hover {
+    background-color: #f8fafc;
+    border-color: #11487b;
+}
+
+.add-item-button:not(:hover) {
+    background-color: #ffffff;
+    border-color: #0D3B66;
+}
+
+.add-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+}
+
+.empty-state-icon {
+    margin-bottom: 12px;
+}
+
+.empty-state-title {
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+.empty-state-subtitle {
+    color: #94a3b8;
+}
+
+.food-item-card {
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid;
+}
+
+.food-item-veg {
+    border-color: green;
+    background: #EFFBF0;
+}
+
+.food-item-nonveg {
+    border-color: red;
+    background: #FFEBEB;
+}
+
+.toggle-container {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    align-items: center;
+}
+
+.toggle-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+}
+
+.switch {
+    transform: scale(0.85);
+}
+
+.status {
+    margin: 0;
+}
+
+.action-buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.edit-button {
+    background: linear-gradient(135deg, #0D3B66, #1a5490);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(13, 59, 102, 0.2);
+    width: 100%;
+}
+
+.edit-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 59, 102, 0.3);
+}
+
+.edit-button:not(:hover) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(13, 59, 102, 0.2);
+}
+
+.delete-button {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+    width: 100%;
+}
+
+.delete-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.delete-button:not(:hover) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+/* Loading Styles */
+.loading-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 18px;
+    color: #555;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 0.4s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Sync Loading Overlay Styles */
+.sync-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.sync-loading-content {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    text-align: center;
+    min-width: 200px;
+}
+
+.sync-loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0D3B66;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+.sync-loading-title {
+    margin: 0 0 10px 0;
+    color: #1e293b;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.sync-loading-text {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* MENU-EDIT-POPUP-OVERLAY STARTS HERE*/
+
+
+
+/* MENU-EDIT-POPUP-OVERLAY ENDS HERE*/
