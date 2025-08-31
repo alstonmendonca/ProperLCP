@@ -11,72 +11,9 @@ function createConfirmPopup(message) {
         popup.id = "custom-confirm-popup";
         popup.classList.add("confirm-popup");
 
-        popup.style.cssText = `
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        `;
-
         popup.innerHTML = `
-            <div style="
-                background: #ffffff;
-                padding: 32px;
-                border-radius: 16px;
-                box-shadow: 0 20px 60px rgba(13, 59, 102, 0.15);
-                width: 420px;
-                max-width: 90%;
-                text-align: center;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                border: 1px solid #e2e8f0;
-                position: relative;
-                animation: popupSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            ">
-                <style>
-                    @keyframes popupSlideIn {
-                        from {
-                            opacity: 0;
-                            transform: scale(0.8) translateY(-20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: scale(1) translateY(0);
-                        }
-                    }
-                    
-                    .confirm-btn:hover {
-                        transform: translateY(-2px);
-                    }
-                    
-                    .confirm-btn:active {
-                        transform: translateY(0);
-                    }
-                    
-                    .ok-btn:hover {
-                        box-shadow: 0 8px 24px rgba(13, 59, 102, 0.3);
-                    }
-                    
-                    .cancel-btn:hover {
-                        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
-                    }
-                </style>
-                
-                <div style="
-                    width: 64px;
-                    height: 64px;
-                    background: linear-gradient(135deg, #ff9800, #f57c00);
-                    border-radius: 50%;
-                    margin: 0 auto 24px auto;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    box-shadow: 0 8px 24px rgba(255, 152, 0, 0.2);
-                ">
+            <div class="confirm-popup-content">
+                <div class="confirm-icon-container">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
                         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                         <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -84,52 +21,11 @@ function createConfirmPopup(message) {
                     </svg>
                 </div>
                 
-                <p style="
-                    font-size: 18px;
-                    line-height: 1.5;
-                    margin-bottom: 32px;
-                    color: #1e293b;
-                    font-weight: 500;
-                    letter-spacing: -0.01em;
-                ">${message}</p>
+                <p class="confirm-message">${message}</p>
 
-                <div style="
-                    display: flex;
-                    gap: 16px;
-                    justify-content: center;
-                    flex-wrap: wrap;
-                ">
-                    <button id="confirmPopup_okButton" class="confirm-btn ok-btn" style="
-                        background: linear-gradient(135deg, #0D3B66, #1a5490);
-                        color: white;
-                        border: none;
-                        border-radius: 12px;
-                        padding: 14px 28px;
-                        font-size: 16px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-                        box-shadow: 0 4px 16px rgba(13, 59, 102, 0.2);
-                        font-family: inherit;
-                        letter-spacing: 0.02em;
-                        min-width: 120px;
-                    ">OK</button>
-
-                    <button id="confirmPopup_cancelButton" class="confirm-btn cancel-btn" style="
-                        background: linear-gradient(135deg, #ef4444, #dc2626);
-                        color: white;
-                        border: none;
-                        border-radius: 12px;
-                        padding: 14px 28px;
-                        font-size: 16px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-                        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
-                        font-family: inherit;
-                        letter-spacing: 0.02em;
-                        min-width: 120px;
-                    ">Cancel</button>
+                <div class="confirm-buttons-container">
+                    <button id="confirmPopup_okButton" class="confirm-btn ok-btn">OK</button>
+                    <button id="confirmPopup_cancelButton" class="confirm-btn cancel-btn">Cancel</button>
                 </div>
             </div>
         `;
@@ -590,7 +486,7 @@ async function displayMenu() {
                                 checkbox.value = inv.inv_no;
                                 checkbox.id = `edit_inv_${inv.inv_no}`;
                                 checkbox.name = "dependant_inv";
-                                checkbox.style.accentColor = "#0D3B66";
+                                checkbox.className = "inventory-checkbox";
 
                                 // Pre-check if this item is in depend_inv
                                 const dependArray = (item.depend_inv || "").split(",").map(i => i.trim()).filter(i => i);
@@ -601,9 +497,7 @@ async function displayMenu() {
                                 const label = document.createElement("label");
                                 label.htmlFor = `edit_inv_${inv.inv_no}`;
                                 label.textContent = inv.inv_item;
-                                label.style.fontSize = "13px";
-                                label.style.color = "#475569";
-                                label.style.cursor = "pointer";
+                                label.className = "inventory-label";
 
                                 const wrapper = document.createElement("div");
                                 wrapper.className = "edit-checkbox-item";
@@ -617,26 +511,15 @@ async function displayMenu() {
 
                             // Add empty state message if needed
                             if (inventoryItems.length === 0) {
-                                container.innerHTML = `<div style="
-                                    color: #94a3b8;
-                                    font-style: italic;
-                                    padding: 10px;
-                                    text-align: center;
-                                    width: 100%;
-                                ">No inventory items available</div>`;
+                                container.innerHTML = `<div class="empty-inventory-message">No inventory items available</div>`;
                             }
 
                         } catch (error) {
                             console.error("Failed to load inventory items:", error);
                             const container = document.getElementById("dependant-items-container");
-                            container.innerHTML = `<div style="
-                                color: #ef4444;
-                                padding: 10px;
-                                text-align: center;
-                                font-size: 13px;
-                            ">Failed to load inventory items</div>`;
+                            container.innerHTML = `<div class="inventory-error-message">Failed to load inventory items</div>`;
                         }
-                    }
+                    }                                                   
 
                     loadCategoriesForEdit();
                     loadInventoryItemsForEdit();
@@ -813,304 +696,84 @@ function toggleAddItemPopup() {
     // Create overlay container
     const popupOverlay = document.createElement("div");
     popupOverlay.id = "add-item-popup-overlay";
-    popupOverlay.classList.add("menu-edit-popup-overlay");
+    popupOverlay.classList.add("add-item-popup-overlay");
 
     // Create popup content
     const popup = document.createElement("div");
     popup.id = "add-item-popup";
-    popup.classList.add("menu-edit-popup");
+    popup.classList.add("add-item-popup");
 
     popup.innerHTML = `
-    <div class="menu-popup-content" style="
-        pointer-events: auto;
-        max-width: 500px;
-        width: 100%;
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    ">
-        <style>
-            .popup-input:focus, .popup-select:focus {
-                border-color: #6366f1;
-                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-                outline: none;
-            }
-            .popup-switch {
-                position: relative;
-                display: inline-block;
-                width: 44px;
-                height: 24px;
-            }
-            .popup-switch input { 
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-            .popup-slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #e2e8f0;
-                transition: .3s;
-                border-radius: 24px;
-            }
-            .popup-slider:before {
-                position: absolute;
-                content: "";
-                height: 18px;
-                width: 18px;
-                left: 3px;
-                bottom: 3px;
-                background-color: white;
-                transition: .3s;
-                border-radius: 50%;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-            input:checked + .popup-slider {
-                background-color: #0D3B66;
-            }
-            input:checked + .popup-slider:before {
-                transform: translateX(20px);
-            }
-            .popup-btn {
-                transition: all 0.2s ease;
-                font-weight: 500;
-                border-radius: 8px;
-                padding: 10px 22px;
-                font-size: 14px;
-                cursor: pointer;
-            }
-            .popup-btn:active {
-                transform: translateY(1px);
-            }
-            .checkbox-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 6px 10px;
-                border-radius: 6px;
-                background: #f8fafc;
-                border: 1px solid #e2e8f0;
-            }
-        </style>
-        
-        <h3 style="
-            text-align: center;
-            margin-bottom: 24px;
-            font-size: 22px;
-            font-weight: 700;
-            color: #1e293b;
-            letter-spacing: -0.02em;
-        ">
-            Add New Food Item
-        </h3>
-        
-        <form id="addItemForm" style="display: flex; flex-direction: column; gap: 18px;">
-            <div class="form-group">
-                <label for="fname" style="
-                    display: block;
-                    font-size: 14px;
-                    color: #475569;
-                    margin-bottom: 6px;
-                    font-weight: 500;
-                ">Food Name</label>
-                <input type="text" id="fname" required class="popup-input" style="
-                    width: 100%;
-                    padding: 12px;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    background: #f8fafc;
-                    transition: border 0.2s, box-shadow 0.2s;
-                ">
-            </div>
-
-            <div class="form-group">
-                <label for="category" style="
-                    display: block;
-                    font-size: 14px;
-                    color: #475569;
-                    margin-bottom: 6px;
-                    font-weight: 500;
-                ">Category</label>
-                <select id="category" required class="popup-select" style="
-                    width: 100%;
-                    padding: 12px;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    background: #f8fafc;
-                    appearance: none;
-                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
-                    background-repeat: no-repeat;
-                    background-position: right 12px center;
-                    background-size: 14px;
-                    transition: border 0.2s, box-shadow 0.2s;
-                ">
-                    <option value="">Select a category</option>
-                </select>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div class="menu-popup-content">
+            <h3 class="add-item-popup-title">
+                Add New Food Item
+            </h3>
+            
+            <form id="addItemForm" class="add-item-form">
                 <div class="form-group">
-                    <label for="cost" style="
-                        display: block;
-                        font-size: 14px;
-                        color: #475569;
-                        margin-bottom: 6px;
-                        font-weight: 500;
-                    ">Cost (₹)</label>
-                    <input type="number" id="cost" step="0.01" required class="popup-input" style="
-                        width: 100%;
-                        padding: 12px;
-                        border: 1px solid #cbd5e1;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        background: #f8fafc;
-                        transition: border 0.2s, box-shadow 0.2s;
-                    ">
+                    <label for="fname" class="form-label">Food Name</label>
+                    <input type="text" id="fname" required class="popup-input">
                 </div>
+
                 <div class="form-group">
-                    <label for="sgst" style="
-                        display: block;
-                        font-size: 14px;
-                        color: #475569;
-                        margin-bottom: 6px;
-                        font-weight: 500;
-                    ">SGST (%)</label>
-                    <input type="number" id="sgst" step="0.01" value="0" class="popup-input" style="
-                        width: 100%;
-                        padding: 12px;
-                        border: 1px solid #cbd5e1;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        background: #f8fafc;
-                        transition: border 0.2s, box-shadow 0.2s;
-                    ">
+                    <label for="category" class="form-label">Category</label>
+                    <select id="category" required class="popup-select">
+                        <option value="">Select a category</option>
+                    </select>
                 </div>
+
+                <div class="add-item-price-grid">
+                    <div class="form-group">
+                        <label for="cost" class="form-label">Cost (₹)</label>
+                        <input type="number" id="cost" step="0.01" required class="popup-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="sgst" class="form-label">SGST (%)</label>
+                        <input type="number" id="sgst" step="0.01" value="0" class="popup-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="cgst" class="form-label">CGST (%)</label>
+                        <input type="number" id="cgst" step="0.01" value="0" class="popup-input">
+                    </div>
+                </div>
+
+                <div class="toggles-container">
+                    <div class="form-group toggle-group">
+                        <label for="veg" class="toggle-label">Veg</label>
+                        <label class="popup-switch">
+                            <input type="checkbox" id="veg" checked>
+                            <span class="popup-slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group toggle-group">
+                        <label for="active" class="toggle-label">Active</label>
+                        <label class="popup-switch">
+                            <input type="checkbox" id="active" checked>
+                            <span class="popup-slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group toggle-group">
+                        <label for="is_on" class="toggle-label">Available</label>
+                        <label class="popup-switch">
+                            <input type="checkbox" id="is_on" checked>
+                            <span class="popup-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label for="cgst" style="
-                        display: block;
-                        font-size: 14px;
-                        color: #475569;
-                        margin-bottom: 6px;
-                        font-weight: 500;
-                    ">CGST (%)</label>
-                    <input type="number" id="cgst" step="0.01" value="0" class="popup-input" style="
-                        width: 100%;
-                        padding: 12px;
-                        border: 1px solid #cbd5e1;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        background: #f8fafc;
-                        transition: border 0.2s, box-shadow 0.2s;
-                    ">
+                    <label class="form-label">Inventory Dependencies</label>
+                    <div id="inventory-checklist" class="inventory-checklist">
+                    </div>
                 </div>
-            </div>
 
-            <div style="
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 12px;
-                background: #f1f5f9;
-                padding: 16px;
-                border-radius: 10px;
-                margin-top: 8px;
-            ">
-                <div class="form-group" style="
-                    flex: 1;
-                    min-width: 120px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                ">
-                    <label for="veg" style="font-size: 14px; color: #334155; font-weight: 500;">Veg</label>
-                    <label class="popup-switch">
-                        <input type="checkbox" id="veg" checked>
-                        <span class="popup-slider"></span>
-                    </label>
+                <div class="add-item-buttons-container">
+                    <button type="submit" id="addItemBtn" class="popup-btn add-item-btn">Add Item</button>
+                    <button type="button" id="closeAddItemPopup" class="popup-btn cancel-add-btn">Cancel</button>
                 </div>
-                <div class="form-group" style="
-                    flex: 1;
-                    min-width: 120px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                ">
-                    <label for="active" style="font-size: 14px; color: #334155; font-weight: 500;">Active</label>
-                    <label class="popup-switch">
-                        <input type="checkbox" id="active" checked>
-                        <span class="popup-slider"></span>
-                    </label>
-                </div>
-                <div class="form-group" style="
-                    flex: 1;
-                    min-width: 120px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                ">
-                    <label for="is_on" style="font-size: 14px; color: #334155; font-weight: 500;">Available</label>
-                    <label class="popup-switch">
-                        <input type="checkbox" id="is_on" checked>
-                        <span class="popup-slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label style="
-                    display: block;
-                    font-size: 14px;
-                    color: #475569;
-                    margin-bottom: 6px;
-                    font-weight: 500;
-                ">Inventory Dependencies</label>
-                <div id="inventory-checklist" style="
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 10px;
-                    padding: 16px;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 10px;
-                    max-height: 140px;
-                    overflow-y: auto;
-                    background: #ffffff;
-                ">
-                </div>
-            </div>
-
-            <div style="
-                display: flex;
-                justify-content: center;
-                gap: 12px;
-                margin-top: 10px;
-                padding-top: 8px;
-                border-top: 1px solid #f1f5f9;
-            ">
-                <button type="submit" id="addItemBtn" class="popup-btn" style="
-                    background: #0D3B66;
-                    color: white;
-                    border: none;
-                    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
-                ">Add Item</button>
-                <button type="button" id="closeAddItemPopup" class="popup-btn" style="
-                    background: #ffffff;
-                    color: #64748b;
-                    border: 1px solid #e2e8f0;
-                ">Cancel</button>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
     `;
-
-
 
     // Append to overlay
     popupOverlay.appendChild(popup);
