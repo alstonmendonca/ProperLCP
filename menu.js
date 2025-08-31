@@ -656,9 +656,9 @@ function toggleAddItemPopup() {
                     <input type="checkbox" 
                         id="${itemId}" 
                         value="${inv.inv_no}" 
-                        style="accent-color: #0D3B66;">
+                        class="inventory-checkbox">
                     <label for="${itemId}" 
-                        style="font-size: 13px; color: #475569; cursor: pointer;">
+                        class="inventory-label">
                         ${inv.inv_item}
                     </label>
                 `;
@@ -670,24 +670,13 @@ function toggleAddItemPopup() {
             
             // Add empty state message if needed
             if (inventory.length === 0) {
-                container.innerHTML = `<div style="
-                    color: #94a3b8;
-                    font-style: italic;
-                    padding: 10px;
-                    text-align: center;
-                    width: 100%;
-                ">No inventory items available</div>`;
+                container.innerHTML = `<div class="empty-inventory-message">No inventory items available</div>`;
             }
         } catch (err) {
             console.error("Failed to load inventory items:", err);
             // Show error in UI
             document.getElementById("inventory-checklist").innerHTML = `
-                <div style="
-                    color: #ef4444;
-                    padding: 10px;
-                    text-align: center;
-                    font-size: 13px;
-                ">
+                <div class="inventory-error-message">
                     Failed to load inventory items
                 </div>`;
         }

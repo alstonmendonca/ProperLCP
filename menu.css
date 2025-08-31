@@ -1084,3 +1084,34 @@ input:checked + .popup-slider:before {
 }
 
 /* ============================================= MENU-LOAD-INVENTORY-ITEMS-FOR-EDIT-POPUP ENDS HERE ============================================== */
+
+/* ============================================= MENU-LOAD-INVENTORY-ITEMS-POPUP STARTS HERE ============================================== */
+
+/* These classes are already defined from previous migrations, but adding them here for completeness */
+
+.inventory-checkbox {
+    accent-color: #0D3B66;
+}
+
+.inventory-label {
+    font-size: 13px;
+    color: #475569;
+    cursor: pointer;
+}
+
+.empty-inventory-message {
+    color: #94a3b8;
+    font-style: italic;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.inventory-error-message {
+    color: #ef4444;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* ============================================= MENU-LOAD-INVENTORY-ITEMS-POPUP ENDS HERE ============================================== */
