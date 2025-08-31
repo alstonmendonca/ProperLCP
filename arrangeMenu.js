@@ -7,9 +7,9 @@ function loadArrangeMenu(mainContent, billPanel) {
     billPanel.style.display = 'none';
 
     mainContent.innerHTML = `
-        <div class="arrange-menu-container" style="padding: 20px;">
+        <div class="arrange-menu-container">
             <div class="arrange-menu-header">
-                <h2 style="margin-bottom: 8px; color: #0D3B66;">Arrange Menu Items</h2>
+                <h2>Arrange Menu Items</h2>
                 <p style="color: #64748b; margin-bottom: 24px;">Drag and drop items to change their display order within each category</p>
             </div>
             

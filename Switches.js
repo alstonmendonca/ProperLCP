@@ -9,7 +9,7 @@ async function Switches(mainContent, billPanel){
     const switches = await ipcRenderer.invoke("load-switches");
     
     mainContent.innerHTML = `
-        <div style="padding: 30px; max-width: 900px; margin: 0 auto;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <div class="section-title" style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #0D3B66; padding-bottom: 15px;">
                 <h2 style="color: #0D3B66; font-size: 2.5rem; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 2px;">System Switches</h2>
                 <p style="color: #666; margin: 10px 0 0 0; font-size: 16px;">Configure interface settings and toggle features</p>

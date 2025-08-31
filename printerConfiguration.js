@@ -374,11 +374,11 @@ function loadPrinterConfiguration(mainContent, billPanel, mode = 'auto') {
             }
         </style>
         
+        <div class="printer-configuration-header">
+            <h2 class="printer-title">Printer Configuration</h2>
+            <p class="printer-subtitle">Configure your thermal printer settings for receipts and KOTs</p>
+        </div>
         <div class="printer-config-wrapper">
-            <div class="printer-header">
-                <h2 class="printer-title">Printer Configuration</h2>
-                <p class="printer-subtitle">Configure your thermal printer settings for receipts and KOTs</p>
-            </div>
             
             <div class="printer-tabs">
                 <button class="tab-btn ${mode === 'auto' ? 'active' : ''}" data-mode="auto">

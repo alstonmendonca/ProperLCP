@@ -221,10 +221,12 @@ async function ChangeMasterPassword(mainContent, billPanel) {
             }
         </style>
 
-        <div class="change-password-container">
-            <h1 class="change-password-title">Change Master Password</h1>
+        <div class="change-password-header">
+            <h2>Change Master Password</h2>
             <p class="change-password-subtitle">Secure your POS system with a new master password</p>
+        </div>
 
+        <div class="change-password-container">
             <div class="step-indicator">
                 <div class="step-dot active" id="step-dot-1"></div>
                 <div class="step-dot" id="step-dot-2"></div>

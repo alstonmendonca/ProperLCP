@@ -200,7 +200,7 @@ input:checked + .slider:before {
 }
 
 /* ============================================= MENU SECTION TITLE STARTS HERE ============================================== */
-.menu-section-title {
+/* .menu-section-title {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -210,7 +210,7 @@ input:checked + .slider:before {
 
 .menu-section-title h2 {
     margin: 0;
-}
+} */
 /* ============================================= MENU SECTION TITLE ENDS HERE ============================================== */
 
 .menu-controls-container {
@@ -235,11 +235,6 @@ input:checked + .slider:before {
     border-color: #0D3B66;
     box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
     outline: none;
-}
-
-.search-input:blur {
-    border-color: #cbd5e1;
-    box-shadow: none;
 }
 
 .filter-select {
@@ -534,7 +529,7 @@ input:checked + .slider:before {
     font-size: 14px;
 }
 
-/* MENU-EDIT-POPUP-OVERLAY STARTS HERE*/
+/* ============================================ MENU-EDIT-POPUP-OVERLAY STARTS HERE =======================================================*/
 
 .menu-edit-popup-overlay {
     position: fixed;

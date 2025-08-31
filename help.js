@@ -7,13 +7,8 @@ function loadHelpSection() {
     billPanel.style.display = 'none';
 
     mainContent.innerHTML = `
-        <div class="section-title">
-            <h2 style="
-                margin: 0;
-                font-size: 28px;
-                font-weight: 600;
-                letter-spacing: 0.5px;
-            ">Help & Support Center</h2>
+        <div class="help-and-support-header">
+            <h2>Help & Support Center</h2>
         </div>
         
         <div style="
