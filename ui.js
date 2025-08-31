@@ -22,7 +22,7 @@ async function updateMainContent(contentType) {
     const settingsButtons = [
         'UserProfile', 'BusinessInfo',  
         'Receipt', 'DriverConfiguration', 'BackupDatabase', 'RestoreDatabase',
-        'ConnectedDevices', 'Help', 'customizeLeftPanel', 'Switches', 'ChangeMasterPassword'
+        'ConnectedDevices', 'Help', 'customizeLeftPanel', 'Switches', 'ChangeMasterPassword', 'ArrangeMenu'
     ];
     
     // Highlight top panel button for any top-level section
@@ -260,6 +260,9 @@ async function updateMainContent(contentType) {
         }
         else if (contentType === "customizeLeftPanel") {
             loadCustomizeLeftPanel(mainContent, billPanel);
+        }
+        else if (contentType === "ArrangeMenu") {
+            loadArrangeMenu(mainContent, billPanel);
         }
         else if (contentType === "Switches") {
             mainContent.style.marginLeft = "200px";

@@ -69,6 +69,7 @@ const { loadReceiptEditor } = require("./receiptEditor");
 const { loadPrinterConfiguration } = require("./printerConfiguration");
 const { loadSearchOrder, searchOrders, sortSearchResults} = require("./searchOrder");
 const { loadCustomizeLeftPanel } = require("./customizeLeftPanel");
+const { loadArrangeMenu } = require("./arrangeMenu");
 
 window.fetchOrderHistory = fetchOrderHistory;
 window.updateCategoryPanel = updateCategoryPanel;

@@ -123,6 +123,7 @@ async function updateLeftPanel(contentType) {
                 <button class="category" id="BackupDatabase" onclick="updateMainContent('BackupDatabase')">Backup Database</button>
                 <button class="category" id="RestoreDatabase" onclick="updateMainContent('RestoreDatabase')">Restore Database</button>
                 <button class="category" id="customizeLeftPanel" onclick="updateMainContent('customizeLeftPanel')">Customize Panel</button>
+                <button class="category" id="ArrangeMenu" onclick="updateMainContent('ArrangeMenu')">Arrange Menu</button>
                 <button class="category" id="Switches" onclick="updateMainContent('Switches')">Switches</button>
                 <button class="category" id="ChangeMasterPassword" onclick="updateMainContent('ChangeMasterPassword')">Change Master Password</button>
                 <button class="category" id="Help" onclick="updateMainContent('Help')">Help and Support</button>

@@ -3569,28 +3569,118 @@ ipcMain.handle("deduct-inventory-stock", async (event, { foodId, quantity }) => 
     }
 });
 
+//-0--------------------HOME TAB ENDS HERE--------------------------------------------------------------------------------
 
+// Store for item order (you'll need to initialize this at the top)
+const itemOrderStore = new Store({ name: 'item-order' });
 
-
-//-0-----------HOME TAB ENDS HERE-----------
-
-ipcMain.handle("get-food-items", async (event, categoryName) => {
+// Get food items with custom order
+ipcMain.handle("get-food-items-with-order", async (event, categoryName) => {
     return new Promise((resolve, reject) => {
         const query = `
-            SELECT f.fid,f.fname, f.cost, f.veg, f.category 
+            SELECT f.fid, f.fname, f.cost, f.veg, f.category 
             FROM FoodItem f 
             JOIN Category c ON f.category = c.catid 
             WHERE c.catname = ? AND f.active = 1 AND f.is_on = 1
         `;
+        
         db.all(query, [categoryName], (err, rows) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(rows);
+                // Get custom order if exists
+                const customOrder = itemOrderStore.get(categoryName, []);
+                
+                if (customOrder.length > 0) {
+                    // Sort items according to custom order
+                    const orderedItems = [];
+                    const unorderedItems = [];
+                    
+                    rows.forEach(item => {
+                        const index = customOrder.indexOf(item.fid);
+                        if (index !== -1) {
+                            orderedItems[index] = item;
+                        } else {
+                            unorderedItems.push(item);
+                        }
+                    });
+                    
+                    // Remove undefined slots and combine with unordered items
+                    const filteredOrdered = orderedItems.filter(item => item !== undefined);
+                    resolve([...filteredOrdered, ...unorderedItems]);
+                } else {
+                    resolve(rows);
+                }
             }
         });
     });
 });
+
+// Save item order
+ipcMain.handle("save-item-order", async (event, categoryName, itemOrder) => {
+    return new Promise((resolve, reject) => {
+        try {
+            itemOrderStore.set(categoryName, itemOrder);
+            resolve({ success: true });
+        } catch (error) {
+            reject(error);
+        }
+    });
+});
+
+// Reset item order
+ipcMain.handle("reset-item-order", async (event, categoryName) => {
+    return new Promise((resolve, reject) => {
+        try {
+            itemOrderStore.delete(categoryName);
+            resolve({ success: true });
+        } catch (error) {
+            reject(error);
+        }
+    });
+});
+
+ipcMain.handle("get-food-items", async (event, categoryName) => {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT f.fid, f.fname, f.cost, f.veg, f.category 
+            FROM FoodItem f 
+            JOIN Category c ON f.category = c.catid 
+            WHERE c.catname = ? AND f.active = 1 AND f.is_on = 1
+        `;
+        
+        db.all(query, [categoryName], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                // Get custom order if exists
+                const customOrder = itemOrderStore.get(categoryName, []);
+                
+                if (customOrder.length > 0) {
+                    // Sort items according to custom order
+                    const orderedItems = [];
+                    const unorderedItems = [];
+                    
+                    rows.forEach(item => {
+                        const index = customOrder.indexOf(item.fid);
+                        if (index !== -1) {
+                            orderedItems[index] = item;
+                        } else {
+                            unorderedItems.push(item);
+                        }
+                    });
+                    
+                    // Remove undefined slots and combine with unordered items
+                    const filteredOrdered = orderedItems.filter(item => item !== undefined);
+                    resolve([...filteredOrdered, ...unorderedItems]);
+                } else {
+                    resolve(rows);
+                }
+            }
+        });
+    });
+});
+
 // ADD FOOD ITEM IN MENU APP
 // Fetch categories for dropdown
 let addItemWindow;
