@@ -557,6 +557,55 @@ function setupIPC() {
     return MONGO_PORT || 34235;
   });
 
+  // IPC handler for editing user profile
+  ipcMain.handle("edit-user-profile", async (event, { userid, name, email, username }) => {
+    try {
+      const response = await axios.post(`http://127.0.0.1:${MONGO_PORT}/edituser`, {
+        userid,
+        name,
+        email,
+        username
+      });
+      return response.data;
+    } catch (err) {
+      console.error("Edit user profile API error:", err.message);
+      return { success: false, message: "Network error. Please check your connection and try again." };
+    }
+  });
+
+  // IPC handler for changing password
+  ipcMain.handle("change-user-password", async (event, { userid, currentPassword, newPassword }) => {
+    try {
+      const response = await axios.post(`http://127.0.0.1:${MONGO_PORT}/change-password`, {
+        userid,
+        currentPassword,
+        newPassword
+      });
+      return response.data;
+    } catch (err) {
+      console.error("Change password API error:", err.message);
+      return { success: false, message: "Network error. Please check your connection and try again." };
+    }
+  });
+
+  // IPC handler for adding new user
+  ipcMain.handle("add-new-user", async (event, { name, username, email, password, role, adminUserId }) => {
+    try {
+      const response = await axios.post(`http://127.0.0.1:${MONGO_PORT}/add-user`, {
+        name,
+        username,
+        email,
+        password,
+        role,
+        adminUserId
+      });
+      return response.data;
+    } catch (err) {
+      console.error("Add user API error:", err.message);
+      return { success: false, message: "Network error. Please check your connection and try again." };
+    }
+  });
+
   ipcMain.handle("get-printer-config", () => {
     const config = store.get("printerConfig", {
       vendorId: "0x0525",

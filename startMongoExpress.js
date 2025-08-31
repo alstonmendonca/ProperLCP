@@ -314,6 +314,89 @@ app.post('/change-password', async (req, res) => {
   }
 });
 
+app.post('/add-user', async (req, res) => {
+  try {
+    const { name, username, email, password, role, adminUserId } = req.body;
+
+    if (!name || !username || !email || !password || !role || !adminUserId) {
+      return res.status(400).json({ success: false, message: 'Name, username, email, password, role, and admin user ID are required' });
+    }
+
+    // Verify the requesting user is an admin
+    const adminUser = await db.collection('LCPUsers').findOne({ userid: adminUserId });
+    if (!adminUser || adminUser.isadmin !== 1) {
+      return res.status(403).json({ success: false, message: 'Access denied. Admin privileges required.' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address' });
+    }
+
+    if (!['admin', 'staff'].includes(role)) {
+      return res.status(400).json({ success: false, message: 'Role must be either "admin" or "staff"' });
+    }
+
+    // Check if username already exists
+    const existingUsername = await db.collection('LCPUsers').findOne({ username: username });
+    if (existingUsername) {
+      return res.status(400).json({ success: false, message: 'Username is already taken' });
+    }
+
+    // Check if email already exists
+    const existingEmail = await db.collection('LCPUsers').findOne({ email: email });
+    if (existingEmail) {
+      return res.status(400).json({ success: false, message: 'Email address is already in use' });
+    }
+
+    // Generate new userid - find the highest existing userid and increment
+    const lastUser = await db.collection('LCPUsers').findOne({}, { sort: { userid: -1 } });
+    const newUserId = lastUser ? lastUser.userid + 1 : 1;
+
+    // Hash the password
+    const saltRounds = 12;
+    const passwordHash = bcrypt.hashSync(password, saltRounds);
+
+    // Create new user object
+    const newUser = {
+      userid: newUserId,
+      uname: name,
+      username: username,
+      email: email,
+      password_hash: passwordHash,
+      isadmin: role === 'admin' ? 1 : 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    // Insert the new user
+    const result = await db.collection('LCPUsers').insertOne(newUser);
+
+    if (!result.insertedId) {
+      return res.status(500).json({ success: false, message: 'Failed to create user' });
+    }
+
+    res.json({
+      success: true,
+      message: 'User created successfully!',
+      user: {
+        userid: newUserId,
+        name: name,
+        username: username,
+        email: email,
+        role: role
+      }
+    });
+  } catch (err) {
+    console.error('[startMongoExpress] Error creating user:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Start server after connecting to Mongo
 connectToMongo()
   .then(() => {

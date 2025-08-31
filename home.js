@@ -44,7 +44,7 @@ async function loadHome(mainContent, billPanel) {
                             
                             <div style="flex-grow: 1;">
                                 <h3 style="margin-bottom: 10px;">${item.fname}<br style="line-height:5px;display:block"> 
-                                    ${item.veg ? "🥕" : "🍗"}</h3>
+                                    ${item.veg ? "🌱" : "🍗"}</h3>
                             </div>
                             <p>Price: ₹${item.cost}</p>
                             <div class="quantity-control" style="display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0;">
@@ -150,7 +150,7 @@ async function loadFrequent(mainContent, billPanel) {
                     
                     <div style="flex-grow: 1;">
                     <h3 style="margin-bottom: 10px;">${item.fname}<br style="line-height:5px;display:block"> 
-                        ${item.veg ? "🥕" : "🍗"}</h3>
+                        ${item.veg ? "🌱" : "🍗"}</h3>
                     </div>
                     <p>Price: ₹${item.cost}</p>
                     <div class="quantity-control" style="display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0;">
@@ -223,7 +223,7 @@ async function loadFrequent(mainContent, billPanel) {
         // Show message when no frequent items are available
         mainContent.innerHTML = `
             <div style="text-align: center; margin-top: 100px; color: #555;">
-                <h2>No frequent items marked 🍽️</h2>
+                <h2>No frequent items marked</h2>
                 <p>Mark items as frequent in Settings → Customize Panel to see them here.</p>
             </div>
         `;
