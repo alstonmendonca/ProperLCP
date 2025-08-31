@@ -101,6 +101,9 @@ async function loadBusinessInfo(mainContent, billPanel) {
     };
 
     mainContent.innerHTML = `
+        <div class="business-info-header">
+            <h2>Business Information</h2>
+        </div>
         <div class="business-info-container">
             <!-- Header with Edit Toggle -->
             <div class="header-section">

@@ -617,11 +617,13 @@ h1 {
     background-color: #1a5735; /* Darker green on hover */
 }
 
+/* ================================================ STYLING FOR THE TITLES OF ALL SECTIONS STARTS HERE ========================================================= */
+
 /* Center the header and make it visually appealing */
 .todays-orders-header, .order-history-header, .category-history-header, .deleted-orders-header, .discounted-orders-header, .item-history-header,
 .item-summary-header, .category-wise-sales-header, .top-selling-items-header, .top-selling-categories-header, .day-end-summary-header, .categories-title,
 .customer-header, .business-info-header, .theme-toggle-header, .display-settings-header,.search-order-header, .menu-section-title, .arrange-menu-header, 
-.printer-configuration-header {
+.printer-configuration-header, .customize-panel-header, .help-and-support-header, .change-password-header, .business-info-header{
     text-align: center; /* Center the content */
     margin-bottom: 20px; /* Add some spacing below the header */
 }
@@ -629,7 +631,7 @@ h1 {
 .todays-orders-header h1, .order-history-header h1, .category-history-header h1, .deleted-orders-header h1, .discounted-orders-header h1, .item-history-header h1,
 .item-summary-header h2, .category-wise-sales-header h2, .top-selling-items-header h2, .top-selling-categories-header h2, .day-end-summary-header h2,
 .categories-title h2, .customer-header h2, .business-info-header h1, .theme-toggle-header h2, .display-settings-header h2, .search-order-header h2, .menu-section-title h2, 
-.arrange-menu-header h2, .printer-configuration-header h2 {
+.arrange-menu-header h2, .printer-configuration-header h2, .customize-panel-header h2, .help-and-support-header h2, .change-password-header h2, .business-info-header h2{
     font-size: 2.5rem; /* Increase font size */
     font-weight: bold; /* Make it bold */
     color: #2c3e50; /* Use a dark, professional color */
@@ -651,6 +653,10 @@ h1 {
     padding-bottom: 8px; /* Add padding to create space for the border */
     border-bottom: 3px solid #0D3B66; /* Add a blue line underneath the title */
 }
+
+/* ================================================ STYLING FOR THE TITLES OF ALL SECTIONS ENDS HERE =====================================================================*/
+
+/* ================================================ DATE FILTERS FOR HISTORY AND ANALYTICS SECTIONS STARTS HERE ========================================================= */
 
 /* THE BELOW DATE FILTERS ARE SHARED BY THE HISTORY AND ANALYTICS SECTION */
 .date-filters {
@@ -706,7 +712,7 @@ input[type="date"] {
 .date-filters button:hover {
     background-color: #092947; /* Darker Blue */
 }
-/* ================================================ DATE FILTERS END HERE ========================================================= */
+/* ================================================ DATE FILTERS FOR HISTORY AND ANALYTICS SECTIONS ENDS HERE =========================================================== */
 
 /*Held orders Display*/
 #heldpopup {

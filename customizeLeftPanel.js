@@ -7,7 +7,7 @@ function loadCustomizeLeftPanel(mainContent, billPanel) {
     billPanel.style.display = 'none';
 
     mainContent.innerHTML = `
-        <div style="padding: 30px; max-width: 1200px; margin: 0 auto;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #0D3B66; padding-bottom: 15px;">
                 <h2 style="color: #0D3B66; font-size: 2.5rem; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Customize Panel</h2>
                 <p style="color: #666; margin: 10px 0 0 0; font-size: 16px;">Manage categories order and frequent items</p>
