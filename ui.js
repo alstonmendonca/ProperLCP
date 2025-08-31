@@ -129,7 +129,7 @@ async function updateMainContent(contentType) {
                     
                     <div style="flex-grow: 1;">
                         <h3 style="margin-bottom: 10px;">${item.fname}<br style="line-height:5px;display:block"> 
-                            ${item.veg ? "🌱" : "🍖"}</h3>
+                            ${item.veg ? "🥕" : "🍗"}</h3>
                     </div>
                     <p>Price: ₹${item.cost}</p>
                     

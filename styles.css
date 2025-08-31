@@ -135,13 +135,13 @@ body {
 
 /* Active Category Button Style */
 #category-panel .category.active {
-    background-color: #0D3B66; /* Highlight color */
+    background-color: #194b7a; /* Highlight color */
     color: white;
     font-weight: bold;
 }
 
 #category-panel .category.active:hover {
-    background-color: #0D3B66; /* Highlight color */
+    background-color: #194b7a; /* Highlight color */
     color: white;
     font-weight: bold;
 }
