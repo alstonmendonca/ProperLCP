@@ -204,28 +204,6 @@ async function displayMenu() {
         let menuContent = `
             <div class="menu-section-title" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px; position: relative;">
                 <h2 style="margin: 0;">Menu</h2>
-                <button id="syncToOnlineBtn" style="
-                    padding: 10px 20px;
-                    background: #0D3B66;
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    position: absolute;
-                    right: 0;
-                " onmouseover="this.style.backgroundColor='#11487b'" 
-                   onmouseout="this.style.backgroundColor='#0D3B66'">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
-                    </svg>
-                    SYNC TO ONLINE
-                </button>
             </div>
 
             <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center;">
@@ -239,7 +217,7 @@ async function displayMenu() {
                     transition: border-color 0.2s ease;
                     box-sizing: border-box;
                 " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
-                   onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
                 
                 <select id="categoryFilter" style="
                     padding: 10px 16px;
@@ -251,7 +229,7 @@ async function displayMenu() {
                     cursor: pointer;
                     transition: border-color 0.2s ease;
                 " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
-                   onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
                     <option value="">All Categories</option>
                 </select>
                 
@@ -265,11 +243,56 @@ async function displayMenu() {
                     cursor: pointer;
                     transition: border-color 0.2s ease;
                 " onfocus="this.style.borderColor='#0D3B66'; this.style.boxShadow='0 0 0 3px rgba(13, 59, 102, 0.1)'" 
-                   onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
                     <option value="">All Items</option>
                     <option value="1">🌱 Vegetarian</option>
                     <option value="0">🍖 Non-Vegetarian</option>
                 </select>
+                
+                <button id="bulkEditBtn" style="
+                    padding: 10px 20px;
+                    background: linear-gradient(135deg, #059669, #047857);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    white-space: nowrap;
+                " onmouseover="this.style.backgroundColor='#065f46'; this.style.transform='translateY(-1px)'" 
+                onmouseout="this.style.backgroundColor='#059669'; this.style.transform='translateY(0)'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    BULK EDIT
+                </button>
+                
+                <button id="syncToOnlineBtn" style="
+                    padding: 10px 20px;
+                    background: #0D3B66;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    white-space: nowrap;
+                " onmouseover="this.style.backgroundColor='#11487b'; this.style.transform='translateY(-1px)'" 
+                onmouseout="this.style.backgroundColor='#0D3B66'; this.style.transform='translateY(0)'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                    </svg>
+                    SYNC TO ONLINE
+                </button>
             </div>
 
             <div class="food-items" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
