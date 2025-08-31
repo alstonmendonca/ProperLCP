@@ -59,6 +59,14 @@
       {
         "from": "AddItem.html",
         "to": "AddItem.html"
+      },
+      {
+        "from": "Miscellaneous.json",
+        "to": "Miscellaneous.json"
+      },
+      {
+        "from": "switches.json",
+        "to": "switches.json"
       }
     ],
     "win": {
