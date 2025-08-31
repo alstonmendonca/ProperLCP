@@ -480,213 +480,42 @@ async function displayMenu() {
                     const popupContent = document.createElement("div");
                     popupContent.classList.add("menu-edit-popup");
                     popupContent.innerHTML = `
-                        <div class="menu-popup-content" style="
-                            pointer-events: auto;
-                            max-width: 500px;
-                            width: 100%;
-                            background: #ffffff;
-                            padding: 30px;
-                            border-radius: 16px;
-                            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-                            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                        ">
-                            <style>
-                                .edit-popup-input:focus, .edit-popup-select:focus {
-                                    border-color: #0D3B66;
-                                    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-                                    outline: none;
-                                }
-                                .edit-popup-switch {
-                                    position: relative;
-                                    display: inline-block;
-                                    width: 44px;
-                                    height: 24px;
-                                }
-                                .edit-popup-switch input { 
-                                    opacity: 0;
-                                    width: 0;
-                                    height: 0;
-                                }
-                                .edit-popup-slider {
-                                    position: absolute;
-                                    cursor: pointer;
-                                    top: 0;
-                                    left: 0;
-                                    right: 0;
-                                    bottom: 0;
-                                    background-color: #e2e8f0;
-                                    transition: .3s;
-                                    border-radius: 24px;
-                                }
-                                .edit-popup-slider:before {
-                                    position: absolute;
-                                    content: "";
-                                    height: 18px;
-                                    width: 18px;
-                                    left: 3px;
-                                    bottom: 3px;
-                                    background-color: white;
-                                    transition: .3s;
-                                    border-radius: 50%;
-                                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                                }
-                                input:checked + .edit-popup-slider {
-                                    background-color: #0D3B66;
-                                }
-                                input:checked + .edit-popup-slider:before {
-                                    transform: translateX(20px);
-                                }
-                                .edit-popup-btn {
-                                    transition: all 0.2s ease;
-                                    font-weight: 500;
-                                    border-radius: 8px;
-                                    padding: 10px 22px;
-                                    font-size: 14px;
-                                    cursor: pointer;
-                                }
-                                .edit-popup-btn:active {
-                                    transform: translateY(1px);
-                                }
-                                .edit-checkbox-item {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 8px;
-                                    padding: 6px 10px;
-                                    border-radius: 6px;
-                                    background: #f8fafc;
-                                    border: 1px solid #e2e8f0;
-                                }
-                            </style>
-                            
-                            <h3 style="
-                                text-align: center;
-                                margin-bottom: 24px;
-                                font-size: 22px;
-                                font-weight: 700;
-                                color: #1e293b;
-                                letter-spacing: -0.02em;
-                            ">
+                        <div class="menu-popup-content">
+                            <h3 class="menu-popup-title">
                                 Edit Food Item
                             </h3>
                             
-                            <form style="display: flex; flex-direction: column; gap: 18px;">
+                            <form class="menu-popup-form">
                                 <div class="form-group">
-                                    <label for="editFname" style="
-                                        display: block;
-                                        font-size: 14px;
-                                        color: #475569;
-                                        margin-bottom: 6px;
-                                        font-weight: 500;
-                                    ">Food Name</label>
-                                    <input type="text" id="editFname" value="${item.fname}" class="edit-popup-input" style="
-                                        width: 100%;
-                                        padding: 12px;
-                                        border: 1px solid #cbd5e1;
-                                        border-radius: 8px;
-                                        font-size: 14px;
-                                        background: #f8fafc;
-                                        transition: border 0.2s, box-shadow 0.2s;
-                                    ">
+                                    <label for="editFname" class="form-label">Food Name</label>
+                                    <input type="text" id="editFname" value="${item.fname}" class="edit-popup-input">
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="category" style="
-                                        display: block;
-                                        font-size: 14px;
-                                        color: #475569;
-                                        margin-bottom: 6px;
-                                        font-weight: 500;
-                                    ">Category</label>
-                                    <select id="category" required class="edit-popup-select" style="
-                                        width: 100%;
-                                        padding: 12px;
-                                        border: 1px solid #cbd5e1;
-                                        border-radius: 8px;
-                                        font-size: 14px;
-                                        background: #f8fafc;
-                                        appearance: none;
-                                        background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" viewBox=\"0 0 16 16\"><path d=\"M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z\"/></svg>');
-                                        background-repeat: no-repeat;
-                                        background-position: right 12px center;
-                                        background-size: 14px;
-                                        transition: border 0.2s, box-shadow 0.2s;
-                                    ">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select id="category" required class="edit-popup-select">
                                         <option value="${item.category}">${item.category_name}</option>
                                     </select>
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                <div class="price-grid">
                                     <div class="form-group">
-                                        <label for="editCost" style="
-                                            display: block;
-                                            font-size: 14px;
-                                            color: #475569;
-                                            margin-bottom: 6px;
-                                            font-weight: 500;
-                                        ">Cost (₹)</label>
-                                        <input type="number" id="editCost" value="${item.cost}" step="0.01" class="edit-popup-input" style="
-                                            width: 100%;
-                                            padding: 12px;
-                                            border: 1px solid #cbd5e1;
-                                            border-radius: 8px;
-                                            font-size: 14px;
-                                            background: #f8fafc;
-                                            transition: border 0.2s, box-shadow 0.2s;
-                                        ">
+                                        <label for="editCost" class="form-label">Cost (₹)</label>
+                                        <input type="number" id="editCost" value="${item.cost}" step="0.01" class="edit-popup-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="editsgst" style="
-                                            display: block;
-                                            font-size: 14px;
-                                            color: #475569;
-                                            margin-bottom: 6px;
-                                            font-weight: 500;
-                                        ">SGST (%)</label>
-                                        <input type="number" id="editsgst" value="${item.sgst}" step="0.01" min="0" class="edit-popup-input" style="
-                                            width: 100%;
-                                            padding: 12px;
-                                            border: 1px solid #cbd5e1;
-                                            border-radius: 8px;
-                                            font-size: 14px;
-                                            background: #f8fafc;
-                                            transition: border 0.2s, box-shadow 0.2s;
-                                        ">
+                                        <label for="editsgst" class="form-label">SGST (%)</label>
+                                        <input type="number" id="editsgst" value="${item.sgst}" step="0.01" min="0" class="edit-popup-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="editcgst" style="
-                                            display: block;
-                                            font-size: 14px;
-                                            color: #475569;
-                                            margin-bottom: 6px;
-                                            font-weight: 500;
-                                        ">CGST (%)</label>
-                                        <input type="number" id="editcgst" value="${item.cgst}" step="0.01" min="0" class="edit-popup-input" style="
-                                            width: 100%;
-                                            padding: 12px;
-                                            border: 1px solid #cbd5e1;
-                                            border-radius: 8px;
-                                            font-size: 14px;
-                                            background: #f8fafc;
-                                            transition: border 0.2s, box-shadow 0.2s;
-                                        ">
+                                        <label for="editcgst" class="form-label">CGST (%)</label>
+                                        <input type="number" id="editcgst" value="${item.cgst}" step="0.01" min="0" class="edit-popup-input">
                                     </div>
                                 </div>
 
-                                <div style="
-                                    display: flex;
-                                    justify-content: center;
-                                    background: #f1f5f9;
-                                    padding: 16px;
-                                    border-radius: 10px;
-                                    margin-top: 8px;
-                                ">
-                                    <div class="form-group" style="
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: space-between;
-                                        min-width: 120px;
-                                    ">
-                                        <label for="editveg" style="font-size: 14px; color: #334155; font-weight: 500;">Vegetarian</label>
+                                <div class="veg-toggle-container">
+                                    <div class="form-group veg-toggle-group">
+                                        <label for="editveg" class="veg-toggle-label">Vegetarian</label>
                                         <label class="edit-popup-switch">
                                             <input type="checkbox" id="editveg" ${item.veg == 1 ? "checked" : ""}>
                                             <span class="edit-popup-slider"></span>
@@ -695,47 +524,15 @@ async function displayMenu() {
                                 </div>
 
                                 <div class="form-group">
-                                    <label style="
-                                        display: block;
-                                        font-size: 14px;
-                                        color: #475569;
-                                        margin-bottom: 6px;
-                                        font-weight: 500;
-                                    ">Inventory Dependencies</label>
-                                    <div id="dependant-items-container" style="
-                                        display: flex;
-                                        flex-wrap: wrap;
-                                        gap: 10px;
-                                        padding: 16px;
-                                        border: 1px solid #e2e8f0;
-                                        border-radius: 10px;
-                                        max-height: 140px;
-                                        overflow-y: auto;
-                                        background: #ffffff;
-                                    ">
+                                    <label class="form-label">Inventory Dependencies</label>
+                                    <div id="dependant-items-container" class="inventory-container">
                                         Loading...
                                     </div>
                                 </div>
 
-                                <div style="
-                                    display: flex;
-                                    justify-content: center;
-                                    gap: 12px;
-                                    margin-top: 10px;
-                                    padding-top: 8px;
-                                    border-top: 1px solid #f1f5f9;
-                                ">
-                                    <button type="button" id="saveChanges" class="edit-popup-btn" style="
-                                        background: #0D3B66;
-                                        color: white;
-                                        border: none;
-                                        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
-                                    ">Save Changes</button>
-                                    <button type="button" id="closePopup" class="edit-popup-btn" style="
-                                        background: #ffffff;
-                                        color: #64748b;
-                                        border: 1px solid #e2e8f0;
-                                    ">Cancel</button>
+                                <div class="popup-buttons-container">
+                                    <button type="button" id="saveChanges" class="edit-popup-btn save-changes-btn">Save Changes</button>
+                                    <button type="button" id="closePopup" class="edit-popup-btn cancel-btn">Cancel</button>
                                 </div>
                             </form>
                         </div>
