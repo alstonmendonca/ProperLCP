@@ -230,7 +230,7 @@ async function displayMenu() {
             const categoryValue = document.querySelector("#categoryFilter")?.value || "";
             const vegValue = document.querySelector("#vegFilter")?.value || "";
 
-            document.querySelectorAll(".food-item").forEach((itemEl) => {
+            document.querySelectorAll(".food-item-card").forEach((itemEl) => {
                 const foodName = itemEl.querySelector("h3").textContent.trim().toLowerCase();
                 const itemCategory = itemEl.getAttribute("data-category");
                 const itemVeg = itemEl.getAttribute("data-veg");
