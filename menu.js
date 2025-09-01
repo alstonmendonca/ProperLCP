@@ -302,6 +302,22 @@ async function displayMenu() {
                 console.error("Sync error:", error);
             }
         });
+
+        // Attach bulk edit button handler
+        const bulkEditBtn = document.getElementById('bulkEditBtn');
+        if (bulkEditBtn) {
+            bulkEditBtn.addEventListener('click', async () => {
+                try {
+                    // Get food items from the main process
+                    const foodItems = await ipcRenderer.invoke("get-menu-items");
+                    openBulkEditPopup(foodItems);
+                } catch (error) {
+                    console.error('Error loading food items for bulk edit:', error);
+                    createTextPopup('Failed to load food items for bulk editing');
+                }
+            });
+        }
+        
         // If items exist, attach interactive listeners
         if (Array.isArray(foodItems) && foodItems.length > 0) {
             // IS_ON toggles

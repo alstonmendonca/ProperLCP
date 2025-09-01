@@ -1109,4 +1109,169 @@ input:checked + .popup-slider:before {
     font-size: 13px;
 }
 
-/* ============================================= MENU-LOAD-INVENTORY-ITEMS-POPUP ENDS HERE ============================================== */
+/* ============================================= MENU-LOAD-INVENTORY-ITEMS-POPUP ENDS HERE ================================================ */
+
+/* ============================================= BULK-EDIT-POPUP STARTS HERE ============================================================== */
+
+/* Bulk Edit Popup Styles */
+.bulk-edit-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.bulk-edit-container {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 1400px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.bulk-edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.bulk-edit-title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 24px;
+}
+
+.bulk-edit-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+}
+
+.bulk-edit-controls {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.bulk-search-input {
+    padding: 10px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    flex: 1;
+    font-size: 14px;
+}
+
+.bulk-select-btn {
+    padding: 10px 16px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.bulk-edit-table-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.bulk-edit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.bulk-edit-table th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #e5e7eb;
+    background: #f9fafb;
+    position: sticky;
+    top: 0;
+}
+
+.bulk-edit-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.bulk-select-checkbox {
+    margin: 0;
+}
+
+.bulk-edit-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.bulk-edit-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+}
+
+.bulk-edit-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.bulk-cancel-btn {
+    padding: 12px 24px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.bulk-save-btn {
+    padding: 12px 24px;
+    background: #059669;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Column widths */
+.bulk-col-checkbox { width: 40px; }
+.bulk-col-id { width: 60px; }
+.bulk-col-name { min-width: 150px; }
+.bulk-col-category { width: 150px; }
+.bulk-col-price { width: 100px; }
+.bulk-col-sgst { width: 80px; }
+.bulk-col-cgst { width: 80px; }
+.bulk-col-veg { width: 120px; }
+.bulk-col-status { width: 100px; }
+
+/* ============================================= BULK-EDIT-POPUP ENDS HERE ============================================================== */
