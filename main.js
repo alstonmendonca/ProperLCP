@@ -1767,15 +1767,15 @@ function generateKOTOnly(items, totalAmount, kot, orderId) {
     
     // KOT receipt only (larger KOT #)
     const kotReceipt = `\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01\x1B\x2D\x00${kot}
-    \x1B\x33\x03
-    \x1D\x21\x00\x1B\x45\x00\x1B\x2D\x00
-    Time: ${new Date().toLocaleTimeString()}\x1B\x61\x00\x1B\x45\x01\x1B\x2D\x00               Rs ${totalAmount.toFixed(2)}
-    ------------------------------------------
-    ITEM                                   QTY
-    ------------------------------------------
-    \x1B\x45\x00\x1B\x2D\x00
-    ${kotItems}
-    \x1D\x56\x41\x00`;  // Partial cut
+\x1B\x33\x03
+\x1D\x21\x00\x1B\x45\x00\x1B\x2D\x00
+Time: ${new Date().toLocaleTimeString()}\x1B\x61\x00\x1B\x45\x01\x1B\x2D\x00               Rs ${totalAmount.toFixed(2)}
+------------------------------------------
+ITEM                                   QTY
+------------------------------------------
+\x1B\x45\x00\x1B\x2D\x00
+${kotItems}
+\x1D\x56\x41\x00`;  // Partial cut
 
     return kotReceipt;
 }

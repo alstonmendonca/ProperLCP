@@ -154,6 +154,53 @@ body {
     overflow-y: auto;
     justify-content: space-evenly;
     background: linear-gradient(135deg, #fbf9f9, #ffffff);
+    transition: margin-right 0.3s ease;
+    min-width: 0; /* Prevents overflow issues */
+    box-sizing: border-box;
+}
+
+/* Responsive grid for food items */
+.food-items {
+    display: grid;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+/* Dynamic grid adjustments based on available space */
+@media (max-width: 1800px) {
+    .food-items[data-columns="6"] { 
+        grid-template-columns: repeat(5, 1fr) !important; 
+    }
+}
+
+@media (max-width: 1600px) {
+    .food-items[data-columns="5"], 
+    .food-items[data-columns="6"] { 
+        grid-template-columns: repeat(4, 1fr) !important; 
+    }
+}
+
+@media (max-width: 1400px) {
+    .food-items[data-columns="4"], 
+    .food-items[data-columns="5"], 
+    .food-items[data-columns="6"] { 
+        grid-template-columns: repeat(3, 1fr) !important; 
+    }
+}
+
+@media (max-width: 1200px) {
+    .food-items[data-columns="3"], 
+    .food-items[data-columns="4"], 
+    .food-items[data-columns="5"], 
+    .food-items[data-columns="6"] { 
+        grid-template-columns: repeat(2, 1fr) !important; 
+    }
+}
+
+@media (max-width: 900px) {
+    .food-items { 
+        grid-template-columns: 1fr !important; 
+    }
 }
 
 /* Bill Panel (Right Side) */
@@ -161,6 +208,8 @@ body {
     position: fixed;
     right: 0;
     width: 600px;
+    min-width: 300px;
+    max-width: 800px;
     padding: 15px 20px;
     border-left: 2px solid #e0e0e0;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
@@ -170,6 +219,25 @@ body {
     height: calc(100vh - 50px);
     background: #ffffff;
     z-index: 100;
+    resize: horizontal;
+    overflow: auto;
+}
+
+#bill-panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: col-resize;
+    background: linear-gradient(90deg, transparent 0%, rgba(13, 59, 102, 0.1) 50%, transparent 100%);
+    transition: background 0.2s ease;
+    z-index: 1001;
+}
+
+#bill-panel:hover::before {
+    background: linear-gradient(90deg, transparent 0%, rgba(13, 59, 102, 0.3) 50%, transparent 100%);
 }
 
 #bill-panel h3 {
