@@ -1696,7 +1696,17 @@ ipcRenderer.on("todays-orders-response-for-save-to-orders", (event, data) => {
     document.head.appendChild(style);
 
     // Add event listeners
-    overlay.addEventListener('click', closeTodaysOrdersPopup);
+    overlay.addEventListener('click', (e) => {
+        // Only close if clicking directly on the overlay, not on the popup
+        if (e.target === overlay) {
+            closeTodaysOrdersPopup();
+        }
+    });
+    
+    // Prevent popup from closing when clicking inside it
+    popup.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
     
     if (data.orders.length === 0) {
         document.getElementById('sto-goHomeButton').addEventListener('click', function() {

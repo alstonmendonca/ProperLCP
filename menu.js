@@ -131,7 +131,7 @@ function openBulkEditPopup(foodItems) {
                             <button id="increaseByAmount" class="bulk-operation-btn">+₹</button>
                             <button id="decreaseByAmount" class="bulk-operation-btn">-₹</button>
                         </div>
-                        <input type="number" id="setFixedPrice" class="bulk-operation-input" placeholder="Set fixed price ₹" step="0.01">
+                        <input type="number" id="setFixedPrice" class="bulk-operation-input" placeholder="Set fixed price ₹" step="0.01" style="width: 200px; min-width: 200px;">
                         <button id="applyFixedPrice" class="bulk-operation-btn">Set Price</button>
                     </div>
 
@@ -672,10 +672,10 @@ async function displayMenu() {
 
                             <div class="toggle-group is-on-container" style="display: ${item.active ? 'flex' : 'none'}">
                                 <label class="switch">
-                                    <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.is_on ? "checked" : ""}>
+                                    <input type="checkbox" class="toggle-switch" data-fid="${item.fid}" ${item.active && item.is_on ? "checked" : ""}>
                                     <span class="slider round"></span>
                                 </label>
-                                <p class="status is-on-status">${item.is_on ? "ON ✅" : "OFF ❌"}</p>
+                                <p class="status is-on-status">${item.active && item.is_on ? "ON ✅" : "OFF ❌"}</p>
                             </div>
                         </div>
 
@@ -837,7 +837,7 @@ async function displayMenu() {
                     const fid = event.target.getAttribute("data-fid");
                     await ipcRenderer.invoke("toggle-menu-item", parseInt(fid));
 
-                    const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                    const foodItemElement = document.querySelector(`.food-item-card[data-fid="${fid}"]`);
                     if (!foodItemElement) return;
                     const statusElement = foodItemElement.querySelector(".is-on-status");
                     const isChecked = event.target.checked;
@@ -851,14 +851,24 @@ async function displayMenu() {
                     const fid = event.target.getAttribute("data-fid");
                     await ipcRenderer.invoke("toggle-menu-item-active", parseInt(fid));
 
-                    const foodItemElement = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                    const foodItemElement = document.querySelector(`.food-item-card[data-fid="${fid}"]`);
                     if (!foodItemElement) return;
                     const statusElement = foodItemElement.querySelector(".active-status");
                     const isOnContainer = foodItemElement.querySelector(".is-on-container");
+                    const isOnToggle = foodItemElement.querySelector(".toggle-switch");
+                    const isOnStatus = foodItemElement.querySelector(".is-on-status");
                     const isChecked = event.target.checked;
 
                     if (statusElement) statusElement.textContent = isChecked ? "ACTIVE ✅" : "INACTIVE ❌";
                     if (isOnContainer) isOnContainer.style.display = isChecked ? "flex" : "none";
+                    
+                    // When deactivating, turn off the 'on' toggle as well
+                    if (!isChecked) {
+                        if (isOnToggle) isOnToggle.checked = false;
+                        if (isOnStatus) isOnStatus.textContent = "OFF ❌";
+                        // Update the database to turn off is_on when item becomes inactive
+                        await ipcRenderer.invoke("set-menu-item-off", parseInt(fid));
+                    }
                 });
             });
             // Delete buttons
@@ -868,11 +878,11 @@ async function displayMenu() {
                     const confirmDelete = await createConfirmPopup("Are you sure you want to delete this item?");
                     if (confirmDelete) {
                         await ipcRenderer.invoke("delete-menu-item", parseInt(fid));
-                        const removed = document.querySelector(`.food-item[data-fid="${fid}"]`);
+                        const removed = document.querySelector(`.food-item-card[data-fid="${fid}"]`);
                         if (removed) removed.remove();
 
                         // if now no items, refresh the menu to show empty state (keeps Add button visible)
-                        if (document.querySelectorAll(".food-item").length === 0) {
+                        if (document.querySelectorAll(".food-item-card").length === 0) {
                             displayMenu();
                         }
                     }
