@@ -3244,7 +3244,7 @@ ipcMain.handle("get-categories", async () => {
         });
     });
 });
-//----------------------------------------------MENU TAB--------------------------------------------
+//----------------------------------------------MENU TAB STARTS HERE ----------------------------------------------------------
 ipcMain.handle('sync-menu-items-to-mongo', async () => {
     try {
         await syncFoodItemsToMongo();
@@ -3254,57 +3254,71 @@ ipcMain.handle('sync-menu-items-to-mongo', async () => {
         return { success: false, error: err.message };
     }
 });
-// Fetch Food Items when requested from the renderer process
+
+// Update the IPC handler in main.js with better error handling
 ipcMain.handle("get-menu-items", async () => {
-    const foodQuery = `
-        SELECT 
-            FoodItem.fid, FoodItem.fname, FoodItem.category, FoodItem.cost, 
-            FoodItem.sgst, FoodItem.cgst, FoodItem.veg, FoodItem.is_on, FoodItem.active,
-            FoodItem.depend_inv,
-            Category.catname AS category_name
-        FROM FoodItem
-        JOIN Category ON FoodItem.category = Category.catid;
-    `;
-
-    const inventoryQuery = `
-        SELECT inv_no, inv_item FROM Inventory;
-    `;
-
     try {
+        if (!db) {
+            throw new Error("Database not connected");
+        }
+
+        const foodQuery = `
+            SELECT 
+                f.fid, f.fname, f.category, f.cost, 
+                f.sgst, f.cgst, f.veg, f.is_on, f.active,
+                f.depend_inv,
+                c.catname AS category_name
+            FROM FoodItem f
+            JOIN Category c ON f.category = c.catid;
+        `;
+
+        const inventoryQuery = `SELECT inv_no, inv_item FROM Inventory;`;
+
+        // Wrap in try-catch and improve error messages
         const foodItems = await new Promise((resolve, reject) => {
             db.all(foodQuery, (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
+                if (err) {
+                    console.error("[Food Query] SQL Error:", err.message);
+                    reject(new Error(`Food query failed: ${err.message}`));
+                } else {
+                    resolve(rows);
+                }
             });
         });
 
         const inventoryItems = await new Promise((resolve, reject) => {
             db.all(inventoryQuery, (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
+                if (err) {
+                    console.error("[Inventory Query] SQL Error:", err.message);
+                    reject(new Error(`Inventory query failed: ${err.message}`));
+                } else {
+                    resolve(rows);
+                }
             });
         });
 
-        // Create a map from inv_no to inv_item
-        const invMap = {};
-        inventoryItems.forEach(item => {
-            invMap[item.inv_no] = item.inv_item;
-        });
+        const invMap = Object.fromEntries(
+            inventoryItems.map(item => [item.inv_no, item.inv_item])
+        );
 
-        // Add `depend_inv_names` to each food item
         const enrichedFoodItems = foodItems.map(item => {
-            const dependInvIds = (item.depend_inv || "").split(",").map(i => i.trim()).filter(i => i);
-            const dependNames = dependInvIds.map(id => invMap[id]).filter(Boolean); // filter out nulls
+            const dependInvIds = (item.depend_inv || "")
+                .split(",")
+                .map(id => id.trim())
+                .filter(id => id && !isNaN(id));
+            const dependNames = dependInvIds.map(id => invMap[id]).filter(Boolean);
             return {
                 ...item,
-                depend_inv_names: dependNames.join(", ")
+                depend_inv_names: dependNames.join(", ") || null
             };
         });
 
+        console.log("✅ Successfully fetched and enriched food items:", enrichedFoodItems.length);
         return enrichedFoodItems;
+
     } catch (err) {
-        console.error("Error fetching food or inventory items:", err);
-        return [];
+        console.error("❌ Error in get-menu-items handler:", err);
+        throw new Error(`Failed to fetch menu items: ${err.message || err}`);
     }
 });
 
@@ -3434,9 +3448,107 @@ ipcMain.handle("update-food-item", async (event, { fid, fname, category, cost, s
     }
 });
 
+// Handle fetching categories for dropdowns
+ipcMain.handle("get-categories-for-additem", async () => {
+    try {
+        if (!db) throw new Error("Database not connected");
 
-//-------------------
-//-----------HOME TAB----------------
+        const query = "SELECT catid, catname, active FROM Category ORDER BY catname";
+        
+        return await new Promise((resolve, reject) => {
+            db.all(query, (err, rows) => {
+                if (err) {
+                    console.error("Database error fetching categories:", err);
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    } catch (err) {
+        console.error("Error in get-categories-for-additem handler:", err);
+        throw err;
+    }
+});
+// Add new food item
+ipcMain.handle("add-food-item", async (event, item) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `INSERT INTO FoodItem (fname, category, cost, sgst, cgst, tax, active, is_on, veg, depend_inv)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                item.fname,
+                item.category,
+                item.cost,
+                item.sgst,
+                item.cgst,
+                item.tax,
+                item.active,
+                item.is_on,
+                item.veg,
+                item.depend_inv || "" // Fallback to empty string if undefined
+            ],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ success: true, fid: this.lastID });
+                }
+            }
+        );
+    });
+});
+
+// Bulk update food items
+ipcMain.handle('bulk-update-food-items', async (event, updates) => {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run("BEGIN TRANSACTION");
+            
+            let completed = 0;
+            let errors = [];
+            
+            updates.forEach(update => {
+                const query = `
+                    UPDATE FoodItem 
+                    SET fname = ?, category = ?, cost = ?, sgst = ?, cgst = ?, veg = ?, active = ?
+                    WHERE fid = ?
+                `;
+                
+                db.run(query, [
+                    update.fname,
+                    update.category,
+                    update.cost,
+                    update.sgst,
+                    update.cgst,
+                    update.veg,
+                    update.active,
+                    update.fid
+                ], function(err) {
+                    completed++;
+                    
+                    if (err) {
+                        errors.push(`Item ${update.fid}: ${err.message}`);
+                    }
+                    
+                    if (completed === updates.length) {
+                        if (errors.length > 0) {
+                            db.run("ROLLBACK");
+                            resolve({ success: false, error: errors.join(', ') });
+                        } else {
+                            db.run("COMMIT");
+                            resolve({ success: true, updatedCount: updates.length });
+                        }
+                    }
+                });
+            });
+        });
+    });
+});
+
+//----------------------------------------------MENU TAB ENDS HERE ------------------------------------------------------------
+
+//----------------------------------------------HOME TAB STARTS HERE ----------------------------------------------------------
 ipcMain.handle("get-all-food-items", async () => {
     return new Promise((resolve, reject) => {
         const query = `
@@ -3756,47 +3868,6 @@ ipcMain.on("open-add-item-window", () => {
             addItemWindow = null;
         });
     }
-});
-
-ipcMain.handle("get-categories-for-additem", async () => {
-    return new Promise((resolve, reject) => {
-        db.all("SELECT catid, catname FROM Category", [], (err, rows) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-});
-
-// Add new food item
-ipcMain.handle("add-food-item", async (event, item) => {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO FoodItem (fname, category, cost, sgst, cgst, tax, active, is_on, veg, depend_inv)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                item.fname,
-                item.category,
-                item.cost,
-                item.sgst,
-                item.cgst,
-                item.tax,
-                item.active,
-                item.is_on,
-                item.veg,
-                item.depend_inv || "" // Fallback to empty string if undefined
-            ],
-            function (err) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ success: true, fid: this.lastID });
-                }
-            }
-        );
-    });
 });
 
 

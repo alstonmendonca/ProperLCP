@@ -55,6 +55,205 @@ function createConfirmPopup(message) {
     });
 }
 
+function openBulkEditPopup(foodItems) {
+    // Remove existing popup if it exists
+    let existingPopup = document.getElementById("bulk-edit-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
+    }
+
+    // Create popup overlay
+    const popupOverlay = document.createElement("div");
+    popupOverlay.id = "bulk-edit-popup";
+    popupOverlay.classList.add("bulk-edit-popup-overlay");
+
+    // Create table rows
+    const tableRows = foodItems.map(item => `
+        <tr data-fid="${item.fid}">
+            <td class="bulk-col-checkbox">
+                <input type="checkbox" class="bulk-select-checkbox">
+            </td>
+            <td class="bulk-col-id">${item.fid}</td>
+            <td class="bulk-col-name">
+                <input type="text" class="bulk-edit-input" data-field="fname" value="${item.fname}">
+            </td>
+            <td class="bulk-col-category">
+                <select class="bulk-edit-select bulk-category-select" data-field="category">
+                    <option value="${item.category}" selected>${item.category_name}</option>
+                </select>
+            </td>
+            <td class="bulk-col-price">
+                <input type="number" class="bulk-edit-input" data-field="cost" value="${item.cost}" step="0.01">
+            </td>
+            <td class="bulk-col-sgst">
+                <input type="number" class="bulk-edit-input" data-field="sgst" value="${item.sgst}" step="0.01">
+            </td>
+            <td class="bulk-col-cgst">
+                <input type="number" class="bulk-edit-input" data-field="cgst" value="${item.cgst}" step="0.01">
+            </td>
+            <td class="bulk-col-veg">
+                <select class="bulk-edit-select" data-field="veg">
+                    <option value="1" ${item.veg == 1 ? 'selected' : ''}>Veg</option>
+                    <option value="0" ${item.veg == 0 ? 'selected' : ''}>Non-Veg</option>
+                </select>
+            </td>
+            <td class="bulk-col-status">
+                <select class="bulk-edit-select" data-field="active">
+                    <option value="1" ${item.active ? 'selected' : ''}>Active</option>
+                    <option value="0" ${!item.active ? 'selected' : ''}>Inactive</option>
+                </select>
+            </td>
+        </tr>
+    `).join('');
+
+    popupOverlay.innerHTML = `
+        <div class="bulk-edit-container">
+            <div class="bulk-edit-header">
+                <h2 class="bulk-edit-title">Bulk Edit Menu Items</h2>
+                <button id="closeBulkEdit" class="bulk-edit-close">×</button>
+            </div>
+            
+            <div class="bulk-edit-controls">
+                <input type="text" id="bulkSearch" class="bulk-search-input" placeholder="Search items...">
+                <button id="selectAllBtn" class="bulk-select-btn">Select All</button>
+                <button id="deselectAllBtn" class="bulk-select-btn">Deselect All</button>
+            </div>
+            
+            <div class="bulk-edit-table-container">
+                <table class="bulk-edit-table">
+                    <thead>
+                        <tr>
+                            <th class="bulk-col-checkbox">
+                                <input type="checkbox" id="selectAllCheckbox">
+                            </th>
+                            <th class="bulk-col-id">ID</th>
+                            <th class="bulk-col-name">Food Name</th>
+                            <th class="bulk-col-category">Category</th>
+                            <th class="bulk-col-price">Price (₹)</th>
+                            <th class="bulk-col-sgst">SGST (%)</th>
+                            <th class="bulk-col-cgst">CGST (%)</th>
+                            <th class="bulk-col-veg">Veg/Non-Veg</th>
+                            <th class="bulk-col-status">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="bulk-edit-footer">
+                <button id="cancelBulkEdit" class="bulk-cancel-btn">Cancel</button>
+                <button id="saveBulkEdit" class="bulk-save-btn">Save Changes</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popupOverlay);
+
+    // Load categories for dropdowns
+    loadCategoriesForBulkEdit();
+
+    // Add event listeners
+    document.getElementById('closeBulkEdit').addEventListener('click', () => {
+        popupOverlay.remove();
+    });
+
+    document.getElementById('cancelBulkEdit').addEventListener('click', () => {
+        popupOverlay.remove();
+    });
+
+    // Select all functionality
+    document.getElementById('selectAllCheckbox').addEventListener('change', (e) => {
+        const checkboxes = document.querySelectorAll('.bulk-select-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+        });
+    });
+
+    document.getElementById('selectAllBtn').addEventListener('click', () => {
+        document.querySelectorAll('.bulk-select-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        document.getElementById('selectAllCheckbox').checked = true;
+    });
+
+    document.getElementById('deselectAllBtn').addEventListener('click', () => {
+        document.querySelectorAll('.bulk-select-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        document.getElementById('selectAllCheckbox').checked = false;
+    });
+
+    // Search functionality
+    document.getElementById('bulkSearch').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.bulk-edit-table tbody tr').forEach(row => {
+            const foodName = row.querySelector('input[data-field="fname"]').value.toLowerCase();
+            row.style.display = foodName.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Save functionality
+    document.getElementById('saveBulkEdit').addEventListener('click', async () => {
+        const selectedRows = document.querySelectorAll('.bulk-select-checkbox:checked');
+        
+        if (selectedRows.length === 0) {
+            createTextPopup('Please select at least one item to update');
+            return;
+        }
+
+        const updates = [];
+        
+        selectedRows.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            const fid = row.getAttribute('data-fid');
+            
+            const updateData = {
+                fid: parseInt(fid),
+                fname: row.querySelector('input[data-field="fname"]').value,
+                category: parseInt(row.querySelector('select[data-field="category"]').value),
+                cost: parseFloat(row.querySelector('input[data-field="cost"]').value),
+                sgst: parseFloat(row.querySelector('input[data-field="sgst"]').value),
+                cgst: parseFloat(row.querySelector('input[data-field="cgst"]').value),
+                veg: parseInt(row.querySelector('select[data-field="veg"]').value),
+                active: parseInt(row.querySelector('select[data-field="active"]').value)
+            };
+            
+            updates.push(updateData);
+        });
+
+        try {
+            const result = await ipcRenderer.invoke('bulk-update-food-items', updates);
+            if (result.success) {
+                createTextPopup(`Successfully updated ${updates.length} items!`);
+                popupOverlay.remove();
+                displayMenu(); // Refresh the menu
+            } else {
+                createTextPopup('Failed to update items: ' + result.error);
+            }
+        } catch (error) {
+            createTextPopup('Error updating items: ' + error.message);
+        }
+    });
+}
+
+async function loadCategoriesForBulkEdit() {
+    try {
+        const categories = await ipcRenderer.invoke("get-categories-for-additem");
+        const categorySelects = document.querySelectorAll('.bulk-category-select');
+        
+        categorySelects.forEach(select => {
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select Category</option>' + 
+                categories.map(cat => `<option value="${cat.catid}">${cat.catname}</option>`).join('');
+            select.value = currentValue; // Preserve current selection
+        });
+    } catch (error) {
+        console.error("Failed to load categories for bulk edit:", error);
+    }
+}
 async function displayMenu() {
     const mainContent = document.getElementById("main-content");
     const billPanel = document.getElementById("bill-panel");
@@ -303,21 +502,25 @@ async function displayMenu() {
             }
         });
 
-        // Attach bulk edit button handler
+        // Update the bulk edit button event listener to log more details
         const bulkEditBtn = document.getElementById('bulkEditBtn');
         if (bulkEditBtn) {
             bulkEditBtn.addEventListener('click', async () => {
                 try {
-                    // Get food items from the main process
+                    console.log('Attempting to load food items for bulk edit...');
                     const foodItems = await ipcRenderer.invoke("get-menu-items");
+                    console.log('Food items loaded successfully:', foodItems);
+                    
+                    // Now try to open popup
                     openBulkEditPopup(foodItems);
+                    
                 } catch (error) {
-                    console.error('Error loading food items for bulk edit:', error);
-                    createTextPopup('Failed to load food items for bulk editing');
+                    console.error('Error in bulk edit flow:', error);
+                    createTextPopup(`Failed to load food items: ${error.message}`);
                 }
             });
         }
-        
+
         // If items exist, attach interactive listeners
         if (Array.isArray(foodItems) && foodItems.length > 0) {
             // IS_ON toggles
