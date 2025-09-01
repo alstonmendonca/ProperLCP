@@ -131,8 +131,10 @@ function openBulkEditPopup(foodItems) {
                             <button id="increaseByAmount" class="bulk-operation-btn">+₹</button>
                             <button id="decreaseByAmount" class="bulk-operation-btn">-₹</button>
                         </div>
-                        <input type="number" id="setFixedPrice" class="bulk-operation-input" placeholder="Set fixed price ₹" step="0.01" style="width: 200px; min-width: 200px;">
-                        <button id="applyFixedPrice" class="bulk-operation-btn">Set Price</button>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="number" id="setFixedPrice" class="bulk-operation-input" placeholder="Set fixed price ₹" step="0.01" style="width: 200px; min-width: 200px;">
+                            <button id="applyFixedPrice" class="bulk-operation-btn">Set</button>
+                        </div>
                     </div>
 
                     <!-- Category Operations -->
