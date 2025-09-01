@@ -606,6 +606,31 @@ function setupIPC() {
     }
   });
 
+  // Bulk update food items
+  ipcMain.handle('bulk-update-food-items', async (event, updates) => {
+    try {
+      const url = getMongoExpressUrl();
+      const responses = [];
+      
+      for (const update of updates) {
+        const response = await axios.put(`${url}/api/food/${update.fid}`, update, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        responses.push(response.data);
+      }
+      
+      return { success: true, results: responses };
+    } catch (error) {
+      console.error('Error bulk updating food items:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || error.message 
+      };
+    }
+  });
+
   ipcMain.handle("get-printer-config", () => {
     const config = store.get("printerConfig", {
       vendorId: "0x0525",

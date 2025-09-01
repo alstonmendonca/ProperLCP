@@ -114,38 +114,113 @@ function openBulkEditPopup(foodItems) {
                 <button id="closeBulkEdit" class="bulk-edit-close">×</button>
             </div>
             
-            <div class="bulk-edit-controls">
-                <input type="text" id="bulkSearch" class="bulk-search-input" placeholder="Search items...">
-                <button id="selectAllBtn" class="bulk-select-btn">Select All</button>
-                <button id="deselectAllBtn" class="bulk-select-btn">Deselect All</button>
-            </div>
-            
-            <div class="bulk-edit-table-container">
-                <table class="bulk-edit-table">
-                    <thead>
-                        <tr>
-                            <th class="bulk-col-checkbox">
-                                <input type="checkbox" id="selectAllCheckbox">
-                            </th>
-                            <th class="bulk-col-id">ID</th>
-                            <th class="bulk-col-name">Food Name</th>
-                            <th class="bulk-col-category">Category</th>
-                            <th class="bulk-col-price">Price (₹)</th>
-                            <th class="bulk-col-sgst">SGST (%)</th>
-                            <th class="bulk-col-cgst">CGST (%)</th>
-                            <th class="bulk-col-veg">Veg/Non-Veg</th>
-                            <th class="bulk-col-status">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
+            <div class="bulk-edit-main-content">
+                <div class="bulk-operations-panel">
+                    <h3 class="bulk-operations-title">Bulk Operations</h3>
+                    
+                    <!-- Price Operations -->
+                    <div class="bulk-operation-group">
+                        <label class="bulk-operation-label">Price Changes</label>
+                        <div class="bulk-input-group">
+                            <input type="number" id="percentageChange" class="bulk-operation-input" placeholder="%" step="0.1">
+                            <button id="increaseByPercentage" class="bulk-operation-btn">+%</button>
+                            <button id="decreaseByPercentage" class="bulk-operation-btn">-%</button>
+                        </div>
+                        <div class="bulk-input-group">
+                            <input type="number" id="fixedAmountChange" class="bulk-operation-input" placeholder="₹" step="0.01">
+                            <button id="increaseByAmount" class="bulk-operation-btn">+₹</button>
+                            <button id="decreaseByAmount" class="bulk-operation-btn">-₹</button>
+                        </div>
+                        <input type="number" id="setFixedPrice" class="bulk-operation-input" placeholder="Set fixed price ₹" step="0.01">
+                        <button id="applyFixedPrice" class="bulk-operation-btn">Set Price</button>
+                    </div>
+
+                    <!-- Category Operations -->
+                    <div class="bulk-operation-group">
+                        <label class="bulk-operation-label">Category Change</label>
+                        <select id="bulkCategorySelect" class="bulk-operation-select">
+                            <option value="">Select Category</option>
+                        </select>
+                        <button id="applyCategory" class="bulk-operation-btn">Apply Category</button>
+                    </div>
+
+                    <!-- Veg/Non-Veg Operations -->
+                    <div class="bulk-operation-group">
+                        <label class="bulk-operation-label">Veg/Non-Veg Change</label>
+                        <select id="bulkVegSelect" class="bulk-operation-select">
+                            <option value="">Select Type</option>
+                            <option value="1">Vegetarian</option>
+                            <option value="0">Non-Vegetarian</option>
+                        </select>
+                        <button id="applyVegType" class="bulk-operation-btn">Apply Type</button>
+                    </div>
+
+                    <!-- Status Operations -->
+                    <div class="bulk-operation-group">
+                        <label class="bulk-operation-label">Status Change</label>
+                        <select id="bulkStatusSelect" class="bulk-operation-select">
+                            <option value="">Select Status</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                        <button id="applyStatus" class="bulk-operation-btn">Apply Status</button>
+                    </div>
+
+                    <!-- Tax Operations -->
+                    <div class="bulk-operation-group">
+                        <label class="bulk-operation-label">Tax Changes</label>
+                        <div class="bulk-input-group">
+                            <input type="number" id="sgstValue" class="bulk-operation-input" placeholder="SGST %" step="0.01">
+                            <button id="applySGST" class="bulk-operation-btn">Set SGST</button>
+                        </div>
+                        <div class="bulk-input-group">
+                            <input type="number" id="cgstValue" class="bulk-operation-input" placeholder="CGST %" step="0.01">
+                            <button id="applyCGST" class="bulk-operation-btn">Set CGST</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bulk-table-section">
+                    <div class="bulk-edit-controls">
+                        <input type="text" id="bulkSearch" class="bulk-search-input" placeholder="Search items...">
+                        <button id="selectAllBtn" class="bulk-select-btn">Select All</button>
+                        <button id="deselectAllBtn" class="bulk-select-btn">Deselect All</button>
+                        <div class="selected-count" id="selectedCount">0 items selected</div>
+                    </div>
+                    
+                    <div class="bulk-edit-table-container">
+                        <table class="bulk-edit-table">
+                            <thead>
+                                <tr>
+                                    <th class="bulk-col-checkbox">
+                                        <input type="checkbox" id="selectAllCheckbox">
+                                    </th>
+                                    <th class="bulk-col-id">ID</th>
+                                    <th class="bulk-col-name">Food Name</th>
+                                    <th class="bulk-col-category">Category</th>
+                                    <th class="bulk-col-price">Price (₹)</th>
+                                    <th class="bulk-col-sgst">SGST (%)</th>
+                                    <th class="bulk-col-cgst">CGST (%)</th>
+                                    <th class="bulk-col-veg">Type</th>
+                                    <th class="bulk-col-status">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             
             <div class="bulk-edit-footer">
-                <button id="cancelBulkEdit" class="bulk-cancel-btn">Cancel</button>
-                <button id="saveBulkEdit" class="bulk-save-btn">Save Changes</button>
+                <div class="bulk-footer-info">
+                    <span id="totalItemsCount">${foodItems.length} total items</span>
+                </div>
+                <div class="bulk-footer-buttons">
+                    <button id="cancelBulkEdit" class="bulk-cancel-btn">Cancel</button>
+                    <button id="saveBulkEdit" class="bulk-save-btn">Save Changes</button>
+                </div>
             </div>
         </div>
     `;
@@ -155,7 +230,12 @@ function openBulkEditPopup(foodItems) {
     // Load categories for dropdowns
     loadCategoriesForBulkEdit();
 
-    // Add event listeners
+    // Initialize all event listeners
+    initializeBulkEditEvents(popupOverlay);
+}
+
+function initializeBulkEditEvents(popupOverlay) {
+    // Close handlers
     document.getElementById('closeBulkEdit').addEventListener('click', () => {
         popupOverlay.remove();
     });
@@ -164,26 +244,46 @@ function openBulkEditPopup(foodItems) {
         popupOverlay.remove();
     });
 
-    // Select all functionality
+    // Selection functionality
+    updateSelectedCount();
+    
     document.getElementById('selectAllCheckbox').addEventListener('change', (e) => {
         const checkboxes = document.querySelectorAll('.bulk-select-checkbox');
         checkboxes.forEach(checkbox => {
-            checkbox.checked = e.target.checked;
+            if (checkbox.closest('tr').style.display !== 'none') {
+                checkbox.checked = e.target.checked;
+                updateRowSelection(checkbox.closest('tr'), checkbox.checked);
+            }
         });
+        updateSelectedCount();
     });
 
     document.getElementById('selectAllBtn').addEventListener('click', () => {
         document.querySelectorAll('.bulk-select-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
+            if (checkbox.closest('tr').style.display !== 'none') {
+                checkbox.checked = true;
+                updateRowSelection(checkbox.closest('tr'), true);
+            }
         });
         document.getElementById('selectAllCheckbox').checked = true;
+        updateSelectedCount();
     });
 
     document.getElementById('deselectAllBtn').addEventListener('click', () => {
         document.querySelectorAll('.bulk-select-checkbox').forEach(checkbox => {
             checkbox.checked = false;
+            updateRowSelection(checkbox.closest('tr'), false);
         });
         document.getElementById('selectAllCheckbox').checked = false;
+        updateSelectedCount();
+    });
+
+    // Individual checkbox changes
+    document.querySelectorAll('.bulk-select-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            updateRowSelection(e.target.closest('tr'), e.target.checked);
+            updateSelectedCount();
+        });
     });
 
     // Search functionality
@@ -191,52 +291,253 @@ function openBulkEditPopup(foodItems) {
         const searchTerm = e.target.value.toLowerCase();
         document.querySelectorAll('.bulk-edit-table tbody tr').forEach(row => {
             const foodName = row.querySelector('input[data-field="fname"]').value.toLowerCase();
-            row.style.display = foodName.includes(searchTerm) ? '' : 'none';
+            const shouldShow = foodName.includes(searchTerm);
+            row.style.display = shouldShow ? '' : 'none';
+            
+            // If hiding a selected row, uncheck it
+            if (!shouldShow && row.querySelector('.bulk-select-checkbox').checked) {
+                row.querySelector('.bulk-select-checkbox').checked = false;
+                updateRowSelection(row, false);
+            }
         });
+        updateSelectedCount();
     });
+
+    // Bulk operations
+    setupBulkOperations();
 
     // Save functionality
-    document.getElementById('saveBulkEdit').addEventListener('click', async () => {
-        const selectedRows = document.querySelectorAll('.bulk-select-checkbox:checked');
-        
-        if (selectedRows.length === 0) {
-            createTextPopup('Please select at least one item to update');
+    document.getElementById('saveBulkEdit').addEventListener('click', saveBulkChanges);
+}
+
+function updateRowSelection(row, isSelected) {
+    if (isSelected) {
+        row.classList.add('selected');
+    } else {
+        row.classList.remove('selected');
+    }
+}
+
+function updateSelectedCount() {
+    const selectedCount = document.querySelectorAll('.bulk-select-checkbox:checked').length;
+    const selectedCountEl = document.getElementById('selectedCount');
+    if (selectedCountEl) {
+        selectedCountEl.textContent = `${selectedCount} items selected`;
+    }
+    
+    // Enable/disable save button
+    const saveBtn = document.getElementById('saveBulkEdit');
+    if (saveBtn) {
+        saveBtn.disabled = selectedCount === 0;
+    }
+}
+
+function getSelectedRows() {
+    return Array.from(document.querySelectorAll('.bulk-select-checkbox:checked')).map(cb => cb.closest('tr'));
+}
+
+function setupBulkOperations() {
+    // Price operations
+    document.getElementById('increaseByPercentage').addEventListener('click', () => {
+        const percentage = parseFloat(document.getElementById('percentageChange').value);
+        if (isNaN(percentage) || percentage <= 0) {
+            createTextPopup('Please enter a valid percentage');
             return;
         }
+        applyPriceChange('percentage', percentage);
+    });
 
-        const updates = [];
-        
-        selectedRows.forEach(checkbox => {
-            const row = checkbox.closest('tr');
-            const fid = row.getAttribute('data-fid');
-            
-            const updateData = {
-                fid: parseInt(fid),
-                fname: row.querySelector('input[data-field="fname"]').value,
-                category: parseInt(row.querySelector('select[data-field="category"]').value),
-                cost: parseFloat(row.querySelector('input[data-field="cost"]').value),
-                sgst: parseFloat(row.querySelector('input[data-field="sgst"]').value),
-                cgst: parseFloat(row.querySelector('input[data-field="cgst"]').value),
-                veg: parseInt(row.querySelector('select[data-field="veg"]').value),
-                active: parseInt(row.querySelector('select[data-field="active"]').value)
-            };
-            
-            updates.push(updateData);
-        });
+    document.getElementById('decreaseByPercentage').addEventListener('click', () => {
+        const percentage = parseFloat(document.getElementById('percentageChange').value);
+        if (isNaN(percentage) || percentage <= 0) {
+            createTextPopup('Please enter a valid percentage');
+            return;
+        }
+        applyPriceChange('percentage', -percentage);
+    });
 
-        try {
-            const result = await ipcRenderer.invoke('bulk-update-food-items', updates);
-            if (result.success) {
-                createTextPopup(`Successfully updated ${updates.length} items!`);
-                popupOverlay.remove();
-                displayMenu(); // Refresh the menu
-            } else {
-                createTextPopup('Failed to update items: ' + result.error);
-            }
-        } catch (error) {
-            createTextPopup('Error updating items: ' + error.message);
+    document.getElementById('increaseByAmount').addEventListener('click', () => {
+        const amount = parseFloat(document.getElementById('fixedAmountChange').value);
+        if (isNaN(amount) || amount <= 0) {
+            createTextPopup('Please enter a valid amount');
+            return;
+        }
+        applyPriceChange('fixed', amount);
+    });
+
+    document.getElementById('decreaseByAmount').addEventListener('click', () => {
+        const amount = parseFloat(document.getElementById('fixedAmountChange').value);
+        if (isNaN(amount) || amount <= 0) {
+            createTextPopup('Please enter a valid amount');
+            return;
+        }
+        applyPriceChange('fixed', -amount);
+    });
+
+    document.getElementById('applyFixedPrice').addEventListener('click', () => {
+        const price = parseFloat(document.getElementById('setFixedPrice').value);
+        if (isNaN(price) || price <= 0) {
+            createTextPopup('Please enter a valid price');
+            return;
+        }
+        applyPriceChange('set', price);
+    });
+
+    // Category operations
+    document.getElementById('applyCategory').addEventListener('click', () => {
+        const categoryValue = document.getElementById('bulkCategorySelect').value;
+        if (!categoryValue) {
+            createTextPopup('Please select a category');
+            return;
+        }
+        applyBulkChange('category', categoryValue);
+    });
+
+    // Veg/Non-Veg operations
+    document.getElementById('applyVegType').addEventListener('click', () => {
+        const vegValue = document.getElementById('bulkVegSelect').value;
+        if (vegValue === '') {
+            createTextPopup('Please select veg/non-veg type');
+            return;
+        }
+        applyBulkChange('veg', vegValue);
+    });
+
+    // Status operations
+    document.getElementById('applyStatus').addEventListener('click', () => {
+        const statusValue = document.getElementById('bulkStatusSelect').value;
+        if (statusValue === '') {
+            createTextPopup('Please select a status');
+            return;
+        }
+        applyBulkChange('active', statusValue);
+    });
+
+    // Tax operations
+    document.getElementById('applySGST').addEventListener('click', () => {
+        const sgst = parseFloat(document.getElementById('sgstValue').value);
+        if (isNaN(sgst) || sgst < 0) {
+            createTextPopup('Please enter a valid SGST value');
+            return;
+        }
+        applyBulkChange('sgst', sgst);
+    });
+
+    document.getElementById('applyCGST').addEventListener('click', () => {
+        const cgst = parseFloat(document.getElementById('cgstValue').value);
+        if (isNaN(cgst) || cgst < 0) {
+            createTextPopup('Please enter a valid CGST value');
+            return;
+        }
+        applyBulkChange('cgst', cgst);
+    });
+}
+
+function applyPriceChange(type, value) {
+    const selectedRows = getSelectedRows();
+    if (selectedRows.length === 0) {
+        createTextPopup('Please select items to modify');
+        return;
+    }
+
+    selectedRows.forEach(row => {
+        const priceInput = row.querySelector('input[data-field="cost"]');
+        const currentPrice = parseFloat(priceInput.value);
+        let newPrice;
+
+        switch (type) {
+            case 'percentage':
+                newPrice = currentPrice * (1 + value / 100);
+                break;
+            case 'fixed':
+                newPrice = currentPrice + value;
+                break;
+            case 'set':
+                newPrice = value;
+                break;
+        }
+
+        if (newPrice >= 0) {
+            priceInput.value = newPrice.toFixed(2);
+            // Add visual feedback
+            priceInput.style.background = 'rgba(13, 59, 102, 0.1)';
+            setTimeout(() => {
+                priceInput.style.background = '#FFFFFF';
+            }, 1000);
         }
     });
+
+    createTextPopup(`Price updated for ${selectedRows.length} items`);
+}
+
+function applyBulkChange(field, value) {
+    const selectedRows = getSelectedRows();
+    if (selectedRows.length === 0) {
+        createTextPopup('Please select items to modify');
+        return;
+    }
+
+    selectedRows.forEach(row => {
+        const element = row.querySelector(`[data-field="${field}"]`);
+        if (element) {
+            element.value = value;
+            // Add visual feedback
+            element.style.background = 'rgba(13, 59, 102, 0.1)';
+            setTimeout(() => {
+                element.style.background = '#FFFFFF';
+            }, 1000);
+        }
+    });
+
+    createTextPopup(`${field.toUpperCase()} updated for ${selectedRows.length} items`);
+}
+
+async function saveBulkChanges() {
+    const selectedRows = document.querySelectorAll('.bulk-select-checkbox:checked');
+    
+    if (selectedRows.length === 0) {
+        createTextPopup('Please select at least one item to update');
+        return;
+    }
+
+    const updates = [];
+    
+    selectedRows.forEach(checkbox => {
+        const row = checkbox.closest('tr');
+        const fid = row.getAttribute('data-fid');
+        
+        const updateData = {
+            fid: parseInt(fid),
+            fname: row.querySelector('input[data-field="fname"]').value,
+            category: parseInt(row.querySelector('select[data-field="category"]').value),
+            cost: parseFloat(row.querySelector('input[data-field="cost"]').value),
+            sgst: parseFloat(row.querySelector('input[data-field="sgst"]').value),
+            cgst: parseFloat(row.querySelector('input[data-field="cgst"]').value),
+            veg: parseInt(row.querySelector('select[data-field="veg"]').value),
+            active: parseInt(row.querySelector('select[data-field="active"]').value)
+        };
+        
+        updates.push(updateData);
+    });
+
+    // Add loading state
+    const container = document.querySelector('.bulk-edit-container');
+    container.classList.add('bulk-loading');
+
+    try {
+        const result = await ipcRenderer.invoke('bulk-update-food-items', updates);
+        if (result.success) {
+            createTextPopup(`Successfully updated ${updates.length} items!`);
+            document.getElementById("bulk-edit-popup").remove();
+            displayMenu(); // Refresh the menu
+        } else {
+            createTextPopup('Failed to update items: ' + result.error);
+        }
+    } catch (error) {
+        createTextPopup('Error updating items: ' + error.message);
+    } finally {
+        container.classList.remove('bulk-loading');
+    }
 }
 
 async function loadCategoriesForBulkEdit() {
@@ -250,6 +551,13 @@ async function loadCategoriesForBulkEdit() {
                 categories.map(cat => `<option value="${cat.catid}">${cat.catname}</option>`).join('');
             select.value = currentValue; // Preserve current selection
         });
+
+        // Populate bulk operation category dropdown
+        const bulkCategorySelect = document.getElementById('bulkCategorySelect');
+        if (bulkCategorySelect) {
+            bulkCategorySelect.innerHTML = '<option value="">Select Category</option>' + 
+                categories.map(cat => `<option value="${cat.catid}">${cat.catname}</option>`).join('');
+        }
     } catch (error) {
         console.error("Failed to load categories for bulk edit:", error);
     }
