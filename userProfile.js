@@ -449,230 +449,38 @@ function showEditProfileModal(user) {
   // Create modal overlay
   const modalOverlay = document.createElement('div');
   modalOverlay.className = 'modal-overlay';
-  modalOverlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    backdrop-filter: blur(5px);
-  `;
 
   // Create modal content
   const modalContent = document.createElement('div');
   modalContent.className = 'modal-content';
-  modalContent.style.cssText = `
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    position: relative;
-    animation: modalSlideIn 0.3s ease;
-  `;
-
-  // Add CSS animations
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes modalSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-    
-    .modal-input {
-      width: 100%;
-      padding: 18px 24px;
-      border: 2px solid var(--border-gray);
-      border-radius: 15px;
-      font-size: 16px;
-      font-family: inherit;
-      margin-bottom: 1.5rem;
-      transition: var(--transition);
-      background: var(--white);
-      font-weight: 500;
-    }
-    
-    .modal-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      background: var(--white);
-      box-shadow: 0 0 0 4px var(--primary-light);
-      transform: translateY(-2px);
-    }
-    
-    .modal-input:disabled {
-      background-color: var(--light-gray);
-      color: var(--text-gray);
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-    
-    .modal-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    
-    .modal-buttons {
-      display: flex;
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-    
-    .modal-btn {
-      flex: 1;
-      padding: 18px 28px;
-      border: 2px solid var(--primary);
-      border-radius: 15px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .modal-btn-primary {
-      background: var(--primary);
-      color: var(--white);
-    }
-    
-    .modal-btn-primary:hover:not(:disabled) {
-      background: var(--white);
-      color: var(--primary);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-    }
-    
-    .modal-btn-secondary {
-      background: var(--white);
-      color: var(--primary);
-    }
-    
-    .modal-btn-secondary:hover:not(:disabled) {
-      background: var(--primary);
-      color: var(--white);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-    }
-    
-    .modal-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    .modal-close {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--white);
-      border: 2px solid var(--primary);
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--primary);
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-close:hover {
-      background: var(--primary);
-      color: var(--white);
-      transform: scale(1.1);
-    }
-    
-    .error-message {
-      color: var(--primary);
-      font-size: 14px;
-      margin-top: 1.5rem;
-      padding: 15px 20px;
-      background: var(--primary-light);
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      display: none;
-      font-weight: 600;
-    }
-    
-    .success-message {
-      color: var(--primary);
-      font-size: 14px;
-      margin-top: 1.5rem;
-      padding: 15px 20px;
-      background: var(--primary-light);
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      display: none;
-      font-weight: 600;
-    }
-    
-    .loading-spinner-edit {
-      width: 22px;
-      height: 22px;
-      border: 3px solid var(--white);
-      border-top: 3px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
 
   modalContent.innerHTML = `
     <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
-    <h2 style="margin-bottom: 1.5rem; color: #0D3B66; font-size: 1.5rem; font-weight: 600;">Edit Profile</h2>
+    <h2 style="margin-bottom: 1.25rem; color: #0D3B66; font-size: 1.25rem; font-weight: 600;">Edit Profile</h2>
     
-    <div style="margin-bottom: 1.5rem;">
+    <div style="margin-bottom: 1rem;">
       <label class="modal-label">User ID</label>
       <input type="text" class="modal-input" value="${user.userid || ''}" disabled>
     </div>
     
-         <div style="margin-bottom: 1.5rem;">
-       <label class="modal-label">Username *</label>
-       <input type="text" id="editUsername" class="modal-input" value="${user.username || ''}" placeholder="Enter your username">
-     </div>
+    <div style="margin-bottom: 1rem;">
+      <label class="modal-label">Username *</label>
+      <input type="text" id="editUsername" class="modal-input" value="${user.username || ''}" placeholder="Enter username">
+    </div>
     
-    <div style="margin-bottom: 1.5rem;">
+    <div style="margin-bottom: 1rem;">
       <label class="modal-label">Role</label>
       <input type="text" class="modal-input" value="${user.role ? user.role.toUpperCase() : ''}" disabled>
     </div>
     
-    <div style="margin-bottom: 1.5rem;">
+    <div style="margin-bottom: 1rem;">
       <label class="modal-label">Name *</label>
-      <input type="text" id="editName" class="modal-input" value="${user.name || ''}" placeholder="Enter your full name">
+      <input type="text" id="editName" class="modal-input" value="${user.name || ''}" placeholder="Enter full name">
     </div>
     
-    <div style="margin-bottom: 1.5rem;">
+    <div style="margin-bottom: 1rem;">
       <label class="modal-label">Email *</label>
-      <input type="email" id="editEmail" class="modal-input" value="${user.email || ''}" placeholder="Enter your email address">
+      <input type="email" id="editEmail" class="modal-input" value="${user.email || ''}" placeholder="Enter email address">
     </div>
     
     <div id="errorMessage" class="error-message"></div>
@@ -828,267 +636,23 @@ function showEditProfileModal(user) {
 function showChangePasswordModal(user) {
   // Create modal overlay
   const modalOverlay = document.createElement('div');
-  modalOverlay.className = 'modal-overlay';
-  modalOverlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    backdrop-filter: blur(5px);
-    opacity: 0;
-    animation: fadeIn 0.3s ease forwards;
-  `;
+  modalOverlay.className = 'password-modal-overlay';
 
   // Create modal content
   const modalContent = document.createElement('div');
-  modalContent.className = 'modal-content';
-  modalContent.style.cssText = `
-    background: var(--white);
-    border-radius: 25px;
-    padding: 3rem;
-    width: 90%;
-    max-width: 520px;
-    box-shadow: var(--shadow-hover);
-    position: relative;
-    transform: translateY(20px) scale(0.9);
-    animation: modalSlideIn 0.4s ease forwards;
-    overflow: hidden;
-    border: 2px solid var(--primary);
-  `;
-
-  // Add enhanced CSS animations and styles
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    
-    @keyframes modalSlideIn {
-      to {
-        transform: translateY(0) scale(1);
-      }
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    
-    .password-modal-input {
-      width: 100%;
-      padding: 18px 24px;
-      border: 2px solid var(--border-gray);
-      border-radius: 15px;
-      font-size: 16px;
-      font-family: inherit;
-      margin-bottom: 1.5rem;
-      transition: var(--transition);
-      background: var(--white);
-      font-weight: 500;
-    }
-    
-    .password-modal-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      background: var(--white);
-      box-shadow: 0 0 0 4px var(--primary-light);
-      transform: translateY(-2px);
-    }
-    
-    .password-modal-input:disabled {
-      background-color: var(--light-gray);
-      color: var(--text-gray);
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-    
-    .password-modal-input::placeholder {
-      color: var(--text-gray);
-      font-weight: 400;
-    }
-    
-    .password-modal-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    
-    .password-modal-buttons {
-      display: flex;
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-    
-    .password-modal-btn {
-      flex: 1;
-      padding: 18px 28px;
-      border: 2px solid var(--primary);
-      border-radius: 15px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .password-modal-btn-primary {
-      background: var(--primary);
-      color: var(--white);
-    }
-    
-    .password-modal-btn-primary:hover:not(:disabled) {
-      background: var(--white);
-      color: var(--primary);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-    }
-    
-    .password-modal-btn-secondary {
-      background: var(--white);
-      color: var(--primary);
-    }
-    
-    .password-modal-btn-secondary:hover:not(:disabled) {
-      background: var(--primary);
-      color: var(--white);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-    }
-    
-    .password-modal-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    
-    .password-modal-close {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--white);
-      border: 2px solid var(--primary);
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--primary);
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .password-modal-close:hover {
-      background: var(--primary);
-      color: var(--white);
-      transform: scale(1.1);
-    }
-    
-    .password-error-message {
-      color: var(--primary);
-      font-size: 14px;
-      margin-top: 1.5rem;
-      padding: 15px 20px;
-      background: var(--primary-light);
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      display: none;
-      font-weight: 600;
-    }
-    
-    .password-success-message {
-      color: var(--primary);
-      font-size: 14px;
-      margin-top: 1.5rem;
-      padding: 15px 20px;
-      background: var(--primary-light);
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      display: none;
-      font-weight: 600;
-    }
-    
-    .loading-spinner {
-      width: 22px;
-      height: 22px;
-      border: 3px solid var(--white);
-      border-top: 3px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    .input-group {
-      position: relative;
-      margin-bottom: 2rem;
-    }
-    
-    .input-help {
-      font-size: 13px;
-      color: var(--text-gray);
-      margin-top: 8px;
-      margin-left: 4px;
-      font-weight: 500;
-    }
-    
-    .modal-header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-      padding-bottom: 2rem;
-      border-bottom: 2px solid var(--border-gray);
-    }
-    
-    .modal-header h2 {
-      color: var(--primary);
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    .modal-icon {
-      width: 28px;
-      height: 28px;
-      color: var(--primary);
-    }
-  `;
-  document.head.appendChild(style);
+  modalContent.className = 'password-modal-content';
 
   modalContent.innerHTML = `
-    <button class="password-modal-close" onclick="this.closest('.modal-overlay').remove()">
-      ×
+    <button class="password-modal-close" onclick="this.closest('.password-modal-overlay').remove()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
     </button>
     
-    <div class="modal-header">
+    <div class="password-header">
       <h2>
-        <svg class="modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="password-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <circle cx="12" cy="16" r="1"></circle>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -1097,32 +661,32 @@ function showChangePasswordModal(user) {
       </h2>
     </div>
     
-    <div class="input-group">
+    <div>
       <label class="password-modal-label">Current Password</label>
-      <input type="password" id="currentPassword" class="password-modal-input" placeholder="Enter your current password" autocomplete="current-password">
+      <input type="password" id="currentPassword" class="password-modal-input" placeholder="Enter current password" autocomplete="current-password">
     </div>
     
-    <div class="input-group">
+    <div>
       <label class="password-modal-label">New Password</label>
-      <input type="password" id="newPassword" class="password-modal-input" placeholder="Enter your new password" autocomplete="new-password">
-      <div class="input-help">Password must be at least 6 characters long</div>
+      <input type="password" id="newPassword" class="password-modal-input" placeholder="Enter new password" autocomplete="new-password">
+      <div class="password-help">Password must be at least 6 characters</div>
     </div>
     
-    <div class="input-group">
+    <div>
       <label class="password-modal-label">Confirm New Password</label>
-      <input type="password" id="confirmPassword" class="password-modal-input" placeholder="Confirm your new password" autocomplete="new-password">
+      <input type="password" id="confirmPassword" class="password-modal-input" placeholder="Confirm new password" autocomplete="new-password">
     </div>
     
-    <div id="passwordErrorMessage" class="password-error-message"></div>
-    <div id="passwordSuccessMessage" class="password-success-message"></div>
+    <div id="passwordErrorMessage" class="password-error"></div>
+    <div id="passwordSuccessMessage" class="password-success"></div>
     
     <div class="password-modal-buttons">
-      <button class="password-modal-btn password-modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+      <button class="password-modal-btn password-modal-btn-secondary" onclick="this.closest('.password-modal-overlay').remove()">
         Cancel
       </button>
       <button class="password-modal-btn password-modal-btn-primary" id="confirmPasswordBtn">
-        <span class="btn-text">Change Password</span>
-        <div class="loading-spinner" style="display: none;"></div>
+        <span class="password-btn-text">Change Password</span>
+        <div class="password-loading" style="display: none;"></div>
       </button>
     </div>
   `;
@@ -1138,8 +702,8 @@ function showChangePasswordModal(user) {
     const errorMessage = document.getElementById('passwordErrorMessage');
     const successMessage = document.getElementById('passwordSuccessMessage');
     const confirmBtn = document.getElementById('confirmPasswordBtn');
-    const btnText = confirmBtn.querySelector('.btn-text');
-    const spinner = confirmBtn.querySelector('.loading-spinner');
+    const btnText = confirmBtn.querySelector('.password-btn-text');
+    const spinner = confirmBtn.querySelector('.password-loading');
 
     // Clear previous messages
     errorMessage.style.display = 'none';
@@ -1275,272 +839,23 @@ function showChangePasswordModal(user) {
 function showAddUserModal(user) {
   // Create modal overlay
   const modalOverlay = document.createElement('div');
-  modalOverlay.className = 'modal-overlay';
-  modalOverlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    backdrop-filter: blur(5px);
-    opacity: 0;
-    animation: fadeIn 0.3s ease forwards;
-  `;
+  modalOverlay.className = 'add-user-modal-overlay';
 
   // Create modal content
   const modalContent = document.createElement('div');
-  modalContent.className = 'modal-content';
-  modalContent.style.cssText = `
-    background: var(--white);
-    border-radius: 25px;
-    padding: 3rem;
-    width: 90%;
-    max-width: 520px;
-    box-shadow: var(--shadow-hover);
-    position: relative;
-    transform: translateY(20px) scale(0.9);
-    animation: modalSlideIn 0.4s ease forwards;
-    overflow: hidden;
-    border: 2px solid var(--primary);
-  `;
-
-  // Add enhanced CSS animations and styles for Add User Modal
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    
-    @keyframes modalSlideIn {
-      to {
-        transform: translateY(0) scale(1);
-      }
-    }
-    
-    .add-user-modal-input {
-      width: 100%;
-      padding: 18px 24px;
-      border: 2px solid var(--border-gray);
-      border-radius: 15px;
-      font-size: 16px;
-      font-family: inherit;
-      margin-bottom: 1.5rem;
-      transition: var(--transition);
-      background: var(--white);
-      font-weight: 500;
-    }
-    
-    .add-user-modal-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      background: var(--white);
-      box-shadow: 0 0 0 4px var(--primary-light);
-      transform: translateY(-2px);
-    }
-    
-    .add-user-modal-input::placeholder {
-      color: var(--text-gray);
-      font-weight: 400;
-    }
-    
-    .add-user-modal-select {
-      width: 100%;
-      padding: 18px 24px;
-      border: 2px solid var(--border-gray);
-      border-radius: 15px;
-      font-size: 16px;
-      font-family: inherit;
-      margin-bottom: 1.5rem;
-      transition: var(--transition);
-      background: var(--white);
-      font-weight: 500;
-      cursor: pointer;
-    }
-    
-    .add-user-modal-select:focus {
-      outline: none;
-      border-color: var(--primary);
-      background: var(--white);
-      box-shadow: 0 0 0 4px var(--primary-light);
-      transform: translateY(-2px);
-    }
-    
-    .add-user-modal-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    
-    .add-user-modal-buttons {
-      display: flex;
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-    
-    .add-user-modal-btn {
-      flex: 1;
-      padding: 18px 28px;
-      border: 2px solid var(--primary);
-      border-radius: 15px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .add-user-modal-btn-primary {
-      background: var(--primary);
-      color: var(--white);
-    }
-    
-    .add-user-modal-btn-primary:hover:not(:disabled) {
-      background: var(--white);
-      color: var(--primary);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-    }
-    
-    .add-user-modal-btn-secondary {
-      background: var(--white);
-      color: var(--primary);
-    }
-    
-    .add-user-modal-btn-secondary:hover:not(:disabled) {
-      background: var(--primary);
-      color: var(--white);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-    }
-    
-    .add-user-modal-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    
-    .add-user-modal-close {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--white);
-      border: 2px solid var(--primary);
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--primary);
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .add-user-modal-close:hover {
-      background: var(--primary);
-      color: var(--white);
-      transform: scale(1.1);
-    }
-    
-    .add-user-error-message {
-      color: var(--primary);
-      font-size: 14px;
-      margin-top: 1.5rem;
-      padding: 15px 20px;
-      background: var(--primary-light);
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      display: none;
-      font-weight: 600;
-    }
-    
-    .add-user-success-message {
-      color: var(--primary);
-      font-size: 14px;
-      margin-top: 1.5rem;
-      padding: 15px 20px;
-      background: var(--primary-light);
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      display: none;
-      font-weight: 600;
-    }
-    
-    .loading-spinner-add {
-      width: 22px;
-      height: 22px;
-      border: 3px solid var(--white);
-      border-top: 3px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    .input-group {
-      position: relative;
-      margin-bottom: 2rem;
-    }
-    
-    .input-help {
-      font-size: 13px;
-      color: var(--text-gray);
-      margin-top: 8px;
-      margin-left: 4px;
-      font-weight: 500;
-    }
-    
-    .modal-header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-      padding-bottom: 2rem;
-      border-bottom: 2px solid var(--border-gray);
-    }
-    
-    .modal-header h2 {
-      color: var(--primary);
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    .modal-icon {
-      width: 28px;
-      height: 28px;
-      color: var(--primary);
-    }
-  `;
-  document.head.appendChild(style);
+  modalContent.className = 'add-user-modal-content';
 
   modalContent.innerHTML = `
-    <button class="add-user-modal-close" onclick="this.closest('.modal-overlay').remove()">
-      ×
+    <button class="add-user-close" onclick="this.closest('.add-user-modal-overlay').remove()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
     </button>
     
-    <div class="modal-header">
+    <div class="add-user-header">
       <h2>
-        <svg class="modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="add-user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="8.5" cy="7" r="4"></circle>
           <line x1="20" y1="8" x2="20" y2="14"></line>
@@ -1550,47 +865,47 @@ function showAddUserModal(user) {
       </h2>
     </div>
     
-    <div class="input-group">
-      <label class="add-user-modal-label">Full Name</label>
-      <input type="text" id="addUserName" class="add-user-modal-input" placeholder="Enter full name" autocomplete="name">
+    <div>
+      <label class="add-user-label">Full Name</label>
+      <input type="text" id="addUserName" class="add-user-input" placeholder="Enter full name" autocomplete="name">
     </div>
     
-    <div class="input-group">
-      <label class="add-user-modal-label">Username</label>
-      <input type="text" id="addUserUsername" class="add-user-modal-input" placeholder="Enter username" autocomplete="username">
-      <div class="input-help">Username must be unique</div>
+    <div>
+      <label class="add-user-label">Username</label>
+      <input type="text" id="addUserUsername" class="add-user-input" placeholder="Enter username" autocomplete="username">
+      <div class="add-user-help">Username must be unique</div>
     </div>
     
-    <div class="input-group">
-      <label class="add-user-modal-label">Email Address</label>
-      <input type="email" id="addUserEmail" class="add-user-modal-input" placeholder="Enter email address" autocomplete="email">
+    <div>
+      <label class="add-user-label">Email Address</label>
+      <input type="email" id="addUserEmail" class="add-user-input" placeholder="Enter email address" autocomplete="email">
     </div>
     
-    <div class="input-group">
-      <label class="add-user-modal-label">Password</label>
-      <input type="password" id="addUserPassword" class="add-user-modal-input" placeholder="Enter password" autocomplete="new-password">
-      <div class="input-help">Password must be at least 6 characters long</div>
+    <div>
+      <label class="add-user-label">Password</label>
+      <input type="password" id="addUserPassword" class="add-user-input" placeholder="Enter password" autocomplete="new-password">
+      <div class="add-user-help">Password must be at least 6 characters</div>
     </div>
     
-    <div class="input-group">
-      <label class="add-user-modal-label">Role</label>
-      <select id="addUserRole" class="add-user-modal-select">
+    <div>
+      <label class="add-user-label">Role</label>
+      <select id="addUserRole" class="add-user-select">
         <option value="">Select role</option>
         <option value="staff">Staff</option>
         <option value="admin">Admin</option>
       </select>
     </div>
     
-    <div id="addUserErrorMessage" class="add-user-error-message"></div>
-    <div id="addUserSuccessMessage" class="add-user-success-message"></div>
+    <div id="addUserErrorMessage" class="add-user-error"></div>
+    <div id="addUserSuccessMessage" class="add-user-success"></div>
     
-    <div class="add-user-modal-buttons">
-      <button class="add-user-modal-btn add-user-modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+    <div class="add-user-buttons">
+      <button class="add-user-btn add-user-btn-secondary" onclick="this.closest('.add-user-modal-overlay').remove()">
         Cancel
       </button>
-      <button class="add-user-modal-btn add-user-modal-btn-primary" id="confirmAddUserBtn">
-        <span class="btn-text">Create User</span>
-        <div class="loading-spinner-add" style="display: none;"></div>
+      <button class="add-user-btn add-user-btn-primary" id="confirmAddUserBtn">
+        <span class="add-user-btn-text">Create User</span>
+        <div class="add-user-loading" style="display: none;"></div>
       </button>
     </div>
   `;
@@ -1672,8 +987,8 @@ function showAddUserModal(user) {
     }
 
     // Show loading state
-    const btnText = confirmBtn.querySelector('.btn-text');
-    const spinner = confirmBtn.querySelector('.loading-spinner-add');
+    const btnText = confirmBtn.querySelector('.add-user-btn-text');
+    const spinner = confirmBtn.querySelector('.add-user-loading');
     
     function setLoadingState(loading) {
       if (loading) {
