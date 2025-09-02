@@ -471,21 +471,21 @@ function showEditProfileModal(user) {
       
       .modal-content {
         background: #ffffff;
-        border-radius: 10px;
-        padding: 1.5rem;
-        width: 400px;
+        border-radius: 12px;
+        padding: 2rem;
+        width: 440px;
         max-width: 90vw;
         max-height: 85vh;
         overflow-y: auto;
-        box-shadow: 0 4px 16px rgba(13, 59, 102, 0.12);
+        box-shadow: 0 6px 24px rgba(13, 59, 102, 0.12);
         border: 1.5px solid #e5e7eb;
         position: relative;
       }
       
       .modal-close {
         position: absolute;
-        top: 0.875rem;
-        right: 0.875rem;
+        top: 1.25rem;
+        right: 1.25rem;
         background: none;
         border: none;
         font-size: 1.4rem;
@@ -552,19 +552,20 @@ function showEditProfileModal(user) {
       .input-wrapper {
         position: relative;
         display: flex;
-        align-items: center;
+        align-items: stretch;
       }
       
       .modal-input {
         width: 100%;
-        padding: 0.75rem 1rem;
-        padding-left: 2.5rem;
+        height: 48px;
+        padding: 0 1.125rem 0 2.75rem;
         border: 2px solid #e5e7eb;
         border-radius: 8px;
-        font-size: 0.95rem;
+        font-size: 1rem;
         background: #ffffff;
         box-sizing: border-box;
         transition: all 0.2s ease;
+        line-height: normal;
       }
       
       .modal-input:focus {
@@ -582,11 +583,11 @@ function showEditProfileModal(user) {
       
       .input-icon {
         position: absolute;
-        left: 0.75rem;
+        left: 0.875rem;
         top: 50%;
         transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         color: #6b7280;
         pointer-events: none;
         z-index: 1;
@@ -621,26 +622,26 @@ function showEditProfileModal(user) {
       
       .modal-buttons {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
         justify-content: flex-end;
-        margin-top: 1.5rem;
-        padding-top: 1.25rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
         border-top: 1px solid #e5e7eb;
       }
       
       .modal-btn {
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 0.875rem;
+        font-size: 0.95rem;
         cursor: pointer;
         border: 1.5px solid #0D3B66;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.375rem;
-        min-width: 80px;
-        transition: all 0.15s ease;
+        gap: 0.5rem;
+        min-width: 90px;
+        transition: all 0.2s ease;
       }
       
       .modal-btn-secondary {
@@ -1014,19 +1015,20 @@ function showChangePasswordModal(user) {
       .password-input-wrapper {
         position: relative;
         display: flex;
-        align-items: center;
+        align-items: stretch;
       }
       
       .password-modal-input {
         width: 100%;
-        padding: 0.75rem 1rem;
-        padding-left: 2.5rem;
+        height: 48px;
+        padding: 0 1.125rem 0 2.75rem;
         border: 2px solid #e5e7eb;
         border-radius: 8px;
-        font-size: 0.95rem;
+        font-size: 1rem;
         background: #ffffff;
         box-sizing: border-box;
         transition: all 0.2s ease;
+        line-height: normal;
       }
       
       .password-modal-input:focus {
@@ -1037,11 +1039,11 @@ function showChangePasswordModal(user) {
       
       .password-input-icon {
         position: absolute;
-        left: 0.75rem;
+        left: 0.875rem;
         top: 50%;
         transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         color: #6b7280;
         pointer-events: none;
         z-index: 1;
@@ -1502,16 +1504,16 @@ function showAddUserModal(user) {
       }
       
       .add-user-form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.75rem;
         position: relative;
       }
       
       .add-user-label {
         display: block;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         color: #0D3B66;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         text-align: left;
       }
       
@@ -1524,21 +1526,22 @@ function showAddUserModal(user) {
       .add-user-input-wrapper {
         position: relative;
         display: flex;
-        align-items: center;
+        align-items: stretch;
       }
       
       .add-user-input, .add-user-select {
         width: 100%;
-        padding: 0.75rem 1rem;
-        padding-left: 2.5rem;
+        height: 48px;
+        padding: 0 1.125rem 0 2.75rem;
         border: 2px solid #e5e7eb;
         border-radius: 8px;
-        font-size: 0.95rem;
+        font-size: 1rem;
         background: #ffffff;
         box-sizing: border-box;
         transition: all 0.2s ease;
+        line-height: normal;
       }
-      
+
       .add-user-input:focus, .add-user-select:focus {
         outline: none;
         border-color: #0D3B66;
@@ -1547,17 +1550,15 @@ function showAddUserModal(user) {
       
       .add-user-input-icon {
         position: absolute;
-        left: 0.75rem;
+        left: 0.875rem;
         top: 50%;
         transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         color: #6b7280;
         pointer-events: none;
         z-index: 1;
-      }
-      
-      .add-user-input:focus + .add-user-input-icon,
+      }      .add-user-input:focus + .add-user-input-icon,
       .add-user-select:focus + .add-user-input-icon {
         color: #0D3B66;
       }
