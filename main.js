@@ -482,6 +482,13 @@ function createMainWindow() {
 
   Menu.setApplicationMenu(null);
 
+  // Enable developer tools with F12 key
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12' && input.type === 'keyDown') {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
+
   mainWindow.loadFile("login.html").catch(console.error);
 
   mainWindow.once("ready-to-show", () => {
