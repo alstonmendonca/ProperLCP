@@ -455,41 +455,321 @@ function showEditProfileModal(user) {
   modalContent.className = 'modal-content';
 
   modalContent.innerHTML = `
+    <style>
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      }
+      
+      .modal-content {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 1.5rem;
+        width: 400px;
+        max-width: 90vw;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 16px rgba(13, 59, 102, 0.12);
+        border: 1.5px solid #e5e7eb;
+        position: relative;
+      }
+      
+      .modal-close {
+        position: absolute;
+        top: 0.875rem;
+        right: 0.875rem;
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        color: #0D3B66;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      
+      .modal-close:hover {
+        background: #0D3B66;
+        color: #ffffff;
+      }
+      
+      .modal-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 2px solid #0D3B66;
+      }
+      
+      .modal-header h2 {
+        color: #0D3B66;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+      
+      .modal-icon {
+        width: 24px;
+        height: 24px;
+        color: #0D3B66;
+      }
+      
+      .form-group {
+        margin-bottom: 1.25rem;
+        position: relative;
+      }
+      
+      .modal-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #0D3B66;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: left;
+      }
+      
+      .required::after {
+        content: " *";
+        color: #dc2626;
+        font-weight: bold;
+      }
+      
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      
+      .modal-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        padding-left: 2.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #ffffff;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+      }
+      
+      .modal-input:focus {
+        outline: none;
+        border-color: #0D3B66;
+        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+      }
+      
+      .modal-input:disabled {
+        background: #f9fafb;
+        color: #6b7280;
+        cursor: not-allowed;
+        border-color: #d1d5db;
+      }
+      
+      .input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: #6b7280;
+        pointer-events: none;
+        z-index: 1;
+      }
+      
+      .modal-input:focus + .input-icon,
+      .modal-input:not(:placeholder-shown) + .input-icon {
+        color: #0D3B66;
+      }
+      
+      .error-message, .success-message {
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin: 1.25rem 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: none;
+        text-align: center;
+      }
+      
+      .error-message {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+      }
+      
+      .success-message {
+        background: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+      }
+      
+      .modal-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid #e5e7eb;
+      }
+      
+      .modal-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border: 1.5px solid #0D3B66;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+        min-width: 80px;
+        transition: all 0.15s ease;
+      }
+      
+      .modal-btn-secondary {
+        background: #ffffff;
+        color: #0D3B66;
+      }
+      
+      .modal-btn-secondary:hover {
+        background: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
+      }
+      
+      .modal-btn-primary {
+        background: #0D3B66;
+        color: #ffffff;
+      }
+      
+      .modal-btn-primary:hover:not(:disabled) {
+        background: #1e3a8a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.25);
+      }
+      
+      .modal-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+      
+      .btn-icon {
+        width: 16px;
+        height: 16px;
+      }
+      
+      .loading-spinner-edit {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    
     <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
-    <h2 style="margin-bottom: 1.25rem; color: #0D3B66; font-size: 1.25rem; font-weight: 600;">Edit Profile</h2>
     
-    <div style="margin-bottom: 1rem;">
+    <div class="modal-header">
+      <h2>
+        <svg class="modal-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit Profile
+      </h2>
+    </div>
+    
+    <div class="form-group">
       <label class="modal-label">User ID</label>
-      <input type="text" class="modal-input" value="${user.userid || ''}" disabled>
+      <div class="input-wrapper">
+        <input type="text" class="modal-input" value="${user.userid || ''}" disabled placeholder="User ID">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
+        </svg>
+      </div>
     </div>
     
-    <div style="margin-bottom: 1rem;">
-      <label class="modal-label">Username *</label>
-      <input type="text" id="editUsername" class="modal-input" value="${user.username || ''}" placeholder="Enter username">
+    <div class="form-group">
+      <label class="modal-label required">Username</label>
+      <div class="input-wrapper">
+        <input type="text" id="editUsername" class="modal-input" value="${user.username || ''}" placeholder="Enter username">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
     </div>
     
-    <div style="margin-bottom: 1rem;">
+    <div class="form-group">
       <label class="modal-label">Role</label>
-      <input type="text" class="modal-input" value="${user.role ? user.role.toUpperCase() : ''}" disabled>
+      <div class="input-wrapper">
+        <input type="text" class="modal-input" value="${user.role ? user.role.toUpperCase() : ''}" disabled placeholder="User Role">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      </div>
     </div>
     
-    <div style="margin-bottom: 1rem;">
-      <label class="modal-label">Name *</label>
-      <input type="text" id="editName" class="modal-input" value="${user.name || ''}" placeholder="Enter full name">
+    <div class="form-group">
+      <label class="modal-label required">Full Name</label>
+      <div class="input-wrapper">
+        <input type="text" id="editName" class="modal-input" value="${user.name || ''}" placeholder="Enter full name">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
     </div>
     
-    <div style="margin-bottom: 1rem;">
-      <label class="modal-label">Email *</label>
-      <input type="email" id="editEmail" class="modal-input" value="${user.email || ''}" placeholder="Enter email address">
+    <div class="form-group">
+      <label class="modal-label required">Email Address</label>
+      <div class="input-wrapper">
+        <input type="email" id="editEmail" class="modal-input" value="${user.email || ''}" placeholder="Enter email address">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
     </div>
     
     <div id="errorMessage" class="error-message"></div>
     <div id="successMessage" class="success-message"></div>
     
     <div class="modal-buttons">
-      <button class="modal-btn modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+      <button class="modal-btn modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Cancel
+      </button>
       <button class="modal-btn modal-btn-primary" id="confirmEditBtn">
-        <span class="btn-text-edit">Confirm Changes</span>
+        <span class="btn-text-edit">
+          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Save Changes
+        </span>
         <div class="loading-spinner-edit" style="display: none;"></div>
       </button>
     </div>
@@ -643,6 +923,252 @@ function showChangePasswordModal(user) {
   modalContent.className = 'password-modal-content';
 
   modalContent.innerHTML = `
+    <style>
+      .password-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      }
+      
+      .password-modal-content {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+        width: 420px;
+        max-width: 90vw;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 32px rgba(13, 59, 102, 0.15);
+        border: 2px solid #0D3B66;
+        position: relative;
+      }
+      
+      .password-modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        color: #0D3B66;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      
+      .password-modal-close:hover {
+        background: #0D3B66;
+        color: #ffffff;
+      }
+      
+      .password-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 2px solid #0D3B66;
+      }
+      
+      .password-header h2 {
+        color: #0D3B66;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+      
+      .password-icon {
+        width: 24px;
+        height: 24px;
+        color: #0D3B66;
+      }
+      
+      .password-form-group {
+        margin-bottom: 1.25rem;
+        position: relative;
+      }
+      
+      .password-modal-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #0D3B66;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: left;
+      }
+      
+      .password-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      
+      .password-modal-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        padding-left: 2.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #ffffff;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+      }
+      
+      .password-modal-input:focus {
+        outline: none;
+        border-color: #0D3B66;
+        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+      }
+      
+      .password-input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: #6b7280;
+        pointer-events: none;
+        z-index: 1;
+      }
+      
+      .password-modal-input:focus + .password-input-icon {
+        color: #0D3B66;
+      }
+      
+      .password-help {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.4rem;
+        text-align: left;
+      }
+      
+      .strength-meter {
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+      }
+      
+      .strength-fill {
+        height: 100%;
+        background: #0D3B66;
+        border-radius: 3px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      
+      .password-error, .password-success {
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin: 1.25rem 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: none;
+        text-align: center;
+      }
+      
+      .password-error {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+      }
+      
+      .password-success {
+        background: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+      }
+      
+      .password-modal-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+      }
+      
+      .password-modal-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: 2px solid #0D3B66;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-width: 100px;
+        transition: all 0.2s ease;
+      }
+      
+      .password-modal-btn-secondary {
+        background: #ffffff;
+        color: #0D3B66;
+      }
+      
+      .password-modal-btn-secondary:hover {
+        background: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
+      }
+      
+      .password-modal-btn-primary {
+        background: #0D3B66;
+        color: #ffffff;
+      }
+      
+      .password-modal-btn-primary:hover:not(:disabled) {
+        background: #1e3a8a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.25);
+      }
+      
+      .password-modal-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+      
+      .password-btn-icon {
+        width: 16px;
+        height: 16px;
+      }
+      
+      .password-loading {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    
     <button class="password-modal-close" onclick="this.closest('.password-modal-overlay').remove()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -661,20 +1187,38 @@ function showChangePasswordModal(user) {
       </h2>
     </div>
     
-    <div>
+    <div class="password-form-group">
       <label class="password-modal-label">Current Password</label>
-      <input type="password" id="currentPassword" class="password-modal-input" placeholder="Enter current password" autocomplete="current-password">
+      <div class="password-input-wrapper">
+        <input type="password" id="currentPassword" class="password-modal-input" placeholder="Enter current password" autocomplete="current-password">
+        <svg class="password-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
     </div>
     
-    <div>
+    <div class="password-form-group">
       <label class="password-modal-label">New Password</label>
-      <input type="password" id="newPassword" class="password-modal-input" placeholder="Enter new password" autocomplete="new-password">
-      <div class="password-help">Password must be at least 6 characters</div>
+      <div class="password-input-wrapper">
+        <input type="password" id="newPassword" class="password-modal-input" placeholder="Enter new password" autocomplete="new-password">
+        <svg class="password-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-6 7a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <div class="password-help">Password must be at least 6 characters long</div>
+      <div class="strength-meter">
+        <div class="strength-fill" id="strengthFill"></div>
+      </div>
     </div>
     
-    <div>
+    <div class="password-form-group">
       <label class="password-modal-label">Confirm New Password</label>
-      <input type="password" id="confirmPassword" class="password-modal-input" placeholder="Confirm new password" autocomplete="new-password">
+      <div class="password-input-wrapper">
+        <input type="password" id="confirmPassword" class="password-modal-input" placeholder="Confirm new password" autocomplete="new-password">
+        <svg class="password-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
     </div>
     
     <div id="passwordErrorMessage" class="password-error"></div>
@@ -682,10 +1226,18 @@ function showChangePasswordModal(user) {
     
     <div class="password-modal-buttons">
       <button class="password-modal-btn password-modal-btn-secondary" onclick="this.closest('.password-modal-overlay').remove()">
+        <svg class="password-btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
         Cancel
       </button>
       <button class="password-modal-btn password-modal-btn-primary" id="confirmPasswordBtn">
-        <span class="password-btn-text">Change Password</span>
+        <span class="password-btn-text">
+          <svg class="password-btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Update Password
+        </span>
         <div class="password-loading" style="display: none;"></div>
       </button>
     </div>
@@ -693,6 +1245,35 @@ function showChangePasswordModal(user) {
 
   modalOverlay.appendChild(modalContent);
   document.body.appendChild(modalOverlay);
+
+  // Add password strength meter functionality
+  const newPasswordInput = document.getElementById('newPassword');
+  const strengthFill = document.getElementById('strengthFill');
+  
+  newPasswordInput.addEventListener('input', (e) => {
+    const password = e.target.value;
+    const strength = calculatePasswordStrength(password);
+    strengthFill.style.width = `${strength}%`;
+    
+    if (strength < 30) {
+      strengthFill.style.background = '#ef4444';
+    } else if (strength < 70) {
+      strengthFill.style.background = '#f59e0b';
+    } else {
+      strengthFill.style.background = '#10b981';
+    }
+  });
+  
+  function calculatePasswordStrength(password) {
+    let strength = 0;
+    if (password.length >= 6) strength += 20;
+    if (password.length >= 10) strength += 20;
+    if (/[a-z]/.test(password)) strength += 15;
+    if (/[A-Z]/.test(password)) strength += 15;
+    if (/[0-9]/.test(password)) strength += 15;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 15;
+    return Math.min(100, strength);
+  }
 
   // Handle confirm button click
   document.getElementById('confirmPasswordBtn').addEventListener('click', async () => {
@@ -846,6 +1427,260 @@ function showAddUserModal(user) {
   modalContent.className = 'add-user-modal-content';
 
   modalContent.innerHTML = `
+    <style>
+      .add-user-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      }
+      
+      .add-user-modal-content {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+        width: 480px;
+        max-width: 90vw;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 32px rgba(13, 59, 102, 0.15);
+        border: 2px solid #0D3B66;
+        position: relative;
+      }
+      
+      .add-user-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        color: #0D3B66;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      
+      .add-user-close:hover {
+        background: #0D3B66;
+        color: #ffffff;
+      }
+      
+      .add-user-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 2px solid #0D3B66;
+      }
+      
+      .add-user-header h2 {
+        color: #0D3B66;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+      
+      .add-user-icon {
+        width: 24px;
+        height: 24px;
+        color: #0D3B66;
+      }
+      
+      .add-user-form-group {
+        margin-bottom: 1.25rem;
+        position: relative;
+      }
+      
+      .add-user-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #0D3B66;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: left;
+      }
+      
+      .add-user-required::after {
+        content: " *";
+        color: #dc2626;
+        font-weight: bold;
+      }
+      
+      .add-user-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      
+      .add-user-input, .add-user-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        padding-left: 2.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #ffffff;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+      }
+      
+      .add-user-input:focus, .add-user-select:focus {
+        outline: none;
+        border-color: #0D3B66;
+        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+      }
+      
+      .add-user-input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: #6b7280;
+        pointer-events: none;
+        z-index: 1;
+      }
+      
+      .add-user-input:focus + .add-user-input-icon,
+      .add-user-select:focus + .add-user-input-icon {
+        color: #0D3B66;
+      }
+      
+      .add-user-help {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.4rem;
+        text-align: left;
+      }
+      
+      .add-user-error, .add-user-success {
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin: 1.25rem 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: none;
+        text-align: center;
+      }
+      
+      .add-user-error {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+      }
+      
+      .add-user-success {
+        background: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+      }
+      
+      .add-user-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+      }
+      
+      .add-user-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: 2px solid #0D3B66;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-width: 100px;
+        transition: all 0.2s ease;
+      }
+      
+      .add-user-btn-secondary {
+        background: #ffffff;
+        color: #0D3B66;
+      }
+      
+      .add-user-btn-secondary:hover {
+        background: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
+      }
+      
+      .add-user-btn-primary {
+        background: #0D3B66;
+        color: #ffffff;
+      }
+      
+      .add-user-btn-primary:hover:not(:disabled) {
+        background: #1e3a8a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.25);
+      }
+      
+      .add-user-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+      
+      .add-user-btn-icon {
+        width: 16px;
+        height: 16px;
+      }
+      
+      .add-user-loading {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      
+      @media (max-width: 640px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        
+        .add-user-modal-content {
+          width: 90vw;
+          padding: 1.5rem;
+        }
+      }
+    </style>
+    
     <button class="add-user-close" onclick="this.closest('.add-user-modal-overlay').remove()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -861,39 +1696,66 @@ function showAddUserModal(user) {
           <line x1="20" y1="8" x2="20" y2="14"></line>
           <line x1="23" y1="11" x2="17" y2="11"></line>
         </svg>
-        Add New User
+        Create New User
       </h2>
     </div>
     
-    <div>
-      <label class="add-user-label">Full Name</label>
-      <input type="text" id="addUserName" class="add-user-input" placeholder="Enter full name" autocomplete="name">
+    <div class="add-user-form-group">
+      <label class="add-user-label add-user-required">Full Name</label>
+      <div class="add-user-input-wrapper">
+        <input type="text" id="addUserName" class="add-user-input" placeholder="Enter full name" autocomplete="name">
+        <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
     </div>
     
-    <div>
-      <label class="add-user-label">Username</label>
-      <input type="text" id="addUserUsername" class="add-user-input" placeholder="Enter username" autocomplete="username">
-      <div class="add-user-help">Username must be unique</div>
+    <div class="form-row">
+      <div class="add-user-form-group">
+        <label class="add-user-label add-user-required">Username</label>
+        <div class="add-user-input-wrapper">
+          <input type="text" id="addUserUsername" class="add-user-input" placeholder="Enter username" autocomplete="username">
+          <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <div class="add-user-help">Username must be unique</div>
+      </div>
+      
+      <div class="add-user-form-group">
+        <label class="add-user-label add-user-required">Role</label>
+        <div class="add-user-input-wrapper">
+          <select id="addUserRole" class="add-user-select">
+            <option value="">Select role</option>
+            <option value="staff">Staff Member</option>
+            <option value="admin">Administrator</option>
+          </select>
+          <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+      </div>
     </div>
     
-    <div>
-      <label class="add-user-label">Email Address</label>
-      <input type="email" id="addUserEmail" class="add-user-input" placeholder="Enter email address" autocomplete="email">
+    <div class="add-user-form-group">
+      <label class="add-user-label add-user-required">Email Address</label>
+      <div class="add-user-input-wrapper">
+        <input type="email" id="addUserEmail" class="add-user-input" placeholder="Enter email address" autocomplete="email">
+        <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
     </div>
     
-    <div>
-      <label class="add-user-label">Password</label>
-      <input type="password" id="addUserPassword" class="add-user-input" placeholder="Enter password" autocomplete="new-password">
-      <div class="add-user-help">Password must be at least 6 characters</div>
-    </div>
-    
-    <div>
-      <label class="add-user-label">Role</label>
-      <select id="addUserRole" class="add-user-select">
-        <option value="">Select role</option>
-        <option value="staff">Staff</option>
-        <option value="admin">Admin</option>
-      </select>
+    <div class="add-user-form-group">
+      <label class="add-user-label add-user-required">Password</label>
+      <div class="add-user-input-wrapper">
+        <input type="password" id="addUserPassword" class="add-user-input" placeholder="Enter secure password" autocomplete="new-password">
+        <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+      <div class="add-user-help">Password must be at least 6 characters long</div>
     </div>
     
     <div id="addUserErrorMessage" class="add-user-error"></div>
@@ -901,10 +1763,18 @@ function showAddUserModal(user) {
     
     <div class="add-user-buttons">
       <button class="add-user-btn add-user-btn-secondary" onclick="this.closest('.add-user-modal-overlay').remove()">
+        <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
         Cancel
       </button>
       <button class="add-user-btn add-user-btn-primary" id="confirmAddUserBtn">
-        <span class="add-user-btn-text">Create User</span>
+        <span class="add-user-btn-text">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Create User
+        </span>
         <div class="add-user-loading" style="display: none;"></div>
       </button>
     </div>
