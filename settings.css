@@ -1138,3 +1138,649 @@ input:checked + .user-slider:before {
     gap: 12px;
     justify-content: flex-end;
 }
+
+/* =================================================== Edit USER MODAL STARTS HERE =================================================*/
+
+/* Compact Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: modalSlideIn 0.2s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-gray, #e2e8f0);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    background: var(--white, #ffffff);
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--primary, #0D3B66);
+    background: var(--white, #ffffff);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+}
+
+.modal-input:disabled {
+    background-color: var(--light-gray, #f8fafc);
+    color: var(--text-gray, #64748b);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.modal-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary, #0D3B66);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1.5px solid var(--primary, #0D3B66);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.modal-btn-primary {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+}
+
+.modal-btn-primary:hover:not(:disabled) {
+    background: var(--white, #ffffff);
+    color: var(--primary, #0D3B66);
+    transform: translateY(-1px);
+}
+
+.modal-btn-secondary {
+    background: var(--white, #ffffff);
+    color: var(--primary, #0D3B66);
+}
+
+.modal-btn-secondary:hover:not(:disabled) {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+    transform: translateY(-1px);
+}
+
+.modal-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--white, #ffffff);
+    border: 1.5px solid var(--primary, #0D3B66);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--primary, #0D3B66);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+    transform: scale(1.05);
+}
+
+.error-message {
+    color: var(--primary, #0D3B66);
+    font-size: 13px;
+    margin-top: 1rem;
+    padding: 10px 12px;
+    background: rgba(13, 59, 102, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(13, 59, 102, 0.2);
+    display: none;
+    font-weight: 500;
+}
+
+.success-message {
+    color: #059669;
+    font-size: 13px;
+    margin-top: 1rem;
+    padding: 10px 12px;
+    background: rgba(5, 150, 105, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    display: none;
+    font-weight: 500;
+}
+
+.loading-spinner-edit {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--white, #ffffff);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ================================================================ EDIT USER MODAL Section ENDS HERE ======================================================== */
+
+/* ================================================================ADD USER MODAL Section STARTS HERE ======================================================== */
+
+/* Compact Add User Modal Styles */
+.add-user-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+}
+
+.add-user-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: addUserModalSlideIn 0.2s ease;
+}
+
+@keyframes addUserModalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.add-user-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-gray, #e2e8f0);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    background: var(--white, #ffffff);
+}
+
+.add-user-input:focus {
+    outline: none;
+    border-color: var(--primary, #0D3B66);
+    background: var(--white, #ffffff);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+}
+
+.add-user-input::placeholder {
+    color: var(--text-gray, #64748b);
+}
+
+.add-user-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-gray, #e2e8f0);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    background: var(--white, #ffffff);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+.add-user-select:focus {
+    outline: none;
+    border-color: var(--primary, #0D3B66);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+}
+
+.add-user-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary, #0D3B66);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.add-user-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.add-user-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1.5px solid var(--primary, #0D3B66);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.add-user-btn-primary {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+}
+
+.add-user-btn-primary:hover:not(:disabled) {
+    background: var(--white, #ffffff);
+    color: var(--primary, #0D3B66);
+    transform: translateY(-1px);
+}
+
+.add-user-btn-secondary {
+    background: var(--white, #ffffff);
+    color: var(--primary, #0D3B66);
+}
+
+.add-user-btn-secondary:hover:not(:disabled) {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+    transform: translateY(-1px);
+}
+
+.add-user-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.add-user-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--white, #ffffff);
+    border: 1.5px solid var(--primary, #0D3B66);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--primary, #0D3B66);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-user-close:hover {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+    transform: scale(1.05);
+}
+
+.add-user-error {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 1rem;
+    padding: 10px 12px;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    display: none;
+    font-weight: 500;
+}
+
+.add-user-success {
+    color: #059669;
+    font-size: 13px;
+    margin-top: 1rem;
+    padding: 10px 12px;
+    background: rgba(5, 150, 105, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    display: none;
+    font-weight: 500;
+}
+
+.add-user-loading {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--white, #ffffff);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: addUserSpin 1s linear infinite;
+}
+
+@keyframes addUserSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.add-user-help {
+    font-size: 12px;
+    color: var(--text-gray, #64748b);
+    margin-top: 6px;
+    margin-left: 2px;
+    font-weight: 500;
+}
+
+.add-user-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-gray, #e2e8f0);
+}
+
+.add-user-header h2 {
+    color: var(--primary, #0D3B66);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.add-user-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--primary, #0D3B66);
+}
+
+/* ================================================================ADD USER MODAL Section ENDS HERE ======================================================== */
+
+/* ================================================================ CHANGE USER PASSWORD MODAL STARTS HERE ======================================================== */
+
+/* Compact Change Password Modal Styles */
+.password-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+}
+
+.password-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: passwordModalSlideIn 0.2s ease;
+}
+
+@keyframes passwordModalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.password-modal-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-gray, #e2e8f0);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    background: var(--white, #ffffff);
+}
+
+.password-modal-input:focus {
+    outline: none;
+    border-color: var(--primary, #0D3B66);
+    background: var(--white, #ffffff);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+}
+
+.password-modal-input::placeholder {
+    color: var(--text-gray, #64748b);
+}
+
+.password-modal-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary, #0D3B66);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.password-modal-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.password-modal-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1.5px solid var(--primary, #0D3B66);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.password-modal-btn-primary {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+}
+
+.password-modal-btn-primary:hover:not(:disabled) {
+    background: var(--white, #ffffff);
+    color: var(--primary, #0D3B66);
+    transform: translateY(-1px);
+}
+
+.password-modal-btn-secondary {
+    background: var(--white, #ffffff);
+    color: var(--primary, #0D3B66);
+}
+
+.password-modal-btn-secondary:hover:not(:disabled) {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+    transform: translateY(-1px);
+}
+
+.password-modal-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.password-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--white, #ffffff);
+    border: 1.5px solid var(--primary, #0D3B66);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--primary, #0D3B66);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-modal-close:hover {
+    background: var(--primary, #0D3B66);
+    color: var(--white, #ffffff);
+    transform: scale(1.05);
+}
+
+.password-error {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 1rem;
+    padding: 10px 12px;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    display: none;
+    font-weight: 500;
+}
+
+.password-success {
+    color: #059669;
+    font-size: 13px;
+    margin-top: 1rem;
+    padding: 10px 12px;
+    background: rgba(5, 150, 105, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    display: none;
+    font-weight: 500;
+}
+
+.password-loading {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--white, #ffffff);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: passwordSpin 1s linear infinite;
+}
+
+@keyframes passwordSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.password-help {
+    font-size: 12px;
+    color: var(--text-gray, #64748b);
+    margin-top: 6px;
+    margin-left: 2px;
+    font-weight: 500;
+}
+
+.password-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-gray, #e2e8f0);
+}
+
+.password-header h2 {
+    color: var(--primary, #0D3B66);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.password-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--primary, #0D3B66);
+}
+
+/* ================================================================ CHANGE USER PASSWORD MODAL Section ENDS HERE ======================================================== */
