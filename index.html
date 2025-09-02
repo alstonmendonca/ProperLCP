@@ -249,6 +249,48 @@
             const homeBtn = document.getElementById('Home');
             if (homeBtn) homeBtn.click();
         }
+
+        // Machine-specific blank screen detection and recovery
+        setTimeout(() => {
+            const { ipcRenderer } = require('electron');
+            
+            // Check if critical elements are present and visible
+            const topPanel = document.getElementById('top-panel');
+            const mainContent = document.getElementById('main-content');
+            const body = document.body;
+            
+            const isBlankScreen = !topPanel || !mainContent || 
+                                 body.offsetHeight < 100 || 
+                                 body.offsetWidth < 100 ||
+                                 window.getComputedStyle(body).display === 'none';
+            
+            if (isBlankScreen) {
+                console.error('🚨 Machine-specific blank screen detected!');
+                console.log('Debug info:', {
+                    topPanel: !!topPanel,
+                    mainContent: !!mainContent,
+                    bodyHeight: body.offsetHeight,
+                    bodyWidth: body.offsetWidth,
+                    bodyDisplay: window.getComputedStyle(body).display
+                });
+                
+                // Force a repaint and reload
+                document.body.style.display = 'none';
+                setTimeout(() => {
+                    document.body.style.display = '';
+                    
+                    // If still blank, force refresh
+                    setTimeout(() => {
+                        if (body.offsetHeight < 100) {
+                            console.log('🔄 Forcing page refresh for machine-specific fix');
+                            window.location.reload();
+                        }
+                    }, 500);
+                }, 100);
+            } else {
+                console.log('✅ Page loaded successfully with content');
+            }
+        }, 2000);
     });
 </script>
 

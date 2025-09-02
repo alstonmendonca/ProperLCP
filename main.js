@@ -489,6 +489,38 @@ function createMainWindow() {
     }
   });
 
+  // Add machine-specific debugging for blank screen issues
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('✅ Page loaded:', mainWindow.webContents.getURL());
+    
+    // Force a repaint to fix potential rendering issues
+    setTimeout(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.invalidate();
+      }
+    }, 100);
+  });
+
+  // Handle renderer crashes (machine-specific issue)
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('❌ Renderer process crashed:', details);
+    // Restart the window
+    setTimeout(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.reload();
+      }
+    }, 1000);
+  });
+
+  // Handle unresponsive renderer
+  mainWindow.webContents.on('unresponsive', () => {
+    console.warn('⚠️ Renderer became unresponsive');
+  });
+
+  mainWindow.webContents.on('responsive', () => {
+    console.log('✅ Renderer became responsive again');
+  });
+
   mainWindow.loadFile("login.html").catch(console.error);
 
   mainWindow.once("ready-to-show", () => {
@@ -553,15 +585,100 @@ function setupIPC() {
     return store.get("sessionUser") || null;
   });
 
-  ipcMain.handle("logout", () => {
-    store.delete("sessionUser");
-    return true;
+  ipcMain.handle("logout", async () => {
+    try {
+      console.log("🔄 Starting logout process...");
+      
+      // Clear session data
+      store.delete("sessionUser");
+      userRole = null;
+      
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        // Step 1: Stop all current operations
+        mainWindow.webContents.stop();
+        
+        // Step 2: Clear all possible caches
+        await mainWindow.webContents.session.clearStorageData();
+        await mainWindow.webContents.session.clearCache();
+        
+        // Step 3: Force garbage collection if available
+        if (global.gc) {
+          global.gc();
+        }
+        
+        // Step 4: Wait for cleanup
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Step 5: Load login page
+        await mainWindow.loadFile("login.html");
+        
+        // Step 6: Ensure window focus
+        setTimeout(() => {
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.focus();
+          }
+        }, 200);
+        
+        console.log("✅ Logout completed successfully");
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("❌ Error during logout:", error);
+      
+      // Simple fallback: just clear session and reload login
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        try {
+          console.log("� Using simple logout fallback...");
+          await mainWindow.loadFile("login.html");
+        } catch (fallbackError) {
+          console.error("❌ Fallback also failed:", fallbackError);
+        }
+      }
+      
+      return false;
+    }
   });
 
   ipcMain.handle("get-user-role", () => userRole);
 
   ipcMain.handle("get-mongo-port", () => {
     return MONGO_PORT || 34235;
+  });
+
+  // Machine-specific hard reset handler for blank screen issues
+  ipcMain.handle("force-hard-reset", async () => {
+    console.log("🔥 Executing machine-specific hard reset...");
+    
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      try {
+        // Nuclear option: destroy and recreate renderer
+        const bounds = mainWindow.getBounds();
+        const isFullscreen = mainWindow.isFullScreen();
+        
+        // Close current window
+        mainWindow.destroy();
+        
+        // Wait and recreate
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        createMainWindow();
+        
+        if (mainWindow) {
+          mainWindow.setBounds(bounds);
+          if (isFullscreen) {
+            mainWindow.setFullScreen(true);
+          }
+        }
+        
+        return true;
+      } catch (error) {
+        console.error("❌ Hard reset failed:", error);
+        return false;
+      }
+    }
+    
+    return false;
   });
 
   // IPC handler for editing user profile
