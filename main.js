@@ -1973,52 +1973,49 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
 
 ipcMain.handle('test-printer', async (event, { printerName, vendorId, productId, testData }) => {
     if (isPrinting) {
-        throw new Error('Printer is busy with another job');
+        event.sender.send('test-printer-error', 'Printer is busy');
+        return;
     }
     isPrinting = true;
 
     try {
-        let device;
-        
-        if (printerName) {
-            // Use printer name approach (for auto detection)
-            device = new escpos.Network(printerName);
-        } else if (vendorId && productId) {
-            // Use USB vendor/product ID approach (for manual config)
-            const vendorNum = parseInt(vendorId, 16);
-            const productNum = parseInt(productId, 16);
-            device = new escpos.USB(vendorNum, productNum);
-        } else {
-            throw new Error('No printer configuration provided');
+        // Use config from store if not provided
+        const config = store.get('printerConfig', {
+            vendorId: '0x0525',
+            productId: '0xA700'
+        });
+        const vendorNum = parseInt(vendorId || config.vendorId, 16);
+        const productNum = parseInt(productId || config.productId, 16);
+
+        if (isNaN(vendorNum) || isNaN(productNum)) {
+            throw new Error('Invalid printer configuration - please check Vendor/Product IDs');
         }
 
+        const device = new escpos.USB(vendorNum, productNum);
         const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
 
-        // Generate test receipt
         const commands = generateTestReceipt(testData);
 
-        return await new Promise((resolve, reject) => {
-            device.open((error) => {
-                if (error) {
-                    reject(new Error(`Printer connection failed: ${error.message}`));
-                    return;
-                }
+        device.open((err) => {
+            if (err) {
+                event.sender.send('test-printer-error', `Printer connection failed: ${err.message}`);
+                isPrinting = false;
+                return;
+            }
 
-                printer
-                    .raw(Buffer.from(commands, 'utf8'))
-                    .cut()
-                    .close((err) => {
-                        if (err) {
-                            reject(new Error(`Print failed: ${err.message}`));
-                        } else {
-                            resolve(true);
-                        }
-                    });
-            });
+            printer
+                .raw(Buffer.from(commands, 'utf8'))
+                .close((err) => {
+                    if (err) {
+                        event.sender.send('test-printer-error', `Print failed: ${err.message}`);
+                    } else {
+                        event.sender.send('test-printer-success', true);
+                    }
+                    isPrinting = false;
+                });
         });
     } catch (error) {
-        throw error;
-    } finally {
+        event.sender.send('test-printer-error', `System error: ${error.message}`);
         isPrinting = false;
     }
 });

@@ -288,17 +288,25 @@ function initializeBulkEditEvents(popupOverlay) {
         });
     });
 
-    // Search functionality
+    // Enhanced Search functionality
     document.getElementById('bulkSearch').addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
+        const searchTerm = e.target.value.trim().toLowerCase();
         document.querySelectorAll('.bulk-edit-table tbody tr').forEach(row => {
-            const foodName = row.querySelector('input[data-field="fname"]').value.toLowerCase();
-            const shouldShow = foodName.includes(searchTerm);
+            // Get all searchable fields
+            let id = row.querySelector('td.bulk-col-id')?.textContent?.toLowerCase() || "";
+            let foodName = row.querySelector('input[data-field="fname"]')?.value?.toLowerCase() || "";
+            let category = row.querySelector('select[data-field="category"]')?.value?.toLowerCase() || "";
+            // If category is a text cell, fallback
+            if (!category) {
+                category = row.querySelector('td.bulk-col-category')?.textContent?.toLowerCase() || "";
+            }
+            // Match if any field contains the search term
+            const shouldShow = id.includes(searchTerm) || foodName.includes(searchTerm) || category.includes(searchTerm);
             row.style.display = shouldShow ? '' : 'none';
-            
             // If hiding a selected row, uncheck it
-            if (!shouldShow && row.querySelector('.bulk-select-checkbox').checked) {
-                row.querySelector('.bulk-select-checkbox').checked = false;
+            const checkbox = row.querySelector('.bulk-select-checkbox');
+            if (!shouldShow && checkbox?.checked) {
+                checkbox.checked = false;
                 updateRowSelection(row, false);
             }
         });

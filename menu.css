@@ -280,16 +280,16 @@ input:checked + .slider:before {
 }
 
 .bulk-edit-btn {
-    background: linear-gradient(135deg, #059669, #047857);
+    background: linear-gradient(135deg, #0D3B66, #0D3B66);
 }
 
 .bulk-edit-btn:hover {
-    background: #065f46;
+    background: #0D3B66;
     transform: translateY(-1px);
 }
 
 .bulk-edit-btn:not(:hover) {
-    background: #059669;
+    background: #0D3B66;
     transform: translateY(0);
 }
 

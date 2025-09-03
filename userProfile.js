@@ -462,33 +462,65 @@ function showEditProfileModal(user) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(13, 59, 102, 0.85);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 10000;
+        backdrop-filter: blur(8px);
+        animation: modalFadeIn 0.3s ease-out;
+      }
+      
+      @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes modalSlideIn {
+        from { 
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to { 
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
       
       .modal-content {
         background: #ffffff;
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 2rem;
-        width: 440px;
-        max-width: 90vw;
-        max-height: 85vh;
+        width: 420px;
+        max-width: 95vw;
+        max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 6px 24px rgba(13, 59, 102, 0.12);
-        border: 1.5px solid #e5e7eb;
+        box-shadow: 0 20px 60px rgba(13, 59, 102, 0.3);
+        border: 2px solid #0D3B66;
         position: relative;
+        animation: modalSlideIn 0.4s ease-out;
+      }
+      
+      @media (max-width: 1366px) {
+        .modal-content {
+          width: 400px;
+          padding: 1.75rem;
+        }
+      }
+      
+      @media (max-width: 1024px) {
+        .modal-content {
+          width: 380px;
+          padding: 1.5rem;
+        }
       }
       
       .modal-close {
         position: absolute;
-        top: 1.25rem;
-        right: 1.25rem;
-        background: none;
-        border: none;
-        font-size: 1.4rem;
+        top: 1rem;
+        right: 1rem;
+        background: #ffffff;
+        border: 2px solid #0D3B66;
         color: #0D3B66;
         cursor: pointer;
         width: 32px;
@@ -496,82 +528,96 @@ function showEditProfileModal(user) {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 4px;
-        transition: all 0.2s ease;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 18px;
+        font-weight: bold;
+        z-index: 1002;
       }
       
       .modal-close:hover {
         background: #0D3B66;
         color: #ffffff;
+        transform: scale(1.1);
       }
       
       .modal-header {
         text-align: center;
         margin-bottom: 2rem;
-        padding-bottom: 1.25rem;
+        padding-bottom: 1.5rem;
         border-bottom: 2px solid #0D3B66;
+        position: relative;
       }
       
       .modal-header h2 {
         color: #0D3B66;
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.75rem;
+        font-weight: 800;
         margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.75rem;
+        letter-spacing: -0.025em;
       }
       
       .modal-icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         color: #0D3B66;
+        background: #ffffff;
+        padding: 6px;
+        border-radius: 10px;
+        border: 2px solid #0D3B66;
       }
       
       .form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
         position: relative;
       }
       
       .modal-label {
         display: block;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         color: #0D3B66;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         text-align: left;
+        letter-spacing: 0.025em;
       }
       
       .required::after {
         content: " *";
         color: #dc2626;
         font-weight: bold;
+        margin-left: 2px;
       }
       
       .input-wrapper {
         position: relative;
         display: flex;
-        align-items: stretch;
+        align-items: center;
       }
       
       .modal-input {
         width: 100%;
-        height: 48px;
-        padding: 0 1.125rem 0 2.75rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 1rem;
+        height: 44px;
+        padding: 0 1rem 0 2.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
         background: #ffffff;
         box-sizing: border-box;
-        transition: all 0.2s ease;
-        line-height: normal;
+        transition: all 0.3s ease;
+        line-height: 1.5;
       }
       
       .modal-input:focus {
         outline: none;
         border-color: #0D3B66;
-        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.15);
+        background: #ffffff;
+        transform: translateY(-1px);
       }
       
       .modal-input:disabled {
@@ -584,64 +630,76 @@ function showEditProfileModal(user) {
       .input-icon {
         position: absolute;
         left: 0.875rem;
-        top: 50%;
+        top: 22px;
         transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
-        color: #6b7280;
+        width: 18px;
+        height: 18px;
+        color: #0D3B66;
         pointer-events: none;
-        z-index: 1;
+        z-index: 2;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .input-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2;
       }
       
       .modal-input:focus + .input-icon,
       .modal-input:not(:placeholder-shown) + .input-icon {
         color: #0D3B66;
+        transform: translateY(-50%) scale(1.05);
       }
       
       .error-message, .success-message {
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        margin: 1.25rem 0;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
         font-size: 0.9rem;
-        font-weight: 500;
+        font-weight: 600;
         display: none;
         text-align: center;
       }
       
       .error-message {
-        background: #fef2f2;
+        background: #ffffff;
         color: #dc2626;
-        border: 1px solid #fecaca;
+        border: 2px solid #dc2626;
       }
       
       .success-message {
-        background: #f0fdf4;
+        background: #ffffff;
         color: #16a34a;
-        border: 1px solid #bbf7d0;
+        border: 2px solid #16a34a;
       }
       
       .modal-buttons {
         display: flex;
-        gap: 0.75rem;
+        gap: 1rem;
         justify-content: flex-end;
         margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+        border-top: 2px solid #0D3B66;
       }
       
       .modal-btn {
-        padding: 0.625rem 1.25rem;
-        border-radius: 8px;
-        font-weight: 600;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
         font-size: 0.95rem;
         cursor: pointer;
-        border: 1.5px solid #0D3B66;
+        border: 2px solid #0D3B66;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        min-width: 90px;
-        transition: all 0.2s ease;
+        min-width: 120px;
+        transition: all 0.3s ease;
+        letter-spacing: 0.025em;
       }
       
       .modal-btn-secondary {
@@ -650,9 +708,9 @@ function showEditProfileModal(user) {
       }
       
       .modal-btn-secondary:hover {
-        background: #f8fafc;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
+        background: #0D3B66;
+        color: #ffffff;
+        transform: translateY(-2px);
       }
       
       .modal-btn-primary {
@@ -661,26 +719,35 @@ function showEditProfileModal(user) {
       }
       
       .modal-btn-primary:hover:not(:disabled) {
-        background: #1e3a8a;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.25);
+        background: #ffffff;
+        color: #0D3B66;
+        transform: translateY(-2px);
       }
       
       .modal-btn:disabled {
-        opacity: 0.5;
+        opacity: 0.6;
         cursor: not-allowed;
         transform: none !important;
         box-shadow: none !important;
       }
       
+      .modal-btn:disabled::before {
+        display: none;
+      }
+      
       .btn-icon {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
+        transition: transform 0.3s ease;
+      }
+      
+      .modal-btn:hover .btn-icon {
+        transform: scale(1.1);
       }
       
       .loading-spinner-edit {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         border: 2px solid rgba(255, 255, 255, 0.3);
         border-top: 2px solid white;
         border-radius: 50%;
@@ -691,9 +758,25 @@ function showEditProfileModal(user) {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+      
+      @media (max-width: 640px) {
+        .modal-content {
+          width: 95vw;
+          padding: 2rem;
+          margin: 1rem;
+        }
+        
+        .modal-buttons {
+          flex-direction: column;
+        }
+        
+        .modal-btn {
+          width: 100%;
+        }
+      }
     </style>
     
-    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
     
     <div class="modal-header">
       <h2>
@@ -708,9 +791,11 @@ function showEditProfileModal(user) {
       <label class="modal-label">User ID</label>
       <div class="input-wrapper">
         <input type="text" class="modal-input" value="${user.userid || ''}" disabled placeholder="User ID">
-        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
-        </svg>
+        <div class="input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -718,9 +803,11 @@ function showEditProfileModal(user) {
       <label class="modal-label required">Username</label>
       <div class="input-wrapper">
         <input type="text" id="editUsername" class="modal-input" value="${user.username || ''}" placeholder="Enter username">
-        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
+        <div class="input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -728,9 +815,11 @@ function showEditProfileModal(user) {
       <label class="modal-label">Role</label>
       <div class="input-wrapper">
         <input type="text" class="modal-input" value="${user.role ? user.role.toUpperCase() : ''}" disabled placeholder="User Role">
-        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
+        <div class="input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -738,9 +827,11 @@ function showEditProfileModal(user) {
       <label class="modal-label required">Full Name</label>
       <div class="input-wrapper">
         <input type="text" id="editName" class="modal-input" value="${user.name || ''}" placeholder="Enter full name">
-        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
+        <div class="input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -748,9 +839,11 @@ function showEditProfileModal(user) {
       <label class="modal-label required">Email Address</label>
       <div class="input-wrapper">
         <input type="email" id="editEmail" class="modal-input" value="${user.email || ''}" placeholder="Enter email address">
-        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
+        <div class="input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -931,33 +1024,65 @@ function showChangePasswordModal(user) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(13, 59, 102, 0.85);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 10000;
+        backdrop-filter: blur(8px);
+        animation: modalFadeIn 0.3s ease-out;
+      }
+      
+      @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes modalSlideIn {
+        from { 
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to { 
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
       
       .password-modal-content {
         background: #ffffff;
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 2rem;
-        width: 420px;
-        max-width: 90vw;
-        max-height: 85vh;
+        width: 400px;
+        max-width: 95vw;
+        max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 8px 32px rgba(13, 59, 102, 0.15);
+        box-shadow: 0 20px 60px rgba(13, 59, 102, 0.3);
         border: 2px solid #0D3B66;
         position: relative;
+        animation: modalSlideIn 0.4s ease-out;
+      }
+      
+      @media (max-width: 1366px) {
+        .password-modal-content {
+          width: 380px;
+          padding: 1.75rem;
+        }
+      }
+      
+      @media (max-width: 1024px) {
+        .password-modal-content {
+          width: 360px;
+          padding: 1.5rem;
+        }
       }
       
       .password-modal-close {
         position: absolute;
         top: 1rem;
         right: 1rem;
-        background: none;
-        border: none;
-        font-size: 1.4rem;
+        background: #ffffff;
+        border: 2px solid #0D3B66;
         color: #0D3B66;
         cursor: pointer;
         width: 32px;
@@ -965,161 +1090,190 @@ function showChangePasswordModal(user) {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 4px;
-        transition: all 0.2s ease;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 18px;
+        font-weight: bold;
+        z-index: 1002;
       }
       
       .password-modal-close:hover {
         background: #0D3B66;
         color: #ffffff;
+        transform: scale(1.1);
       }
       
       .password-header {
         text-align: center;
         margin-bottom: 2rem;
-        padding-bottom: 1.25rem;
+        padding-bottom: 1.5rem;
+        padding-right: 3rem;
         border-bottom: 2px solid #0D3B66;
+        position: relative;
       }
       
       .password-header h2 {
         color: #0D3B66;
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.75rem;
+        font-weight: 800;
         margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.75rem;
+        letter-spacing: -0.025em;
       }
       
       .password-icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         color: #0D3B66;
+        background: #ffffff;
+        padding: 6px;
+        border-radius: 10px;
+        border: 2px solid #0D3B66;
       }
       
       .password-form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
         position: relative;
       }
       
       .password-modal-label {
         display: block;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         color: #0D3B66;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         text-align: left;
+        letter-spacing: 0.025em;
       }
       
       .password-input-wrapper {
         position: relative;
         display: flex;
-        align-items: stretch;
+        align-items: center;
       }
       
       .password-modal-input {
         width: 100%;
-        height: 48px;
-        padding: 0 1.125rem 0 2.75rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 1rem;
+        height: 44px;
+        padding: 0 1rem 0 2.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
         background: #ffffff;
         box-sizing: border-box;
-        transition: all 0.2s ease;
-        line-height: normal;
+        transition: all 0.3s ease;
+        line-height: 1.5;
       }
       
       .password-modal-input:focus {
         outline: none;
         border-color: #0D3B66;
-        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.15);
+        background: #ffffff;
+        transform: translateY(-1px);
       }
       
       .password-input-icon {
         position: absolute;
         left: 0.875rem;
-        top: 50%;
+        top: 22px;
         transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
-        color: #6b7280;
+        width: 18px;
+        height: 18px;
+        color: #0D3B66;
         pointer-events: none;
-        z-index: 1;
+        z-index: 2;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .password-input-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2;
       }
       
       .password-modal-input:focus + .password-input-icon {
         color: #0D3B66;
+        transform: translateY(-50%) scale(1.05);
       }
       
       .password-help {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         color: #6b7280;
-        margin-top: 0.4rem;
+        margin-top: 0.5rem;
         text-align: left;
+        font-weight: 500;
       }
       
       .strength-meter {
-        height: 6px;
+        height: 8px;
         background: #e5e7eb;
-        border-radius: 3px;
-        margin-top: 0.5rem;
+        border-radius: 6px;
+        margin-top: 0.75rem;
         overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
       }
       
       .strength-fill {
         height: 100%;
-        background: #0D3B66;
-        border-radius: 3px;
+        background: linear-gradient(90deg, #0D3B66, #1e40af);
+        border-radius: 6px;
         width: 0%;
-        transition: width 0.3s ease;
+        transition: all 0.4s ease;
+        box-shadow: 0 2px 8px rgba(13, 59, 102, 0.3);
       }
       
       .password-error, .password-success {
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        margin: 1.25rem 0;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
         font-size: 0.9rem;
-        font-weight: 500;
+        font-weight: 600;
         display: none;
         text-align: center;
       }
       
       .password-error {
-        background: #fef2f2;
+        background: #ffffff;
         color: #dc2626;
-        border: 1px solid #fecaca;
+        border: 2px solid #dc2626;
       }
       
       .password-success {
-        background: #f0fdf4;
+        background: #ffffff;
         color: #16a34a;
-        border: 1px solid #bbf7d0;
+        border: 2px solid #16a34a;
       }
       
       .password-modal-buttons {
         display: flex;
-        gap: 0.75rem;
+        gap: 1rem;
         justify-content: flex-end;
         margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #e5e7eb;
+        padding-top: 2rem;
+        border-top: 2px solid #0D3B66;
       }
       
       .password-modal-btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
         cursor: pointer;
         border: 2px solid #0D3B66;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        min-width: 100px;
-        transition: all 0.2s ease;
+        min-width: 120px;
+        transition: all 0.3s ease;
+        letter-spacing: 0.025em;
       }
       
       .password-modal-btn-secondary {
@@ -1128,9 +1282,9 @@ function showChangePasswordModal(user) {
       }
       
       .password-modal-btn-secondary:hover {
-        background: #f8fafc;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
+        background: #0D3B66;
+        color: #ffffff;
+        transform: translateY(-2px);
       }
       
       .password-modal-btn-primary {
@@ -1139,26 +1293,35 @@ function showChangePasswordModal(user) {
       }
       
       .password-modal-btn-primary:hover:not(:disabled) {
-        background: #1e3a8a;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.25);
+        background: #ffffff;
+        color: #0D3B66;
+        transform: translateY(-2px);
       }
       
       .password-modal-btn:disabled {
-        opacity: 0.5;
+        opacity: 0.6;
         cursor: not-allowed;
         transform: none !important;
         box-shadow: none !important;
       }
       
+      .password-modal-btn:disabled::before {
+        display: none;
+      }
+      
       .password-btn-icon {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
+        transition: transform 0.3s ease;
+      }
+      
+      .password-modal-btn:hover .password-btn-icon {
+        transform: scale(1.1);
       }
       
       .password-loading {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         border: 2px solid rgba(255, 255, 255, 0.3);
         border-top: 2px solid white;
         border-radius: 50%;
@@ -1169,13 +1332,26 @@ function showChangePasswordModal(user) {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+      
+      @media (max-width: 640px) {
+        .password-modal-content {
+          width: 95vw;
+          padding: 2rem;
+          margin: 1rem;
+        }
+        
+        .password-modal-buttons {
+          flex-direction: column;
+        }
+        
+        .password-modal-btn {
+          width: 100%;
+        }
+      }
     </style>
     
     <button class="password-modal-close" onclick="this.closest('.password-modal-overlay').remove()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
+      ×
     </button>
     
     <div class="password-header">
@@ -1193,9 +1369,11 @@ function showChangePasswordModal(user) {
       <label class="password-modal-label">Current Password</label>
       <div class="password-input-wrapper">
         <input type="password" id="currentPassword" class="password-modal-input" placeholder="Enter current password" autocomplete="current-password">
-        <svg class="password-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
+        <div class="password-input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -1203,9 +1381,11 @@ function showChangePasswordModal(user) {
       <label class="password-modal-label">New Password</label>
       <div class="password-input-wrapper">
         <input type="password" id="newPassword" class="password-modal-input" placeholder="Enter new password" autocomplete="new-password">
-        <svg class="password-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-6 7a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
+        <div class="password-input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2l-4.257-2.257A6 6 0 0117 9zm-6 7a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
       </div>
       <div class="password-help">Password must be at least 6 characters long</div>
       <div class="strength-meter">
@@ -1217,9 +1397,11 @@ function showChangePasswordModal(user) {
       <label class="password-modal-label">Confirm New Password</label>
       <div class="password-input-wrapper">
         <input type="password" id="confirmPassword" class="password-modal-input" placeholder="Confirm new password" autocomplete="new-password">
-        <svg class="password-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <div class="password-input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -1436,33 +1618,65 @@ function showAddUserModal(user) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(13, 59, 102, 0.85);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 10000;
+        backdrop-filter: blur(8px);
+        animation: modalFadeIn 0.3s ease-out;
+      }
+      
+      @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes modalSlideIn {
+        from { 
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to { 
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
       
       .add-user-modal-content {
         background: #ffffff;
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 2rem;
-        width: 480px;
-        max-width: 90vw;
-        max-height: 85vh;
+        width: 460px;
+        max-width: 95vw;
+        max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 8px 32px rgba(13, 59, 102, 0.15);
+        box-shadow: 0 20px 60px rgba(13, 59, 102, 0.3);
         border: 2px solid #0D3B66;
         position: relative;
+        animation: modalSlideIn 0.4s ease-out;
+      }
+      
+      @media (max-width: 1366px) {
+        .add-user-modal-content {
+          width: 440px;
+          padding: 1.75rem;
+        }
+      }
+      
+      @media (max-width: 1024px) {
+        .add-user-modal-content {
+          width: 420px;
+          padding: 1.5rem;
+        }
       }
       
       .add-user-close {
         position: absolute;
         top: 1rem;
         right: 1rem;
-        background: none;
-        border: none;
-        font-size: 1.4rem;
+        background: #ffffff;
+        border: 2px solid #0D3B66;
         color: #0D3B66;
         cursor: pointer;
         width: 32px;
@@ -1470,37 +1684,47 @@ function showAddUserModal(user) {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 4px;
-        transition: all 0.2s ease;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 18px;
+        font-weight: bold;
+        z-index: 1002;
       }
       
       .add-user-close:hover {
         background: #0D3B66;
         color: #ffffff;
+        transform: scale(1.1);
       }
       
       .add-user-header {
         text-align: center;
         margin-bottom: 2rem;
-        padding-bottom: 1.25rem;
+        padding-bottom: 1.5rem;
         border-bottom: 2px solid #0D3B66;
+        position: relative;
       }
       
       .add-user-header h2 {
         color: #0D3B66;
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.75rem;
+        font-weight: 800;
         margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.75rem;
+        letter-spacing: -0.025em;
       }
       
       .add-user-icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         color: #0D3B66;
+        background: #ffffff;
+        padding: 6px;
+        border-radius: 10px;
+        border: 2px solid #0D3B66;
       }
       
       .add-user-form-group {
@@ -1511,148 +1735,181 @@ function showAddUserModal(user) {
       .add-user-label {
         display: block;
         margin-bottom: 0.75rem;
-        color: #0D3B66;
+        color: #374151;
         font-weight: 600;
         font-size: 0.95rem;
         text-align: left;
+        letter-spacing: 0.025em;
       }
       
       .add-user-required::after {
         content: " *";
         color: #dc2626;
         font-weight: bold;
+        margin-left: 2px;
       }
       
       .add-user-input-wrapper {
         position: relative;
         display: flex;
-        align-items: stretch;
+        align-items: center;
       }
       
       .add-user-input, .add-user-select {
         width: 100%;
-        height: 48px;
-        padding: 0 1.125rem 0 2.75rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 1rem;
+        height: 44px;
+        padding: 0 1rem 0 2.75rem;
+        border: 2px solid #0D3B66;
+        border-radius: 10px;
+        font-size: 0.95rem;
         background: #ffffff;
         box-sizing: border-box;
-        transition: all 0.2s ease;
-        line-height: normal;
+        transition: all 0.3s ease;
+        line-height: 1.5;
+        color: #0D3B66;
       }
 
       .add-user-input:focus, .add-user-select:focus {
         outline: none;
         border-color: #0D3B66;
-        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.1);
+        box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.15), 0 4px 12px rgba(13, 59, 102, 0.1);
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-1px);
       }
       
       .add-user-input-icon {
         position: absolute;
         left: 0.875rem;
-        top: 50%;
+        top: 22px;
         transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
-        color: #6b7280;
+        width: 18px;
+        height: 18px;
+        color: #0D3B66;
         pointer-events: none;
-        z-index: 1;
-      }      .add-user-input:focus + .add-user-input-icon,
+        z-index: 2;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .add-user-input-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2;
+      }
+      
+      .add-user-input:focus + .add-user-input-icon,
       .add-user-select:focus + .add-user-input-icon {
         color: #0D3B66;
+        transform: translateY(-50%) scale(1.05);
       }
       
       .add-user-help {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         color: #6b7280;
-        margin-top: 0.4rem;
+        margin-top: 0.5rem;
         text-align: left;
+        font-weight: 500;
       }
       
       .add-user-error, .add-user-success {
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        margin: 1.25rem 0;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
         font-size: 0.9rem;
-        font-weight: 500;
+        font-weight: 600;
         display: none;
         text-align: center;
+        backdrop-filter: blur(10px);
       }
       
       .add-user-error {
-        background: #fef2f2;
+        background: rgba(254, 242, 242, 0.9);
         color: #dc2626;
-        border: 1px solid #fecaca;
+        border: 1px solid rgba(252, 165, 165, 0.5);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
       }
       
       .add-user-success {
-        background: #f0fdf4;
+        background: rgba(240, 253, 244, 0.9);
         color: #16a34a;
-        border: 1px solid #bbf7d0;
+        border: 1px solid rgba(187, 247, 208, 0.5);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
       }
       
       .add-user-buttons {
         display: flex;
-        gap: 0.75rem;
+        gap: 1rem;
         justify-content: flex-end;
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #e5e7eb;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(13, 59, 102, 0.1);
       }
       
       .add-user-btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
         cursor: pointer;
-        border: 2px solid #0D3B66;
+        border: 2px solid transparent;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        min-width: 100px;
-        transition: all 0.2s ease;
+        min-width: 120px;
+        transition: all 0.3s ease;
+        letter-spacing: 0.025em;
+        position: relative;
       }
       
       .add-user-btn-secondary {
         background: #ffffff;
         color: #0D3B66;
+        border-color: #0D3B66;
       }
       
       .add-user-btn-secondary:hover {
-        background: #f8fafc;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.15);
+        background: #0D3B66;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(13, 59, 102, 0.3);
       }
       
       .add-user-btn-primary {
         background: #0D3B66;
         color: #ffffff;
+        border-color: #0D3B66;
+        box-shadow: 0 4px 15px rgba(13, 59, 102, 0.3);
       }
       
       .add-user-btn-primary:hover:not(:disabled) {
-        background: #1e3a8a;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(13, 59, 102, 0.25);
+        background: #0a2d4d;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(13, 59, 102, 0.4);
       }
       
       .add-user-btn:disabled {
-        opacity: 0.5;
+        opacity: 0.6;
         cursor: not-allowed;
         transform: none !important;
         box-shadow: none !important;
       }
       
       .add-user-btn-icon {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
+        transition: transform 0.3s ease;
+      }
+      
+      .add-user-btn:hover .add-user-btn-icon {
+        transform: scale(1.1);
       }
       
       .add-user-loading {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         border: 2px solid rgba(255, 255, 255, 0.3);
         border-top: 2px solid white;
         border-radius: 50%;
@@ -1667,7 +1924,7 @@ function showAddUserModal(user) {
       .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1rem;
+        gap: 1.25rem;
       }
       
       @media (max-width: 640px) {
@@ -1676,18 +1933,22 @@ function showAddUserModal(user) {
         }
         
         .add-user-modal-content {
-          width: 90vw;
-          padding: 1.5rem;
+          width: 95vw;
+          padding: 2rem;
+          margin: 1rem;
+        }
+        
+        .add-user-buttons {
+          flex-direction: column;
+        }
+        
+        .add-user-btn {
+          width: 100%;
         }
       }
     </style>
     
-    <button class="add-user-close" onclick="this.closest('.add-user-modal-overlay').remove()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
+    <button class="add-user-close" onclick="this.closest('.add-user-modal-overlay').remove()">×</button>
     
     <div class="add-user-header">
       <h2>
@@ -1705,9 +1966,11 @@ function showAddUserModal(user) {
       <label class="add-user-label add-user-required">Full Name</label>
       <div class="add-user-input-wrapper">
         <input type="text" id="addUserName" class="add-user-input" placeholder="Enter full name" autocomplete="name">
-        <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
+        <div class="add-user-input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -1716,9 +1979,11 @@ function showAddUserModal(user) {
         <label class="add-user-label add-user-required">Username</label>
         <div class="add-user-input-wrapper">
           <input type="text" id="addUserUsername" class="add-user-input" placeholder="Enter username" autocomplete="username">
-          <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+          <div class="add-user-input-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
         </div>
         <div class="add-user-help">Username must be unique</div>
       </div>
@@ -1731,9 +1996,11 @@ function showAddUserModal(user) {
             <option value="staff">Staff Member</option>
             <option value="admin">Administrator</option>
           </select>
-          <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
+          <div class="add-user-input-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -1742,9 +2009,11 @@ function showAddUserModal(user) {
       <label class="add-user-label add-user-required">Email Address</label>
       <div class="add-user-input-wrapper">
         <input type="email" id="addUserEmail" class="add-user-input" placeholder="Enter email address" autocomplete="email">
-        <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
+        <div class="add-user-input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
       </div>
     </div>
     
@@ -1752,9 +2021,11 @@ function showAddUserModal(user) {
       <label class="add-user-label add-user-required">Password</label>
       <div class="add-user-input-wrapper">
         <input type="password" id="addUserPassword" class="add-user-input" placeholder="Enter secure password" autocomplete="new-password">
-        <svg class="add-user-input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
+        <div class="add-user-input-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
       </div>
       <div class="add-user-help">Password must be at least 6 characters long</div>
     </div>
