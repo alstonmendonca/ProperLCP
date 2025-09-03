@@ -1903,7 +1903,103 @@ function saveReceiptTemplate(template) {
   }
 }
 
-// IPC handlers
+// Add this to main.js - print bill only handler
+ipcMain.on("print-bill-only", (event, { billItems, totalAmount, kot, orderId, dateTime }) => {
+    if (isPrinting) {
+        event.sender.send('print-error', 'Printer is busy');
+        return;
+    }
+    isPrinting = true;
+
+    try {
+        const config = store.get('printerConfig', {
+            vendorId: '0x0525',
+            productId: '0xA700'
+        });
+
+        const vendorId = parseInt(config.vendorId, 16);
+        const productId = parseInt(config.productId, 16);
+
+        if (isNaN(vendorId) || isNaN(productId)) {
+            throw new Error('Invalid printer configuration - please check Vendor/Product IDs');
+        }
+
+        const device = new escpos.USB(vendorId, productId);
+        const printer = new escpos.Printer(device, { encoding: 'UTF-8' });
+
+        device.open((err) => {
+            if (err) {
+                event.sender.send('print-error', `Printer connection failed: ${err.message}`);
+                return;
+            }
+
+            // Generate only customer receipt commands (no KOT)
+            const commands = generateBillOnly(billItems, totalAmount, kot, orderId, dateTime);
+            
+            printer
+                .raw(Buffer.from(commands, 'utf8'))
+                .close((err) => {
+                    if (err) {
+                        event.sender.send('print-error', `Print failed: ${err.message}`);
+                    } else {
+                        event.sender.send('print-success');
+                    }
+                });
+        });
+    } catch (error) {
+        event.sender.send('print-error', `System error: ${error.message}`);
+    } finally {
+        isPrinting = false;
+    }
+});
+
+// Function to generate only customer receipt (no KOT)
+function generateBillOnly(items, totalAmount, kot, orderId, dateTime) {
+    const template = loadReceiptTemplate({
+        title: 'THE LASSI CORNER',
+        subtitle: 'SJEC, VAMANJOOR',
+        footer: 'Thank you for visiting!',
+        itemHeader: 'ITEM',
+        qtyHeader: 'QTY',
+        priceHeader: 'PRICE',
+        totalText: 'TOTAL: Rs.',
+        kotItemHeader: 'ITEM',
+        kotQtyHeader: 'QTY'
+    });
+
+    // Adjusted for 80mm paper (~42-48 chars per line)
+    const customerItemWidth = 27;
+    const itemWidth = 35;  // More space for food names
+    const qtyWidth = 8;    // Right-aligned
+    const priceWidth = 5;  // Right-aligned (for decimals)
+    
+    // Format items with better spacing
+    const formattedItems = items.map(item => 
+        `${item.name.substring(0, itemWidth).padEnd(customerItemWidth)}` +
+        `${item.quantity.toString().padEnd(qtyWidth)}` +
+        `${item.price.toFixed(2).padStart(priceWidth)}`
+    ).join('\n');
+    
+    // Customer receipt only (optimized for 80mm)
+    const customerReceipt = `\x1B\x40\x1B\x61\x01\x1D\x21\x11${template.title}
+\x1D\x21\x00\x1B\x61\x01${template.subtitle}
+\x1B\x61\x01\x1D\x21\x11\x1B\x45\x01
+TOKEN: ${kot}
+\x1D\x21\x00\x1B\x45\x00\x1B\x61\x00
+Date:${dateTime || new Date().toLocaleString()}
+Bill #: ${orderId}
+${'-'.repeat(42)}
+\x1B\x45\x01ITEM                      QTY      PRICE 
+\x1B\x45\x00${formattedItems}
+${'-'.repeat(42)}
+\x1B\x45\x01                        TOTAL: Rs.${totalAmount.toFixed(2).padStart(2)}
+\x1B\x45\x00\x1B\x61\x01${template.footer}
+\x1D\x56\x41\x00`;  // Partial cut
+
+    return customerReceipt;
+}
+
+// Saving the billing template after using edits in receipt editor section
 ipcMain.on('get-receipt-template', (event, defaults) => {
   const template = loadReceiptTemplate(defaults);
   event.returnValue = template;

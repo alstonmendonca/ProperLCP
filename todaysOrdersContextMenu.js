@@ -17,8 +17,9 @@ function attachTodaysOrdersContextMenu(selector) {
             const billNo = box.getAttribute("data-billno");
             menu.innerHTML = `
                 <div class="context-option" id="deleteOrder">🗑️ Delete Order (Bill No: ${billNo})</div>
-                <div class="context-option" id="printBill">🖨️ Print Bill (Bill No: ${billNo})</div>
-                <div class="context-option">📄 View Details</div>
+                <div class="context-option" id="printBill">🖨️ Print Bill Only(Bill No: ${billNo})</div>
+                <div class="context-option" id="printKot">🖨️ Print KOT Only(Bill No: ${billNo})</div>
+                <div class="context-option" id="printBillAndKot">🖨️ Print Bill and KOT(Bill No: ${billNo})</div>
             `;
 
             // Handle delete order
@@ -28,8 +29,20 @@ function attachTodaysOrdersContextMenu(selector) {
             });
 
             // Handle print bill
-            menu.querySelector("#printBill").addEventListener("click", () => {
+            menu.querySelector("#printBillAndKot").addEventListener("click", () => {
                 printBill(billNo);
+                menu.remove();
+            });
+
+            // Handle print bill only
+            menu.querySelector("#printBill").addEventListener("click", () => {
+                printBillOnly(billNo);
+                menu.remove();
+            });
+
+            // Handle print KOT only
+            menu.querySelector("#printKot").addEventListener("click", () => {
+                printKOTOnly(billNo);
                 menu.remove();
             });
 
@@ -88,5 +101,87 @@ function openDeleteOrderPopup(billNo, sourceSection) {
         }
     });
 }
+
+// Function to print only the bill (customer receipt)
+function printBillOnly(billno) {
+    // Get the order details from the database
+    ipcRenderer.send("get-order-for-printing", billno);
+    
+    // Handle the response
+    ipcRenderer.once("order-for-printing-response", (event, { order, items }) => {
+        if (!order || !items) {
+            createTextPopup("Failed to load order details for printing");
+            return;
+        }
+        
+        // Prepare the data for printing
+        const printData = {
+            billItems: items.map(item => ({
+                name: item.fname,
+                quantity: item.quantity,
+                price: item.price * item.quantity
+            })),
+            totalAmount: order.price,
+            kot: order.kot,
+            orderId: order.billno,
+            dateTime: order.date
+        };
+        
+        // Send to main process for printing bill only
+        ipcRenderer.send("print-bill-only", printData);
+        
+        // Handle print result
+        ipcRenderer.once('print-success', () => {
+            createTextPopup("Bill printed successfully");
+        });
+        
+        ipcRenderer.once('print-error', (event, error) => {
+            createTextPopup(`Print Failed: ${error}`);
+        });
+    });
+}
+
+// Function to print only KOT
+function printKOTOnly(billno) {
+    // Get the order details from the database
+    ipcRenderer.send("get-order-for-printing", billno);
+    
+    // Handle the response
+    ipcRenderer.once("order-for-printing-response", (event, { order, items }) => {
+        if (!order || !items) {
+            createTextPopup("Failed to load order details for printing");
+            return;
+        }
+        
+        // Prepare the data for printing
+        const printData = {
+            billItems: items.map(item => ({
+                name: item.fname,
+                quantity: item.quantity,
+                price: item.price * item.quantity
+            })),
+            totalAmount: order.price,
+            kot: order.kot,
+            orderId: order.billno,
+            dateTime: order.date
+        };
+        
+        // Send to main process for printing KOT only
+        ipcRenderer.send("print-kot-only", printData);
+        
+        // Handle print result
+        ipcRenderer.once('print-kot-success', () => {
+            createTextPopup("KOT printed successfully");
+        });
+        
+        ipcRenderer.once('print-error', (event, error) => {
+            createTextPopup(`Print Failed: ${error}`);
+        });
+    });
+}
+
+// Make these functions available globally
+window.printBillOnly = printBillOnly;
+window.printKOTOnly = printKOTOnly;
 
 module.exports = { attachTodaysOrdersContextMenu};
