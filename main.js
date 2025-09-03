@@ -566,6 +566,10 @@ function setupIPC() {
       if (response.data.success) {
         const user = response.data.user;
         console.log("Login successful:", user);
+        
+        // Set the user role for IPC access
+        userRole = user.role;
+        
         await startGetOnlineServer();
         await checkAndResetFoodItems();
         await syncFoodItemsToMongo();

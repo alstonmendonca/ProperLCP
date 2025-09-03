@@ -145,16 +145,18 @@ function resetBill() {
     // Remove or reset the discount fields
     let discountField = document.getElementById("discounted-total");
     if (discountField) {
-        discountField.value = 0;
+        discountField.remove(); // Remove completely instead of just setting value
     }
 
     let discountPercentageInput = document.getElementById("discount-percentage");
     let discountAmountInput = document.getElementById("discount-amount");
     if (discountPercentageInput) {
         discountPercentageInput.value = "";
+        discountPercentageInput.disabled = false; // Re-enable in case it was disabled
     }
     if (discountAmountInput) {
         discountAmountInput.value = "";
+        discountAmountInput.disabled = false; // Re-enable in case it was disabled
     }
 
     // Update the total bill amount
@@ -288,7 +290,11 @@ async function saveBill() {
 
     // Check if a discounted total exists, otherwise use the original totalAmount
     let discountField = document.getElementById("discounted-total");
-    let discountedTotal = discountField && discountField.value ? parseFloat(discountField.value) : totalAmount;
+    let discountedTotal = totalAmount; // Default to original total
+    
+    if (discountField && discountField.value && parseFloat(discountField.value) !== totalAmount) {
+        discountedTotal = parseFloat(discountField.value);
+    }
 
     // Send order data to main process with discount applied (or not)
     ipcRenderer.send("save-bill", { cashier, date, orderItems, totalAmount: discountedTotal });
@@ -328,9 +334,13 @@ async function saveAndPrintBill() {
         return;
     }
 
-    // Handle discount
+    // Handle discount - only use discount if it exists and has a valid value
     let discountField = document.getElementById("discounted-total");
-    let discountedTotal = discountField?.value ? parseFloat(discountField.value) : totalAmount;
+    let discountedTotal = totalAmount; // Default to original total
+    
+    if (discountField && discountField.value && parseFloat(discountField.value) !== totalAmount) {
+        discountedTotal = parseFloat(discountField.value);
+    }
 
     // Prepare items for printing
     const itemsForPrinting = Array.from(billItems).map(item => ({
@@ -358,6 +368,7 @@ async function saveAndPrintBill() {
 
             ipcRenderer.once("print-success-with-data", () => {
                 DeductInventory();
+                clearAllDiscountFields(); // Clear discount immediately after successful print
                 const billPanel = document.getElementById("bill-panel");
                 billPanel.classList.add("glow");
 
@@ -371,6 +382,7 @@ async function saveAndPrintBill() {
                 // Even if final print fails, at least we tested the printer was available
                 createTextPopup(`Print failed after saving: ${error}`);
                 DeductInventory();
+                clearAllDiscountFields(); // Clear discount even if print fails
                 const billPanel = document.getElementById("bill-panel");
                 billPanel.classList.add("glow");
 
@@ -413,9 +425,13 @@ async function saveAndPrintKOT() {
         return;
     }
 
-    // Handle discount
+    // Handle discount - only use discount if it exists and has a valid value
     let discountField = document.getElementById("discounted-total");
-    let discountedTotal = discountField?.value ? parseFloat(discountField.value) : totalAmount;
+    let discountedTotal = totalAmount; // Default to original total
+    
+    if (discountField && discountField.value && parseFloat(discountField.value) !== totalAmount) {
+        discountedTotal = parseFloat(discountField.value);
+    }
 
     // Prepare items for printing
     const itemsForPrinting = Array.from(billItems).map(item => ({
@@ -1766,6 +1782,36 @@ function closeTodaysOrdersPopup() {
 // ------------ SAVE TO ORDER FUNCTIONALITY ENDS HERE ------------------
 function NewOrder() {
     resetBill();
+    // Extra safety: ensure all discount-related fields are properly cleared
+    clearAllDiscountFields();
+}
+
+// Helper function to completely clear all discount-related fields
+function clearAllDiscountFields() {
+    // Remove the hidden discounted-total field completely
+    let discountField = document.getElementById("discounted-total");
+    if (discountField) {
+        discountField.remove();
+    }
+    
+    // Clear visible discount input fields
+    let discountPercentageInput = document.getElementById("discount-percentage");
+    let discountAmountInput = document.getElementById("discount-amount");
+    
+    if (discountPercentageInput) {
+        discountPercentageInput.value = "";
+        discountPercentageInput.disabled = false;
+    }
+    if (discountAmountInput) {
+        discountAmountInput.value = "";
+        discountAmountInput.disabled = false;
+    }
+    
+    // Reset discount display
+    let discountDisplay = document.getElementById("discount-applied-display");
+    if (discountDisplay) {
+        discountDisplay.textContent = "Discount: ₹0.00";
+    }
 }
 // ----------------ONLINE ORDERS FUNCTIONALITY STARTS HERE ------------------
 function getOnlineOrders() {

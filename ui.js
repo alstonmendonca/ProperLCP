@@ -1,6 +1,21 @@
 const { loadInventory } = require('./inventoryList');
 const { loadYearWiseAnalysis } = require('./yearWise');
 
+// Helper function to get user role with fallback
+async function getUserRole() {
+    try {
+        let userRole = await ipcRenderer.invoke("get-user-role");
+        // Fallback to localStorage if IPC fails
+        if (!userRole) {
+            userRole = localStorage.getItem('userRole');
+        }
+        return userRole;
+    } catch (error) {
+        console.error("Error getting user role:", error);
+        return localStorage.getItem('userRole');
+    }
+}
+
 // Function to handle category button clicks
 async function updateMainContent(contentType) {
     const mainContent = document.getElementById("main-content");
@@ -301,11 +316,29 @@ async function updateMainContent(contentType) {
         }
 
         else if (contentType === 'orderHistory') {
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await getUserRole();
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             loadOrderHistory(mainContent, billPanel);
         } else if (contentType === 'categoryHistory') {
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await getUserRole();
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             loadCategoryHistory(mainContent, billPanel);
         }
          else if (contentType === "deletedOrders") {
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await getUserRole();
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
             billPanel.style.display = 'none'; // Hide bill panel for History
@@ -355,6 +388,12 @@ async function updateMainContent(contentType) {
             }
         }
         else if (contentType === 'discountedOrders') {
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await ipcRenderer.invoke("get-user-role");
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
             billPanel.style.display = 'none'; 
@@ -423,12 +462,30 @@ async function updateMainContent(contentType) {
             fetchDiscountedOrders(storedStartDate, storedEndDate);
         }
         else if (contentType === 'customer') {
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await ipcRenderer.invoke("get-user-role");
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             loadCustomers(mainContent, billPanel);
         }
         else if(contentType === "searchOrder"){
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await ipcRenderer.invoke("get-user-role");
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             loadSearchOrder(mainContent,billPanel);
         }
         else if (contentType === 'itemHistory') {
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await ipcRenderer.invoke("get-user-role");
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             mainContent.style.marginLeft = "200px";
             mainContent.style.marginRight = "0px";
             billPanel.style.display = 'none'; // Hide bill panel for History
@@ -497,12 +554,30 @@ async function updateMainContent(contentType) {
         }
         
         else if(contentType === "dayWise"){
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await ipcRenderer.invoke("get-user-role");
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             loadDayWiseAnalysis(mainContent, billPanel);
         }
         else if(contentType === "monthWise"){
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await ipcRenderer.invoke("get-user-role");
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             loadMonthWiseAnalysis(mainContent, billPanel);
         }
         else if(contentType === "yearWise"){
+            // Check if user is staff - if so, redirect to todaysOrders
+            const userRole = await ipcRenderer.invoke("get-user-role");
+            if (userRole === 'staff') {
+                updateMainContent('todaysOrders');
+                return;
+            }
             loadYearWiseAnalysis(mainContent, billPanel);
         }
 

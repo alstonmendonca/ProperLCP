@@ -123,7 +123,11 @@ ipcRenderer.on('set-user-role', (event, role) => {
         if (role === 'staff') {
             console.log("Hiding buttons for staff via 'set-user-role'");
             document.getElementById('Analytics').style.display = 'none';
-            document.getElementById('History').style.display = 'none';
+            // Ensure History tab is visible for staff (they should have limited access)
+            const historyTab = document.getElementById('History');
+            if (historyTab) {
+                historyTab.style.display = 'block';
+            }
         }
     }
 });

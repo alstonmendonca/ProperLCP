@@ -1,6 +1,21 @@
 // leftPanel.js
 const { ipcRenderer } = require('electron');
 
+// Helper function to get user role with fallback
+async function getUserRole() {
+    try {
+        let userRole = await ipcRenderer.invoke("get-user-role");
+        // Fallback to localStorage if IPC fails
+        if (!userRole) {
+            userRole = localStorage.getItem('userRole');
+        }
+        return userRole;
+    } catch (error) {
+        console.error("Error getting user role:", error);
+        return localStorage.getItem('userRole');
+    }
+}
+
 // Function to dynamically update the left panel (category or settings buttons)
 async function updateLeftPanel(contentType) {
     const categoryPanel = document.getElementById("category-panel");
@@ -78,29 +93,53 @@ async function updateLeftPanel(contentType) {
 
         case "History":
             categoryPanel.style.display = "block";
-            categoryPanel.innerHTML = `
-                <button class="category" id="todaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
-                <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
-                <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
-                <button class="category" id="itemHistory" onclick="updateMainContent('itemHistory')">Item History</button>
-                <button class="category" id="dayWise" onclick="updateMainContent('dayWise')">Day-wise</button>
-                <button class="category" id="monthWise" onclick="updateMainContent('monthWise')">Month-wise</button>
-                <button class="category" id="yearWise" onclick="updateMainContent('yearWise')">Year-wise</button>
-                <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
-                <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
-                <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
-                <button class="category" id="searchOrder" onclick="updateMainContent('searchOrder')">Search Order</button>
-            `;
+            
+            // Get user role from multiple sources for reliability
+            const userRole = await getUserRole();
+            
+            console.log("Current user role in History section:", userRole);
+            
+            if (userRole === 'staff') {
+                // Staff users only see Today's Orders
+                categoryPanel.innerHTML = `
+                    <button class="category" id="todaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
+                `;
+            } else {
+                // Admin users see all history options
+                categoryPanel.innerHTML = `
+                    <button class="category" id="todaysOrders" onclick="updateMainContent('todaysOrders')">Todays Orders</button>
+                    <button class="category" id="orderHistory" onclick="updateMainContent('orderHistory')">Order History</button>
+                    <button class="category" id="categoryHistory" onclick="updateMainContent('categoryHistory')">Category-wise</button>
+                    <button class="category" id="itemHistory" onclick="updateMainContent('itemHistory')">Item History</button>
+                    <button class="category" id="dayWise" onclick="updateMainContent('dayWise')">Day-wise</button>
+                    <button class="category" id="monthWise" onclick="updateMainContent('monthWise')">Month-wise</button>
+                    <button class="category" id="yearWise" onclick="updateMainContent('yearWise')">Year-wise</button>
+                    <button class="category" id="discountedOrders" onclick="updateMainContent('discountedOrders')">Discounted Orders</button>
+                    <button class="category" id="deletedOrders" onclick="updateMainContent('deletedOrders')">Deleted Orders</button>
+                    <button class="category" id="customer" onclick="updateMainContent('customer')">Customers</button>
+                    <button class="category" id="searchOrder" onclick="updateMainContent('searchOrder')">Search Order</button>
+                `;
+            }
 
             // Highlight the active history button
             const lastHistoryButton = sessionStorage.getItem('lastHistoryButton');
-            if (lastHistoryButton) {
-                const buttonToHighlight = document.getElementById(lastHistoryButton);
-                if (buttonToHighlight) {
-                    buttonToHighlight.classList.add('active');
+            if (userRole === 'staff') {
+                // For staff, always highlight and default to "todaysOrders"
+                const todaysOrdersButton = document.getElementById('todaysOrders');
+                if (todaysOrdersButton) {
+                    todaysOrdersButton.classList.add('active');
                 }
+                sessionStorage.setItem('lastHistoryButton', 'todaysOrders');
             } else {
-                document.getElementById('todaysOrders').classList.add('active');
+                // For admin, use normal highlighting logic
+                if (lastHistoryButton) {
+                    const buttonToHighlight = document.getElementById(lastHistoryButton);
+                    if (buttonToHighlight) {
+                        buttonToHighlight.classList.add('active');
+                    }
+                } else {
+                    document.getElementById('todaysOrders').classList.add('active');
+                }
             }
             break;
 
