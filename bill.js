@@ -66,12 +66,53 @@ function addToBill(itemId, itemName, price, quantity, category = null) {
             itemNameSpan.classList.add("bill-item-name");
             itemNameSpan.textContent = itemName;
 
+            // Create quantity container with decrease/increase buttons
+            const quantityContainer = document.createElement("div");
+            quantityContainer.classList.add("quantity-container");
+            quantityContainer.style.display = "flex";
+            quantityContainer.style.alignItems = "center";
+            quantityContainer.style.gap = "5px";
+
+            const decreaseBtn = document.createElement("button");
+            decreaseBtn.textContent = "-";
+            decreaseBtn.classList.add("quantity-btn", "decrease-btn");
+            decreaseBtn.style.width = "25px";
+            decreaseBtn.style.height = "25px";
+            decreaseBtn.style.border = "1px solid #ccc";
+            decreaseBtn.style.background = "#0D3B66";
+            decreaseBtn.style.cursor = "pointer";
+            decreaseBtn.onclick = () => {
+                const quantityInput = document.querySelector(`#bill-item-${itemId} .bill-quantity`);
+                let newQuantity = Math.max(1, parseInt(quantityInput.value) - 1);
+                quantityInput.value = newQuantity;
+                updateQuantityInput(itemId, price);
+            };
+
             const quantityInput = document.createElement("input");
             quantityInput.type = "number";
             quantityInput.classList.add("bill-quantity");
             quantityInput.value = quantity;
             quantityInput.min = 1;
+            quantityInput.style.width = "60px";
+            quantityInput.style.textAlign = "center";
             quantityInput.addEventListener("input", () => updateQuantityInput(itemId, price));
+
+            const increaseBtn = document.createElement("button");
+            increaseBtn.textContent = "+";
+            increaseBtn.classList.add("quantity-btn", "increase-btn");
+            increaseBtn.style.width = "25px";
+            increaseBtn.style.height = "25px";
+            increaseBtn.style.border = "1px solid #ccc";
+            increaseBtn.style.background = "#0D3B66";
+            increaseBtn.style.cursor = "pointer";
+            increaseBtn.onclick = () => {
+                const quantityInput = document.querySelector(`#bill-item-${itemId} .bill-quantity`);
+                let newQuantity = parseInt(quantityInput.value) + 1;
+                quantityInput.value = newQuantity;
+                updateQuantityInput(itemId, price);
+            };
+
+            quantityContainer.append(decreaseBtn, quantityInput, increaseBtn);
 
             const timesSpan = document.createElement("span");
             timesSpan.textContent = " x ";
@@ -91,7 +132,7 @@ function addToBill(itemId, itemName, price, quantity, category = null) {
             removeBtn.textContent = "Remove";
             removeBtn.onclick = () => removeFromBill(itemId);
 
-            billItemRow.append(itemNameSpan, quantityInput, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
+            billItemRow.append(itemNameSpan, quantityContainer, timesSpan, priceSpan, equalsSpan, totalSpan, removeBtn);
             requestAnimationFrame(() => {
                 billItemRow.classList.add("show");
             });
