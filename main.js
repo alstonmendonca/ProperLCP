@@ -9,20 +9,188 @@ const { fork, spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater')
 const log = require('electron-log')
 
+// Progress window for update download
+let updateProgressWindow = null;
+
 autoUpdater.logger = log
 autoUpdater.logger.transports.file.level = 'info'
+
+// Check for updates available
+autoUpdater.on('update-available', (info) => {
+  console.log('🔄 Update available:', info);
+  
+  // Show dialog that update is required
+  dialog.showMessageBox({
+    type: "warning",
+    buttons: ["OK"],
+    title: "Update Required",
+    message: "A critical update is available and will be downloaded automatically. The application will restart once the update is complete.",
+    detail: `Version ${info.version} is now available.`
+  });
+  
+  // Create progress window
+  createUpdateProgressWindow();
+});
+
+// Download progress
+autoUpdater.on('download-progress', (progressObj) => {
+  const percent = Math.round(progressObj.percent);
+  console.log(`📥 Download progress: ${percent}%`);
+  
+  if (updateProgressWindow) {
+    updateProgressWindow.webContents.send('update-progress', {
+      percent: percent,
+      transferred: progressObj.transferred,
+      total: progressObj.total,
+      bytesPerSecond: progressObj.bytesPerSecond
+    });
+  }
+});
+
+// Update downloaded - force restart
 autoUpdater.on("update-downloaded", (info) => {
   console.log("📦 Update downloaded", info);
+  
+  if (updateProgressWindow) {
+    updateProgressWindow.close();
+    updateProgressWindow = null;
+  }
 
   dialog.showMessageBox({
     type: "info",
-    buttons: ["Restart Now", "Later"],
+    buttons: ["Restart Now"],
     title: "Update Ready",
-    message: "A new version has been downloaded. Restart now to install?"
-  }).then(result => {
-    if (result.response === 0) autoUpdater.quitAndInstall();
+    message: "The update has been downloaded and will be installed now. The application will restart automatically.",
+    detail: "This is a mandatory update and cannot be postponed."
+  }).then(() => {
+    autoUpdater.quitAndInstall(false, true);
   });
 });
+
+// Handle update errors
+autoUpdater.on('error', (error) => {
+  console.error('❌ Update error:', error);
+  
+  if (updateProgressWindow) {
+    updateProgressWindow.close();
+    updateProgressWindow = null;
+  }
+  
+  dialog.showErrorBox('Update Error', 
+    'Failed to download update. The application will close and you must manually update to continue using the software.'
+  );
+  
+  // Force close the app if update fails
+  setTimeout(() => {
+    app.quit();
+  }, 5000);
+});
+
+// Function to create update progress window
+function createUpdateProgressWindow() {
+  updateProgressWindow = new BrowserWindow({
+    width: 400,
+    height: 200,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    center: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  // Create HTML content for progress window
+  const progressHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Downloading Update</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 160px;
+                box-sizing: border-box;
+            }
+            .title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .progress-container {
+                width: 300px;
+                height: 20px;
+                background-color: rgba(255,255,255,0.3);
+                border-radius: 10px;
+                overflow: hidden;
+                margin-bottom: 10px;
+            }
+            .progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, #4CAF50, #45a049);
+                width: 0%;
+                transition: width 0.3s ease;
+                border-radius: 10px;
+            }
+            .progress-text {
+                font-size: 14px;
+                text-align: center;
+                margin-top: 5px;
+            }
+            .speed-text {
+                font-size: 12px;
+                text-align: center;
+                opacity: 0.8;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="title">📥 Downloading Critical Update...</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+        <div class="speed-text" id="speedText">Preparing download...</div>
+        
+        <script>
+            const { ipcRenderer } = require('electron');
+            
+            ipcRenderer.on('update-progress', (event, data) => {
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+                const speedText = document.getElementById('speedText');
+                
+                progressBar.style.width = data.percent + '%';
+                progressText.textContent = data.percent + '%';
+                
+                const speedMB = (data.bytesPerSecond / 1024 / 1024).toFixed(2);
+                const transferredMB = (data.transferred / 1024 / 1024).toFixed(2);
+                const totalMB = (data.total / 1024 / 1024).toFixed(2);
+                
+                speedText.textContent = \`\${transferredMB} / \${totalMB} MB (\${speedMB} MB/s)\`;
+            });
+        </script>
+    </body>
+    </html>
+  `;
+
+  updateProgressWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(progressHTML));
+  
+  updateProgressWindow.on('closed', () => {
+    updateProgressWindow = null;
+  });
+}
 let mainWindow;
 let splash;
 let userRole = null;
@@ -775,17 +943,24 @@ function setupIPC() {
 
 // === App lifecycle ===
 app.whenReady().then(async () => {
-    autoUpdater.checkForUpdatesAndNotify();
-  createSplash();
+    // Check for updates first - this is mandatory
+    try {
+        autoUpdater.checkForUpdatesAndNotify();
+    } catch (error) {
+        console.error('Failed to check for updates:', error);
+        // Continue app startup even if update check fails
+    }
+    
+    createSplash();
 
-  try {
-    await runStartupTasks();
-    createMainWindow();
-    setupIPC();
-  } catch (err) {
-    console.error("Startup error:", err);
-    if (splash) splash.close();
-  }
+    try {
+        await runStartupTasks();
+        createMainWindow();
+        setupIPC();
+    } catch (err) {
+        console.error("Startup error:", err);
+        if (splash) splash.close();
+    }
 });
 
 app.on("activate", () => {
@@ -812,6 +987,12 @@ function closeDatabase() {
 
 app.on('will-quit', () => {
   console.log("App is quitting. Cleaning up...");
+
+  // Close update progress window if it exists
+  if (updateProgressWindow) {
+    updateProgressWindow.close();
+    updateProgressWindow = null;
+  }
 
   if (onlineProcess) {
     onlineProcess.kill('SIGTERM');
