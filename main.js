@@ -4231,6 +4231,64 @@ ipcMain.on('restore-database', async (event) => {
     }
 });
 
+// Local database backup handler
+ipcMain.on('backup-database-local', async (event) => {
+    const { backupLCdbLocal } = require('./backup');
+    
+    try {
+        // Show save dialog to let user choose backup location
+        const { dialog } = require('electron');
+        const result = await dialog.showSaveDialog(mainWindow, {
+            title: 'Save Database Backup',
+            defaultPath: `LC_backup_${new Date().toISOString().split('T')[0]}.db`,
+            filters: [
+                { name: 'Database Files', extensions: ['db'] },
+                { name: 'All Files', extensions: ['*'] }
+            ]
+        });
+
+        if (result.canceled) {
+            event.reply('backup-local-completed', false, null);
+            return;
+        }
+
+        const success = await backupLCdbLocal(result.filePath);
+        event.reply('backup-local-completed', success, success ? result.filePath : null);
+    } catch (error) {
+        console.error('Local backup failed:', error);
+        event.reply('backup-local-completed', false, null);
+    }
+});
+
+// Local database restore handler
+ipcMain.on('restore-database-local', async (event) => {
+    const { restoreLCdbLocal } = require('./restore');
+    
+    try {
+        // Show open dialog to let user select backup file
+        const { dialog } = require('electron');
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: 'Select Database Backup to Restore',
+            filters: [
+                { name: 'Database Files', extensions: ['db'] },
+                { name: 'All Files', extensions: ['*'] }
+            ],
+            properties: ['openFile']
+        });
+
+        if (result.canceled || result.filePaths.length === 0) {
+            event.reply('restore-local-completed', false, null);
+            return;
+        }
+
+        const success = await restoreLCdbLocal(result.filePaths[0]);
+        event.reply('restore-local-completed', success, success ? result.filePaths[0] : null);
+    } catch (error) {
+        console.error('Local restore failed:', error);
+        event.reply('restore-local-completed', false, null);
+    }
+});
+
 
 // ---------------------------------- BACKUP AND RESTORE SECTION ENDS HERE -------------------
 
