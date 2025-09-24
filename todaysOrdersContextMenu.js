@@ -102,6 +102,45 @@ function openDeleteOrderPopup(billNo, sourceSection) {
     });
 }
 
+// Function to print both bill and KOT
+function printBill(billno) {
+    // Get the order details from the database
+    ipcRenderer.send("get-order-for-printing", billno);
+    
+    // Handle the response
+    ipcRenderer.once("order-for-printing-response", (event, { order, items }) => {
+        if (!order || !items) {
+            createTextPopup("Failed to load order details for printing");
+            return;
+        }
+        
+        // Prepare the data for printing - calculate total price per line item like in bill.js
+        const printData = {
+            billItems: items.map(item => ({
+                name: item.fname,
+                quantity: item.quantity,
+                price: parseFloat(item.price) * parseInt(item.quantity) // Total price for this line item
+            })),
+            totalAmount: order.price,
+            kot: order.kot,
+            orderId: order.billno,
+            dateTime: order.date
+        };
+        
+        // Send to main process for printing both bill and KOT
+        ipcRenderer.send("print-bill", printData);
+        
+        // Handle print result
+        ipcRenderer.once('print-success', () => {
+            createTextPopup("Bill and KOT printed successfully");
+        });
+        
+        ipcRenderer.once('print-error', (event, error) => {
+            createTextPopup(`Print Failed: ${error}`);
+        });
+    });
+}
+
 // Function to print only the bill (customer receipt)
 function printBillOnly(billno) {
     // Get the order details from the database
@@ -114,12 +153,12 @@ function printBillOnly(billno) {
             return;
         }
         
-        // Prepare the data for printing
+        // Prepare the data for printing - calculate total price per line item like in bill.js
         const printData = {
             billItems: items.map(item => ({
                 name: item.fname,
                 quantity: item.quantity,
-                price: item.price * item.quantity
+                price: parseFloat(item.price) * parseInt(item.quantity) // Total price for this line item
             })),
             totalAmount: order.price,
             kot: order.kot,
@@ -153,12 +192,12 @@ function printKOTOnly(billno) {
             return;
         }
         
-        // Prepare the data for printing
+        // Prepare the data for printing - calculate total price per line item like in bill.js
         const printData = {
             billItems: items.map(item => ({
                 name: item.fname,
                 quantity: item.quantity,
-                price: item.price * item.quantity
+                price: parseFloat(item.price) * parseInt(item.quantity) // Total price for this line item
             })),
             totalAmount: order.price,
             kot: order.kot,
@@ -181,6 +220,7 @@ function printKOTOnly(billno) {
 }
 
 // Make these functions available globally
+window.printBill = printBill;
 window.printBillOnly = printBillOnly;
 window.printKOTOnly = printKOTOnly;
 

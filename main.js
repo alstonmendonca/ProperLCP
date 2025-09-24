@@ -2026,15 +2026,14 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
         SELECT * FROM Orders WHERE billno = ?;
     `;
     
-    // Updated query to calculate item price based on order total and quantities
+    // Get actual item prices from FoodItem table
     const itemsQuery = `
         SELECT 
             f.fname,
-            od.quantity,
-            (o.price / (SELECT SUM(quantity) FROM OrderDetails WHERE orderid = o.billno)) as item_price
+            f.cost as item_price,
+            od.quantity
         FROM OrderDetails od
         JOIN FoodItem f ON od.foodid = f.fid
-        JOIN Orders o ON od.orderid = o.billno
         WHERE od.orderid = ?;
     `;
     
@@ -2057,10 +2056,11 @@ ipcMain.on('get-order-for-printing', (event, billno) => {
                 return;
             }
             
-            // Calculate total price for each item (quantity * item_price)
+            // Format items with individual prices (not total prices)
             const processedItems = items.map(item => ({
-                ...item,
-                price: item.quantity * item.item_price
+                fname: item.fname,
+                quantity: item.quantity,
+                price: item.item_price // Individual item price, not total
             }));
             
             event.reply('order-for-printing-response', { 
