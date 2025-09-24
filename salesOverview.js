@@ -7,7 +7,7 @@ function loadSalesOverview(mainContent, billPanel) {
     mainContent.style.marginLeft = "200px";
     mainContent.style.marginRight = "0px";
 
-    // Create the HTML structure for the Sales Overview
+    // Create the HTML structure for the Sales Overview with updated header
     mainContent.innerHTML = `
         <h2 class="salesOverviewTitle" style="
             font-size: 2.5rem; /* Increase font size */
@@ -35,7 +35,7 @@ function loadSalesOverview(mainContent, billPanel) {
                     <tr>
                         <th style="padding: 10px; cursor: pointer; border-right: 1px solid #fff;" onclick="sortSalesOverviewTable('date')">Date <span id="dateSortIndicator">▲</span></th>
                         <th style="padding: 10px; cursor: pointer; border-right: 1px solid #fff;" onclick="sortSalesOverviewTable('sales')">Total Sales <span id="salesSortIndicator"></span></th>
-                        <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('revenue')">Total Revenue <span id="revenueSortIndicator"></span></th>
+                        <th style="padding: 10px; cursor: pointer;" onclick="sortSalesOverviewTable('revenue')">Total Revenue (₹0.00) <span id="revenueSortIndicator"></span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -153,12 +153,20 @@ async function displaySalesOverview(startDate, endDate) {
 
         if (salesData.length === 0) {
             salesTableBody.innerHTML = `<tr><td colspan="3">No sales data found for the selected date range.</td></tr>`;
+            // Reset total revenue to 0 when no data
+            updateTotalRevenueHeader(0);
             return;
         }
 
+        // Calculate total revenue for the header
+        let totalRevenue = 0;
+        
         salesData.forEach((data) => {
             // Format the date in "Day-Month-Year" format
             const formattedDate = formatDate(data.date);
+
+            // Add to total revenue (handle potential null/undefined values)
+            totalRevenue += parseFloat(data.totalRevenue) || 0;
 
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -168,9 +176,28 @@ async function displaySalesOverview(startDate, endDate) {
             `;
             salesTableBody.appendChild(row);
         });
+
+        // Update the header with total revenue
+        updateTotalRevenueHeader(totalRevenue);
+
     } catch (error) {
         console.error("Error fetching sales overview data:", error);
         createTextPopup("An error occurred while fetching sales data.");
+        // Reset total revenue on error
+        updateTotalRevenueHeader(0);
+    }
+}
+
+// New function to update the Total Revenue header with the sum
+function updateTotalRevenueHeader(totalRevenue) {
+    const revenueHeader = document.querySelector('#salesTable thead th:nth-child(3)');
+    if (revenueHeader) {
+        // Get the current sort indicator
+        const sortIndicator = document.getElementById("revenueSortIndicator");
+        const indicatorText = sortIndicator ? sortIndicator.innerText : '';
+        
+        // Update header with total revenue
+        revenueHeader.innerHTML = `Total Revenue (₹${totalRevenue.toFixed(2)}) <span id="revenueSortIndicator">${indicatorText}</span>`;
     }
 }
 
@@ -212,7 +239,7 @@ function sortSalesOverviewTable(column) {
     }
     rows.forEach(row => table.appendChild(row));
 
-    // Update the sort indicators
+    // Update the sort indicators (this will preserve the total revenue display)
     updateSortIndicators(column);
 }
 
