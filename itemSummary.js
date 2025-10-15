@@ -111,6 +111,10 @@ function displayItemSummary(items) {
 
     // Add rows for each category
     Object.keys(groupedItems).forEach(category => {
+        // Calculate total revenue for this category
+        const categoryTotal = groupedItems[category].reduce((sum, item) => sum + item.revenue, 0);
+        const totalQuantity = groupedItems[category].reduce((sum, item) => sum + item.quantity, 0);
+        
         tableHTML += `
             <tr class="category-row">
                 <td colspan="3"><strong>${category}</strong></td>
@@ -125,6 +129,14 @@ function displayItemSummary(items) {
                 </tr>
             `;
         });
+        // Add category total row
+        tableHTML += `
+            <tr class="category-total-row" style="background-color: #f0f0f0; font-weight: bold;">
+                <td style="text-align: right; padding-right: 10px;">Total ${category}:</td>
+                <td>${totalQuantity}</td>
+                <td>₹${categoryTotal.toFixed(2)}</td>
+            </tr>
+        `;
     });
 
     tableHTML += `

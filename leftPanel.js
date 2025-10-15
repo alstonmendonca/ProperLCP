@@ -181,6 +181,115 @@ async function updateLeftPanel(contentType) {
             activeCategoryButton.classList.add("active");
         }
     }
+
+    // Add logout button at the bottom of the panel only on Home screen
+    if (contentType === "Home") {
+        addLogoutButton();
+    } else {
+        // Remove logout button if it exists when not on Home screen
+        const existingLogoutBtn = document.getElementById("logoutPanelBtn");
+        if (existingLogoutBtn) {
+            existingLogoutBtn.remove();
+        }
+    }
+}
+
+// Function to add logout button at the bottom of the left panel
+function addLogoutButton() {
+    const categoryPanel = document.getElementById("category-panel");
+    
+    // Remove existing logout button if any
+    const existingLogoutBtn = document.getElementById("logoutPanelBtn");
+    if (existingLogoutBtn) {
+        existingLogoutBtn.remove();
+    }
+    
+    // Create logout button
+    const logoutButton = document.createElement("button");
+    logoutButton.id = "logoutPanelBtn";
+    logoutButton.className = "category logout-btn";
+    logoutButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+            stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Logout
+    `;
+    
+    // Add click event listener
+    logoutButton.addEventListener("click", handleLogout);
+    
+    // Append to the bottom of the panel
+    categoryPanel.appendChild(logoutButton);
+    
+    // Add specific styling for logout button to keep it at the bottom
+    logoutButton.style.marginTop = "auto";
+    logoutButton.style.backgroundColor = "#dc3545";
+    logoutButton.style.borderTop = "2px solid #999";
+}
+
+// Handle logout functionality
+async function handleLogout() {
+    try {
+        // Create loading overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'logout-loading-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 59, 102, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        `;
+        
+        const spinner = document.createElement('div');
+        spinner.style.cssText = `
+            border: 6px solid rgba(255, 255, 255, 0.2);
+            border-top: 6px solid #FFFFFF;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        `;
+        
+        // Add keyframes for spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        overlay.appendChild(spinner);
+        document.body.appendChild(overlay);
+        
+        // Small delay to show the overlay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Call logout IPC
+        await ipcRenderer.invoke("logout");
+        
+        // Redirect to login page
+        window.location.href = "login.html";
+    } catch (error) {
+        console.error("Error during logout:", error);
+        // Remove overlay if there's an error
+        const overlay = document.getElementById('logout-loading-overlay');
+        if (overlay) {
+            overlay.remove();
+        }
+    }
 }
 
 module.exports = { updateLeftPanel };
